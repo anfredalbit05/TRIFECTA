@@ -1,0 +1,118 @@
+/* Hero Section Container */
+.hero-section {
+    @apply relative min-h-[600px] lg:min-h-[700px] overflow-hidden flex items-center;
+}
+
+/* Background & Overlays */
+.hero-bg-container {
+    @apply absolute inset-0;
+}
+
+.hero-image {
+    @apply w-full h-full object-cover;
+}
+
+.hero-overlay {
+    @apply absolute inset-0 bg-[#0C2C6B]/80;
+}
+
+.hero-glow-gold {
+    @apply absolute -top-20 -right-[100px] h-[300px] w-[300px] lg:h-[600px] lg:w-[600px] rounded-full bg-[#D79B10]/20 blur-3xl pointer-events-none;
+}
+
+.hero-glow-blue {
+    @apply absolute -bottom-32 -left-32 h-[300px] w-[300px] lg:h-[500px] lg:w-[500px] rounded-full bg-[#123B86]/50 blur-3xl pointer-events-none;
+}
+
+/* Layout & Content Area */
+.hero-content-wrapper {
+    @apply relative z-10 w-full pt-2 pb-12 lg:pt-0 lg:pb-6;
+}
+
+.hero-container {
+    @apply mx-auto max-w-7xl px-6 sm:px-8 lg:px-12;
+}
+
+.hero-grid {
+    @apply grid items-center gap-10 lg:grid-cols-2;
+}
+
+/* Left Column Elements */
+.hero-left-col {
+    @apply -mt-12 sm:-mt-16 lg:-mt-20; /* Pulls content higher up */
+}
+
+.hero-badge {
+    @apply inline-flex items-center gap-2.5 rounded-full border border-[#E5B83B]/40 bg-white/10 px-4 py-1.5 backdrop-blur-xl;
+}
+
+.hero-badge-dot {
+    @apply h-2 w-2 rounded-full bg-[#E5B83B];
+}
+
+.hero-badge-text {
+    @apply text-xs font-semibold tracking-widest uppercase text-[#E5B83B];
+}
+
+.hero-title {
+    @apply mt-4 font-black tracking-tight leading-tight text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl;
+}
+
+.hero-title-highlight {
+    @apply text-[#E5B83B];
+}
+
+.hero-accent-line {
+    @apply mt-4 h-1 w-20 rounded-full bg-[#D79B10];
+}
+
+.hero-description {
+    @apply mt-5 max-w-xl text-base sm:text-lg leading-relaxed text-blue-100;
+}
+
+/* Buttons */
+.hero-btn-group {
+    @apply mt-8 flex flex-col sm:flex-row gap-4;
+}
+
+.hero-btn-primary {
+    @apply rounded-full bg-[#D79B10] px-8 py-3.5 text-center font-bold text-[#0C2C6B] shadow-lg shadow-[#D79B10]/30 transition duration-300 hover:-translate-y-0.5 hover:bg-[#E5B83B];
+}
+
+.hero-btn-secondary {
+    @apply rounded-full border border-white/30 bg-white/10 px-8 py-3.5 text-center font-bold text-white backdrop-blur-xl transition duration-300 hover:bg-white hover:text-[#0C2C6B];
+}
+
+/* Right Column Elements */
+.hero-right-col {
+    @apply hidden lg:flex justify-center lg:translate-x-10 xl:translate-x-16;
+}
+
+.hero-logo-box {
+    @apply rounded-full bg-white/10 p-8 backdrop-blur-xl border border-white/20 shadow-2xl;
+}
+
+.hero-logo-img {
+    @apply w-64 xl:w-72;
+}
+
+.hero-card-members {
+    @apply absolute -left-8 top-6 rounded-2xl bg-white/10 border border-white/20 p-4 backdrop-blur-xl shadow-xl;
+}
+
+.hero-card-support {
+    @apply absolute -right-8 bottom-6 rounded-2xl bg-white/10 border border-white/20 p-4 backdrop-blur-xl shadow-xl;
+}
+
+.hero-card-title {
+    @apply text-2xl font-black text-[#E5B83B];
+}
+
+.hero-card-subtext {
+    @apply text-xs font-medium text-white;
+}
+
+/* Bottom Bar Accent */
+.hero-bottom-bar {
+    @apply absolute bottom-0 left-0 h-1.5 w-full bg-gradient-to-r from-[#123B86] via-[#D79B10] to-[#123B86];
+}

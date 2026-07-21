@@ -1,0 +1,163 @@
+/* Overview Section Container */
+.overview-section {
+    @apply bg-gradient-to-b from-slate-50 to-white py-20 sm:py-24 lg:py-32;
+}
+
+.overview-container {
+    @apply max-w-7xl mx-auto px-6 sm:px-8 lg:px-12;
+}
+
+.overview-grid {
+    @apply grid grid-cols-1 lg:grid-cols-12 gap-12 items-center;
+}
+
+/* Left Content Side */
+.overview-content-col {
+    @apply lg:col-span-7 space-y-6;
+}
+
+.overview-header-wrapper {
+    @apply max-w-3xl text-left;
+}
+
+.overview-tag {
+    @apply inline-block px-4 py-1.5 rounded-full bg-amber-100/80 text-amber-700 font-bold tracking-widest uppercase text-xs sm:text-sm border border-amber-200;
+}
+
+.overview-title {
+    @apply mt-4 text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0C2C6B] leading-tight;
+}
+
+.overview-title-highlight {
+    @apply text-amber-500;
+}
+
+.overview-description {
+    @apply mt-4 text-slate-600 text-base sm:text-lg leading-relaxed;
+}
+
+/* Tier Highlights */
+.overview-tiers-grid {
+    @apply bg-slate-100/70 rounded-2xl p-3 border border-slate-200 grid grid-cols-3 gap-3 text-center;
+}
+
+.overview-tier-card {
+    @apply bg-white p-3 rounded-xl shadow-sm border;
+}
+
+.overview-tier-card-bronze {
+    @apply bg-white p-3 rounded-xl shadow-sm border border-amber-200;
+}
+
+.overview-tier-card-silver {
+    @apply bg-white p-3 rounded-xl shadow-sm border border-slate-300;
+}
+
+.overview-tier-card-gold {
+    @apply bg-white p-3 rounded-xl shadow-sm border border-amber-400;
+}
+
+.overview-tier-label-bronze {
+    @apply text-xs font-bold text-amber-800 uppercase;
+}
+
+.overview-tier-label-silver {
+    @apply text-xs font-bold text-slate-700 uppercase;
+}
+
+.overview-tier-label-gold {
+    @apply text-xs font-bold text-amber-600 uppercase;
+}
+
+.overview-tier-val {
+    @apply text-sm sm:text-base font-extrabold text-[#0C2C6B];
+}
+
+/* Core Features Cards */
+.overview-features-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2;
+}
+
+.overview-feature-card {
+    @apply flex items-start space-x-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm;
+}
+
+.overview-feature-icon {
+    @apply flex-shrink-0 p-2.5 rounded-xl font-bold shadow-sm border;
+}
+
+.overview-feature-icon-blue {
+    @apply flex-shrink-0 p-2.5 rounded-xl font-bold shadow-sm border bg-blue-50 text-[#0C2C6B] border-blue-100;
+}
+
+.overview-feature-icon-amber {
+    @apply flex-shrink-0 p-2.5 rounded-xl font-bold shadow-sm border bg-amber-50 text-amber-600 border-amber-100;
+}
+
+.overview-feature-icon-emerald {
+    @apply flex-shrink-0 p-2.5 rounded-xl font-bold shadow-sm border bg-emerald-50 text-emerald-600 border-emerald-100;
+}
+
+.overview-feature-icon-indigo {
+    @apply flex-shrink-0 p-2.5 rounded-xl font-bold shadow-sm border bg-indigo-50 text-indigo-600 border-indigo-100;
+}
+
+.overview-feature-heading {
+    @apply text-sm font-bold text-[#0C2C6B];
+}
+
+.overview-feature-text {
+    @apply text-xs text-slate-500 mt-1 leading-relaxed;
+}
+
+/* Key Metrics Stats */
+.overview-stats-grid {
+    @apply grid grid-cols-3 gap-4 pt-4 border-t border-slate-200 text-left;
+}
+
+.overview-stat-val {
+    @apply text-2xl sm:text-3xl font-black text-[#0C2C6B];
+}
+
+.overview-stat-label {
+    @apply text-xs font-medium text-slate-500 mt-0.5;
+}
+
+/* Action Buttons */
+.overview-btn-group {
+    @apply pt-2 flex flex-col sm:flex-row gap-3;
+}
+
+.overview-btn-primary {
+    @apply inline-flex justify-center items-center px-6 py-3.5 bg-[#0C2C6B] hover:bg-blue-900 text-white font-bold text-sm rounded-xl transition duration-200 shadow-md hover:shadow-lg;
+}
+
+.overview-btn-secondary {
+    @apply inline-flex justify-center items-center px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl transition duration-200 border border-slate-200;
+}
+
+/* Right Media Side */
+.overview-media-col {
+    @apply lg:col-span-5 relative;
+}
+
+.overview-image-wrapper {
+    @apply relative mx-auto max-w-md lg:max-w-none rounded-3xl overflow-hidden shadow-2xl border-4 border-white;
+}
+
+.overview-image {
+    @apply w-full h-[480px] object-cover;
+}
+
+.overview-image-overlay {
+    @apply absolute inset-0 bg-gradient-to-t from-[#0C2C6B]/80 via-transparent to-transparent;
+}
+
+/* Floating Cards & Badges */
+.overview-pricing-card {
+    @apply absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-slate-100 flex items-center justify-between;
+}
+
+.overview-partner-badge {
+    @apply absolute -top-4 -left-2 bg-[#0C2C6B] text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg tracking-wide border-2 border-white;
+}
