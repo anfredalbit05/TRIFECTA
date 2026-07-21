@@ -35,32 +35,32 @@
 
                 <!-- Home Link -->
                 <a href="{{ route('home') }}"
-                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('/') ? 'bg-[#D79B10] font-bold text-[#0C2C6B] shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('/') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     Home
                 </a>
 
                 <!-- About Link -->
                 <a href="{{ route('about') }}"
-                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('about*') ? 'bg-[#D79B10] font-bold text-[#0C2C6B] shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('about*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     About
                 </a>
 
                 <!-- Team Link -->
                 <a href="{{ route('team') }}"
-                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('team*') ? 'bg-[#D79B10] font-bold text-[#0C2C6B] shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('team*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     Team
                 </a>
 
                 <!-- How It Works Link -->
                 <a href="{{ route('how-it-works') }}"
-                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('how-it-works*') ? 'bg-[#D79B10] font-bold text-[#0C2C6B] shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('how-it-works*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     How It Works
                 </a>
 
                 <!-- News Link -->
                 <a href="{{ route('news') }}"
-                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('news*') ? 'bg-[#D79B10] font-bold text-[#0C2C6B] shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
-                    News
+                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('news*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+                    News & Updates
                 </a>
 
             </div>
@@ -70,7 +70,7 @@
 
                 <button
                     onclick="Livewire.dispatch('open-application-modal')"
-                    class="rounded-full bg-[#D79B10] px-6 py-2.5 text-sm font-extrabold text-[#0C2C6B] shadow-lg shadow-[#D79B10]/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#E5B83B] hover:shadow-xl">
+                    class="rounded-full bg-[#D79B10] px-6 py-2.5 text-sm font-extrabold text-white shadow-lg shadow-[#D79B10]/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#E5B83B] hover:shadow-xl">
                     JOIN
                 </button>
 
@@ -128,34 +128,34 @@
             <div class="mt-2 space-y-2 rounded-3xl border border-white/10 bg-[#071D3F]/90 p-4 backdrop-blur-xl">
 
                 <a href="{{ route('home') }}"
-                   class="block rounded-xl py-3 text-center transition {{ request()->is('/') ? 'bg-[#D79B10] font-bold text-[#0C2C6B]' : 'font-semibold text-white hover:bg-white/10' }}">
+                   class="block rounded-xl py-3 text-center transition {{ request()->is('/') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
                     Home
                 </a>
 
                 <a href="{{ route('about') }}"
-                   class="block rounded-xl py-3 text-center transition {{ request()->is('about*') ? 'bg-[#D79B10] font-bold text-[#0C2C6B]' : 'font-semibold text-white hover:bg-white/10' }}">
+                   class="block rounded-xl py-3 text-center transition {{ request()->is('about*') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
                     About Us
                 </a>
 
                 <a href="{{ route('team') }}"
-                   class="block rounded-xl py-3 text-center transition {{ request()->is('team*') ? 'bg-[#D79B10] font-bold text-[#0C2C6B]' : 'font-semibold text-white hover:bg-white/10' }}">
+                   class="block rounded-xl py-3 text-center transition {{ request()->is('team*') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
                     Team
                 </a>
 
                 <a href="{{ route('how-it-works') }}"
-                   class="block rounded-xl py-3 text-center transition {{ request()->is('how-it-works*') ? 'bg-[#D79B10] font-bold text-[#0C2C6B]' : 'font-semibold text-white hover:bg-white/10' }}">
+                   class="block rounded-xl py-3 text-center transition {{ request()->is('how-it-works*') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
                     How It Works
                 </a>
 
                 <a href="{{ route('news') }}"
-                   class="block rounded-xl py-3 text-center transition {{ request()->is('news*') ? 'bg-[#D79B10] font-bold text-[#0C2C6B]' : 'font-semibold text-white hover:bg-white/10' }}">
+                   class="block rounded-xl py-3 text-center transition {{ request()->is('news*') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
                     News & Updates
                 </a>
 
                 <div class="pt-2 border-t border-white/10 flex flex-col gap-2">
                     <button
                         onclick="Livewire.dispatch('open-application-modal')"
-                        class="w-full rounded-xl bg-[#D79B10] py-3 font-bold text-[#0C2C6B] transition hover:bg-[#E5B83B]">
+                        class="w-full rounded-xl bg-[#D79B10] py-3 font-bold text-white transition hover:bg-[#E5B83B]">
                         JOIN
                     </button>
 

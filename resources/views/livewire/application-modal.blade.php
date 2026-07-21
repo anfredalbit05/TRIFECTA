@@ -49,6 +49,27 @@
                             </div>
 
                             <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Gender *</label>
+                                <select wire:model="gender" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none bg-white">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Civil Status *</label>
+                                <select wire:model="civil_status" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none bg-white">
+                                    <option value="">Select Status</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Widowed">Widowed</option>
+                                    <option value="Separated">Separated</option>
+                                </select>
+                            </div>
+
+                            <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Birthdate *</label>
                                 <input wire:model="birthdate" type="date" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
                             </div>
