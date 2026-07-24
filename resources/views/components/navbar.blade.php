@@ -57,10 +57,22 @@
                     How It Works
                 </a>
 
+                   <!-- How It Works Link -->
+                <a href="{{ route('testimonials') }}"
+                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('testimonials*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+                    Testimonials
+                </a>
+
                 <!-- News Link -->
                 <a href="{{ route('news') }}"
                    class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('news*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     News & Updates
+                </a>
+
+                   <!-- News Link -->
+                <a href="{{ route('contact') }}"
+                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('contact*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+                    Contact Us
                 </a>
 
             </div>

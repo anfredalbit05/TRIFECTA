@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @import "./components/home/hero.css";
 @import "./components/home/details.css";
+@import "./pages/testimonials.css";
+@import "./pages/how-it-works.css";
+@import "./pages/about.css";
+@import "./pages/new.css";
+@import "./pages/contact.css";
+@import "./pages/team.css";
 
 @theme {
 

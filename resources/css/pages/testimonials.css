@@ -1,0 +1,159 @@
+/* ===================================================
+   HERO SECTION
+=================================================== */
+
+.testimonials-hero {
+    @apply relative overflow-hidden bg-gradient-to-br from-[#0B2A5B] via-[#123B78] to-[#071D3F] py-24 text-white;
+}
+
+.testimonials-hero-glow-top {
+    @apply absolute -top-20 -left-20 w-80 h-80 rounded-full bg-[#D4A017]/20 blur-3xl pointer-events-none;
+}
+
+.testimonials-hero-glow-bottom {
+    @apply absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none;
+}
+
+.testimonials-container {
+    @apply relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12;
+}
+
+.testimonials-container-center {
+    @apply relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 text-center;
+}
+
+.testimonials-tag {
+    @apply uppercase tracking-[0.3em] text-[#FFD54A] font-bold text-sm block;
+}
+
+.testimonials-title {
+    @apply mt-5 text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight;
+}
+
+.testimonials-title-highlight {
+    @apply text-[#FFD54A];
+}
+
+.testimonials-description {
+    @apply mt-8 max-w-3xl mx-auto text-base sm:text-lg text-slate-300 leading-relaxed;
+}
+
+/* =========================
+   INTRO
+========================= */
+
+.testimonials-intro{
+    @apply py-20 bg-white;
+}
+
+.testimonials-intro-container{
+    @apply max-w-4xl mx-auto px-6 text-center;
+}
+
+.testimonials-small-title{
+    @apply uppercase tracking-widest font-bold;
+    color:#D4A017;
+}
+
+.testimonials-heading{
+    @apply mt-4 text-4xl font-black;
+    color:#0B2A5B;
+}
+
+.testimonials-text{
+    @apply mt-6 text-lg text-slate-600 leading-8;
+}
+
+/* =========================
+   TESTIMONIALS
+========================= */
+
+.testimonials-section{
+    @apply py-20 bg-slate-50;
+}
+
+.testimonials-grid{
+    @apply grid md:grid-cols-2 lg:grid-cols-3 gap-8;
+}
+
+.testimonial-card{
+    @apply bg-white rounded-3xl shadow-lg p-8;
+}
+
+.testimonial-quote{
+    @apply text-5xl;
+    color:#D4A017;
+}
+
+.testimonial-body{
+    @apply mt-6 text-slate-600 leading-7 italic;
+}
+
+.testimonial-footer{
+    @apply mt-8 border-t pt-6;
+}
+
+.testimonial-name{
+    @apply font-bold;
+    color:#0B2A5B;
+}
+
+.testimonial-role{
+    @apply text-sm text-slate-500;
+}
+
+/* =========================
+   HIGHLIGHTS
+========================= */
+
+.testimonials-highlights{
+    padding:5rem 0;
+    color:white;
+    background:#0B2A5B;
+}
+
+.testimonials-highlights-grid{
+    @apply grid grid-cols-2 lg:grid-cols-4 gap-10 text-center;
+}
+
+.testimonial-highlight-icon{
+    @apply text-4xl font-black;
+    color:#FFD54A;
+}
+
+.testimonial-highlight-title{
+    @apply mt-4 text-xl font-bold;
+}
+
+/* =========================
+   CTA
+========================= */
+
+.testimonials-cta{
+    @apply py-20 bg-white;
+}
+
+.testimonials-buttons{
+    @apply mt-10 flex flex-col sm:flex-row justify-center gap-4;
+}
+
+.testimonial-btn-primary{
+    @apply px-8 py-4 rounded-xl font-bold transition;
+    background:#D4A017;
+    color:#0B2A5B;
+}
+
+.testimonial-btn-primary:hover{
+    background:#facc15;
+}
+
+.testimonial-btn-secondary{
+    @apply px-8 py-4 rounded-xl transition;
+    border:1px solid #0B2A5B;
+    color:#0B2A5B;
+}
+
+.testimonial-btn-secondary:hover{
+    background:#0B2A5B;
+    color:white;
+}

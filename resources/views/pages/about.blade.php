@@ -4,177 +4,411 @@
 
 @section('content')
 
-<!-- ABOUT HERO SECTION -->
-<section class="relative bg-gradient-to-b from-[#0B2A5B] to-[#071D3F] py-16 sm:py-20 lg:py-28 text-white overflow-hidden">
-    <!-- Decorative Glows -->
-    <div class="absolute -top-24 -right-24 h-72 w-72 sm:h-96 sm:w-96 rounded-full bg-[#D4A017]/20 blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-24 -left-24 h-72 w-72 sm:h-96 sm:w-96 rounded-full bg-[#163E7A]/50 blur-3xl pointer-events-none"></div>
+<!-- ======================================
+     HERO SECTION
+====================================== -->
+<section class="about-hero">
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <span class="inline-block px-3.5 py-1.5 rounded-full bg-[#D4A017]/20 text-[#E8B923] font-bold tracking-widest uppercase text-[11px] sm:text-xs border border-[#D4A017]/30">
-            Solidaritas • Vitae Auxilium
+    <div class="about-hero-glow-top"></div>
+    <div class="about-hero-glow-bottom"></div>
+
+    <div class="about-container-center">
+
+        <span class="about-hero-badge">
+            Helping Hands • Caring Heart
         </span>
 
-        <h1 class="mt-4 sm:mt-6 text-2xl xs:text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-snug sm:leading-tight">
-            Empowering Communities Through <br class="hidden sm:block" />
-            <span class="text-[#E8B923]">Protection & Compassion</span>
+        <h1 class="about-hero-title">
+            Building a
+            <span class="about-hero-title-highlight">
+                Loving & Protected
+            </span>
+            Community
         </h1>
 
-        <p class="mt-4 sm:mt-6 max-w-3xl mx-auto text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed px-2">
-            DAYONGAN is a dedicated community support platform operating in official partnership with <strong>COCOGEN Insurance</strong>. We bridge the gap between families and essential financial, medical, and micro-insurance support.
+        <p class="about-hero-description">
+            <strong>TRUELIFE DAYONGAN SOLIDARITAS</strong>
+            Social Welfare Services and Financial Literacy Inc.
+            is committed to providing affordable community-based
+            protection and financial assistance for Filipino families.
+            Through solidarity, compassion, protection, and hope,
+            we empower communities to build a safer and stronger future.
         </p>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     ABOUT DAYONGAN
+========================= -->
+<section class="py-20 bg-white">
+    <div class="about-container">
+        <div class="about-container-center">
+            <span class="about-section-label-gold">Who We Are</span>
+
+            <h2 class="about-section-title-dark">
+                About DAYONGAN
+            </h2>
+
+            <p class="mt-6 text-slate-600 text-lg leading-8">
+                DAYONGAN believes that every Filipino family deserves
+                affordable protection, dignity, and hope.
+                Through community cooperation and financial literacy,
+                we provide accessible welfare services that strengthen
+                families during life's most difficult moments.
+            </p>
+        </div>
     </div>
 </section>
 
+<!-- =========================
+     VISION & MISSION
+========================= -->
+<section class="py-20 bg-slate-50">
+    <div class="about-container">
+        <div class="about-vm-grid">
 
-<!-- MISSION, VISION & STORY SECTION -->
-<section class="py-12 sm:py-16 lg:py-20 bg-slate-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <!-- Vision -->
+            <div class="about-vm-card-vision">
+                <div class="about-vm-icon">👁️</div>
 
-            <!-- Left Text Content -->
-            <div class="space-y-4 sm:space-y-6">
-                <span class="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#D4A017] block">Who We Are</span>
-                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B2A5B] leading-tight">
-                    Built to protect families when they need it most.
+                <h2 class="about-vm-title">
+                    PANAN-AWON
+                    <span class="text-[#D4A017]">(VISION)</span>
                 </h2>
-                <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Founded on the principles of community solidarity and mutual aid, DAYONGAN provides structured, accessible micro-insurance and health assistance for primary account holders and their families.
+
+                <p class="about-vm-text">
+                    Ang pagtataguyod ng isang
+                    <strong>mapagmahal at protektadong komunidad</strong>
+                    kung saan ang bawat pamilyang Pilipino,
+                    lalo na ang mga kapos-palad,
+                    ay may
+                    <strong>
+                        abot-kaya at kayang tustusan na proteksyon,
+                        dignidad, at pag-asa
+                    </strong>
+                    sa panahon ng pagsubok.
                 </p>
-                <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Whether facing unexpected medical emergencies, accidents, or life events, our mission is to ensure every member moves forward with dignity and financial peace of mind.
+            </div>
+
+            <!-- Mission -->
+            <div class="about-vm-card-mission">
+                <div class="about-vm-icon">🎯</div>
+
+                <h2 class="about-vm-title">
+                    MISYON
+                    <span class="text-[#D4A017]">(MISSION)</span>
+                </h2>
+
+                <p class="about-vm-text">
+                    Ang DAYONGAN ay nagsisikap na magbigay ng
+                    <strong>abot-kaya at nakabatay sa komunidad</strong>
+                    na proteksyon at mga benepisyo upang
+                    matulungan, maprotektahan,
+                    at mapatatag ang buhay ng bawat pamilya
+                    sa pamamagitan ng diwa ng
+                    <strong>"Pagtutulungan at Pagkakaisa."</strong>
                 </p>
-
-                <!-- Mission & Vision Cards -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 sm:pt-4">
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm transition hover:shadow-md">
-                        <div class="text-2xl mb-2">🎯</div>
-                        <h3 class="font-bold text-[#0B2A5B] text-base">Our Mission</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">To deliver transparent, accessible, and fast assistance to every Filipino household.</p>
-                    </div>
-
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm transition hover:shadow-md">
-                        <div class="text-2xl mb-2">👁️</div>
-                        <h3 class="font-bold text-[#0B2A5B] text-base">Our Vision</h3>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">A resilient community where no family faces financial hardship alone.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Visual Box -->
-            <div class="relative mt-6 lg:mt-0">
-                <div class="relative mx-auto rounded-3xl overflow-hidden shadow-2xl border-2 sm:border-4 border-white max-w-lg lg:max-w-none">
-                    <img src="{{ asset('images/hero-bg.jpg') }}" alt="Dayongan Community Support" class="w-full h-[320px] sm:h-[400px] lg:h-[450px] object-cover">
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#0B2A5B]/90 via-[#0B2A5B]/20 to-transparent"></div>
-
-                    <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 right-5 sm:right-6 text-white">
-                        <p class="text-[10px] sm:text-xs uppercase tracking-wider text-[#E8B923] font-bold">Official Partner</p>
-                        <h3 class="text-lg sm:text-xl font-bold mt-0.5">COCOGEN Insurance</h3>
-                        <p class="text-xs text-slate-200 mt-1 leading-normal">Providing trusted micro-insurance and assistance solutions.</p>
-                    </div>
-                </div>
             </div>
 
         </div>
     </div>
 </section>
 
+<!-- =========================
+     CORE VALUES
+========================= -->
+<section class="py-20 bg-white">
+    <div class="about-container">
 
-<!-- CORE VALUES SECTION -->
-<section class="py-12 sm:py-16 lg:py-20 bg-white border-t border-slate-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-2xl mx-auto">
-            <span class="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#D4A017] block">Guiding Principles</span>
-            <h2 class="mt-1 sm:mt-2 text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B2A5B]">Our Core Values</h2>
-            <p class="mt-2 text-sm sm:text-base text-slate-600">The standards that guide every decision and claim we process.</p>
+        <div class="text-center">
+            <span class="about-section-label-gold">
+                Our Foundation
+            </span>
+
+            <h2 class="about-section-title-dark">
+                Core Values
+            </h2>
+
+            <p class="mt-4 text-slate-600 max-w-2xl mx-auto">
+                These values guide every service and every decision we make for
+                Filipino families and communities.
+            </p>
         </div>
 
-        <div class="mt-8 sm:mt-12 grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div class="about-values-grid">
 
-            <div class="p-5 sm:p-6 bg-slate-50 rounded-2xl border border-slate-200/80 transition hover:border-[#0B2A5B]/30">
-                <div class="h-11 w-11 sm:h-12 sm:w-12 rounded-xl bg-[#0B2A5B]/10 text-[#0B2A5B] flex items-center justify-center font-bold text-xl mb-3 sm:mb-4">
-                    🤝
-                </div>
-                <h3 class="font-bold text-base sm:text-lg text-[#0B2A5B]">Solidarity</h3>
-                <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">Standing together with our members through life’s triumphs and challenges.</p>
+            <div class="about-value-card">
+                <div class="about-value-icon-blue">🤝</div>
+                <h3 class="about-value-title">Pagtutulungan</h3>
+                <p class="about-value-text">Tulungan ang Kapwa</p>
             </div>
 
-            <div class="p-5 sm:p-6 bg-slate-50 rounded-2xl border border-slate-200/80 transition hover:border-[#D4A017]/30">
-                <div class="h-11 w-11 sm:h-12 sm:w-12 rounded-xl bg-[#D4A017]/10 text-[#D4A017] flex items-center justify-center font-bold text-xl mb-3 sm:mb-4">
-                    🛡️
-                </div>
-                <h3 class="font-bold text-base sm:text-lg text-[#0B2A5B]">Integrity</h3>
-                <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">Maintaining total transparency in our benefits, coverage, and operations.</p>
+            <div class="about-value-card">
+                <div class="about-value-icon-gold">🛡️</div>
+                <h3 class="about-value-title">Proteksyon</h3>
+                <p class="about-value-text">Paunang Pag-alaga</p>
             </div>
 
-            <div class="p-5 sm:p-6 bg-slate-50 rounded-2xl border border-slate-200/80 transition hover:border-emerald-500/30">
-                <div class="h-11 w-11 sm:h-12 sm:w-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xl mb-3 sm:mb-4">
-                    ⚡
-                </div>
-                <h3 class="font-bold text-base sm:text-lg text-[#0B2A5B]">Accessibility</h3>
-                <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">Ensuring protection is affordable and simple to apply for every household.</p>
+            <div class="about-value-card">
+                <div class="about-value-icon-blue">👨‍👩‍👧‍👦</div>
+                <h3 class="about-value-title">Pamilya</h3>
+                <p class="about-value-text">Una sa Lahat</p>
             </div>
 
-            <div class="p-5 sm:p-6 bg-slate-50 rounded-2xl border border-slate-200/80 transition hover:border-indigo-500/30">
-                <div class="h-11 w-11 sm:h-12 sm:w-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xl mb-3 sm:mb-4">
-                    ❤️
+            <div class="about-value-card">
+                <div class="about-value-icon-gold">✔️</div>
+                <h3 class="about-value-title">Integridad</h3>
+                <p class="about-value-text">Tapat at Totoo</p>
+            </div>
+
+            <div class="about-value-card">
+                <div class="about-value-icon-blue">❤️</div>
+                <h3 class="about-value-title">Pagkakaisa</h3>
+                <p class="about-value-text">Magkaisa, Magtagumpay</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- =========================
+     OBJECTIVES
+========================= -->
+<section class="about-objectives-section">
+    <div class="about-container">
+        <div class="about-objectives-grid">
+
+            <!-- Left -->
+            <div>
+                <span class="about-section-label-yellow">
+                    Our Objectives
+                </span>
+
+                <h2 class="about-section-title-white">
+                    Mga Katuyoan
+                    <span class="text-[#FFD54A]">(Objectives)</span>
+                </h2>
+
+                <div class="about-objectives-list">
+
+                    <div class="about-objective-item">
+                        <div class="about-objective-check">✔</div>
+                        <p>Magbigay ng barato ug maabot nga serbisyo sa proteksyon alang sa ordinaryong pamilya Pilipino.</p>
+                    </div>
+
+                    <div class="about-objective-item">
+                        <div class="about-objective-check">✔</div>
+                        <p>Magtabang dayon sa panahon sa aksidente, pagkasakit, ug kamatayon.</p>
+                    </div>
+
+                    <div class="about-objective-item">
+                        <div class="about-objective-check">✔</div>
+                        <p>Magpahiug-ot sa panaghiusa, pagtinabangay, ug pag-amuma sa komunidad.</p>
+                    </div>
+
+                    <div class="about-objective-item">
+                        <div class="about-objective-check">✔</div>
+                        <p>Maghatag og paglaum ug seguridad sa mga kabus ug nanginahanglan.</p>
+                    </div>
+
+                    <div class="about-objective-item">
+                        <div class="about-objective-check">✔</div>
+                        <p>Magsiguro nga walay pamilya nga biyaan sa kalisod.</p>
+                    </div>
+
                 </div>
-                <h3 class="font-bold text-base sm:text-lg text-[#0B2A5B]">Compassion</h3>
-                <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">Delivering support with care, empathy, and speed when claims are made.</p>
+            </div>
+
+            <!-- Right -->
+            <div>
+                <img
+                    src="{{ asset('images/dayongan-objectives.jpg') }}"
+                    alt="DAYONGAN Objectives"
+                    class="about-hero-img">
             </div>
 
         </div>
     </div>
 </section>
 
+<!-- =========================
+     WHY CHOOSE DAYONGAN
+========================= -->
+<section class="py-20 bg-slate-50">
+    <div class="about-container">
 
-<!-- STATS BAR -->
-<section class="py-12 sm:py-16 bg-[#0B2A5B] text-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 text-center">
-            <div class="p-2">
-                <div class="text-2xl sm:text-4xl font-black text-[#E8B923]">500+</div>
-                <div class="text-xs sm:text-sm text-slate-300 mt-1 font-medium">Active Members</div>
+        <div class="about-container-center">
+            <span class="about-section-label-gold">
+                Why Choose DAYONGAN
+            </span>
+
+            <h2 class="about-section-title-dark">
+                Protecting Filipino Families with Care
+            </h2>
+
+            <p class="mt-5 text-lg text-slate-600 leading-8">
+                DAYONGAN is more than a membership program. It is a community
+                built on compassion, protection, and solidarity. We strive to
+                ensure that every Filipino family has access to affordable
+                assistance during life's most difficult moments.
+            </p>
+        </div>
+
+        <div class="about-feature-grid">
+
+            <div class="about-feature-card">
+                <div class="about-feature-icon-blue">🛡️</div>
+                <h3 class="about-feature-title">Affordable Protection</h3>
+                <p class="about-feature-text">
+                    Community-based protection programs that every Filipino family can afford.
+                </p>
             </div>
-            <div class="p-2">
-                <div class="text-2xl sm:text-4xl font-black text-[#E8B923]">13+</div>
-                <div class="text-xs sm:text-sm text-slate-300 mt-1 font-medium">Benefit Categories</div>
+
+            <div class="about-feature-card">
+                <div class="about-feature-icon-gold">❤️</div>
+                <h3 class="about-feature-title">Caring Community</h3>
+                <p class="about-feature-text">
+                    We strengthen families through cooperation, compassion, and mutual support.
+                </p>
             </div>
-            <div class="p-2">
-                <div class="text-2xl sm:text-4xl font-black text-[#E8B923]">0–100</div>
-                <div class="text-xs sm:text-sm text-slate-300 mt-1 font-medium">Age Eligibility</div>
+
+            <div class="about-feature-card">
+                <div class="about-feature-icon-blue">🤝</div>
+                <h3 class="about-feature-title">Community Solidarity</h3>
+                <p class="about-feature-text">
+                    We believe every member contributes to a stronger, united, and resilient community.
+                </p>
             </div>
-            <div class="p-2">
-                <div class="text-2xl sm:text-4xl font-black text-[#E8B923]">24/7</div>
-                <div class="text-xs sm:text-sm text-slate-300 mt-1 font-medium">Community Support</div>
+
+            <div class="about-feature-card">
+                <div class="about-feature-icon-gold">🌱</div>
+                <h3 class="about-feature-title">Hope for the Future</h3>
+                <p class="about-feature-text">
+                    Together we build a future where no family is left behind during times of hardship.
+                </p>
             </div>
+
         </div>
     </div>
 </section>
 
+<!-- =========================
+     DAYONGAN HIGHLIGHTS
+========================= -->
+<section class="about-highlights-section">
+    <div class="about-container">
 
-<!-- CALL TO ACTION -->
-<section class="py-12 sm:py-16 lg:py-20 bg-slate-50 text-center">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B2A5B] leading-tight">
-            Ready to Protect What Matters Most?
+        <div class="text-center">
+            <span class="about-section-label-yellow">
+                DAYONGAN at a Glance
+            </span>
+
+            <h2 class="about-section-title-white">
+                Our Commitment
+            </h2>
+        </div>
+
+        <div class="about-highlights-grid">
+
+            <div class="about-highlight-card">
+                <div class="about-highlight-icon">👨‍👩‍👧‍👦</div>
+                <h3 class="about-highlight-title">Family</h3>
+                <p class="about-highlight-text">
+                    Every decision begins with protecting Filipino families.
+                </p>
+            </div>
+
+            <div class="about-highlight-card">
+                <div class="about-highlight-icon">🛡️</div>
+                <h3 class="about-highlight-title">Protection</h3>
+                <p class="about-highlight-text">
+                    Affordable community-based welfare and financial assistance.
+                </p>
+            </div>
+
+            <div class="about-highlight-card">
+                <div class="about-highlight-icon">🤝</div>
+                <h3 class="about-highlight-title">Unity</h3>
+                <p class="about-highlight-text">
+                    Working together through solidarity and cooperation.
+                </p>
+            </div>
+
+            <div class="about-highlight-card">
+                <div class="about-highlight-icon">⭐</div>
+                <h3 class="about-highlight-title">Hope</h3>
+                <p class="about-highlight-text">
+                    Bringing dignity, confidence, and hope during difficult times.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- =========================
+     CALL TO ACTION
+========================= -->
+<section class="about-cta-section">
+    <div class="about-cta-glow-left"></div>
+    <div class="about-cta-glow-right"></div>
+
+    <div class="about-cta-container">
+
+        <span class="about-section-label-yellow tracking-[0.3em]">
+            Join Our Community
+        </span>
+
+        <h2 class="about-cta-title">
+            Together We Can Build a
+            <span class="text-[#FFD54A]">
+                Safer and Stronger Future
+            </span>
         </h2>
-        <p class="mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg text-slate-600 max-w-2xl mx-auto">
-            Join DAYONGAN today and give your family the financial protection and care they deserve.
+
+        <p class="about-cta-description">
+            Become part of the DAYONGAN family and experience
+            community-based protection, financial literacy,
+            and compassionate assistance that helps every
+            Filipino family move forward with confidence and hope.
         </p>
 
-        <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-md sm:max-w-none mx-auto">
+        <div class="about-btn-group-center">
             <button
                 onclick="Livewire.dispatch('open-application-modal')"
-                class="w-full sm:w-auto px-8 py-3.5 bg-[#D4A017] hover:bg-[#E8B923] text-[#0B2A5B] font-extrabold rounded-xl shadow-lg shadow-[#D4A017]/20 transition duration-200 text-sm">
+                class="about-btn-primary">
                 Become a Member
             </button>
+
             <a
-                href="{{ route('news') }}"
-                class="w-full sm:w-auto px-8 py-3.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-xl transition duration-200 text-sm text-center">
-                Read Latest News
+                href="{{ route('contact') }}"
+                class="about-btn-secondary text-center">
+                Contact Us
             </a>
         </div>
+
+    </div>
+</section>
+
+<!-- =========================
+     QUOTE SECTION
+========================= -->
+<section class="about-quote-section">
+    <div class="about-quote-container">
+
+        <div class="about-quote-icon">❝</div>
+
+        <blockquote class="about-quote-text">
+            "Sa DAYONGAN, naniniwala kami na ang tunay na
+            lakas ng isang komunidad ay nagmumula sa
+            pagtutulungan, pagkakaisa, at malasakit
+            sa bawat pamilyang Pilipino."
+        </blockquote>
+
+        <div class="about-quote-divider"></div>
+
     </div>
 </section>
 

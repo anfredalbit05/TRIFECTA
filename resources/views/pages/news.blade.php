@@ -4,82 +4,157 @@
 
 @section('content')
 
-<!-- HERO SECTION / FEATURED STORY -->
-<section class="relative bg-gradient-to-b from-[#0B2A5B] to-[#071D3F] py-20 lg:py-28 text-white overflow-hidden">
-    <!-- Decorative Ambient Glows -->
-    <div class="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[#D4A017]/20 blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-[#163E7A]/50 blur-3xl pointer-events-none"></div>
+<!-- =========================
+     HERO / FEATURED STORY
+========================== -->
+<section class="news-hero">
+
+    <!-- Ambient Glow Effects -->
+    <div class="news-hero-glow-top"></div>
+    <div class="news-hero-glow-bottom"></div>
 
     <div class="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
 
-        <div class="text-center max-w-3xl mx-auto mb-12">
-            <span class="inline-block px-4 py-1.5 rounded-full bg-[#D4A017]/20 text-[#E8B923] font-bold tracking-widest uppercase text-xs sm:text-sm border border-[#D4A017]/30">
+        <div class="text-center max-w-3xl mx-auto">
+
+            <span class="news-hero-badge">
                 Solidaritas • Vitae Auxilium
             </span>
-            <h1 class="mt-4 text-3xl sm:text-5xl font-black tracking-tight leading-tight">
-                News, Stories & <span class="text-[#E8B923]">Community Updates</span>
+
+            <h1 class="news-hero-title">
+                News, Stories &
+                <span class="news-hero-title-highlight">
+                    Community Updates
+                </span>
             </h1>
-            <p class="mt-4 text-base sm:text-lg text-slate-300">
-                Stay informed with the latest announcements, branch updates, claim stories, and official partnerships from DAYONGAN.
+
+            <p class="news-hero-description">
+                Stay informed with the latest announcements,
+                branch updates, claim stories, and official
+                partnerships from DAYONGAN. Discover important
+                updates, community activities, and milestones
+                that highlight our continued commitment to
+                serving and supporting every member.
             </p>
         </div>
 
+    </div>
+
+</section>
+
+<!-- =========================
+     FEATURED NEWS SECTION
+========================== -->
+<section class="news-featured-section">
+
+    <div class="news-featured-container">
+
+        <div class="text-center max-w-3xl mx-auto mb-16">
+
+            <span class="news-section-label">
+                Featured Update
+            </span>
+
+            <h2 class="news-section-title">
+                Latest News & Community Highlights
+            </h2>
+
+            <p class="news-section-description">
+                Explore the latest announcements, partnerships,
+                community activities, and important updates from
+                DAYONGAN as we continue strengthening protection
+                and support for every family.
+            </p>
+
+        </div>
+
+
         <!-- FEATURED POST BANNER -->
-        <div class="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 overflow-hidden grid grid-cols-1 lg:grid-cols-12 shadow-2xl">
-            <div class="lg:col-span-7 relative h-64 sm:h-80 lg:h-auto">
-                <img src="{{ asset('images/hero-bg.jpg') }}" alt="COCOGEN Partnership Expansion" class="w-full h-full object-cover">
-                <div class="absolute top-4 left-4 bg-[#D4A017] text-[#0B2A5B] text-xs font-extrabold uppercase px-3 py-1 rounded-full shadow">
+        <div class="news-featured-card">
+
+            <div class="news-featured-image-wrapper">
+                <img src="{{ asset('images/hero-bg.jpg') }}"
+                     alt="COCOGEN Partnership Expansion"
+                     class="news-featured-image">
+
+                <div class="news-featured-tag">
                     Featured Update
                 </div>
             </div>
 
-            <div class="lg:col-span-5 p-6 sm:p-8 lg:p-10 flex flex-col justify-between">
+
+            <div class="news-featured-content">
+
                 <div>
-                    <span class="text-xs text-[#E8B923] font-semibold uppercase tracking-wider block">July 2026 • Partnership</span>
-                    <h2 class="text-xl sm:text-2xl font-bold mt-2 leading-snug">
+
+                    <span class="news-featured-meta">
+                        July 2026 • Partnership
+                    </span>
+
+
+                    <h2 class="news-featured-heading">
                         DAYONGAN Expands Community Micro-Insurance Coverage in Davao Region with COCOGEN
                     </h2>
-                    <p class="text-xs sm:text-sm text-slate-300 mt-3 leading-relaxed">
-                        Through reinforced underwriting cooperation, DAYONGAN and COCOGEN Insurance bring expanded medical reimbursement and family death assistance capabilities to thousands of households in Tagum City and Kapalong.
+
+
+                    <p class="news-featured-text">
+                        Through reinforced underwriting cooperation,
+                        DAYONGAN and COCOGEN Insurance bring expanded
+                        medical reimbursement and family death assistance
+                        capabilities to thousands of households in Tagum
+                        City and Kapalong.
                     </p>
+
                 </div>
 
-                <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
-                    <span class="text-xs text-slate-400">By Dayongan Media Team</span>
-                    <a href="#article-1" class="text-xs font-bold text-[#E8B923] hover:underline flex items-center gap-1">
-                        Read Full Story &rarr;
+
+                <div class="news-featured-footer">
+
+                    <span class="news-featured-author">
+                        By Dayongan Media Team
+                    </span>
+
+
+                    <a href="#article-1" class="news-featured-link">
+                        Read Full Story →
                     </a>
+
                 </div>
+
             </div>
+
         </div>
 
     </div>
+
 </section>
 
 
-<!-- NEWS CATEGORY FILTER BAR -->
-<section class="py-6 bg-slate-100 border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex flex-wrap items-center justify-between gap-4">
+<!-- =========================
+     CATEGORY FILTER BAR
+========================== -->
+<section class="news-filter-section">
+    <div class="news-filter-container">
 
-        <div class="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
-            <button class="px-4 py-2 bg-[#0B2A5B] text-white text-xs font-bold rounded-full shadow-sm">
+        <div class="news-filter-group">
+            <button class="news-filter-btn-active">
                 All Articles
             </button>
-            <button class="px-4 py-2 bg-white text-slate-600 hover:bg-slate-200 text-xs font-bold rounded-full border border-slate-200 transition">
+            <button class="news-filter-btn">
                 Announcements
             </button>
-            <button class="px-4 py-2 bg-white text-slate-600 hover:bg-slate-200 text-xs font-bold rounded-full border border-slate-200 transition">
+            <button class="news-filter-btn">
                 Partnerships
             </button>
-            <button class="px-4 py-2 bg-white text-slate-600 hover:bg-slate-200 text-xs font-bold rounded-full border border-slate-200 transition">
+            <button class="news-filter-btn">
                 Community Stories
             </button>
-            <button class="px-4 py-2 bg-white text-slate-600 hover:bg-slate-200 text-xs font-bold rounded-full border border-slate-200 transition">
+            <button class="news-filter-btn">
                 Health & Wellness
             </button>
         </div>
 
-        <div class="text-xs text-slate-500 font-medium">
+        <div class="news-filter-count">
             Showing <span class="font-bold text-[#0B2A5B]">6 Latest Updates</span>
         </div>
 
@@ -87,158 +162,160 @@
 </section>
 
 
-<!-- ARTICLE GRID SECTION -->
-<section class="py-16 bg-slate-50">
+<!-- =========================
+     ARTICLE GRID SECTION
+========================== -->
+<section class="news-grid-section">
     <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="news-grid">
 
             <!-- Article 1 -->
-            <article class="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between">
+            <article class="news-card">
                 <div>
-                    <div class="relative h-48 bg-slate-100">
-                        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Health Perks Launch" class="w-full h-full object-cover">
-                        <span class="absolute top-3 left-3 bg-emerald-600 text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">
+                    <div class="news-card-image-wrapper">
+                        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Health Perks Launch" class="news-card-image">
+                        <span class="news-card-badge news-badge-health">
                             Health Perks
                         </span>
                     </div>
-                    <div class="p-6">
-                        <span class="text-xs font-medium text-slate-400">June 28, 2026</span>
-                        <h3 class="text-lg font-bold text-[#0B2A5B] mt-1 leading-snug">
+                    <div class="news-card-body">
+                        <span class="news-card-date">June 28, 2026</span>
+                        <h3 class="news-card-title">
                             Annual Physical Exam & Dental Checkup Reimbursements Now Active
                         </h3>
-                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                        <p class="news-card-excerpt">
                             Primary account holders can now present accredited receipts at our branch desks to claim physical exam and dental perks.
                         </p>
                     </div>
                 </div>
-                <div class="p-6 pt-0 border-t border-slate-100 mt-4 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-[#D4A017]">3 min read</span>
-                    <a href="#read" class="text-xs font-bold text-[#0B2A5B] hover:text-[#D4A017]">Read More &rarr;</a>
+                <div class="news-card-footer">
+                    <span class="news-card-read-time">3 min read</span>
+                    <a href="#read" class="news-card-link">Read More &rarr;</a>
                 </div>
             </article>
 
             <!-- Article 2 -->
-            <article class="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between">
+            <article class="news-card">
                 <div>
-                    <div class="relative h-48 bg-slate-100">
-                        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Kapalong Desk Opening" class="w-full h-full object-cover">
-                        <span class="absolute top-3 left-3 bg-blue-600 text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">
+                    <div class="news-card-image-wrapper">
+                        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Kapalong Desk Opening" class="news-card-image">
+                        <span class="news-card-badge news-badge-branch">
                             Branch Expansion
                         </span>
                     </div>
-                    <div class="p-6">
-                        <span class="text-xs font-medium text-slate-400">June 15, 2026</span>
-                        <h3 class="text-lg font-bold text-[#0B2A5B] mt-1 leading-snug">
+                    <div class="news-card-body">
+                        <span class="news-card-date">June 15, 2026</span>
+                        <h3 class="news-card-title">
                             Kapalong Helpdesk Opens to Support Rural Micro-Insurance Enrollment
                         </h3>
-                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                        <p class="news-card-excerpt">
                             Dedicated support staff in Kapalong are now ready to assist walk-in applicants with family member registrations and claim filings.
                         </p>
                     </div>
                 </div>
-                <div class="p-6 pt-0 border-t border-slate-100 mt-4 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-[#D4A017]">2 min read</span>
-                    <a href="#read" class="text-xs font-bold text-[#0B2A5B] hover:text-[#D4A017]">Read More &rarr;</a>
+                <div class="news-card-footer">
+                    <span class="news-card-read-time">2 min read</span>
+                    <a href="#read" class="news-card-link">Read More &rarr;</a>
                 </div>
             </article>
 
             <!-- Article 3 -->
-            <article class="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between">
+            <article class="news-card">
                 <div>
-                    <div class="relative h-48 bg-slate-100">
-                        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Fast Track Claims" class="w-full h-full object-cover">
-                        <span class="absolute top-3 left-3 bg-amber-500 text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">
+                    <div class="news-card-image-wrapper">
+                        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Fast Track Claims" class="news-card-image">
+                        <span class="news-card-badge news-badge-service">
                             Service Improvement
                         </span>
                     </div>
-                    <div class="p-6">
-                        <span class="text-xs font-medium text-slate-400">May 30, 2026</span>
-                        <h3 class="text-lg font-bold text-[#0B2A5B] mt-1 leading-snug">
+                    <div class="news-card-body">
+                        <span class="news-card-date">May 30, 2026</span>
+                        <h3 class="news-card-title">
                             Fast-Track Claim Verification System Reduced Turnaround Time
                         </h3>
-                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                        <p class="news-card-excerpt">
                             Our streamlined digital integration with COCOGEN underwriters allows natural death and accident payouts to be processed even faster.
                         </p>
                     </div>
                 </div>
-                <div class="p-6 pt-0 border-t border-slate-100 mt-4 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-[#D4A017]">4 min read</span>
-                    <a href="#read" class="text-xs font-bold text-[#0B2A5B] hover:text-[#D4A017]">Read More &rarr;</a>
+                <div class="news-card-footer">
+                    <span class="news-card-read-time">4 min read</span>
+                    <a href="#read" class="news-card-link">Read More &rarr;</a>
                 </div>
             </article>
 
             <!-- Article 4 -->
-            <article class="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between">
+            <article class="news-card">
                 <div>
-                    <div class="relative h-48 bg-slate-100">
-                        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Community Outreach" class="w-full h-full object-cover">
-                        <span class="absolute top-3 left-3 bg-indigo-600 text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">
+                    <div class="news-card-image-wrapper">
+                        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Community Outreach" class="news-card-image">
+                        <span class="news-card-badge news-badge-outreach">
                             Outreach
                         </span>
                     </div>
-                    <div class="p-6">
-                        <span class="text-xs font-medium text-slate-400">May 12, 2026</span>
-                        <h3 class="text-lg font-bold text-[#0B2A5B] mt-1 leading-snug">
+                    <div class="news-card-body">
+                        <span class="news-card-date">May 12, 2026</span>
+                        <h3 class="news-card-title">
                             Barangay Financial Literacy & Micro-Insurance Awareness Drive
                         </h3>
-                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                        <p class="news-card-excerpt">
                             Community officers conducted informational workshops across Tagum City to educate household heads about emergency protection.
                         </p>
                     </div>
                 </div>
-                <div class="p-6 pt-0 border-t border-slate-100 mt-4 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-[#D4A017]">3 min read</span>
-                    <a href="#read" class="text-xs font-bold text-[#0B2A5B] hover:text-[#D4A017]">Read More &rarr;</a>
+                <div class="news-card-footer">
+                    <span class="news-card-read-time">3 min read</span>
+                    <a href="#read" class="news-card-link">Read More &rarr;</a>
                 </div>
             </article>
 
             <!-- Article 5 -->
-            <article class="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between">
+            <article class="news-card">
                 <div>
-                    <div class="relative h-48 bg-slate-100">
-                        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Beneficiary Updates" class="w-full h-full object-cover">
-                        <span class="absolute top-3 left-3 bg-rose-600 text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">
+                    <div class="news-card-image-wrapper">
+                        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Beneficiary Updates" class="news-card-image">
+                        <span class="news-card-badge news-badge-advisory">
                             Member Advisory
                         </span>
                     </div>
-                    <div class="p-6">
-                        <span class="text-xs font-medium text-slate-400">April 22, 2026</span>
-                        <h3 class="text-lg font-bold text-[#0B2A5B] mt-1 leading-snug">
+                    <div class="news-card-body">
+                        <span class="news-card-date">April 22, 2026</span>
+                        <h3 class="news-card-title">
                             Important Advisory: How to Keep Your Beneficiary Information Updated
                         </h3>
-                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                        <p class="news-card-excerpt">
                             Ensure all three of your declared dependents (aged 0–100) are accurately listed on your policy before your annual renewal.
                         </p>
                     </div>
                 </div>
-                <div class="p-6 pt-0 border-t border-slate-100 mt-4 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-[#D4A017]">2 min read</span>
-                    <a href="#read" class="text-xs font-bold text-[#0B2A5B] hover:text-[#D4A017]">Read More &rarr;</a>
+                <div class="news-card-footer">
+                    <span class="news-card-read-time">2 min read</span>
+                    <a href="#read" class="news-card-link">Read More &rarr;</a>
                 </div>
             </article>
 
             <!-- Article 6 -->
-            <article class="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between">
+            <article class="news-card">
                 <div>
-                    <div class="relative h-48 bg-slate-100">
-                        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Gold Shield Tier" class="w-full h-full object-cover">
-                        <span class="absolute top-3 left-3 bg-[#D4A017] text-[#0B2A5B] text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">
+                    <div class="news-card-image-wrapper">
+                        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Gold Shield Tier" class="news-card-image">
+                        <span class="news-card-badge news-badge-gold">
                             Coverage Tiers
                         </span>
                     </div>
-                    <div class="p-6">
-                        <span class="text-xs font-medium text-slate-400">April 05, 2026</span>
-                        <h3 class="text-lg font-bold text-[#0B2A5B] mt-1 leading-snug">
+                    <div class="news-card-body">
+                        <span class="news-card-date">April 05, 2026</span>
+                        <h3 class="news-card-title">
                             Understanding Your Gold Shield Coverage Maximum Benefits (₱250,000)
                         </h3>
-                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                        <p class="news-card-excerpt">
                             A breakdown of critical illness support, disability assistance, and hospitalization coverage under the premier Gold tier.
                         </p>
                     </div>
                 </div>
-                <div class="p-6 pt-0 border-t border-slate-100 mt-4 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-[#D4A017]">5 min read</span>
-                    <a href="#read" class="text-xs font-bold text-[#0B2A5B] hover:text-[#D4A017]">Read More &rarr;</a>
+                <div class="news-card-footer">
+                    <span class="news-card-read-time">5 min read</span>
+                    <a href="#read" class="news-card-link">Read More &rarr;</a>
                 </div>
             </article>
 
@@ -247,20 +324,22 @@
 </section>
 
 
-<!-- NEWSLETTER / UPDATES SUBSCRIPTION -->
-<section class="py-20 bg-[#0B2A5B] text-white">
-    <div class="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center">
-        <span class="text-xs font-bold uppercase tracking-widest text-[#E8B923]">Never Miss an Update</span>
-        <h2 class="mt-2 text-2xl sm:text-4xl font-extrabold">
+<!-- =========================
+     NEWSLETTER SUBSCRIPTION
+========================== -->
+<section class="news-newsletter-section">
+    <div class="news-newsletter-container">
+        <span class="news-newsletter-subtitle">Never Miss an Update</span>
+        <h2 class="news-newsletter-title">
             Subscribe to Official Bulletins
         </h2>
-        <p class="mt-3 text-slate-300 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
+        <p class="news-newsletter-description">
             Get official announcements, policy advisories, and community health perk updates sent directly to your email inbox or phone.
         </p>
 
-        <form class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-lg mx-auto">
-            <input type="email" placeholder="Enter your email address" class="w-full px-5 py-3.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#D4A017]">
-            <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-[#D4A017] hover:bg-[#E8B923] text-[#0B2A5B] font-bold rounded-xl shadow-lg transition duration-200 text-sm flex-shrink-0">
+        <form class="news-newsletter-form">
+            <input type="email" placeholder="Enter your email address" class="news-newsletter-input">
+            <button type="submit" class="news-newsletter-btn">
                 Subscribe Now
             </button>
         </form>
