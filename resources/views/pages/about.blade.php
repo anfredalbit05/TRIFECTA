@@ -15,7 +15,7 @@
     <div class="about-container-center">
 
         <span class="about-hero-badge">
-            Helping Hands • Caring Heart
+              Solidaritas • Vitae Auxilium
         </span>
 
         <h1 class="about-hero-title">

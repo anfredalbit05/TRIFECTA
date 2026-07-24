@@ -16,7 +16,7 @@
     <div class="relative max-w-7xl mx-auto px-6 text-center">
 
         <span class="contact-hero-badge">
-            Contact DAYONGAN
+              Solidaritas • Vitae Auxilium
         </span>
 
         <h1 class="contact-hero-title">

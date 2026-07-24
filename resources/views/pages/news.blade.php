@@ -27,15 +27,15 @@
                     Community Updates
                 </span>
             </h1>
-
-            <p class="news-hero-description">
-                Stay informed with the latest announcements,
-                branch updates, claim stories, and official
-                partnerships from DAYONGAN. Discover important
-                updates, community activities, and milestones
-                that highlight our continued commitment to
-                serving and supporting every member.
-            </p>
+                <p class="news-hero-description">
+                    Stay informed with the latest announcements,
+                    branch updates, claim stories, and official
+                    partnerships from DAYONGAN. Discover important
+                    updates, community activities, and milestones
+                    that highlight our continued commitment to
+                    serving, supporting, and empowering every
+                    member and their families.
+                </p>
         </div>
 
     </div>

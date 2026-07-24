@@ -15,7 +15,7 @@
     <div class="testimonials-container-center">
 
         <span class="testimonials-tag">
-            Testimonials
+              Solidaritas • Vitae Auxilium
         </span>
 
         <h1 class="testimonials-title">
