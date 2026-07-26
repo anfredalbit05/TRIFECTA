@@ -6,91 +6,79 @@
     <!-- NEWS FEED -->
     <section class="news-feed-card">
 
+    <!-- NEWS FEED CONTENT -->
+    <div class="news-feed-body">
+        <div class="news-feed-scroll">
+            @for($i = 0; $i < 6; $i++)
+                <article class="feed-card">
 
-        <!-- NEWS HEADER -->
-        <header class="news-feed-header">
+                    <!-- CARD HEADER -->
+                    <header class="card-header">
+                        <div class="user-info">
+                            <img
+                                src="{{ asset('images/user.png') }}"
+                                alt="Profile Picture"
+                                class="user-avatar"
+                            >
+                            <div class="user-details">
+                                <div class="user-name-row">
+                                    <span class="user-name">Mga pusa sa daan</span>
+                                    <span class="verified-icon">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="#1877F2">
+                                            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.9 14.7L6 12.6l1.5-1.5 2.6 2.6 6.3-6.3 1.5 1.5-7.8 7.8z"/>
+                                        </svg>
+                                    </span>
+                                    <span class="dot-separator">•</span>
+                                    <button class="follow-btn" type="button">Follow</button>
+                                </div>
+                                <div class="post-meta">
+                                    <span>16h</span>
+                                    <span class="dot-separator">•</span>
+                                    <span class="privacy-icon">🌐</span>
+                                </div>
+                            </div>
+                        </div>
 
-            <div class="news-feed-title">
+                        <div class="card-actions">
+                            <button class="action-btn" aria-label="More options">•••</button>
+                            <button class="action-btn" aria-label="Close">✕</button>
+                        </div>
+                    </header>
 
-                <h3>
-                    📰 News & Updates
-                </h3>
+                    <!-- POST BODY -->
+                    <div class="card-body">
+                        <p class="post-text">minggo</p>
 
-                <p>
-                    Latest announcements from Dayongan
-                </p>
+                        <div class="media-container">
+                            <img
+                                src="{{ asset('images/hero-bg.jpg') }}"
+                                alt="Cat resting on a fruit scale"
+                                class="post-image"
+                            >
+                        </div>
+                    </div>
 
-            </div>
+                    <!-- CARD FOOTER (STATS & REACTIONS) -->
+                    <footer class="card-footer">
+                        <div class="post-stats">
+                            <div class="reactions-count">
+                                <span class="reaction-badge laugh">😆</span>
+                                <span class="reaction-badge heart">❤️</span>
+                                <span class="reaction-badge like">👍</span>
+                                <span class="count-text">6.5K</span>
+                            </div>
+                            <div class="comments-shares">
+                                <span>93 comments</span>
+                                <span class="dot-separator">•</span>
+                                <span>465 shares</span>
+                            </div>
+                        </div>
+                    </footer>
 
-
-            <span class="news-feed-live">
-                ● Live
-            </span>
-
-
-        </header>
-
-
-        <!-- TIMELINE CONTENT -->
-<!-- TIMELINE CONTENT -->
-<div class="news-feed-body">
-
-    <div class="news-feed-scroll">
-
-        @for($i = 0; $i < 6; $i++)
-
-            <article class="timeline-item">
-
-
-                <div class="timeline-dot"></div>
-
-
-                <div class="timeline-content">
-
-                    <time class="timeline-date">
-                        April 22, 2026
-                    </time>
-
-
-                    <img
-                        src="{{ asset('images/hero-bg.jpg') }}"
-                        alt="Announcement Image"
-                        class="timeline-image"
-                    >
-
-
-                    <span class="timeline-badge">
-                        Member Advisory
-                    </span>
-
-
-                    <h4>
-                        Important Advisory:
-                        Keep Your Beneficiary Information Updated
-                    </h4>
-
-
-                    <p>
-                        Ensure all declared dependents are updated
-                        before your annual renewal to avoid claim delays.
-                    </p>
-
-
-                    <a href="#">
-                        Read More →
-                    </a>
-
-                </div>
-
-
-            </article>
-
-
-        @endfor
-
+                </article>
+            @endfor
+        </div>
     </div>
-
-</div>
 
 
     </section>

@@ -2,14 +2,8 @@
    DASHBOARD LAYOUT
 ====================================== */
 
-.dashboard-grid{
-    @apply mt-0
-    grid
-    min-w-0
-    grid-cols-1
-    items-stretch
-    gap-8
-    xl:grid-cols-[minmax(0,1fr)_340px];
+.dashboard-grid {
+    @apply mt-0 grid min-w-0 grid-cols-1 items-stretch gap-8 xl:grid-cols-[minmax(0,1fr)_340px];
 }
 
 
@@ -17,48 +11,102 @@
    MEMBER CARD
 ====================================== */
 
-.member-card{
-    @apply sticky top-6 self-start
-    flex
-    h-[calc(88vh-48px)]
-    flex-col
-    w-full
-    rounded-3xl
-    bg-white
-    p-8
-    shadow-md;
+.member-card {
+    @apply sticky top-6 self-start flex h-[calc(88vh-48px)] flex-col w-full rounded-3xl bg-white p-8 shadow-md;
 }
+
 
 /* ======================================
    MEMBER PROFILE
 ====================================== */
 
-.member-profile{
+.member-profile {
     @apply flex items-center gap-4;
 }
 
-.member-avatar{
+.member-avatar {
     @apply h-16 w-16 rounded-full object-cover;
 }
 
-.member-username{
+.member-username {
     @apply text-sm text-gray-500;
 }
 
-.member-name{
+.member-name {
     @apply text-2xl font-bold text-gray-900;
 }
 
-.member-id{
+.member-id {
     @apply text-sm text-gray-500;
 }
 
-.dashboard-divider{
+.dashboard-divider {
     @apply my-6 border-gray-200;
 }
 
-.member-description{
+.member-description {
     @apply text-sm leading-7 text-gray-600;
+}
+
+
+/* ======================================
+   FEED CARD (FLUSH FULL-WIDTH STYLING)
+====================================== */
+
+.feed-card {
+    @apply bg-white w-full font-sans border-b border-gray-200 last:border-b-0;
+}
+
+.card-header {
+    @apply flex justify-between items-center px-6 py-4;
+}
+
+.user-info {
+    @apply flex items-center gap-3;
+}
+
+.user-avatar {
+    @apply h-10 w-10 rounded-full object-cover;
+}
+
+.user-name-row {
+    @apply flex items-center gap-1 font-semibold text-sm text-gray-900;
+}
+
+.follow-btn {
+    @apply bg-transparent border-none text-blue-600 font-semibold cursor-pointer p-0 hover:underline;
+}
+
+.post-meta {
+    @apply text-xs text-gray-500 flex gap-1 items-center;
+}
+
+.card-actions {
+    @apply flex gap-2 text-gray-500;
+}
+
+.action-btn {
+    @apply bg-transparent border-none text-base cursor-pointer text-gray-500 hover:text-gray-700;
+}
+
+.post-text {
+    @apply px-6 pb-4 m-0 text-sm text-gray-800;
+}
+
+.post-image {
+    @apply w-full block object-cover max-h-[500px];
+}
+
+.card-footer {
+    @apply px-6 py-3 text-xs text-gray-500 border-t border-gray-100;
+}
+
+.post-stats {
+    @apply flex justify-between items-center;
+}
+
+.reactions-count {
+    @apply flex items-center gap-1;
 }
 
 
@@ -66,118 +114,103 @@
    NEWS FEED CARD
 ====================================== */
 
-.news-feed-card{
-    @apply mt-8
-    flex
-    min-h-0
-    flex-1
-    flex-col
-    overflow-hidden
-    rounded-2xl
-    border
-    border-gray-200
-    bg-white;
+.news-feed-card {
+    @apply flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white;
 }
 
-
-.news-feed-header{
+.news-feed-header {
     @apply flex items-center justify-between border-b border-gray-200 bg-gray-50 px-6 py-4;
 }
 
-
-.news-feed-header h3{
+.news-feed-header h3 {
     @apply text-lg font-semibold text-gray-900;
 }
 
-
-.news-feed-header p{
+.news-feed-header p {
     @apply mt-1 text-sm text-gray-500;
 }
 
-
-.news-feed-live{
+.news-feed-live {
     @apply rounded-full bg-green-100 px-4 py-1 text-sm font-medium text-green-700;
 }
 
 
-/* ONLY THIS PART SCROLLS */
+/* ZERO PADDING BODY FOR FULL EDGE-TO-EDGE FIT */
 
-.news-feed-body{
-    @apply min-h-0
-    flex-1
-    overflow-hidden
-    p-6;
+.news-feed-body {
+    @apply min-h-0 flex-1 overflow-hidden p-0 w-full;
 }
 
+/* SCROLLABLE CONTAINER (OVERFLOW APPLIED) */
 
-.news-feed-scroll{
-    @apply h-full overflow-y-auto overflow-x-hidden pr-3;
+.news-feed-scroll {
+    @apply h-full w-full overflow-y-auto overflow-x-hidden p-0;
+
+    /* Hide scrollbar for Firefox */
+    scrollbar-width: none;
+
+    /* Hide scrollbar for IE/Edge */
+    -ms-overflow-style: none;
 }
 
+/* Hide scrollbar for Chrome, Safari, Edge, Opera */
+.news-feed-scroll::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
 
 
 /* ======================================
    TIMELINE
 ====================================== */
 
-
-.timeline-item{
+.timeline-item {
     @apply relative mb-10 flex gap-5;
 }
 
-
-.timeline-item:last-child{
+.timeline-item:last-child {
     @apply mb-0;
 }
 
-
-.timeline-item::before{
-    content:"";
+.timeline-item::before {
+    content: "";
     @apply absolute left-[11px] top-7 h-full w-px bg-gray-300;
 }
 
-
-.timeline-item:last-child::before{
-    display:none;
+.timeline-item:last-child::before {
+    @apply hidden;
 }
 
-
-.timeline-dot{
+.timeline-dot {
     @apply relative z-10 mt-2 h-6 w-6 rounded-full border-4 border-white bg-blue-600 shadow;
 }
 
-
-.timeline-content{
+.timeline-content {
     @apply flex-1 rounded-xl border border-gray-200 bg-white p-4 shadow-sm;
 }
 
-
-.timeline-date{
+.timeline-date {
     @apply text-xs uppercase tracking-wide text-gray-500;
 }
 
-
-.timeline-image{
+.timeline-image {
     @apply mt-3 h-52 w-full rounded-xl object-cover;
 }
 
-
-.timeline-badge{
+.timeline-badge {
     @apply mt-3 inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700;
 }
 
-
-.timeline-content h4{
+.timeline-content h4 {
     @apply mt-4 text-xl font-bold text-gray-900;
 }
 
-
-.timeline-content p{
+.timeline-content p {
     @apply mt-3 text-sm leading-7 text-gray-600;
 }
 
-
-.timeline-content a{
+.timeline-content a {
     @apply mt-4 inline-flex font-semibold text-blue-600 transition hover:text-blue-700;
 }
 
@@ -186,128 +219,75 @@
    WALLET CARD
 ====================================== */
 
-.wallet-card{
-    @apply sticky top-6 self-start
-    flex
-    max-h-[calc(88vh-48px)]
-    flex-col
-    w-full
-    rounded-3xl
-    bg-white
-    p-6
-    shadow-md;
+.wallet-card {
+    @apply sticky top-6 self-start flex max-h-[calc(88vh-48px)] flex-col w-full rounded-3xl bg-white p-6 shadow-md;
 }
 
-
-.wallet-card hr{
+.wallet-card hr {
     @apply my-5 border-gray-200;
 }
 
-
-.wallet-block{
+.wallet-block {
     @apply py-2;
 }
 
-
-.wallet-label{
+.wallet-label {
     @apply text-xs font-semibold uppercase tracking-wider text-gray-500;
 }
 
-
-.wallet-value{
+.wallet-value {
     @apply mt-2 text-5xl font-bold text-teal-700;
 }
 
-
-.wallet-summary{
+.wallet-summary {
     @apply grid grid-cols-2 gap-4;
 }
 
-
-.wallet-summary span{
+.wallet-summary span {
     @apply text-xs uppercase tracking-wide text-gray-500;
 }
 
-
-.wallet-summary strong{
+.wallet-summary strong {
     @apply mt-2 block text-xl font-bold text-gray-900;
 }
 
-
-.membership-card{
+.membership-card {
     @apply mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm font-medium text-gray-700;
 }
 
-
-.distribution-card{
+.distribution-card {
     @apply mt-6 flex gap-4 rounded-xl border border-gray-200 bg-white p-4;
 }
 
-
-.distribution-icon{
+.distribution-icon {
     @apply flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-xl;
 }
 
-
-.distribution-card h4{
+.distribution-card h4 {
     @apply font-semibold text-gray-900;
 }
 
-
-.distribution-card p{
+.distribution-card p {
     @apply mt-1 text-sm text-gray-500;
 }
 
-
-.wallet-footer{
+.wallet-footer {
     @apply mt-8 flex items-center justify-between border-t border-gray-200 pt-5 font-semibold text-green-700;
 }
-
-
-
-/* ======================================
-   CUSTOM SCROLLBAR
-====================================== */
-
-
-.news-feed-scroll::-webkit-scrollbar{
-    @apply w-2;
-}
-
-
-.news-feed-scroll::-webkit-scrollbar-track{
-    @apply bg-gray-100;
-}
-
-
-.news-feed-scroll::-webkit-scrollbar-thumb{
-    @apply rounded-full bg-gray-300;
-}
-
-
-.news-feed-scroll::-webkit-scrollbar-thumb:hover{
-    @apply bg-gray-400;
-}
-
 
 
 /* ======================================
    RESPONSIVE
 ====================================== */
 
-@media (max-width:1279px){
-
-    .wallet-card{
+@media (max-width: 1279px) {
+    .wallet-card {
         @apply sticky top-6;
     }
-
 }
 
-
-@media (min-width:1280px){
-
-    .wallet-card{
+@media (min-width: 1280px) {
+    .wallet-card {
         @apply sticky top-6;
     }
-
 }
