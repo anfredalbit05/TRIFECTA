@@ -1,4 +1,6 @@
 @import "tailwindcss";
+
+/*Root Admin */
 @import "./components/home/hero.css";
 @import "./components/home/details.css";
 @import "./pages/testimonials.css";
@@ -7,6 +9,38 @@
 @import "./pages/new.css";
 @import "./pages/contact.css";
 @import "./pages/team.css";
+
+/*Member Pages */
+@import "./pages/member-pages/sidebar.css";
+@import "./pages/member-pages/dashboard.css";
+@import "./pages/member-pages/masterlist.css";
+@import "./pages/member-pages/post.css";
+@import "./pages/member-pages/report-setting.css";
+
+/*Member Pages Dashbord Components*/
+@import "./components/member-pages/dashboard/members.css";
+@import "./components/member-pages/dashboard/overview.css";
+
+
+/*Member Pages Masterlist Components*/
+@import "./components/member-pages/masterlist/overview.css";
+@import "./components/member-pages/masterlist/members.css";
+@import "./components/member-pages/masterlist/inquires.css";
+@import "./components/member-pages/masterlist/branches.css";
+@import "./components/member-pages/masterlist/benefits.css";
+
+
+/*Member Pages Post Components*/
+@import "./components/member-pages/post/overview.css";
+@import "./components/member-pages/post/news-updates.css";
+@import "./components/member-pages/post/testimonials.css";
+
+
+/*Member Pages Report & Settings Components*/
+@import "./components/member-pages/report-settings/overview.css";
+@import "./components/member-pages/report-settings/general.css";
+@import "./components/member-pages/report-settings/user-accounts.css";
+@import "./components/member-pages/report-settings/reports.css";
 
 @theme {
 

@@ -1,0 +1,206 @@
+/* MAIN */
+.sidebar-wrapper {
+    @apply relative
+}
+
+
+/* MOBILE HEADER */
+.mobile-header {
+    @apply fixed top-0 left-0 right-0 z-40
+    flex items-center justify-between
+    bg-white px-4 py-3 shadow-sm;
+}
+
+
+.menu-button {
+    @apply rounded-lg p-2 text-[#0C2C6B];
+}
+
+
+.menu-icon {
+    @apply h-6 w-6;
+}
+
+
+.mobile-logo {
+    @apply h-12 object-contain;
+}
+
+
+
+/* OVERLAY */
+
+.sidebar-overlay {
+    @apply fixed inset-0 z-40 bg-black/40;
+}
+
+
+
+/* SIDEBAR */
+
+.sidebar {
+    @apply fixed top-0 left-0 z-50
+    flex h-screen w-72 flex-col
+    bg-white
+    transition-transform duration-300;
+}
+
+
+.sidebar-open {
+    @apply translate-x-0;
+}
+
+
+.sidebar-close {
+    @apply -translate-x-full;
+}
+
+
+
+/* LOGO */
+
+.sidebar-logo {
+    @apply flex justify-center
+    border-b border-gray-200
+    p-5;
+}
+
+
+.logo-image {
+    @apply h-40 object-contain;
+}
+
+
+
+/* CONTENT */
+
+.sidebar-content {
+    @apply flex-1 overflow-hidden p-5;
+}
+
+
+
+.profile-card {
+    @apply h-full overflow-y-auto
+
+}
+
+
+
+/* HIDE SCROLLBAR */
+
+.sidebar-scroll {
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+}
+
+
+.sidebar-scroll::-webkit-scrollbar {
+    display:none;
+}
+
+
+
+/* PROFILE */
+
+.profile-section {
+    @apply flex flex-col items-center;
+}
+
+
+.profile-image-box {
+    @apply h-24 w-24 overflow-hidden
+    rounded-full
+    border-4 border-white
+    shadow;
+}
+
+
+.profile-image {
+    @apply h-full w-full object-cover;
+}
+
+
+.profile-name {
+    @apply mt-4 text-2xl font-bold;
+}
+
+
+.profile-status {
+    @apply text-gray-500;
+}
+
+
+
+/* MENU */
+
+.menu-list {
+    @apply mt-8 flex flex-col gap-2;
+}
+
+
+
+.menu-item {
+    @apply flex items-center
+    rounded-xl
+    px-4 py-3
+    text-gray-700
+    transition;
+}
+
+
+.menu-item:hover {
+    @apply bg-gray-100;
+}
+
+
+
+.active-menu {
+    @apply bg-[#D79B10]
+    font-semibold
+    text-white
+    shadow;
+}
+
+
+/* LOGOUT */
+
+.logout-area {
+    @apply p-5 mt-auto;
+}
+
+
+.logout-area .logout-button {
+    @apply w-full rounded-xl
+    py-3
+    font-semibold
+    text-white
+    transition
+    cursor-pointer;
+
+    background-color: #D79B10;
+}
+
+
+.logout-area .logout-button:hover {
+    background-color: #B8830D;
+}
+
+
+/* DESKTOP */
+
+@media (min-width:1024px){
+
+    .sidebar {
+        @apply translate-x-0;
+    }
+
+
+    .mobile-header,
+    .sidebar-overlay {
+
+        @apply hidden;
+
+    }
+
+}

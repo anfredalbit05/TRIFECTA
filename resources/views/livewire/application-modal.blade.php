@@ -44,7 +44,7 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Middle Name</label>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Middle Name (Optional)</label>
                                 <input wire:model="middle_name" type="text" placeholder="Santos" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
                             </div>
 
@@ -72,16 +72,6 @@
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Birthdate *</label>
                                 <input wire:model="birthdate" type="date" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number *</label>
-                                <input wire:model="mobile" type="tel" placeholder="0917XXXXXXX" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
-                                <input wire:model="email" type="email" placeholder="juan@example.com" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
                             </div>
 
                             <div class="sm:col-span-2 lg:col-span-3">
@@ -125,6 +115,90 @@
                             @endfor
                         </div>
                     </div>
+
+                     <!-- APPLICANT INFORMATION -->
+                    <div class="space-y-4">
+
+                    <h3 class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
+                        Security Information
+                    </h3>
+
+
+                    <!-- Security Fields -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
+
+
+                        <!-- Mobile Number -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">
+                                Mobile Number *
+                            </label>
+                            <input
+                                wire:model="mobile"
+                                type="tel"
+                                placeholder="0917XXXXXXX"
+                                class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                        </div>
+
+
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">
+                                Email Address (Optional)
+                            </label>
+                            <input
+                                wire:model="email"
+                                type="email"
+                                placeholder="juan@example.com"
+                                class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                        </div>
+
+
+                        <!-- Empty column to push next row -->
+                        <div class="hidden lg:block"></div>
+
+
+                        <!-- Username -->
+                        <div class="lg:col-start-1">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">
+                                Username *
+                            </label>
+                            <input
+                                wire:model="username"
+                                type="text"
+                                placeholder="Juan123"
+                                class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                        </div>
+
+
+                        <!-- Password -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">
+                                Password *
+                            </label>
+                            <input
+                                wire:model="password"
+                                type="password"
+                                placeholder="********"
+                                class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                        </div>
+
+
+                        <!-- Confirm Password -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">
+                                Confirm Password *
+                            </label>
+                            <input
+                                wire:model="password_confirmation"
+                                type="password"
+                                placeholder="********"
+                                class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                        </div>
+
+                    </div>
+
+                  </div>
 
                     <!-- ACCEPTANCE OF TERMS -->
                     <div class="space-y-3">

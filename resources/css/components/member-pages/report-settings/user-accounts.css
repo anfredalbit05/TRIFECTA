@@ -1,0 +1,27 @@
+.users-accounts {
+    @apply space-y-5;
+}
+
+
+
+.users-table {
+    @apply overflow-hidden rounded-xl border border-gray-200;
+}
+
+
+
+.users-table table {
+    @apply w-full text-sm;
+}
+
+
+
+.users-table th {
+    @apply bg-[#0C2C6B] px-4 py-3 text-left text-white;
+}
+
+
+
+.users-table td {
+    @apply border-b border-gray-100 px-4 py-3 text-gray-600;
+}

@@ -1,0 +1,27 @@
+.benefits-container {
+    @apply space-y-5;
+}
+
+
+
+.benefit-card {
+
+    @apply rounded-xl border border-gray-200 bg-white p-5 shadow-sm;
+
+}
+
+
+
+.benefit-card h3 {
+
+    @apply text-lg font-bold text-[#0C2C6B];
+
+}
+
+
+
+.benefit-card p {
+
+    @apply mt-2 text-sm text-gray-500;
+
+}

@@ -1,0 +1,19 @@
+.reports-container {
+    @apply space-y-5;
+}
+
+
+
+.report-btn {
+
+    @apply rounded-lg bg-[#0C2C6B] px-5 py-3 text-sm font-semibold text-white;
+
+}
+
+
+
+.report-btn:hover {
+
+    @apply opacity-90;
+
+}

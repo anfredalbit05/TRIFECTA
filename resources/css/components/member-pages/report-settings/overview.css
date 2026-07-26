@@ -1,0 +1,39 @@
+.report-overview {
+    @apply space-y-5;
+}
+
+
+
+.report-title {
+    @apply text-xl font-bold text-[#0C2C6B];
+}
+
+
+
+.report-description {
+    @apply mt-2 text-sm text-gray-500;
+}
+
+
+
+.report-summary-grid {
+    @apply grid grid-cols-1 gap-4 md:grid-cols-3;
+}
+
+
+
+.report-summary-card {
+    @apply rounded-xl bg-gray-50 p-5;
+}
+
+
+
+.report-summary-card h3 {
+    @apply text-sm text-gray-500;
+}
+
+
+
+.report-summary-card p {
+    @apply mt-2 text-2xl font-bold text-[#0C2C6B];
+}
