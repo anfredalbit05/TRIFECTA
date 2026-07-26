@@ -11,26 +11,54 @@
     <div class="hiw-container-center">
 
         <span class="hiw-badge">
-            TrueLife Dayongan Solidaritas Social Welfare Services, Inc.
+            <x-editable-text
+                key="hiw_hero_badge"
+                :value="$contexts['hiw_hero_badge'] ?? ''"
+                tag="span"
+                class="inline-block"
+            />
         </span>
 
         <h1 class="hiw-title">
-            Simple, Transparent & Fast
+            <x-editable-text
+                key="hiw_hero_title_1"
+                :value="$contexts['hiw_hero_title_1'] ?? ''"
+                tag="span"
+                class="inline-block"
+            />
             <br class="hidden sm:block">
 
             <span class="hiw-title-highlight">
-                Community Protection
+                <x-editable-text
+                    key="hiw_hero_title_highlight"
+                    :value="$contexts['hiw_hero_title_highlight'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
             </span>
         </h1>
 
         <p class="hiw-description">
-            Discover how DAYONGAN and
-            <strong>COCOGEN Insurance</strong>
-            make micro-insurance and health assistance effortless
-            for primary members and their families. We simplify the
-            journey from registration to claiming benefits, providing
-            accessible protection, dependable support, and a stronger
-            sense of security for every household we serve.
+            <x-editable-text
+                key="hiw_hero_desc_part1"
+                :value="$contexts['hiw_hero_desc_part1'] ?? ''"
+                tag="span"
+                class="inline-block"
+            />
+            <strong>
+                <x-editable-text
+                    key="hiw_hero_desc_cocogen"
+                    :value="$contexts['hiw_hero_desc_cocogen'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
+            </strong>
+            <x-editable-text
+                key="hiw_hero_desc_part2"
+                :value="$contexts['hiw_hero_desc_part2'] ?? ''"
+                tag="span"
+                class="inline-block"
+            />
         </p>
 
     </div>
@@ -44,12 +72,31 @@
     <div class="hiw-container">
 
         <div class="text-center max-w-2xl mx-auto mb-16">
-            <span class="hiw-section-label">Simple Journey</span>
+            <span class="hiw-section-label">
+                <x-editable-text
+                    key="hiw_process_label"
+                    :value="$contexts['hiw_process_label'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
+            </span>
 
-            <h2 class="hiw-section-title">How To Get Covered</h2>
+            <h2 class="hiw-section-title">
+                <x-editable-text
+                    key="hiw_process_title"
+                    :value="$contexts['hiw_process_title'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
+            </h2>
 
             <p class="hiw-section-description">
-                Start enjoying complete peace of mind in four easy steps.
+                <x-editable-text
+                    key="hiw_process_description"
+                    :value="$contexts['hiw_process_description'] ?? ''"
+                    tag="span"
+                    class="block"
+                />
             </p>
         </div>
 
@@ -58,67 +105,165 @@
             <!-- STEP 1 -->
             <div class="hiw-step-card">
                 <div>
-                    <div class="hiw-step-number">01</div>
+                    <div class="hiw-step-number">
+                        <x-editable-text
+                            key="hiw_step1_number"
+                            :value="$contexts['hiw_step1_number'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
+                    </div>
 
-                    <h3 class="hiw-step-title">Register Account</h3>
+                    <h3 class="hiw-step-title">
+                        <x-editable-text
+                            key="hiw_step1_title"
+                            :value="$contexts['hiw_step1_title'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
+                    </h3>
 
                     <p class="hiw-step-text">
-                        Fill out the application form online or visit our Tagum City or Kapalong offices.
-                        Primary owners aged 18–65 are eligible.
+                        <x-editable-text
+                            key="hiw_step1_text"
+                            :value="$contexts['hiw_step1_text'] ?? ''"
+                            tag="span"
+                            class="block"
+                        />
                     </p>
                 </div>
 
-                <div class="hiw-step-footer">Takes ~5 minutes</div>
+                <div class="hiw-step-footer">
+                    <x-editable-text
+                        key="hiw_step1_footer"
+                        :value="$contexts['hiw_step1_footer'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </div>
             </div>
 
             <!-- STEP 2 -->
             <div class="hiw-step-card">
                 <div>
-                    <div class="hiw-step-number">02</div>
+                    <div class="hiw-step-number">
+                        <x-editable-text
+                            key="hiw_step2_number"
+                            :value="$contexts['hiw_step2_number'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
+                    </div>
 
-                    <h3 class="hiw-step-title">Add Beneficiaries</h3>
+                    <h3 class="hiw-step-title">
+                        <x-editable-text
+                            key="hiw_step2_title"
+                            :value="$contexts['hiw_step2_title'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
+                    </h3>
 
                     <p class="hiw-step-text">
-                        Enroll up to three family beneficiaries (ages 0–100)
-                        to extend natural death claims, burial assistance,
-                        and health support.
+                        <x-editable-text
+                            key="hiw_step2_text"
+                            :value="$contexts['hiw_step2_text'] ?? ''"
+                            tag="span"
+                            class="block"
+                        />
                     </p>
                 </div>
 
-                <div class="hiw-step-footer">Includes up to 3 dependents</div>
+                <div class="hiw-step-footer">
+                    <x-editable-text
+                        key="hiw_step2_footer"
+                        :value="$contexts['hiw_step2_footer'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </div>
             </div>
 
             <!-- STEP 3 -->
             <div class="hiw-step-card">
                 <div>
-                    <div class="hiw-step-number">03</div>
+                    <div class="hiw-step-number">
+                        <x-editable-text
+                            key="hiw_step3_number"
+                            :value="$contexts['hiw_step3_number'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
+                    </div>
 
-                    <h3 class="hiw-step-title">Activate Coverage</h3>
+                    <h3 class="hiw-step-title">
+                        <x-editable-text
+                            key="hiw_step3_title"
+                            :value="$contexts['hiw_step3_title'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
+                    </h3>
 
                     <p class="hiw-step-text">
-                        Pay the annual plan (₱1,999/year — only around ₱6/day).
-                        Receive your official membership card and policy document
-                        backed by COCOGEN.
+                        <x-editable-text
+                            key="hiw_step3_text"
+                            :value="$contexts['hiw_step3_text'] ?? ''"
+                            tag="span"
+                            class="block"
+                        />
                     </p>
                 </div>
 
-                <div class="hiw-step-footer">Instant Policy Issuance</div>
+                <div class="hiw-step-footer">
+                    <x-editable-text
+                        key="hiw_step3_footer"
+                        :value="$contexts['hiw_step3_footer'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </div>
             </div>
 
             <!-- STEP 4 -->
             <div class="hiw-step-card">
                 <div>
-                    <div class="hiw-step-number">04</div>
+                    <div class="hiw-step-number">
+                        <x-editable-text
+                            key="hiw_step4_number"
+                            :value="$contexts['hiw_step4_number'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
+                    </div>
 
-                    <h3 class="hiw-step-title">Access Benefits</h3>
+                    <h3 class="hiw-step-title">
+                        <x-editable-text
+                            key="hiw_step4_title"
+                            :value="$contexts['hiw_step4_title'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
+                    </h3>
 
                     <p class="hiw-step-text">
-                        Enjoy annual physical exams, medical reimbursements,
-                        dental perks, and hassle-free claim processing anytime.
+                        <x-editable-text
+                            key="hiw_step4_text"
+                            :value="$contexts['hiw_step4_text'] ?? ''"
+                            tag="span"
+                            class="block"
+                        />
                     </p>
                 </div>
 
-                <div class="hiw-step-footer">24/7 Dedicated Support</div>
+                <div class="hiw-step-footer">
+                    <x-editable-text
+                        key="hiw_step4_footer"
+                        :value="$contexts['hiw_step4_footer'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </div>
             </div>
 
         </div>
@@ -136,63 +281,127 @@
             <!-- LEFT COLUMN -->
             <div class="hiw-claims-left">
 
-                <span class="hiw-section-label">Hassle-Free Processing</span>
+                <span class="hiw-section-label">
+                    <x-editable-text
+                        key="hiw_claims_label"
+                        :value="$contexts['hiw_claims_label'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </span>
 
                 <h2 class="hiw-claims-title">
-                    Filing a Claim or Benefit Request
+                    <x-editable-text
+                        key="hiw_claims_title"
+                        :value="$contexts['hiw_claims_title'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </h2>
 
                 <p class="hiw-claims-text">
-                    When emergencies happen, the last thing you need is complex paperwork.
-                    DAYONGAN streamlines claim submissions directly through our local
-                    desks or online dashboard.
+                    <x-editable-text
+                        key="hiw_claims_text"
+                        :value="$contexts['hiw_claims_text'] ?? ''"
+                        tag="span"
+                        class="block"
+                    />
                 </p>
 
                 <div class="hiw-claim-list">
 
                     <!-- Claim Step 1 -->
                     <div class="hiw-claim-item">
-                        <div class="hiw-claim-number">1</div>
+                        <div class="hiw-claim-number">
+                            <x-editable-text
+                                key="hiw_claim1_number"
+                                :value="$contexts['hiw_claim1_number'] ?? ''"
+                                tag="span"
+                                class="inline-block"
+                            />
+                        </div>
 
                         <div>
-                            <h4 class="hiw-claim-title">Submit Documents</h4>
+                            <h4 class="hiw-claim-title">
+                                <x-editable-text
+                                    key="hiw_claim1_title"
+                                    :value="$contexts['hiw_claim1_title'] ?? ''"
+                                    tag="span"
+                                    class="inline-block"
+                                />
+                            </h4>
 
                             <p class="hiw-claim-text">
-                                Present your DAYONGAN ID together with the required
-                                documents such as medical certificates, receipts,
-                                or official reports.
+                                <x-editable-text
+                                    key="hiw_claim1_text"
+                                    :value="$contexts['hiw_claim1_text'] ?? ''"
+                                    tag="span"
+                                    class="block"
+                                />
                             </p>
                         </div>
                     </div>
 
                     <!-- Claim Step 2 -->
                     <div class="hiw-claim-item">
-                        <div class="hiw-claim-number">2</div>
+                        <div class="hiw-claim-number">
+                            <x-editable-text
+                                key="hiw_claim2_number"
+                                :value="$contexts['hiw_claim2_number'] ?? ''"
+                                tag="span"
+                                class="inline-block"
+                            />
+                        </div>
 
                         <div>
                             <h4 class="hiw-claim-title">
-                                COCOGEN Underwriting Verification
+                                <x-editable-text
+                                    key="hiw_claim2_title"
+                                    :value="$contexts['hiw_claim2_title'] ?? ''"
+                                    tag="span"
+                                    class="inline-block"
+                                />
                             </h4>
 
                             <p class="hiw-claim-text">
-                                Our fast-track evaluation system verifies your
-                                submitted information directly with our partner
-                                underwriters.
+                                <x-editable-text
+                                    key="hiw_claim2_text"
+                                    :value="$contexts['hiw_claim2_text'] ?? ''"
+                                    tag="span"
+                                    class="block"
+                                />
                             </p>
                         </div>
                     </div>
 
                     <!-- Claim Step 3 -->
                     <div class="hiw-claim-item">
-                        <div class="hiw-claim-number">3</div>
+                        <div class="hiw-claim-number">
+                            <x-editable-text
+                                key="hiw_claim3_number"
+                                :value="$contexts['hiw_claim3_number'] ?? ''"
+                                tag="span"
+                                class="inline-block"
+                            />
+                        </div>
 
                         <div>
-                            <h4 class="hiw-claim-title">Fast Disbursement</h4>
+                            <h4 class="hiw-claim-title">
+                                <x-editable-text
+                                    key="hiw_claim3_title"
+                                    :value="$contexts['hiw_claim3_title'] ?? ''"
+                                    tag="span"
+                                    class="inline-block"
+                                />
+                            </h4>
 
                             <p class="hiw-claim-text">
-                                Once approved, payouts are released promptly
-                                through bank transfer, e-wallet,
-                                or office pickup.
+                                <x-editable-text
+                                    key="hiw_claim3_text"
+                                    :value="$contexts['hiw_claim3_text'] ?? ''"
+                                    tag="span"
+                                    class="block"
+                                />
                             </p>
                         </div>
                     </div>
@@ -207,15 +416,31 @@
 
                     <div class="hiw-coverage-glow"></div>
 
-                    <span class="hiw-coverage-label">Coverage Tiers</span>
+                    <span class="hiw-coverage-label">
+                        <x-editable-text
+                            key="hiw_coverage_label"
+                            :value="$contexts['hiw_coverage_label'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
+                    </span>
 
                     <h3 class="hiw-coverage-title">
-                        What Tier Am I Under?
+                        <x-editable-text
+                            key="hiw_coverage_title"
+                            :value="$contexts['hiw_coverage_title'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
                     </h3>
 
                     <p class="hiw-coverage-description">
-                        DAYONGAN offers flexible shield tiers tailored to different
-                        levels of protection and financial assistance.
+                        <x-editable-text
+                            key="hiw_coverage_description"
+                            :value="$contexts['hiw_coverage_description'] ?? ''"
+                            tag="span"
+                            class="block"
+                        />
                     </p>
 
                     <div class="hiw-tier-list">
@@ -223,41 +448,97 @@
                         <!-- Bronze -->
                         <div class="hiw-tier-card">
                             <div>
-                                <h5 class="hiw-tier-name-gold">Bronze Shield</h5>
+                                <h5 class="hiw-tier-name-gold">
+                                    <x-editable-text
+                                        key="hiw_tier_bronze_title"
+                                        :value="$contexts['hiw_tier_bronze_title'] ?? ''"
+                                        tag="span"
+                                        class="inline-block"
+                                    />
+                                </h5>
 
                                 <p class="hiw-tier-description">
-                                    Basic Micro-Insurance & Assistance
+                                    <x-editable-text
+                                        key="hiw_tier_bronze_desc"
+                                        :value="$contexts['hiw_tier_bronze_desc'] ?? ''"
+                                        tag="span"
+                                        class="block"
+                                    />
                                 </p>
                             </div>
 
-                            <span class="hiw-tier-price">₱75,000</span>
+                            <span class="hiw-tier-price">
+                                <x-editable-text
+                                    key="hiw_tier_bronze_price"
+                                    :value="$contexts['hiw_tier_bronze_price'] ?? ''"
+                                    tag="span"
+                                    class="inline-block"
+                                />
+                            </span>
                         </div>
 
                         <!-- Silver -->
                         <div class="hiw-tier-card">
                             <div>
-                                <h5 class="hiw-tier-name">Silver Shield</h5>
+                                <h5 class="hiw-tier-name">
+                                    <x-editable-text
+                                        key="hiw_tier_silver_title"
+                                        :value="$contexts['hiw_tier_silver_title'] ?? ''"
+                                        tag="span"
+                                        class="inline-block"
+                                    />
+                                </h5>
 
                                 <p class="hiw-tier-description">
-                                    Enhanced Family & Health Benefits
+                                    <x-editable-text
+                                        key="hiw_tier_silver_desc"
+                                        :value="$contexts['hiw_tier_silver_desc'] ?? ''"
+                                        tag="span"
+                                        class="block"
+                                    />
                                 </p>
                             </div>
 
-                            <span class="hiw-tier-price">₱150,000</span>
+                            <span class="hiw-tier-price">
+                                <x-editable-text
+                                    key="hiw_tier_silver_price"
+                                    :value="$contexts['hiw_tier_silver_price'] ?? ''"
+                                    tag="span"
+                                    class="inline-block"
+                                />
+                            </span>
                         </div>
 
                         <!-- Gold -->
                         <div class="hiw-tier-card">
                             <div>
-                                <h5 class="hiw-tier-name-gold">Gold Shield</h5>
+                                <h5 class="hiw-tier-name-gold">
+                                    <x-editable-text
+                                        key="hiw_tier_gold_title"
+                                        :value="$contexts['hiw_tier_gold_title'] ?? ''"
+                                        tag="span"
+                                        class="inline-block"
+                                    />
+                                </h5>
 
                                 <p class="hiw-tier-description">
-                                    Maximum Protection &
-                                    High Hospital Support
+                                    <x-editable-text
+                                        key="hiw_tier_gold_desc"
+                                        :value="$contexts['hiw_tier_gold_desc'] ?? ''"
+                                        tag="span"
+                                        class="block"
+                                    />
                                 </p>
                             </div>
 
-                            <span class="hiw-tier-price">₱250,000</span>
+                            <span class="hiw-tier-price">
+                                <x-editable-text
+                                    key="hiw_tier_gold_price"
+                                    :value="$contexts['hiw_tier_gold_price'] ?? ''"
+                                    tag="span"
+                                    class="inline-block"
+                                />
+                            </span>
                         </div>
 
                     </div>
@@ -275,10 +556,22 @@
     <div class="hiw-faq-container">
 
         <div class="text-center mb-12">
-            <span class="hiw-section-label">Got Questions?</span>
+            <span class="hiw-section-label">
+                <x-editable-text
+                    key="hiw_faq_label"
+                    :value="$contexts['hiw_faq_label'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
+            </span>
 
             <h2 class="hiw-section-title">
-                Frequently Asked Questions
+                <x-editable-text
+                    key="hiw_faq_title"
+                    :value="$contexts['hiw_faq_title'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
             </h2>
         </div>
 
@@ -287,54 +580,84 @@
             <!-- FAQ 1 -->
             <div class="hiw-faq-card">
                 <h3 class="hiw-faq-question">
-                    Who can apply as the Primary Owner?
+                    <x-editable-text
+                        key="hiw_faq1_question"
+                        :value="$contexts['hiw_faq1_question'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </h3>
 
                 <p class="hiw-faq-answer">
-                    Any individual aged 18 to 65 years old can register as a
-                    Primary Owner. Once enrolled, coverage remains active as long
-                    as annual renewals are maintained.
+                    <x-editable-text
+                        key="hiw_faq1_answer"
+                        :value="$contexts['hiw_faq1_answer'] ?? ''"
+                        tag="span"
+                        class="block"
+                    />
                 </p>
             </div>
 
             <!-- FAQ 2 -->
             <div class="hiw-faq-card">
                 <h3 class="hiw-faq-question">
-                    Who can be declared as beneficiaries?
+                    <x-editable-text
+                        key="hiw_faq2_question"
+                        :value="$contexts['hiw_faq2_question'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </h3>
 
                 <p class="hiw-faq-answer">
-                    You can register up to three immediate family members or
-                    dependents aged 0 to 100 years old. Beneficiaries receive
-                    natural death claims, burial assistance, and medical
-                    benefit eligibility.
+                    <x-editable-text
+                        key="hiw_faq2_answer"
+                        :value="$contexts['hiw_faq2_answer'] ?? ''"
+                        tag="span"
+                        class="block"
+                    />
                 </p>
             </div>
 
             <!-- FAQ 3 -->
             <div class="hiw-faq-card">
                 <h3 class="hiw-faq-question">
-                    How does the COCOGEN Insurance partnership work?
+                    <x-editable-text
+                        key="hiw_faq3_question"
+                        :value="$contexts['hiw_faq3_question'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </h3>
 
                 <p class="hiw-faq-answer">
-                    DAYONGAN operates in official partnership with COCOGEN
-                    Insurance, ensuring all micro-insurance policies are
-                    legally backed, professionally underwritten,
-                    and fully guaranteed.
+                    <x-editable-text
+                        key="hiw_faq3_answer"
+                        :value="$contexts['hiw_faq3_answer'] ?? ''"
+                        tag="span"
+                        class="block"
+                    />
                 </p>
             </div>
 
             <!-- FAQ 4 -->
             <div class="hiw-faq-card">
                 <h3 class="hiw-faq-question">
-                    Where are the official offices located?
+                    <x-editable-text
+                        key="hiw_faq4_question"
+                        :value="$contexts['hiw_faq4_question'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </h3>
 
                 <p class="hiw-faq-answer">
-                    Our walk-in offices are located in Tagum City and Kapalong,
-                    Davao del Norte, open Monday through Saturday for
-                    registrations, claims, and customer consultations.
+                    <x-editable-text
+                        key="hiw_faq4_answer"
+                        :value="$contexts['hiw_faq4_answer'] ?? ''"
+                        tag="span"
+                        class="block"
+                    />
                 </p>
             </div>
 
@@ -349,21 +672,40 @@
     <div class="hiw-cta-container">
 
         <h2 class="hiw-cta-title">
-            Ready to Protect Your Family?
+            <x-editable-text
+                key="hiw_cta_title"
+                :value="$contexts['hiw_cta_title'] ?? ''"
+                tag="span"
+                class="inline-block"
+            />
         </h2>
 
         <p class="hiw-cta-text">
-            Join thousands of covered households today for as low as
-            ₱1,999 per year.
+            <x-editable-text
+                key="hiw_cta_text"
+                :value="$contexts['hiw_cta_text'] ?? ''"
+                tag="span"
+                class="block"
+            />
         </p>
 
         <div class="hiw-cta-buttons">
             <a href="#register" class="hiw-btn-primary">
-                Apply Online Now
+                <x-editable-text
+                    key="hiw_cta_btn_primary"
+                    :value="$contexts['hiw_cta_btn_primary'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
             </a>
 
             <a href="#contact" class="hiw-btn-secondary">
-                Contact Customer Support
+                <x-editable-text
+                    key="hiw_cta_btn_secondary"
+                    :value="$contexts['hiw_cta_btn_secondary'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
             </a>
         </div>
 

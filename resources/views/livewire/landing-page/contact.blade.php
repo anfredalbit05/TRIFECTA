@@ -11,22 +11,39 @@
     <div class="relative max-w-7xl mx-auto px-6 text-center">
 
         <span class="contact-hero-badge">
-              TrueLife Dayongan Solidaritas Social Welfare Services, Inc.
+            <x-editable-text
+                key="contact_hero_badge"
+                :value="$contexts['contact_hero_badge'] ?? ''"
+                tag="span"
+                class="inline-block"
+            />
         </span>
 
         <h1 class="contact-hero-title">
-            We're Here to
+            <x-editable-text
+                key="contact_hero_title_1"
+                :value="$contexts['contact_hero_title_1'] ?? ''"
+                tag="span"
+                class="inline-block"
+            />
             <br class="hidden sm:block">
-            <span class="contact-hero-title-highlight">Help You</span>
+            <span class="contact-hero-title-highlight">
+                <x-editable-text
+                    key="contact_hero_title_highlight"
+                    :value="$contexts['contact_hero_title_highlight'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
+            </span>
         </h1>
 
         <p class="contact-hero-description">
-            Have questions about membership, protection benefits,
-            financial literacy, or other DAYONGAN services? Our
-            friendly team is ready to assist you with reliable
-            information, guidance, and support. We are committed
-            to helping you understand our services and ensuring
-            that every member receives the assistance they need.
+            <x-editable-text
+                key="contact_hero_description"
+                :value="$contexts['contact_hero_description'] ?? ''"
+                tag="span"
+                class="block"
+            />
         </p>
 
     </div>
@@ -42,17 +59,30 @@
 
         <div class="contact-details-header">
             <span class="contact-section-label">
-                Get In Touch
+                <x-editable-text
+                    key="contact_details_label"
+                    :value="$contexts['contact_details_label'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
             </span>
 
             <h2 class="contact-section-title">
-                Contact Information
+                <x-editable-text
+                    key="contact_details_title"
+                    :value="$contexts['contact_details_title'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
             </h2>
 
             <p class="contact-section-description">
-                Visit our offices, call our support team, or send us an email.
-                We're committed to providing timely assistance and answering your
-                questions about memberships, benefits, and other DAYONGAN services.
+                <x-editable-text
+                    key="contact_details_description"
+                    :value="$contexts['contact_details_description'] ?? ''"
+                    tag="span"
+                    class="block"
+                />
             </p>
         </div>
 
@@ -65,12 +95,21 @@
                 </div>
 
                 <h3 class="contact-detail-title">
-                    Main Office
+                    <x-editable-text
+                        key="contact_main_office_title"
+                        :value="$contexts['contact_main_office_title'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </h3>
 
-                <p class="contact-card-text">
-                    001 Liwayway Village<br>
-                    Tagum City
+                <p class="contact-card-text whitespace-pre-line">
+                    <x-editable-text
+                        key="contact_main_office_address"
+                        :value="$contexts['contact_main_office_address'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </p>
             </div>
 
@@ -81,12 +120,21 @@
                 </div>
 
                 <h3 class="contact-detail-title">
-                    Sub Office
+                    <x-editable-text
+                        key="contact_sub_office_title"
+                        :value="$contexts['contact_sub_office_title'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </h3>
 
-                <p class="contact-card-text">
-                    J&R Bldg., 2nd Floor<br>
-                    Mankilam, Kapalong
+                <p class="contact-card-text whitespace-pre-line">
+                    <x-editable-text
+                        key="contact_sub_office_address"
+                        :value="$contexts['contact_sub_office_address'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </p>
             </div>
 
@@ -97,15 +145,30 @@
                 </div>
 
                 <h3 class="contact-detail-title">
-                    Contact Numbers
+                    <x-editable-text
+                        key="contact_phone_title"
+                        :value="$contexts['contact_phone_title'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </h3>
 
                 <p class="contact-card-text font-semibold mt-4">
-                    0927 838 1647
+                    <x-editable-text
+                        key="contact_phone_1"
+                        :value="$contexts['contact_phone_1'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </p>
 
                 <p class="contact-card-text font-semibold">
-                    0997 614 8392
+                    <x-editable-text
+                        key="contact_phone_2"
+                        :value="$contexts['contact_phone_2'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </p>
             </div>
 
@@ -116,11 +179,21 @@
                 </div>
 
                 <h3 class="contact-detail-title">
-                    Email Address
+                    <x-editable-text
+                        key="contact_email_title"
+                        :value="$contexts['contact_email_title'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </h3>
 
                 <p class="contact-card-text break-all">
-                    dayongansolidaritas26@gmail.com
+                    <x-editable-text
+                        key="contact_email_address"
+                        :value="$contexts['contact_email_address'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </p>
             </div>
 
@@ -133,16 +206,39 @@
             </div>
 
             <h3 class="contact-facebook-title">
-                Follow Us on Facebook
+                <x-editable-text
+                    key="contact_fb_title"
+                    :value="$contexts['contact_fb_title'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
             </h3>
 
             <p class="contact-facebook-[#0B2A5B]-text">
-                <strong>TRUELIFE DAYONGAN SOLIDARITAS</strong><br>
-                Social Welfare Services and Financial Literacy Inc.
+                <strong>
+                    <x-editable-text
+                        key="contact_fb_name"
+                        :value="$contexts['contact_fb_name'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </strong>
+                <br>
+                <x-editable-text
+                    key="contact_fb_sub"
+                    :value="$contexts['contact_fb_sub'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
             </p>
 
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">
-                Visit Our Facebook Page &rarr;
+            <a href="{{ $contexts['contact_fb_url'] ?? 'https://facebook.com' }}" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">
+                <x-editable-text
+                    key="contact_fb_btn_text"
+                    :value="$contexts['contact_fb_btn_text'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
             </a>
         </div>
 
@@ -160,21 +256,36 @@
 
         <div class="contact-map-header">
             <span class="contact-map-subtitle">
-                Visit Us
+                <x-editable-text
+                    key="contact_map_subtitle"
+                    :value="$contexts['contact_map_subtitle'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
             </span>
 
             <h2 class="contact-map-title">
-                Find Our Main Office
+                <x-editable-text
+                    key="contact_map_title"
+                    :value="$contexts['contact_map_title'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
             </h2>
 
             <p class="contact-map-location">
-                001 Liwayway Village, Tagum City
+                <x-editable-text
+                    key="contact_map_location"
+                    :value="$contexts['contact_map_location'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
             </p>
         </div>
 
         <div class="contact-map-container">
             <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15814.708236166589!2d125.7950!3d7.4478!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32f932e6fffff!2sTagum%20City!5e0!3m2!1sen!2sph!4v1680000000000!5m2!1sen!2sph"
+                src="{{ $contexts['contact_map_iframe_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15814.708236166589!2d125.7950!3d7.4478!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32f932e6fffff!2sTagum%20City!5e0!3m2!1sen!2sph!4v1680000000000!5m2!1sen!2sph' }}"
                 class="contact-map-iframe"
                 allowfullscreen=""
                 loading="lazy"
