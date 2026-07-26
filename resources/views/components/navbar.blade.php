@@ -20,12 +20,12 @@
                 </div>
 
                 <div>
+                    <p class="text-xs tracking-[0.25em] uppercase text-[#E5B83B]">
+                        TDSSWSI
+                    </p>
                     <h1 class="text-xl font-black tracking-wide text-white">
                         DAYONGAN
                     </h1>
-                    <p class="text-xs tracking-[0.25em] uppercase text-[#E5B83B]">
-                        Community Support
-                    </p>
                 </div>
 
             </a>
@@ -57,7 +57,7 @@
                     How It Works
                 </a>
 
-                   <!-- How It Works Link -->
+                <!-- Testimonials Link -->
                 <a href="{{ route('testimonials') }}"
                    class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('testimonials*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     Testimonials
@@ -69,7 +69,7 @@
                     News & Updates
                 </a>
 
-                   <!-- News Link -->
+                <!-- Contact Link -->
                 <a href="{{ route('contact') }}"
                    class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('contact*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     Contact Us
@@ -77,29 +77,155 @@
 
             </div>
 
-            <!-- Right CTA & Auth Buttons -->
+            <!-- Right CTA & Auth Controls (Desktop) -->
             <div class="hidden lg:flex items-center gap-3">
 
-                <button
-                    onclick="Livewire.dispatch('open-application-modal')"
-                    class="rounded-full bg-[#D79B10] px-6 py-2.5 text-sm font-extrabold text-white shadow-lg shadow-[#D79B10]/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#E5B83B] hover:shadow-xl">
-                    JOIN
-                </button>
+                @guest
 
-                @if (Route::has('login'))
-                    <a
+                    <button
+                        type="button"
+                        onclick="Livewire.dispatch('open-application-modal')"
+                        class="rounded-full bg-[#D79B10] px-6 py-2.5 text-sm font-extrabold text-white shadow-lg shadow-[#D79B10]/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#E5B83B] hover:shadow-xl">
+                        JOIN
+                    </button>
+
+                    <button
+                        type="button"
                         onclick="Livewire.dispatch('open-login-modal')"
                         class="rounded-full border border-[#D79B10]/60 bg-white/5 px-6 py-2.5 text-sm font-bold text-[#E5B83B] backdrop-blur transition-all duration-300 hover:border-[#E5B83B] hover:bg-[#D79B10] hover:text-[#0C2C6B]">
                         Login
-                    </a>
-                @endif
+                    </button>
+
+                @else
+
+                    @php
+                        $u = Auth::user();
+                        $fullName = trim(($u->firstname ?? '') . ' ' . ($u->lastname ?? ''));
+                        if (empty($fullName)) {
+                            $fullName = $u->name ?? $u->username ?? 'User';
+                        }
+
+                        $roleID = (int)($u->RoleID ?? $u->roleID ?? 0);
+                        $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($fullName) . '&background=D79B10&color=fff';
+                    @endphp
+
+                    <!-- User Profile Dropdown -->
+                    <div x-data="{ profileMenu: false }"
+                         @keydown.escape.window="profileMenu = false"
+                         class="relative">
+
+                        <!-- Trigger Button -->
+                        <button
+                            @click="profileMenu = !profileMenu"
+                            :aria-expanded="profileMenu"
+                            type="button"
+                            class="flex items-center gap-3 rounded-full bg-white/10 px-3.5 py-2 border border-white/10 hover:bg-white/15 transition w-auto max-w-xs focus:outline-none focus:ring-2 focus:ring-[#D79B10]">
+
+                            <img
+                                src="{{ $avatarUrl }}"
+                                alt="{{ $fullName }}'s Avatar"
+                                class="w-9 h-9 rounded-full border-2 border-[#D79B10] object-cover shrink-0">
+
+                            <div class="hidden xl:block text-left min-w-0 pr-1">
+                                <p class="text-white text-sm font-bold leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
+                                    {{ $fullName }}
+                                </p>
+                            </div>
+
+                            <svg class="w-4 h-4 text-white transition-transform duration-200 shrink-0"
+                                 :class="{ 'rotate-180': profileMenu }"
+                                 xmlns="http://www.w3.org/2000/svg"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-width="2"
+                                      d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div
+                            x-show="profileMenu"
+                            @click.away="profileMenu = false"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            x-cloak
+                            class="absolute right-0 mt-3 w-64 rounded-2xl bg-white shadow-2xl overflow-hidden border border-slate-200 z-50">
+
+                            <!-- User Header -->
+                            <div class="px-5 py-4 bg-slate-50 border-b border-slate-100">
+                                <div class="flex items-center gap-3">
+                                    <img
+                                        src="{{ $avatarUrl }}"
+                                        alt="{{ $fullName }}"
+                                        class="w-11 h-11 rounded-full object-cover shrink-0 border border-slate-200">
+
+                                    <div class="min-w-0">
+                                        <p class="font-bold text-slate-800 text-sm truncate">
+                                            {{ $fullName }}
+                                        </p>
+                                        <p class="text-xs text-slate-500 truncate">
+                                            {{ $u->email }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Links -->
+                            <div class="py-1">
+                                @if($roleID === 1 || $roleID === 2)
+                                    <a href="{{ route('home') }}"
+                                       class="flex items-center gap-3 px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-100 transition">
+                                        <span>🏠</span>
+                                        <span>Member Landing Page</span>
+                                    </a>
+                                @else
+                                    <a href="{{ route('home') }}"
+                                       class="flex items-center gap-3 px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-100 transition">
+                                        <span>🏠</span>
+                                        <span>Member Landing Page</span>
+                                    </a>
+                                @endif
+
+                                <a href="{{ route('dashboard') }}"
+                                   class="flex items-center gap-3 px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-100 transition">
+                                    <span>🗂️</span>
+                                    <span>My Dashboard</span>
+                                </a>
+                            </div>
+
+                            <!-- Logout Form -->
+                            <div class="border-t border-slate-100 py-1">
+                                <form action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button
+                                        type="submit"
+                                        class="flex w-full items-center gap-3 px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition">
+                                        <span>🚪</span>
+                                        <span>Logout</span>
+                                    </button>
+                                </form>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                @endguest
 
             </div>
 
-            <!-- Mobile Toggle -->
+            <!-- Mobile Menu Toggle Button -->
             <button
-                @click="open=!open"
-                class="rounded-lg p-2 text-[#E5B83B] transition hover:bg-white/10 lg:hidden">
+                type="button"
+                @click="open = !open"
+                class="rounded-lg p-2 text-[#E5B83B] transition hover:bg-white/10 lg:hidden focus:outline-none">
 
                 <svg x-show="!open"
                      xmlns="http://www.w3.org/2000/svg"
@@ -130,10 +256,15 @@
 
         </div>
 
-        <!-- Mobile Menu -->
+        <!-- Mobile Drawer -->
         <div
             x-show="open"
-            x-transition
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 -translate-y-2"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 -translate-y-2"
             x-cloak
             class="pb-6 lg:hidden">
 
@@ -159,25 +290,85 @@
                     How It Works
                 </a>
 
+                <a href="{{ route('testimonials') }}"
+                   class="block rounded-xl py-3 text-center transition {{ request()->is('testimonials*') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
+                    Testimonials
+                </a>
+
                 <a href="{{ route('news') }}"
                    class="block rounded-xl py-3 text-center transition {{ request()->is('news*') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
                     News & Updates
                 </a>
 
-                <div class="pt-2 border-t border-white/10 flex flex-col gap-2">
-                    <button
-                        onclick="Livewire.dispatch('open-application-modal')"
-                        class="w-full rounded-xl bg-[#D79B10] py-3 font-bold text-white transition hover:bg-[#E5B83B]">
-                        JOIN
-                    </button>
+                <a href="{{ route('contact') }}"
+                   class="block rounded-xl py-3 text-center transition {{ request()->is('contact*') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
+                    Contact Us
+                </a>
 
-                    @if (Route::has('login'))
-                        <a
+                <div class="pt-3 border-t border-white/10 flex flex-col gap-2">
+
+                    @guest
+
+                        <button
+                            type="button"
                             onclick="Livewire.dispatch('open-application-modal')"
-                            class="block rounded-xl border border-[#D79B10] py-3 text-center font-bold text-[#E5B83B] transition hover:bg-[#D79B10] hover:text-[#0C2C6B]">
+                            class="w-full rounded-xl bg-[#D79B10] py-3 font-bold text-white transition hover:bg-[#E5B83B]">
+                            JOIN
+                        </button>
+
+                        <button
+                            type="button"
+                            onclick="Livewire.dispatch('open-login-modal')"
+                            class="w-full rounded-xl border border-[#D79B10] py-3 font-bold text-[#E5B83B] transition hover:bg-[#D79B10] hover:text-[#0C2C6B]">
                             Login
-                        </a>
-                    @endif
+                        </button>
+
+                    @else
+
+                        @php
+                            $mUser = Auth::user();
+                            $mFullName = trim(($mUser->firstname ?? '') . ' ' . ($mUser->lastname ?? ''));
+                            if (empty($mFullName)) {
+                                $mFullName = $mUser->name ?? $mUser->username ?? 'User';
+                            }
+
+                            $mRoleID = (int)($mUser->RoleID ?? $mUser->roleID ?? 0);
+
+                            $mAvatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($mFullName) . '&background=D79B10&color=fff';
+                        @endphp
+
+                        <!-- Mobile User Info Block -->
+                        <div class="flex items-center gap-3 px-3 py-2.5 bg-white/5 rounded-xl border border-white/10 mb-2">
+                            <img src="{{ $mAvatarUrl }}" alt="{{ $mFullName }}" class="w-10 h-10 rounded-full border border-[#D79B10] shrink-0">
+                            <div class="min-w-0">
+                                <p class="text-white font-bold text-sm truncate">{{ $mFullName }}</p>
+                                <p class="text-xs text-slate-300 truncate">{{ $mUser->email }}</p>
+                            </div>
+                        </div>
+
+                        @if($mRoleID === 1 || $mRoleID === 2)
+                            <a href="{{ route('home') }}"
+                               class="block rounded-xl bg-white/10 py-3 text-center font-bold text-white hover:bg-white/20 transition">
+                                🏠 Member Landing Page
+                            </a>
+                        @else
+                            <a href="{{ route('dashboard') }}"
+                               class="block rounded-xl bg-[#D79B10] py-3 text-center font-bold text-white hover:bg-[#E5B83B] transition">
+                                📊 My Dashboard
+                            </a>
+                        @endif
+
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button
+                                type="submit"
+                                class="w-full rounded-xl border border-red-400/50 py-3 font-bold text-red-300 transition hover:bg-red-500/20 hover:text-white">
+                                🚪 Logout
+                            </button>
+                        </form>
+
+                    @endguest
+
                 </div>
 
             </div>

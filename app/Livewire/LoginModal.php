@@ -75,11 +75,22 @@ class LoginModal extends Component
         session()->regenerate();
 
         // 5. Reset inputs & close modal
-        $this->reset(['email', 'password', 'remember']);
+        $this->reset([
+            'email',
+            'password',
+            'remember',
+        ]);
+
+        $this->resetValidation();
+
         $this->openLogin = false;
 
-        // 6. Redirect to dashboard
-        return redirect()->route('dashboard');
+        // if ($user->RoleID == 1) {
+        //     return $this->redirect(route('home'), navigate: true);
+        // }
+
+         return $this->redirect(route('home'), navigate: true);
+        // return redirect()->route('dashboard');
     }
 
     public function switchToRegister()

@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'News & Updates')
-
-@section('content')
+<div>
 
 <!-- =========================
      HERO / FEATURED STORY
@@ -18,7 +14,7 @@
         <div class="text-center max-w-3xl mx-auto">
 
             <span class="news-hero-badge">
-                Solidaritas • Vitae Auxilium
+                TrueLife Dayongan Solidaritas Social Welfare Services, Inc.
             </span>
 
             <h1 class="news-hero-title">
@@ -345,5 +341,4 @@
         </form>
     </div>
 </section>
-
-@endsection
+</div>

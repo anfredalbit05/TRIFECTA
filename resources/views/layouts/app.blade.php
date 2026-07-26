@@ -21,14 +21,16 @@
     <x-navbar />
 
     <main>
-        @yield('content')
+        {{ $slot }}
     </main>
+
 
     <x-footer />
 
     <!-- Livewire Modal -->
     <livewire:application-modal />
     <livewire:login-modal />
+    <livewire:context-editor />
 
     @livewireScripts
 

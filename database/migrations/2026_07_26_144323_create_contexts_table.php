@@ -15,10 +15,11 @@ return new class extends Migration
 
             $table->id('ContextID');
 
+            $table->string('context_key')->unique();
+
             $table->longText('details');
 
             $table->timestamps();
-
         });
     }
 

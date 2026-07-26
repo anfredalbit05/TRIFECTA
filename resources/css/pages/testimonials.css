@@ -23,7 +23,7 @@
 }
 
 .testimonials-tag {
-    @apply uppercase tracking-[0.3em] text-[#FFD54A] font-bold text-sm block;
+    @apply uppercase tracking-[0.2em] text-[#FFD54A] font-bold text-sm block;
 }
 
 .testimonials-title {

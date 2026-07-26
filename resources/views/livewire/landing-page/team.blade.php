@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'Our Team')
-
-@section('content')
+<div>
 
 <!-- =========================
      TEAM HERO SECTION
@@ -15,7 +11,7 @@
     <div class="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 text-center">
 
         <span class="team-hero-badge">
-            Solidaritas • Vitae Auxilium
+            TrueLife Dayongan Solidaritas Social Welfare Services, Inc.
         </span>
 
         <h1 class="team-hero-title">
@@ -199,4 +195,4 @@
     </div>
 </section>
 
-@endsection
+

@@ -1,3 +1,7 @@
+@php
+    $isAdmin = auth()->check() && auth()->user()->RoleID == 1;
+@endphp
+
 <div x-data="{ open: false }" class="sidebar-wrapper">
 
     <!-- Mobile Header -->
@@ -105,6 +109,9 @@
                     Dashboard
                 </a>
 
+
+                @if($isAdmin)
+
                 <a
                     href="{{ route('masterlist') }}"
                     class="menu-item {{ request()->routeIs('masterlist') ? 'active-menu' : '' }}">
@@ -122,8 +129,13 @@
                     class="menu-item {{ request()->routeIs('report-settings') ? 'active-menu' : '' }}">
                     Report & Settings
                 </a>
+                   @endif
 
-
+                      <a
+                    {{-- href="{{ route('my-profile') }}" --}}
+                    class="menu-item {{ request()->routeIs('my-profile') ? 'active-menu' : '' }}">
+                    My Profile
+                </a>
 
                 </div>
 

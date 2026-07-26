@@ -1,94 +1,276 @@
 <section class="hero-section">
 
-    <!-- Background Image & Overlays -->
+
+    {{-- =========================
+        BACKGROUND
+    ========================== --}}
+
     <div class="hero-bg-container">
-        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Dayongan Community" class="hero-image">
+
+        <img
+            src="{{ asset('images/hero-bg.jpg') }}"
+            alt="Dayongan Community"
+            class="hero-image"
+        >
+
         <div class="hero-overlay"></div>
 
-        <!-- Gold Glow Accent -->
         <div class="hero-glow-gold"></div>
 
-        <!-- Blue Glow Accent -->
         <div class="hero-glow-blue"></div>
+
     </div>
 
-    <!-- Content Area (Pulled Up) -->
+
+
+
+    {{-- =========================
+        CONTENT
+    ========================== --}}
+
     <div class="hero-content-wrapper">
+
         <div class="hero-container">
+
             <div class="hero-grid">
 
-                <!-- LEFT COLUMN -->
+
+                {{-- LEFT COLUMN --}}
+
                 <div class="hero-left-col pt-10">
-                    <!-- Badge -->
+
+
+                    {{-- Badge --}}
+
                     <div class="hero-badge">
+
                         <span class="hero-badge-dot"></span>
-                        <span class="hero-badge-text">
-                            Community Support System
-                        </span>
+
+                        <x-editable-text
+                            key="hero_badge"
+                            :value="$contexts['hero_badge'] ?? ''"
+                            tag="span"
+                            class="hero-badge-text"
+                        />
+
                     </div>
 
-                    <!-- Heading -->
+
+
+                    {{-- Heading --}}
+
                     <h1 class="hero-title">
+
+
                         <span class="block">
-                            <span class="hero-title-highlight">Helping</span> Hands.
+
+                            <x-editable-text
+                                key="hero_title_line1"
+                                :value="$contexts['hero_title_line1'] ?? ''"
+                                tag="span"
+                            />
+
+
+                            <span class="hero-title-highlight">
+
+                                <x-editable-text
+                                    key="hero_title_highlight1"
+                                    :value="$contexts['hero_title_highlight1'] ?? ''"
+                                    tag="span"
+                                />
+
+                            </span>
+
                         </span>
+
+
+
+
                         <span class="block">
-                            Caring <span class="hero-title-highlight"> Hearts.</span>
+
+                            <x-editable-text
+                                key="hero_title_line2"
+                                :value="$contexts['hero_title_line2'] ?? ''"
+                                tag="span"
+                            />
+
+
+                            <span class="hero-title-highlight">
+
+                                <x-editable-text
+                                    key="hero_title_highlight2"
+                                    :value="$contexts['hero_title_highlight2'] ?? ''"
+                                    tag="span"
+                                />
+
+                            </span>
+
                         </span>
+
+
+
+
                         <span class="block mt-1">
-                            Building Stronger <span class="hero-title-highlight">Communities.</span>
+
+
+                            <x-editable-text
+                                key="hero_title_line3"
+                                :value="$contexts['hero_title_line3'] ?? ''"
+                                tag="span"
+                            />
+
+
+                            <span class="hero-title-highlight">
+
+                                <x-editable-text
+                                    key="hero_title_highlight3"
+                                    :value="$contexts['hero_title_highlight3'] ?? ''"
+                                    tag="span"
+                                />
+
+                            </span>
+
+
                         </span>
+
+
                     </h1>
 
-                    <!-- Decorative Accent Line -->
+
+
+
                     <div class="hero-accent-line"></div>
 
-                    <!-- Description -->
-                    <p class="hero-description">
-                        At TrueLife DAYONGAN, we believe that no family should face life's challenges alone.
-                        Our goal is to build a community that supports one another through compassion, preparedness, and
-                        responsible stewardship.
-                    </p>
 
-                    <!-- CTA Action Buttons -->
+
+                    {{-- Description --}}
+
+                    <x-editable-text
+                        key="hero_description"
+                        :value="$contexts['hero_description'] ?? ''"
+                        tag="p"
+                        class="hero-description"
+                    />
+
+
+
+
+                    {{-- Buttons --}}
+
                     <div class="hero-btn-group">
-                        <a onclick="Livewire.dispatch('open-application-modal')" class="hero-btn-primary">
+
+                        <a
+                            onclick="Livewire.dispatch('open-application-modal')"
+                            class="hero-btn-primary">
+
                             Join Now
+
                         </a>
-                        <a href="#learn-more" class="hero-btn-secondary">
+
+
+                        <a
+                            href="#learn-more"
+                            class="hero-btn-secondary">
+
                             Learn More
+
                         </a>
+
                     </div>
+
+
                 </div>
 
-                <!-- RIGHT COLUMN (Graphic & Floating Cards) -->
+
+
+
+
+                {{-- RIGHT COLUMN --}}
+
                 <div class="hero-right-col">
+
                     <div class="relative">
-                        <!-- Brand Logo Container -->
+
+
                         <div class="hero-logo-box">
-                            <img src="{{ asset('images/dayongan-logo.png') }}" alt="Dayongan Logo"
-                                class="hero-logo-img">
+
+                            <img
+                                src="{{ asset('images/dayongan-logo.png') }}"
+                                alt="Dayongan Logo"
+                                class="hero-logo-img"
+                            >
+
                         </div>
 
-                        <!-- Members Floating Card -->
+
+
+
+                        {{-- Members Card --}}
+
                         <div class="hero-card-members">
-                            <p class="hero-card-title">500+</p>
-                            <p class="hero-card-subtext">Community Members</p>
+
+                            <x-editable-text
+                                key="hero_members_count"
+                                :value="$contexts['hero_members_count'] ?? ''"
+                                tag="p"
+                                class="hero-card-title"
+                            />
+
+
+                            <x-editable-text
+                                key="hero_members_label"
+                                :value="$contexts['hero_members_label'] ?? ''"
+                                tag="p"
+                                class="hero-card-subtext"
+                            />
+
                         </div>
 
-                        <!-- Support Floating Card -->
+
+
+
+
+                        {{-- Support Card --}}
+
                         <div class="hero-card-support">
-                            <p class="hero-card-title">24/7</p>
-                            <p class="hero-card-subtext">Community Support</p>
+
+
+                            <x-editable-text
+                                key="hero_support_count"
+                                :value="$contexts['hero_support_count'] ?? ''"
+                                tag="p"
+                                class="hero-card-title"
+                            />
+
+
+                            <x-editable-text
+                                key="hero_support_label"
+                                :value="$contexts['hero_support_label'] ?? ''"
+                                tag="p"
+                                class="hero-card-subtext"
+                            />
+
+
                         </div>
+
+
+
                     </div>
+
+
                 </div>
+
+
 
             </div>
+
         </div>
+
     </div>
 
-    <!-- Bottom Gradient Accent Bar -->
+
+
     <div class="hero-bottom-bar"></div>
+
 
 </section>

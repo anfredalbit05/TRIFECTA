@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'How It Works')
-
-@section('content')
+<div>
 
 <!-- ======================================
      HERO SECTION
@@ -15,7 +11,7 @@
     <div class="hiw-container-center">
 
         <span class="hiw-badge">
-            Solidaritas • Vitae Auxilium
+            TrueLife Dayongan Solidaritas Social Welfare Services, Inc.
         </span>
 
         <h1 class="hiw-title">
@@ -374,4 +370,4 @@
     </div>
 </section>
 
-@endsection
+</div>

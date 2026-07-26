@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'Home')
-
-@section('content')
+<div>
 
     @include('components.home.hero')
 
@@ -12,4 +8,4 @@
 
     @include('components.home.why-choose')
 
-@endsection
+</div>

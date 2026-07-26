@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'Testimonials')
-
-@section('content')
+<div>
 
 <!-- ======================================
      HERO SECTION
@@ -15,7 +11,7 @@
     <div class="testimonials-container-center">
 
         <span class="testimonials-tag">
-              Solidaritas • Vitae Auxilium
+              TrueLife Dayongan Solidaritas Social Welfare Services, Inc.
         </span>
 
         <h1 class="testimonials-title">
@@ -176,4 +172,4 @@
     </div>
 </section>
 
-@endsection
+</div>

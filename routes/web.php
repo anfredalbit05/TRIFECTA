@@ -2,7 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-
+use App\Livewire\LandingPage\Home;
+use App\Livewire\LandingPage\About;
+use App\Livewire\LandingPage\Team;
+use App\Livewire\LandingPage\HowItWorks;
+use App\Livewire\LandingPage\Testimonials;
+use App\Livewire\LandingPage\NewsUpdates;
+use App\Livewire\LandingPage\Contact;
 
 /*
 |--------------------------------------------------------------------------
@@ -10,41 +16,19 @@ use Illuminate\Support\Facades\Auth;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return view('pages.home');
-})->name('home');
+Route::get('/', Home::class)->name('home');
 
+Route::get('/about', About::class)->name('about');
 
-Route::get('/about', function () {
-    return view('pages.about');
-})->name('about');
+Route::get('/team', Team::class)->name('team');
 
+Route::get('/how-it-works', HowItWorks::class)->name('how-it-works');
 
-Route::get('/team', function () {
-    return view('pages.team');
-})->name('team');
+Route::get('/testimonials', Testimonials::class)->name('testimonials');
 
+Route::get('/news', NewsUpdates::class)->name('news');
 
-Route::get('/how-it-works', function () {
-    return view('pages.how-it-works');
-})->name('how-it-works');
-
-
-Route::get('/testimonials', function () {
-    return view('pages.testimonials');
-})->name('testimonials');
-
-
-Route::get('/news', function () {
-    return view('pages.news');
-})->name('news');
-
-
-Route::get('/contact', function () {
-    return view('pages.contact');
-})->name('contact');
-
-
+Route::get('/contact', Contact::class)->name('contact');
 
 /*
 |--------------------------------------------------------------------------
