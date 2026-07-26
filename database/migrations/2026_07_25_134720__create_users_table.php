@@ -34,7 +34,6 @@ return new class extends Migration
             $table->string('firstname', 100);
             $table->string('middlename', 100)->nullable();
 
-
             $table->string('gender', 20)->nullable();
             $table->string('civilstatus', 20)->nullable();
 
@@ -60,12 +59,17 @@ return new class extends Migration
             $table->enum('status', [
                 'Active',
                 'Inactive',
-                'Suspended'
+                'Suspended',
             ])->default('Inactive');
 
             $table->rememberToken();
 
             $table->timestamps();
+
+            // Profile Picture
+            $table->string('profilepic')
+                ->nullable()
+                ->default('images/profiles/default-avatar.png');
 
             $table->foreign('RoleID')
                 ->references('RoleID')
