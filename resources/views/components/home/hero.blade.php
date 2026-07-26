@@ -18,7 +18,7 @@
             <div class="hero-grid">
 
                 <!-- LEFT COLUMN -->
-                <div class="hero-left-col">
+                <div class="hero-left-col pt-10">
                     <!-- Badge -->
                     <div class="hero-badge">
                         <span class="hero-badge-dot"></span>
@@ -30,10 +30,13 @@
                     <!-- Heading -->
                     <h1 class="hero-title">
                         <span class="block">
-                            United in <span class="hero-title-highlight">Service.</span>
+                            <span class="hero-title-highlight">Helping</span> Hands.
+                        </span>
+                        <span class="block">
+                            Caring <span class="hero-title-highlight"> Hearts.</span>
                         </span>
                         <span class="block mt-1">
-                            Committed to <span class="hero-title-highlight">Excellence.</span>
+                            Building Stronger <span class="hero-title-highlight">Communities.</span>
                         </span>
                     </h1>
 
@@ -42,7 +45,9 @@
 
                     <!-- Description -->
                     <p class="hero-description">
-                        DAYONGAN is a trusted community support platform connecting families, strengthening communities, and delivering meaningful public service through innovation, transparency, and compassion.
+                        At TrueLife DAYONGAN, we believe that no family should face life's challenges alone.
+                        Our goal is to build a community that supports one another through compassion, preparedness, and
+                        responsible stewardship.
                     </p>
 
                     <!-- CTA Action Buttons -->
@@ -61,7 +66,8 @@
                     <div class="relative">
                         <!-- Brand Logo Container -->
                         <div class="hero-logo-box">
-                            <img src="{{ asset('images/dayongan-logo.png') }}" alt="Dayongan Logo" class="hero-logo-img">
+                            <img src="{{ asset('images/dayongan-logo.png') }}" alt="Dayongan Logo"
+                                class="hero-logo-img">
                         </div>
 
                         <!-- Members Floating Card -->

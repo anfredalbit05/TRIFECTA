@@ -8,12 +8,12 @@
             </span>
 
             <h2 class="mt-4 text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0C2C6B] leading-tight">
-                Be Protected. <br class="hidden sm:inline" />
-                <span class="text-amber-500">Be Secured. <br></span> Be Dayongan.
+                Together We Care. <br class="hidden sm:inline" />
+                <span class="text-amber-500">Together We Prosper. <br></span> Be Dayongan.
             </h2>
 
             <p class="mt-4 text-slate-600 text-base sm:text-lg leading-relaxed">
-                <strong>DAYONGAN Solidaritas - Vitae Auxilium</strong> is your dedicated partner in navigating life's uncertainties.
+                <strong>TrueLife Dayongan Solidaritas Social Welfare Services, Inc.</strong> is your dedicated partner in navigating life's uncertainties.
                 <em>"May kaagapay ka sa mga posibleng darating sa pamilya at buhay mo!"</em> We strive to provide accessible, reliable, and comprehensive financial assistance for every family.
             </p>
         </div>
@@ -62,7 +62,7 @@
                 </div>
 
                 <h3 class="mt-8 text-2xl font-bold text-[#0C2C6B]">
-                    Vitae Auxilium
+                    TrueLife Dayongan Solidaritas Social Welfare Services, Inc.
                 </h3>
 
                 <p class="mt-1 text-xs font-semibold uppercase tracking-wider text-amber-600 mb-4">Our Core Life Support Values</p>

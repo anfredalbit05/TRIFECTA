@@ -100,14 +100,13 @@ class ApplicationModal extends Component
         ]);
 
 
-        session()->flash(
-            'success',
-            'Application submitted successfully.'
-        );
-
-
         $this->close();
-        $this->open = false;
+
+      $this->dispatch(
+        'toast',
+        type: 'success',
+        message: 'Application submitted successfully! Your application is now pending review.'
+    );
     }
 
     public function render()
