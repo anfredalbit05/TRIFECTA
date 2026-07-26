@@ -65,12 +65,12 @@
         class="sidebar">
 
 
-        <!-- Logo -->
-        <div class="sidebar-logo">
+        <!-- Fixed Sidebar Logo -->
+        <a href="{{ route('home') }}" class="sidebar-logo">
             <img
                 src="{{ asset('images/dayongan-logo.png') }}"
                 class="logo-image">
-        </div>
+        </a>
 
 
         <!-- Scroll Area -->
@@ -96,6 +96,7 @@
                 <p class="profile-status">
                     {{ Auth::user()->status ?? 'Inactive' }} Member
                 </p>
+
 
             </div>
 
@@ -131,7 +132,7 @@
                 </a>
                    @endif
 
-                      <a
+                <a
                     {{-- href="{{ route('my-profile') }}" --}}
                     class="menu-item {{ request()->routeIs('my-profile') ? 'active-menu' : '' }}">
                     My Profile
