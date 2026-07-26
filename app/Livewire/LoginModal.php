@@ -12,17 +12,15 @@ class LoginModal extends Component
 {
     public bool $openLogin = false;
 
-    public $email = '';
-    public $password = '';
+    public string $email = '';
+    public string $password = '';
     public bool $remember = false;
-
 
     #[On('open-login-modal')]
     public function openModal()
     {
         $this->openLogin = true;
     }
-
 
     public function close()
     {
@@ -32,88 +30,63 @@ class LoginModal extends Component
             'remember'
         ]);
 
+        $this->resetValidation();
+
         $this->openLogin = false;
     }
 
-
     public function login()
     {
+        // 1. Validate inputs
         $this->validate([
             'email' => 'required',
             'password' => 'required',
+        ], [
+            'email.required' => 'Please enter your email, mobile number, or username.',
+            'password.required' => 'Please enter your password.',
         ]);
 
-
-        // Find account using email, mobile, or username
+        // 2. Find account using email, mobile number, or username
         $user = User::where('email', $this->email)
             ->orWhere('contactno', $this->email)
             ->orWhere('username', $this->email)
             ->first();
 
-
         if (!$user) {
-
-            $this->addError(
-                'email',
-                'Account not found.'
-            );
-
+            $this->addError('email', 'Account not found.');
             return;
         }
 
-
-        // Check password
+        // 3. Verify password
         if (!Hash::check($this->password, $user->password)) {
-
-            $this->addError(
-                'password',
-                'Incorrect password.'
-            );
-
+            $this->addError('password', 'Incorrect password.');
             return;
         }
 
-
-        // // Check account status
+        // Optional: Check account status if enabled
         // if ($user->status !== 'Active') {
-
-        //     $this->addError(
-        //         'email',
-        //         'Your account is still inactive.'
-        //     );
-
+        //     $this->addError('email', 'Your account is currently inactive.');
         //     return;
         // }
 
-
-        // Login user
-        Auth::login(
-            $user,
-            $this->remember
-        );
-
+        // 4. Authenticate user session
+        Auth::login($user, $this->remember);
 
         session()->regenerate();
 
-
-        // Close modal
+        // 5. Reset inputs & close modal
+        $this->reset(['email', 'password', 'remember']);
         $this->openLogin = false;
 
-
-        // Redirect
+        // 6. Redirect to dashboard
         return redirect()->route('dashboard');
     }
 
-
     public function switchToRegister()
     {
-        // Close login modal
-        $this->openLogin = false;
-
-        // Open registration modal
+        $this->close();
         $this->dispatch('open-application-modal');
     }
-
 
     public function render()
     {

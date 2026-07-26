@@ -3,59 +3,32 @@
 ====================================== */
 
 .dashboard-grid {
-    @apply mt-0 grid min-w-0 grid-cols-1 items-stretch gap-8 xl:grid-cols-[minmax(0,1fr)_340px];
+    /* items-start is required for sticky to work correctly inside CSS Grid */
+    @apply mt-0 grid min-w-0 grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px];
+}
+
+/* Container for feed posts */
+.feed-column {
+    @apply flex flex-col gap-6 w-full min-w-0;
 }
 
 
 /* ======================================
-   MEMBER CARD
+   MEMBER / FEED CARD (INDIVIDUAL POST BOX)
 ====================================== */
 
 .member-card {
-    @apply sticky top-6 self-start flex h-[calc(88vh-48px)] flex-col w-full rounded-3xl bg-white p-8 shadow-md;
+    @apply flex flex-col w-full rounded-3xl bg-white shadow-md overflow-hidden border border-gray-100;
 }
-
-
-/* ======================================
-   MEMBER PROFILE
-====================================== */
-
-.member-profile {
-    @apply flex items-center gap-4;
-}
-
-.member-avatar {
-    @apply h-16 w-16 rounded-full object-cover;
-}
-
-.member-username {
-    @apply text-sm text-gray-500;
-}
-
-.member-name {
-    @apply text-2xl font-bold text-gray-900;
-}
-
-.member-id {
-    @apply text-sm text-gray-500;
-}
-
-.dashboard-divider {
-    @apply my-6 border-gray-200;
-}
-
-.member-description {
-    @apply text-sm leading-7 text-gray-600;
-}
-
-
-/* ======================================
-   FEED CARD (FLUSH FULL-WIDTH STYLING)
-====================================== */
 
 .feed-card {
-    @apply bg-white w-full font-sans border-b border-gray-200 last:border-b-0;
+    @apply bg-white w-full font-sans;
 }
+
+
+/* ======================================
+   CARD CONTENT STYLING
+====================================== */
 
 .card-header {
     @apply flex justify-between items-center px-6 py-4;
@@ -107,57 +80,6 @@
 
 .reactions-count {
     @apply flex items-center gap-1;
-}
-
-
-/* ======================================
-   NEWS FEED CARD
-====================================== */
-
-.news-feed-card {
-    @apply flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white;
-}
-
-.news-feed-header {
-    @apply flex items-center justify-between border-b border-gray-200 bg-gray-50 px-6 py-4;
-}
-
-.news-feed-header h3 {
-    @apply text-lg font-semibold text-gray-900;
-}
-
-.news-feed-header p {
-    @apply mt-1 text-sm text-gray-500;
-}
-
-.news-feed-live {
-    @apply rounded-full bg-green-100 px-4 py-1 text-sm font-medium text-green-700;
-}
-
-
-/* ZERO PADDING BODY FOR FULL EDGE-TO-EDGE FIT */
-
-.news-feed-body {
-    @apply min-h-0 flex-1 overflow-hidden p-0 w-full;
-}
-
-/* SCROLLABLE CONTAINER (OVERFLOW APPLIED) */
-
-.news-feed-scroll {
-    @apply h-full w-full overflow-y-auto overflow-x-hidden p-0;
-
-    /* Hide scrollbar for Firefox */
-    scrollbar-width: none;
-
-    /* Hide scrollbar for IE/Edge */
-    -ms-overflow-style: none;
-}
-
-/* Hide scrollbar for Chrome, Safari, Edge, Opera */
-.news-feed-scroll::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    height: 0;
 }
 
 
@@ -216,11 +138,12 @@
 
 
 /* ======================================
-   WALLET CARD
+   ALWAYS STICKY WALLET CARD
 ====================================== */
 
 .wallet-card {
-    @apply sticky top-6 self-start flex max-h-[calc(88vh-48px)] flex-col w-full rounded-3xl bg-white p-6 shadow-md;
+    /* Stays firmly stuck at top-6 relative to viewport, regardless of scrolling */
+    @apply sticky top-6 self-start flex flex-col w-full rounded-3xl bg-white p-6 shadow-md;
 }
 
 .wallet-card hr {
@@ -282,12 +205,6 @@
 
 @media (max-width: 1279px) {
     .wallet-card {
-        @apply sticky top-6;
-    }
-}
-
-@media (min-width: 1280px) {
-    .wallet-card {
-        @apply sticky top-6;
+        @apply static;
     }
 }

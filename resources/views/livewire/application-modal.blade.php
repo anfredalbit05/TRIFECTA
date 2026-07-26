@@ -116,89 +116,77 @@
                         </div>
                     </div>
 
-                     <!-- APPLICANT INFORMATION -->
+                    <!-- SECURITY INFORMATION -->
                     <div class="space-y-4">
+                        <h3 class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
+                            Security Information
+                        </h3>
 
-                    <h3 class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
-                        Security Information
-                    </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
+                            <!-- Mobile Number -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    Mobile Number *
+                                </label>
+                                <input
+                                    wire:model="mobile"
+                                    type="tel"
+                                    placeholder="0917XXXXXXX"
+                                    class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                            </div>
 
+                            <!-- Email -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    Email Address (Optional)
+                                </label>
+                                <input
+                                    wire:model="email"
+                                    type="email"
+                                    placeholder="juan@example.com"
+                                    class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                            </div>
 
-                    <!-- Security Fields -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
+                            <!-- Empty column to push next row -->
+                            <div class="hidden lg:block"></div>
 
+                            <!-- Username -->
+                            <div class="lg:col-start-1">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    Username *
+                                </label>
+                                <input
+                                    wire:model="username"
+                                    type="text"
+                                    placeholder="Juan123"
+                                    class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                            </div>
 
-                        <!-- Mobile Number -->
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">
-                                Mobile Number *
-                            </label>
-                            <input
-                                wire:model="mobile"
-                                type="tel"
-                                placeholder="0917XXXXXXX"
-                                class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                            <!-- Password -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    Password *
+                                </label>
+                                <input
+                                    wire:model="password"
+                                    type="password"
+                                    placeholder="********"
+                                    class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    Confirm Password *
+                                </label>
+                                <input
+                                    wire:model="password_confirmation"
+                                    type="password"
+                                    placeholder="********"
+                                    class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                            </div>
                         </div>
-
-
-                        <!-- Email -->
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">
-                                Email Address (Optional)
-                            </label>
-                            <input
-                                wire:model="email"
-                                type="email"
-                                placeholder="juan@example.com"
-                                class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
-                        </div>
-
-
-                        <!-- Empty column to push next row -->
-                        <div class="hidden lg:block"></div>
-
-
-                        <!-- Username -->
-                        <div class="lg:col-start-1">
-                            <label class="block text-xs font-bold text-slate-700 mb-1">
-                                Username *
-                            </label>
-                            <input
-                                wire:model="username"
-                                type="text"
-                                placeholder="Juan123"
-                                class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
-                        </div>
-
-
-                        <!-- Password -->
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">
-                                Password *
-                            </label>
-                            <input
-                                wire:model="password"
-                                type="password"
-                                placeholder="********"
-                                class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
-                        </div>
-
-
-                        <!-- Confirm Password -->
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">
-                                Confirm Password *
-                            </label>
-                            <input
-                                wire:model="password_confirmation"
-                                type="password"
-                                placeholder="********"
-                                class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
-                        </div>
-
                     </div>
-
-                  </div>
 
                     <!-- ACCEPTANCE OF TERMS -->
                     <div class="space-y-3">
@@ -235,11 +223,26 @@
                             Cancel
                         </button>
 
+                        <!-- Submit Application Button -->
                         <button
                             wire:click="submit"
+                            wire:loading.attr="disabled"
                             type="button"
-                            class="w-1/2 sm:w-auto px-6 py-2.5 bg-[#D4A017] hover:bg-[#E8B923] text-[#0B2A5B] font-bold text-xs rounded-xl shadow-md transition text-center">
-                            Submit Application
+                            class="w-1/2 sm:w-auto px-6 py-2.5 bg-[#D4A017] hover:bg-[#E8B923] text-[#0B2A5B] font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center disabled:opacity-75 disabled:cursor-not-allowed">
+
+                            <!-- Normal State -->
+                            <span wire:loading.remove wire:target="submit">
+                                Submit Application
+                            </span>
+
+                            <!-- Loading State (Side-by-Side Flex) -->
+                            <div wire:loading.flex wire:target="submit" class="items-center justify-center gap-2">
+                                <svg class="animate-spin h-4 w-4 text-[#0B2A5B] shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span class="whitespace-nowrap">Submitting...</span>
+                            </div>
                         </button>
                     </div>
                 </div>

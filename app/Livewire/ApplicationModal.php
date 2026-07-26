@@ -114,4 +114,5 @@ class ApplicationModal extends Component
     {
         return view('livewire.application-modal');
     }
+
 }
