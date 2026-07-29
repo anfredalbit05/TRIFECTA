@@ -23,8 +23,8 @@
                                 <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                                     Activating Member
                                 </p>
-                                <p class="text-sm font-extrabold text-[#0B2A5B]">
-                                    {{ trim(($member?->firstname ?? '') . ' ' . ($member?->middlename ?? '') . ' ' . ($member?->lastname ?? '')) ?: 'Member not selected' }}
+                               <p class="text-sm font-extrabold text-[#0B2A5B]">
+                                    {{ trim(($selectedUserRecord?->firstname ?? '') . ' ' . ($selectedUserRecord?->middlename ?? '') . ' ' . ($selectedUserRecord?->lastname ?? '')) ?: 'Member not selected' }}
                                 </p>
                             </div>
                         </div>

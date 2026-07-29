@@ -11,24 +11,39 @@
     <div class="testimonials-container-center">
 
         <span class="testimonials-tag">
-              TrueLife Dayongan Solidaritas Social Welfare Services, Inc.
+            <x-editable-text
+                key="testimonials_hero_tag"
+                :value="$contexts['testimonials_hero_tag'] ?? 'TrueLife Dayongan Solidaritas Social Welfare Services, Inc.'"
+                tag="span"
+                class="inline-block"
+            />
         </span>
 
         <h1 class="testimonials-title">
-            What Our
+            <x-editable-text
+                key="testimonials_hero_title_1"
+                :value="$contexts['testimonials_hero_title_1'] ?? 'What Our'"
+                tag="span"
+                class="inline-block"
+            />
             <br class="hidden sm:block">
             <span class="testimonials-title-highlight">
-                Members Say
+                <x-editable-text
+                    key="testimonials_hero_title_highlight"
+                    :value="$contexts['testimonials_hero_title_highlight'] ?? 'Members Say'"
+                    tag="span"
+                    class="inline-block"
+                />
             </span>
         </h1>
 
         <p class="testimonials-description">
-            Hear inspiring stories from members who have experienced the
-            compassion, protection, and support provided by
-            <strong>TRUELIFE DAYONGAN SOLIDARITAS.</strong>
-            Their experiences reflect our commitment to serving families,
-            providing reliable assistance, and strengthening communities
-            through care, trust, and meaningful support.
+            <x-editable-text
+                key="testimonials_hero_description"
+                :value="$contexts['testimonials_hero_description'] ?? 'Hear inspiring stories from members who have experienced the compassion, protection, and support provided by TRUELIFE DAYONGAN SOLIDARITAS. Their experiences reflect our commitment to serving families, providing reliable assistance, and strengthening communities through care, trust, and meaningful support.'"
+                tag="span"
+                class="block"
+            />
         </p>
 
     </div>
@@ -40,14 +55,31 @@
 ========================= -->
 <section class="testimonials-intro">
     <div class="testimonials-intro-container">
-        <span class="testimonials-small-title">Real Experiences</span>
+        <span class="testimonials-small-title">
+            <x-editable-text
+                key="testimonials_intro_small_title"
+                :value="$contexts['testimonials_intro_small_title'] ?? 'Real Experiences'"
+                tag="span"
+                class="inline-block"
+            />
+        </span>
 
-        <h2 class="testimonials-heading">Stories That Inspire</h2>
+        <h2 class="testimonials-heading">
+            <x-editable-text
+                key="testimonials_intro_heading"
+                :value="$contexts['testimonials_intro_heading'] ?? 'Stories That Inspire'"
+                tag="span"
+                class="inline-block"
+            />
+        </h2>
 
         <p class="testimonials-text">
-            Every family we serve has a unique story. These testimonials
-            reflect the trust and confidence our members have in DAYONGAN's
-            commitment to protecting Filipino families.
+            <x-editable-text
+                key="testimonials_intro_text"
+                :value="$contexts['testimonials_intro_text'] ?? 'Every family we serve has a unique story. These testimonials reflect the trust and confidence our members have in DAYONGAN\'s commitment to protecting Filipino families.'"
+                tag="span"
+                class="block"
+            />
         </p>
     </div>
 </section>
@@ -117,22 +149,50 @@
 
             <div>
                 <div class="testimonial-highlight-icon">❤️</div>
-                <h3 class="testimonial-highlight-title">Compassion</h3>
+                <h3 class="testimonial-highlight-title">
+                    <x-editable-text
+                        key="testimonials_highlight_1"
+                        :value="$contexts['testimonials_highlight_1'] ?? 'Compassion'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </h3>
             </div>
 
             <div>
                 <div class="testimonial-highlight-icon">🤝</div>
-                <h3 class="testimonial-highlight-title">Unity</h3>
+                <h3 class="testimonial-highlight-title">
+                    <x-editable-text
+                        key="testimonials_highlight_2"
+                        :value="$contexts['testimonials_highlight_2'] ?? 'Unity'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </h3>
             </div>
 
             <div>
                 <div class="testimonial-highlight-icon">🛡️</div>
-                <h3 class="testimonial-highlight-title">Protection</h3>
+                <h3 class="testimonial-highlight-title">
+                    <x-editable-text
+                        key="testimonials_highlight_3"
+                        :value="$contexts['testimonials_highlight_3'] ?? 'Protection'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </h3>
             </div>
 
             <div>
                 <div class="testimonial-highlight-icon">⭐</div>
-                <h3 class="testimonial-highlight-title">Hope</h3>
+                <h3 class="testimonial-highlight-title">
+                    <x-editable-text
+                        key="testimonials_highlight_4"
+                        :value="$contexts['testimonials_highlight_4'] ?? 'Hope'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </h3>
             </div>
 
         </div>
@@ -144,30 +204,46 @@
 ========================= -->
 <section class="testimonials-cta">
     <div class="testimonials-intro-container">
-        <span class="testimonials-small-title">Join Us Today</span>
+        <span class="testimonials-small-title">
+            <x-editable-text
+                key="testimonials_cta_small_title"
+                :value="$contexts['testimonials_cta_small_title'] ?? 'Join Us Today'"
+                tag="span"
+                class="inline-block"
+            />
+        </span>
 
         <h2 class="testimonials-heading">
-            Be Part of the DAYONGAN Family
+            <x-editable-text
+                key="testimonials_cta_heading"
+                :value="$contexts['testimonials_cta_heading'] ?? 'Be Part of the DAYONGAN Family'"
+                tag="span"
+                class="inline-block"
+            />
         </h2>
 
         <p class="testimonials-text">
-            Experience community-based protection and financial assistance
-            designed to help Filipino families face life's challenges
-            with confidence and hope.
+            <x-editable-text
+                key="testimonials_cta_text"
+                :value="$contexts['testimonials_cta_text'] ?? 'Experience community-based protection and financial assistance designed to help Filipino families face life\'s challenges with confidence and hope.'"
+                tag="span"
+                class="block"
+            />
         </p>
 
         <div class="testimonials-buttons">
             <button
                 onclick="Livewire.dispatch('open-application-modal')"
                 class="testimonial-btn-primary">
-                Become a Member
+                <x-editable-text
+                    key="testimonials_btn_primary"
+                    :value="$contexts['testimonials_btn_primary'] ?? 'Become a Member'"
+                    tag="span"
+                    class="inline-block"
+                />
             </button>
 
-            <a
-                href="{{ route('contact') }}"
-                class="testimonial-btn-secondary">
-                Contact Us
-            </a>
+
         </div>
     </div>
 </section>

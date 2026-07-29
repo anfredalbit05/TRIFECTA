@@ -62,7 +62,7 @@
             x-show="tab === 'overview'"
             class="dashboard-main-card full-width-card"
         >
-            <x-admin-pages.masterlist.dashboard />
+             <livewire:admin-pages.masterlist.dashboard />
         </div>
 
         <!-- MEMBERS -->
@@ -89,7 +89,7 @@
             x-cloak
             class="dashboard-main-card full-width-card"
         >
-            <x-admin-pages.masterlist.benefits />
+            <livewire:admin-pages.masterlist.benefits-list />
         </div>
 
         <!-- INQUIRIES -->

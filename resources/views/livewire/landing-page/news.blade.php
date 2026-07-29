@@ -10,20 +10,38 @@
         <div class="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div class="text-center max-w-3xl mx-auto">
                 <span class="news-hero-badge">
-                    TrueLife Dayongan Solidaritas Social Welfare Services, Inc.
+                    <x-editable-text
+                        key="news_hero_badge"
+                        :value="$contexts['news_hero_badge'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </span>
 
                 <h1 class="news-hero-title">
-                    News, Stories &
+                    <x-editable-text
+                        key="news_hero_title_1"
+                        :value="$contexts['news_hero_title_1'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
+                    <br class="hidden sm:block">
                     <span class="news-hero-title-highlight">
-                        Community Updates
+                        <x-editable-text
+                            key="news_hero_title_highlight"
+                            :value="$contexts['news_hero_title_highlight'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
                     </span>
                 </h1>
                 <p class="news-hero-description">
-                    Stay informed with the latest announcements, branch updates, claim stories, and official
-                    partnerships from DAYONGAN. Discover important updates, community activities, and milestones
-                    that highlight our continued commitment to serving, supporting, and empowering every
-                    member and their families.
+                    <x-editable-text
+                        key="news_hero_description"
+                        :value="$contexts['news_hero_description'] ?? ''"
+                        tag="span"
+                        class="block"
+                    />
                 </p>
             </div>
         </div>
@@ -38,16 +56,30 @@
 
                 <div class="text-center max-w-3xl mx-auto mb-16">
                     <span class="news-section-label">
-                        Featured Update
+                        <x-editable-text
+                            key="news_featured_label"
+                            :value="$contexts['news_featured_label'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
                     </span>
 
                     <h2 class="news-section-title">
-                        Latest News & Community Highlights
+                        <x-editable-text
+                            key="news_featured_title"
+                            :value="$contexts['news_featured_title'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
                     </h2>
 
                     <p class="news-section-description">
-                        Explore the latest announcements, partnerships, community activities, and important updates from
-                        DAYONGAN as we continue strengthening protection and support for every family.
+                        <x-editable-text
+                            key="news_featured_description"
+                            :value="$contexts['news_featured_description'] ?? ''"
+                            tag="span"
+                            class="block"
+                        />
                     </p>
                 </div>
 
@@ -138,9 +170,9 @@
                                 <img src="{{ $article->image ? asset('storage/' . $article->image) : asset('images/hero-bg.jpg') }}"
                                      alt="{{ $article->title }}"
                                      class="news-card-image">
-                                <span class="news-card-badge {{ $article->category === 'Insurance' ? 'news-badge-health' : 'news-badge-service' }}">
-                                    {{ $article->category ?? 'General' }}
-                                </span>
+                            <span class="news-card-badge {{ $article->category === 'Insurance' ? 'news-badge-health' : 'news-badge-service' }}">
+                                {{ $article->category ?? 'General' }}
+                            </span>
                             </div>
                             <div class="news-card-body">
                                 <span class="news-card-date">{{ $article->created_at ? $article->created_at->format('M d, Y') : '' }}</span>
@@ -174,18 +206,40 @@
     ========================== -->
     <section class="news-newsletter-section">
         <div class="news-newsletter-container">
-            <span class="news-newsletter-subtitle">Never Miss an Update</span>
+            <span class="news-newsletter-subtitle">
+                <x-editable-text
+                    key="news_newsletter_subtitle"
+                    :value="$contexts['news_newsletter_subtitle'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
+            </span>
             <h2 class="news-newsletter-title">
-                Subscribe to Official Bulletins
+                <x-editable-text
+                    key="news_newsletter_title"
+                    :value="$contexts['news_newsletter_title'] ?? ''"
+                    tag="span"
+                    class="inline-block"
+                />
             </h2>
             <p class="news-newsletter-description">
-                Get official announcements, policy advisories, and community health perk updates sent directly to your email inbox or phone.
+                <x-editable-text
+                    key="news_newsletter_description"
+                    :value="$contexts['news_newsletter_description'] ?? ''"
+                    tag="span"
+                    class="block"
+                />
             </p>
 
             <form class="news-newsletter-form" wire:submit.prevent="subscribe">
-                <input type="email" placeholder="Enter your email address" class="news-newsletter-input">
+                <input type="email" placeholder="{{ $contexts['news_newsletter_placeholder'] ?? 'Enter your email address' }}" class="news-newsletter-input">
                 <button type="submit" class="news-newsletter-btn">
-                    Subscribe Now
+                    <x-editable-text
+                        key="news_newsletter_btn_text"
+                        :value="$contexts['news_newsletter_btn_text'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </button>
             </form>
         </div>

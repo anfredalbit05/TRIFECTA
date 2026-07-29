@@ -11,24 +11,45 @@
     <div class="about-container-center">
 
         <span class="about-hero-badge">
-              TrueLife Dayongan Solidaritas Social Welfare Services, Inc.
+            <x-editable-text
+                key="about_hero_badge"
+                :value="$contexts['about_hero_badge'] ?? 'TrueLife Dayongan Solidaritas Social Welfare Services, Inc.'"
+                tag="span"
+                class="inline-block"
+            />
         </span>
 
         <h1 class="about-hero-title">
-            Building a
+            <x-editable-text
+                key="about_hero_title_1"
+                :value="$contexts['about_hero_title_1'] ?? 'Building a'"
+                tag="span"
+                class="inline-block"
+            />
+            <br class="hidden sm:block">
             <span class="about-hero-title-highlight">
-                Loving & Protected
+                <x-editable-text
+                    key="about_hero_title_highlight"
+                    :value="$contexts['about_hero_title_highlight'] ?? 'Loving & Protected'"
+                    tag="span"
+                    class="inline-block"
+                />
             </span>
-            Community
+            <x-editable-text
+                key="about_hero_title_2"
+                :value="$contexts['about_hero_title_2'] ?? 'Community'"
+                tag="span"
+                class="inline-block"
+            />
         </h1>
 
         <p class="about-hero-description">
-            <strong>TRUELIFE DAYONGAN SOLIDARITAS</strong>
-            Social Welfare Services and Financial Literacy Inc.
-            is committed to providing affordable community-based
-            protection and financial assistance for Filipino families.
-            Through solidarity, compassion, protection, and hope,
-            we empower communities to build a safer and stronger future.
+            <x-editable-text
+                key="about_hero_description"
+                :value="$contexts['about_hero_description'] ?? 'TRUELIFE DAYONGAN SOLIDARITAS Social Welfare Services and Financial Literacy Inc. is committed to providing affordable community-based protection and financial assistance for Filipino families. Through solidarity, compassion, protection, and hope, we empower communities to build a safer and stronger future.'"
+                tag="span"
+                class="block"
+            />
         </p>
 
     </div>
@@ -41,18 +62,31 @@
 <section class="py-20 bg-white">
     <div class="about-container">
         <div class="about-container-center">
-            <span class="about-section-label-gold">Who We Are</span>
+            <span class="about-section-label-gold">
+                <x-editable-text
+                    key="about_who_we_are_label"
+                    :value="$contexts['about_who_we_are_label'] ?? 'Who We Are'"
+                    tag="span"
+                    class="inline-block"
+                />
+            </span>
 
             <h2 class="about-section-title-dark">
-                About DAYONGAN
+                <x-editable-text
+                    key="about_who_we_are_title"
+                    :value="$contexts['about_who_we_are_title'] ?? 'About DAYONGAN'"
+                    tag="span"
+                    class="inline-block"
+                />
             </h2>
 
             <p class="mt-6 text-slate-600 text-lg leading-8">
-                DAYONGAN believes that every Filipino family deserves
-                affordable protection, dignity, and hope.
-                Through community cooperation and financial literacy,
-                we provide accessible welfare services that strengthen
-                families during life's most difficult moments.
+                <x-editable-text
+                    key="about_who_we_are_text"
+                    :value="$contexts['about_who_we_are_text'] ?? 'DAYONGAN believes that every Filipino family deserves affordable protection, dignity, and hope. Through community cooperation and financial literacy, we provide accessible welfare services that strengthen families during life\'s most difficult moments.'"
+                    tag="span"
+                    class="block"
+                />
             </p>
         </div>
     </div>
@@ -67,44 +101,61 @@
 
             <!-- Vision -->
             <div class="about-vm-card-vision">
-                <div class="about-vm-icon">👁️</div>
+                <div class="about-vm-icon">
+                    <x-editable-text
+                        key="about_vision_icon"
+                        :value="$contexts['about_vision_icon'] ?? '👁️'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </div>
 
                 <h2 class="about-vm-title">
-                    PANAN-AWON
-                    <span class="text-[#D4A017]">(VISION)</span>
+                    <x-editable-text
+                        key="about_vision_heading"
+                        :value="$contexts['about_vision_heading'] ?? 'PANAN-AWON (VISION)'"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </h2>
 
                 <p class="about-vm-text">
-                    Ang pagtataguyod ng isang
-                    <strong>mapagmahal at protektadong komunidad</strong>
-                    kung saan ang bawat pamilyang Pilipino,
-                    lalo na ang mga kapos-palad,
-                    ay may
-                    <strong>
-                        abot-kaya at kayang tustusan na proteksyon,
-                        dignidad, at pag-asa
-                    </strong>
-                    sa panahon ng pagsubok.
+                    <x-editable-text
+                        key="about_vision_text"
+                        :value="$contexts['about_vision_text'] ?? 'Ang pagtataguyod ng isang mapagmahal at protektadong komunidad kung saan ang bawat pamilyang Pilipino, lalo na ang mga kapos-palad, ay may abot-kaya at kayang tustusan na proteksyon, dignidad, at pag-asa sa panahon ng pagsubok.'"
+                        tag="span"
+                        class="block"
+                    />
                 </p>
             </div>
 
             <!-- Mission -->
             <div class="about-vm-card-mission">
-                <div class="about-vm-icon">🎯</div>
+                <div class="about-vm-icon">
+                    <x-editable-text
+                        key="about_mission_icon"
+                        :value="$contexts['about_mission_icon'] ?? '🎯'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </div>
 
                 <h2 class="about-vm-title">
-                    MISYON
-                    <span class="text-[#D4A017]">(MISSION)</span>
+                    <x-editable-text
+                        key="about_mission_heading"
+                        :value="$contexts['about_mission_heading'] ?? 'MISYON (MISSION)'"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </h2>
 
                 <p class="about-vm-text">
-                    Ang DAYONGAN ay nagsisikap na magbigay ng
-                    <strong>abot-kaya at nakabatay sa komunidad</strong>
-                    na proteksyon at mga benepisyo upang
-                    matulungan, maprotektahan,
-                    at mapatatag ang buhay ng bawat pamilya
-                    sa pamamagitan ng diwa ng
-                    <strong>"Pagtutulungan at Pagkakaisa."</strong>
+                    <x-editable-text
+                        key="about_mission_text"
+                        :value="$contexts['about_mission_text'] ?? 'Ang DAYONGAN ay nagsisikap na magbigay ng abot-kaya at nakabatay sa komunidad na proteksyon at mga benepisyo upang matulungan, maprotektahan, at mapatatag ang buhay ng bawat pamilya sa pamamagitan ng diwa ng Pagtutulungan at Pagkakaisa.'"
+                        tag="span"
+                        class="block"
+                    />
                 </p>
             </div>
 
@@ -120,49 +171,93 @@
 
         <div class="text-center">
             <span class="about-section-label-gold">
-                Our Foundation
+                <x-editable-text
+                    key="about_values_label"
+                    :value="$contexts['about_values_label'] ?? 'Our Foundation'"
+                    tag="span"
+                    class="inline-block"
+                />
             </span>
 
             <h2 class="about-section-title-dark">
-                Core Values
+                <x-editable-text
+                    key="about_values_title"
+                    :value="$contexts['about_values_title'] ?? 'Core Values'"
+                    tag="span"
+                    class="inline-block"
+                />
             </h2>
 
             <p class="mt-4 text-slate-600 max-w-2xl mx-auto">
-                These values guide every service and every decision we make for
-                Filipino families and communities.
+                <x-editable-text
+                    key="about_values_subtitle"
+                    :value="$contexts['about_values_subtitle'] ?? 'These values guide every service and every decision we make for Filipino families and communities.'"
+                    tag="span"
+                    class="block"
+                />
             </p>
         </div>
 
         <div class="about-values-grid">
 
             <div class="about-value-card">
-                <div class="about-value-icon-blue">🤝</div>
-                <h3 class="about-value-title">Pagtutulungan</h3>
-                <p class="about-value-text">Tulungan ang Kapwa</p>
+                <div class="about-value-icon-blue">
+                    <x-editable-text key="about_val_icon_1" :value="$contexts['about_val_icon_1'] ?? '🤝'" tag="span" class="inline-block" />
+                </div>
+                <h3 class="about-value-title">
+                    <x-editable-text key="about_val_title_1" :value="$contexts['about_val_title_1'] ?? 'Pagtutulungan'" tag="span" class="inline-block" />
+                </h3>
+                <p class="about-value-text">
+                    <x-editable-text key="about_val_text_1" :value="$contexts['about_val_text_1'] ?? 'Tulungan ang Kapwa'" tag="span" class="inline-block" />
+                </p>
             </div>
 
             <div class="about-value-card">
-                <div class="about-value-icon-gold">🛡️</div>
-                <h3 class="about-value-title">Proteksyon</h3>
-                <p class="about-value-text">Paunang Pag-alaga</p>
+                <div class="about-value-icon-gold">
+                    <x-editable-text key="about_val_icon_2" :value="$contexts['about_val_icon_2'] ?? '🛡️'" tag="span" class="inline-block" />
+                </div>
+                <h3 class="about-value-title">
+                    <x-editable-text key="about_val_title_2" :value="$contexts['about_val_title_2'] ?? 'Proteksyon'" tag="span" class="inline-block" />
+                </h3>
+                <p class="about-value-text">
+                    <x-editable-text key="about_val_text_2" :value="$contexts['about_val_text_2'] ?? 'Paunang Pag-alaga'" tag="span" class="inline-block" />
+                </p>
             </div>
 
             <div class="about-value-card">
-                <div class="about-value-icon-blue">👨‍👩‍👧‍👦</div>
-                <h3 class="about-value-title">Pamilya</h3>
-                <p class="about-value-text">Una sa Lahat</p>
+                <div class="about-value-icon-blue">
+                    <x-editable-text key="about_val_icon_3" :value="$contexts['about_val_icon_3'] ?? '👨‍👩‍👧‍👦'" tag="span" class="inline-block" />
+                </div>
+                <h3 class="about-value-title">
+                    <x-editable-text key="about_val_title_3" :value="$contexts['about_val_title_3'] ?? 'Pamilya'" tag="span" class="inline-block" />
+                </h3>
+                <p class="about-value-text">
+                    <x-editable-text key="about_val_text_3" :value="$contexts['about_val_text_3'] ?? 'Una sa Lahat'" tag="span" class="inline-block" />
+                </p>
             </div>
 
             <div class="about-value-card">
-                <div class="about-value-icon-gold">✔️</div>
-                <h3 class="about-value-title">Integridad</h3>
-                <p class="about-value-text">Tapat at Totoo</p>
+                <div class="about-value-icon-gold">
+                    <x-editable-text key="about_val_icon_4" :value="$contexts['about_val_icon_4'] ?? '✔️'" tag="span" class="inline-block" />
+                </div>
+                <h3 class="about-value-title">
+                    <x-editable-text key="about_val_title_4" :value="$contexts['about_val_title_4'] ?? 'Integridad'" tag="span" class="inline-block" />
+                </h3>
+                <p class="about-value-text">
+                    <x-editable-text key="about_val_text_4" :value="$contexts['about_val_text_4'] ?? 'Tapat at Totoo'" tag="span" class="inline-block" />
+                </p>
             </div>
 
             <div class="about-value-card">
-                <div class="about-value-icon-blue">❤️</div>
-                <h3 class="about-value-title">Pagkakaisa</h3>
-                <p class="about-value-text">Magkaisa, Magtagumpay</p>
+                <div class="about-value-icon-blue">
+                    <x-editable-text key="about_val_icon_5" :value="$contexts['about_val_icon_5'] ?? '❤️'" tag="span" class="inline-block" />
+                </div>
+                <h3 class="about-value-title">
+                    <x-editable-text key="about_val_title_5" :value="$contexts['about_val_title_5'] ?? 'Pagkakaisa'" tag="span" class="inline-block" />
+                </h3>
+                <p class="about-value-text">
+                    <x-editable-text key="about_val_text_5" :value="$contexts['about_val_text_5'] ?? 'Magkaisa, Magtagumpay'" tag="span" class="inline-block" />
+                </p>
             </div>
 
         </div>
@@ -179,39 +274,58 @@
             <!-- Left -->
             <div>
                 <span class="about-section-label-yellow">
-                    Our Objectives
+                    <x-editable-text
+                        key="about_obj_label"
+                        :value="$contexts['about_obj_label'] ?? 'Our Objectives'"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </span>
 
                 <h2 class="about-section-title-white">
-                    Mga Katuyoan
-                    <span class="text-[#FFD54A]">(Objectives)</span>
+                    <x-editable-text
+                        key="about_obj_title"
+                        :value="$contexts['about_obj_title'] ?? 'Mga Katuyoan (Objectives)'"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </h2>
 
                 <div class="about-objectives-list">
 
                     <div class="about-objective-item">
                         <div class="about-objective-check">✔</div>
-                        <p>Magbigay ng barato ug maabot nga serbisyo sa proteksyon alang sa ordinaryong pamilya Pilipino.</p>
+                        <p>
+                            <x-editable-text key="about_obj_1" :value="$contexts['about_obj_1'] ?? 'Magbigay ng barato ug maabot nga serbisyo sa proteksyon alang sa ordinaryong pamilya Pilipino.'" tag="span" class="inline-block" />
+                        </p>
                     </div>
 
                     <div class="about-objective-item">
                         <div class="about-objective-check">✔</div>
-                        <p>Magtabang dayon sa panahon sa aksidente, pagkasakit, ug kamatayon.</p>
+                        <p>
+                            <x-editable-text key="about_obj_2" :value="$contexts['about_obj_2'] ?? 'Magtabang dayon sa panahon sa aksidente, pagkasakit, ug kamatayon.'" tag="span" class="inline-block" />
+                        </p>
                     </div>
 
                     <div class="about-objective-item">
                         <div class="about-objective-check">✔</div>
-                        <p>Magpahiug-ot sa panaghiusa, pagtinabangay, ug pag-amuma sa komunidad.</p>
+                        <p>
+                            <x-editable-text key="about_obj_3" :value="$contexts['about_obj_3'] ?? 'Magpahiug-ot sa panaghiusa, pagtinabangay, ug pag-amuma sa komunidad.'" tag="span" class="inline-block" />
+                        </p>
                     </div>
 
                     <div class="about-objective-item">
                         <div class="about-objective-check">✔</div>
-                        <p>Maghatag og paglaum ug seguridad sa mga kabus ug nanginahanglan.</p>
+                        <p>
+                            <x-editable-text key="about_obj_4" :value="$contexts['about_obj_4'] ?? 'Maghatag og paglaum ug seguridad sa mga kabus ug nanginahanglan.'" tag="span" class="inline-block" />
+                        </p>
                     </div>
 
                     <div class="about-objective-item">
                         <div class="about-objective-check">✔</div>
-                        <p>Magsiguro nga walay pamilya nga biyaan sa kalisod.</p>
+                        <p>
+                            <x-editable-text key="about_obj_5" :value="$contexts['about_obj_5'] ?? 'Magsiguro nga walay pamilya nga biyaan sa kalisod.'" tag="span" class="inline-block" />
+                        </p>
                     </div>
 
                 </div>
@@ -237,18 +351,30 @@
 
         <div class="about-container-center">
             <span class="about-section-label-gold">
-                Why Choose DAYONGAN
+                <x-editable-text
+                    key="about_why_label"
+                    :value="$contexts['about_why_label'] ?? 'Why Choose DAYONGAN'"
+                    tag="span"
+                    class="inline-block"
+                />
             </span>
 
             <h2 class="about-section-title-dark">
-                Protecting Filipino Families with Care
+                <x-editable-text
+                    key="about_why_title"
+                    :value="$contexts['about_why_title'] ?? 'Protecting Filipino Families with Care'"
+                    tag="span"
+                    class="inline-block"
+                />
             </h2>
 
             <p class="mt-5 text-lg text-slate-600 leading-8">
-                DAYONGAN is more than a membership program. It is a community
-                built on compassion, protection, and solidarity. We strive to
-                ensure that every Filipino family has access to affordable
-                assistance during life's most difficult moments.
+                <x-editable-text
+                    key="about_why_desc"
+                    :value="$contexts['about_why_desc'] ?? 'DAYONGAN is more than a membership program. It is a community built on compassion, protection, and solidarity. We strive to ensure that every Filipino family has access to affordable assistance during life\'s most difficult moments.'"
+                    tag="span"
+                    class="block"
+                />
             </p>
         </div>
 
@@ -256,33 +382,41 @@
 
             <div class="about-feature-card">
                 <div class="about-feature-icon-blue">🛡️</div>
-                <h3 class="about-feature-title">Affordable Protection</h3>
+                <h3 class="about-feature-title">
+                    <x-editable-text key="about_feat_title_1" :value="$contexts['about_feat_title_1'] ?? 'Affordable Protection'" tag="span" class="inline-block" />
+                </h3>
                 <p class="about-feature-text">
-                    Community-based protection programs that every Filipino family can afford.
+                    <x-editable-text key="about_feat_text_1" :value="$contexts['about_feat_text_1'] ?? 'Community-based protection programs that every Filipino family can afford.'" tag="span" class="inline-block" />
                 </p>
             </div>
 
             <div class="about-feature-card">
                 <div class="about-feature-icon-gold">❤️</div>
-                <h3 class="about-feature-title">Caring Community</h3>
+                <h3 class="about-feature-title">
+                    <x-editable-text key="about_feat_title_2" :value="$contexts['about_feat_title_2'] ?? 'Caring Community'" tag="span" class="inline-block" />
+                </h3>
                 <p class="about-feature-text">
-                    We strengthen families through cooperation, compassion, and mutual support.
+                    <x-editable-text key="about_feat_text_2" :value="$contexts['about_feat_text_2'] ?? 'We strengthen families through cooperation, compassion, and mutual support.'" tag="span" class="inline-block" />
                 </p>
             </div>
 
             <div class="about-feature-card">
                 <div class="about-feature-icon-blue">🤝</div>
-                <h3 class="about-feature-title">Community Solidarity</h3>
+                <h3 class="about-feature-title">
+                    <x-editable-text key="about_feat_title_3" :value="$contexts['about_feat_title_3'] ?? 'Community Solidarity'" tag="span" class="inline-block" />
+                </h3>
                 <p class="about-feature-text">
-                    We believe every member contributes to a stronger, united, and resilient community.
+                    <x-editable-text key="about_feat_text_3" :value="$contexts['about_feat_text_3'] ?? 'We believe every member contributes to a stronger, united, and resilient community.'" tag="span" class="inline-block" />
                 </p>
             </div>
 
             <div class="about-feature-card">
                 <div class="about-feature-icon-gold">🌱</div>
-                <h3 class="about-feature-title">Hope for the Future</h3>
+                <h3 class="about-feature-title">
+                    <x-editable-text key="about_feat_title_4" :value="$contexts['about_feat_title_4'] ?? 'Hope for the Future'" tag="span" class="inline-block" />
+                </h3>
                 <p class="about-feature-text">
-                    Together we build a future where no family is left behind during times of hardship.
+                    <x-editable-text key="about_feat_text_4" :value="$contexts['about_feat_text_4'] ?? 'Together we build a future where no family is left behind during times of hardship.'" tag="span" class="inline-block" />
                 </p>
             </div>
 
@@ -298,11 +432,21 @@
 
         <div class="text-center">
             <span class="about-section-label-yellow">
-                DAYONGAN at a Glance
+                <x-editable-text
+                    key="about_glance_label"
+                    :value="$contexts['about_glance_label'] ?? 'DAYONGAN at a Glance'"
+                    tag="span"
+                    class="inline-block"
+                />
             </span>
 
             <h2 class="about-section-title-white">
-                Our Commitment
+                <x-editable-text
+                    key="about_glance_title"
+                    :value="$contexts['about_glance_title'] ?? 'Our Commitment'"
+                    tag="span"
+                    class="inline-block"
+                />
             </h2>
         </div>
 
@@ -310,33 +454,41 @@
 
             <div class="about-highlight-card">
                 <div class="about-highlight-icon">👨‍👩‍👧‍👦</div>
-                <h3 class="about-highlight-title">Family</h3>
+                <h3 class="about-highlight-title">
+                    <x-editable-text key="about_high_title_1" :value="$contexts['about_high_title_1'] ?? 'Family'" tag="span" class="inline-block" />
+                </h3>
                 <p class="about-highlight-text">
-                    Every decision begins with protecting Filipino families.
+                    <x-editable-text key="about_high_text_1" :value="$contexts['about_high_text_1'] ?? 'Every decision begins with protecting Filipino families.'" tag="span" class="inline-block" />
                 </p>
             </div>
 
             <div class="about-highlight-card">
                 <div class="about-highlight-icon">🛡️</div>
-                <h3 class="about-highlight-title">Protection</h3>
+                <h3 class="about-highlight-title">
+                    <x-editable-text key="about_high_title_2" :value="$contexts['about_high_title_2'] ?? 'Protection'" tag="span" class="inline-block" />
+                </h3>
                 <p class="about-highlight-text">
-                    Affordable community-based welfare and financial assistance.
+                    <x-editable-text key="about_high_text_2" :value="$contexts['about_high_text_2'] ?? 'Affordable community-based welfare and financial assistance.'" tag="span" class="inline-block" />
                 </p>
             </div>
 
             <div class="about-highlight-card">
                 <div class="about-highlight-icon">🤝</div>
-                <h3 class="about-highlight-title">Unity</h3>
+                <h3 class="about-highlight-title">
+                    <x-editable-text key="about_high_title_3" :value="$contexts['about_high_title_3'] ?? 'Unity'" tag="span" class="inline-block" />
+                </h3>
                 <p class="about-highlight-text">
-                    Working together through solidarity and cooperation.
+                    <x-editable-text key="about_high_text_3" :value="$contexts['about_high_text_3'] ?? 'Working together through solidarity and cooperation.'" tag="span" class="inline-block" />
                 </p>
             </div>
 
             <div class="about-highlight-card">
                 <div class="about-highlight-icon">⭐</div>
-                <h3 class="about-highlight-title">Hope</h3>
+                <h3 class="about-highlight-title">
+                    <x-editable-text key="about_high_title_4" :value="$contexts['about_high_title_4'] ?? 'Hope'" tag="span" class="inline-block" />
+                </h3>
                 <p class="about-highlight-text">
-                    Bringing dignity, confidence, and hope during difficult times.
+                    <x-editable-text key="about_high_text_4" :value="$contexts['about_high_text_4'] ?? 'Bringing dignity, confidence, and hope during difficult times.'" tag="span" class="inline-block" />
                 </p>
             </div>
 
@@ -354,34 +506,61 @@
     <div class="about-cta-container">
 
         <span class="about-section-label-yellow tracking-[0.3em]">
-            Join Our Community
+            <x-editable-text
+                key="about_cta_label"
+                :value="$contexts['about_cta_label'] ?? 'Join Our Community'"
+                tag="span"
+                class="inline-block"
+            />
         </span>
 
         <h2 class="about-cta-title">
-            Together We Can Build a
+            <x-editable-text
+                key="about_cta_title_1"
+                :value="$contexts['about_cta_title_1'] ?? 'Together We Can Build a'"
+                tag="span"
+                class="inline-block"
+            />
             <span class="text-[#FFD54A]">
-                Safer and Stronger Future
+                <x-editable-text
+                    key="about_cta_title_highlight"
+                    :value="$contexts['about_cta_title_highlight'] ?? 'Safer and Stronger Future'"
+                    tag="span"
+                    class="inline-block"
+                />
             </span>
         </h2>
 
         <p class="about-cta-description">
-            Become part of the DAYONGAN family and experience
-            community-based protection, financial literacy,
-            and compassionate assistance that helps every
-            Filipino family move forward with confidence and hope.
+            <x-editable-text
+                key="about_cta_description"
+                :value="$contexts['about_cta_description'] ?? 'Become part of the DAYONGAN family and experience community-based protection, financial literacy, and compassionate assistance that helps every Filipino family move forward with confidence and hope.'"
+                tag="span"
+                class="block"
+            />
         </p>
 
         <div class="about-btn-group-center">
             <button
                 onclick="Livewire.dispatch('open-application-modal')"
                 class="about-btn-primary">
-                Become a Member
+                <x-editable-text
+                    key="about_cta_btn_primary"
+                    :value="$contexts['about_cta_btn_primary'] ?? 'Become a Member'"
+                    tag="span"
+                    class="inline-block"
+                />
             </button>
 
             <a
                 href="{{ route('contact') }}"
                 class="about-btn-secondary text-center">
-                Contact Us
+                <x-editable-text
+                    key="about_cta_btn_secondary"
+                    :value="$contexts['about_cta_btn_secondary'] ?? 'Contact Us'"
+                    tag="span"
+                    class="inline-block"
+                />
             </a>
         </div>
 
@@ -397,10 +576,12 @@
         <div class="about-quote-icon">❝</div>
 
         <blockquote class="about-quote-text">
-            "Sa DAYONGAN, naniniwala kami na ang tunay na
-            lakas ng isang komunidad ay nagmumula sa
-            pagtutulungan, pagkakaisa, at malasakit
-            sa bawat pamilyang Pilipino."
+            <x-editable-text
+                key="about_quote_text"
+                :value="$contexts['about_quote_text'] ?? '&quot;Sa DAYONGAN, naniniwala kami na ang tunay na lakas ng isang komunidad ay nagmumula sa pagtutulungan, pagkakaisa, at malasakit sa bawat pamilyang Pilipino.&quot;'"
+                tag="span"
+                class="block"
+            />
         </blockquote>
 
         <div class="about-quote-divider"></div>

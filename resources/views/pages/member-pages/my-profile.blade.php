@@ -21,10 +21,10 @@
 
     </nav>
 
-@if(!$hasActivation)
+@if(!$hasActivation && auth()->user()->RoleID != 1)
 <button
     type="button"
-    onclick="Livewire.dispatch('open-activation-modal', { UserID: {{ auth()->user()->UserID }} })"
+    onclick="Livewire.dispatch('open-activation-modal')"
     class="activate-account-btn
            px-5
            py-2
@@ -41,8 +41,7 @@
     Activate Account
 
 </button>
-
-        @endif
+@endif
 
 
     <!-- PROFILE NAVIGATION MENU -->

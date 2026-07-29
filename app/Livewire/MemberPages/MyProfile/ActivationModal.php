@@ -18,6 +18,9 @@ class ActivationModal extends Component
     public bool $open = false;
     public $activationData;
 
+        // Add this property at the top of your class
+    public ?User $selectedUserRecord = null;
+
     /*
     |--------------------------------------------------------------------------
     | Beneficiaries
@@ -48,14 +51,18 @@ class ActivationModal extends Component
     |--------------------------------------------------------------------------
     */
     #[On('open-activation-modal')]
-    public function openModal($UserID): void
+    public function openModal($UserID = null): void
     {
+        // Fallback to currently authenticated user's ID if none provided
+        $UserID = $UserID ?? Auth::id();
+
         Log::info('Activation modal opened', [
             'selected_UserID' => $UserID,
             'opened_by' => Auth::id(),
         ]);
 
         $this->selectedUserID = $UserID;
+        $this->selectedUserRecord = User::find($UserID); // <-- Add this line
         $this->resetValidation();
 
         $this->payment_method = '';
@@ -74,9 +81,13 @@ class ActivationModal extends Component
     |--------------------------------------------------------------------------
     */
     #[On('open-pending-activation')]
-    public function viewActivation($UserID): void
+    public function viewActivation($UserID = null): void
     {
+        $UserID = $UserID ?? Auth::id();
+
         $this->selectedUserID = $UserID;
+
+        $this->selectedUserRecord = User::find($UserID); // <-- Add this line
 
         $this->activationData = Activation::where('UserID', $UserID)
             ->latest()

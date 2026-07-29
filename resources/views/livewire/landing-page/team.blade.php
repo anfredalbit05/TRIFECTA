@@ -11,25 +11,40 @@
     <div class="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 text-center">
 
         <span class="team-hero-badge">
-            TrueLife Dayongan Solidaritas Social Welfare Services, Inc.
+            <x-editable-text
+                key="team_hero_badge"
+                :value="$contexts['team_hero_badge'] ?? 'TrueLife Dayongan Solidaritas Social Welfare Services, Inc.'"
+                tag="span"
+                class="inline-block"
+            />
         </span>
 
         <h1 class="team-hero-title">
-            The Hearts & Minds Behind
+            <x-editable-text
+                key="team_hero_title_1"
+                :value="$contexts['team_hero_title_1'] ?? 'The Hearts & Minds Behind'"
+                tag="span"
+                class="inline-block"
+            />
             <br class="hidden sm:block">
 
             <span class="team-hero-title-highlight">
-                DAYONGAN
+                <x-editable-text
+                    key="team_hero_title_highlight"
+                    :value="$contexts['team_hero_title_highlight'] ?? 'DAYONGAN'"
+                    tag="span"
+                    class="inline-block"
+                />
             </span>
         </h1>
 
        <p class="team-hero-description">
-            Dedicated leaders, compassionate community officers,
-            and insurance professionals working together to safeguard
-            every family we serve. Together, we build stronger communities
-            through trust, commitment, and reliable support. Our team is
-            driven by a shared mission to provide meaningful assistance,
-            protect what matters most, and create a safer future for everyone.
+            <x-editable-text
+                key="team_hero_description"
+                :value="$contexts['team_hero_description'] ?? 'Dedicated leaders, compassionate community officers, and insurance professionals working together to safeguard every family we serve. Together, we build stronger communities through trust, commitment, and reliable support. Our team is driven by a shared mission to provide meaningful assistance, protect what matters most, and create a safer future for everyone.'"
+                tag="span"
+                class="block"
+            />
        </p>
 
     </div>
@@ -44,15 +59,30 @@
 
         <div class="team-board-header">
             <span class="team-board-subtitle">
-                Dayongan Leadership
+                <x-editable-text
+                    key="team_board_subtitle"
+                    :value="$contexts['team_board_subtitle'] ?? 'Dayongan Leadership'"
+                    tag="span"
+                    class="inline-block"
+                />
             </span>
 
             <h2 class="team-board-title">
-                Board Members
+                <x-editable-text
+                    key="team_board_title"
+                    :value="$contexts['team_board_title'] ?? 'Board Members'"
+                    tag="span"
+                    class="inline-block"
+                />
             </h2>
 
             <p class="team-board-description">
-                Dedicated leaders committed to serving the organization with integrity, transparency, and excellence.
+                <x-editable-text
+                    key="team_board_description"
+                    :value="$contexts['team_board_description'] ?? 'Dedicated leaders committed to serving the organization with integrity, transparency, and excellence.'"
+                    tag="span"
+                    class="block"
+                />
             </p>
         </div>
 
@@ -102,47 +132,172 @@
 <section class="team-field-section">
     <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="team-field-header">
-            <span class="team-field-subtitle">On The Ground</span>
-            <h2 class="team-field-title">Branch & Field Support</h2>
-            <p class="team-field-description">Connecting directly with communities in Tagum City, Kapalong, and nearby municipalities.</p>
+            <span class="team-field-subtitle">
+                <x-editable-text
+                    key="team_field_subtitle"
+                    :value="$contexts['team_field_subtitle'] ?? 'On The Ground'"
+                    tag="span"
+                    class="inline-block"
+                />
+            </span>
+            <h2 class="team-field-title">
+                <x-editable-text
+                    key="team_field_title"
+                    :value="$contexts['team_field_title'] ?? 'Branch & Field Support'"
+                    tag="span"
+                    class="inline-block"
+                />
+            </h2>
+            <p class="team-field-description">
+                <x-editable-text
+                    key="team_field_description"
+                    :value="$contexts['team_field_description'] ?? 'Connecting directly with communities in Tagum City, Kapalong, and nearby municipalities.'"
+                    tag="span"
+                    class="block"
+                />
+            </p>
         </div>
 
         <div class="team-field-grid">
 
             <div class="team-field-card">
                 <div class="team-field-icon-box team-icon-blue">
-                    📍
+                    <x-editable-text
+                        key="team_field_icon_1"
+                        :value="$contexts['team_field_icon_1'] ?? '📍'"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </div>
-                <h3 class="team-field-card-title">Tagum City Office</h3>
-                <span class="team-field-card-role">Main Branch Team</span>
-                <p class="team-field-card-text">Handles walk-in inquiries, membership renewals, and local health perk reimbursements.</p>
+                <h3 class="team-field-card-title">
+                    <x-editable-text
+                        key="team_field_card_title_1"
+                        :value="$contexts['team_field_card_title_1'] ?? 'Tagum City Office'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </h3>
+                <span class="team-field-card-role">
+                    <x-editable-text
+                        key="team_field_card_role_1"
+                        :value="$contexts['team_field_card_role_1'] ?? 'Main Branch Team'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </span>
+                <p class="team-field-card-text">
+                    <x-editable-text
+                        key="team_field_card_text_1"
+                        :value="$contexts['team_field_card_text_1'] ?? 'Handles walk-in inquiries, membership renewals, and local health perk reimbursements.'"
+                        tag="span"
+                        class="block"
+                    />
+                </p>
             </div>
 
             <div class="team-field-card">
                 <div class="team-field-icon-box team-icon-amber">
-                    📍
+                    <x-editable-text
+                        key="team_field_icon_2"
+                        :value="$contexts['team_field_icon_2'] ?? '📍'"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </div>
-                <h3 class="team-field-card-title">Kapalong Branch</h3>
-                <span class="team-field-card-role">Municipal Helpdesk</span>
-                <p class="team-field-card-text">Assists rural communities with micro-insurance registration and family beneficiary updates.</p>
+                <h3 class="team-field-card-title">
+                    <x-editable-text
+                        key="team_field_card_title_2"
+                        :value="$contexts['team_field_card_title_2'] ?? 'Kapalong Branch'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </h3>
+                <span class="team-field-card-role">
+                    <x-editable-text
+                        key="team_field_card_role_2"
+                        :value="$contexts['team_field_card_role_2'] ?? 'Municipal Helpdesk'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </span>
+                <p class="team-field-card-text">
+                    <x-editable-text
+                        key="team_field_card_text_2"
+                        :value="$contexts['team_field_card_text_2'] ?? 'Assists rural communities with micro-insurance registration and family beneficiary updates.'"
+                        tag="span"
+                        class="block"
+                    />
+                </p>
             </div>
 
             <div class="team-field-card">
                 <div class="team-field-icon-box team-icon-emerald">
-                    🚑
+                    <x-editable-text
+                        key="team_field_icon_3"
+                        :value="$contexts['team_field_icon_3'] ?? '🚑'"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </div>
-                <h3 class="team-field-card-title">Medical Assistance Officers</h3>
-                <span class="team-field-card-role">Health Support Team</span>
-                <p class="team-field-card-text">Coordinates hospital claim validations, P.E. reimbursements, and ultrasound support.</p>
+                <h3 class="team-field-card-title">
+                    <x-editable-text
+                        key="team_field_card_title_3"
+                        :value="$contexts['team_field_card_title_3'] ?? 'Medical Assistance Officers'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </h3>
+                <span class="team-field-card-role">
+                    <x-editable-text
+                        key="team_field_card_role_3"
+                        :value="$contexts['team_field_card_role_3'] ?? 'Health Support Team'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </span>
+                <p class="team-field-card-text">
+                    <x-editable-text
+                        key="team_field_card_text_3"
+                        :value="$contexts['team_field_card_text_3'] ?? 'Coordinates hospital claim validations, P.E. reimbursements, and ultrasound support.'"
+                        tag="span"
+                        class="block"
+                    />
+                </p>
             </div>
 
             <div class="team-field-card">
                 <div class="team-field-icon-box team-icon-indigo">
-                    🤝
+                    <x-editable-text
+                        key="team_field_icon_4"
+                        :value="$contexts['team_field_icon_4'] ?? '🤝'"
+                        tag="span"
+                        class="inline-block"
+                    />
                 </div>
-                <h3 class="team-field-card-title">Community Organizers</h3>
-                <span class="team-field-card-role">Field Coordinators</span>
-                <p class="team-field-card-text">Engaging barangays and groups to bring affordable insurance education directly to households.</p>
+                <h3 class="team-field-card-title">
+                    <x-editable-text
+                        key="team_field_card_title_4"
+                        :value="$contexts['team_field_card_title_4'] ?? 'Community Organizers'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </h3>
+                <span class="team-field-card-role">
+                    <x-editable-text
+                        key="team_field_card_role_4"
+                        :value="$contexts['team_field_card_role_4'] ?? 'Field Coordinators'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </span>
+                <p class="team-field-card-text">
+                    <x-editable-text
+                        key="team_field_card_text_4"
+                        :value="$contexts['team_field_card_text_4'] ?? 'Engaging barangays and groups to bring affordable insurance education directly to households.'"
+                        tag="span"
+                        class="block"
+                    />
+                </p>
             </div>
 
         </div>
@@ -157,15 +312,39 @@
     <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="team-partner-card">
             <div class="team-partner-content">
-                <span class="team-partner-subtitle">Strategic Alliance</span>
-                <h3 class="team-partner-title">Backed by COCOGEN Insurance</h3>
+                <span class="team-partner-subtitle">
+                    <x-editable-text
+                        key="team_partner_subtitle"
+                        :value="$contexts['team_partner_subtitle'] ?? 'Strategic Alliance'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </span>
+                <h3 class="team-partner-title">
+                    <x-editable-text
+                        key="team_partner_title"
+                        :value="$contexts['team_partner_title'] ?? 'Backed by COCOGEN Insurance'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </h3>
                 <p class="team-partner-text">
-                    Our team works hand-in-hand with licensed underwriters and advisors from COCOGEN to guarantee financial strength, underwriting accuracy, and prompt claim settlement.
+                    <x-editable-text
+                        key="team_partner_text"
+                        :value="$contexts['team_partner_text'] ?? 'Our team works hand-in-hand with licensed underwriters and advisors from COCOGEN to guarantee financial strength, underwriting accuracy, and prompt claim settlement.'"
+                        tag="span"
+                        class="block"
+                    />
                 </p>
             </div>
 
             <a href="#contact" class="team-partner-btn">
-                Contact Partner Desk
+                <x-editable-text
+                    key="team_partner_btn"
+                    :value="$contexts['team_partner_btn'] ?? 'Contact Partner Desk'"
+                    tag="span"
+                    class="inline-block"
+                />
             </a>
         </div>
     </div>
@@ -178,21 +357,41 @@
 <section class="team-cta-section">
     <div class="team-cta-container">
         <h2 class="team-cta-title">
-            Want to Join Our Mission?
+            <x-editable-text
+                key="team_cta_title"
+                :value="$contexts['team_cta_title'] ?? 'Want to Join Our Mission?'"
+                tag="span"
+                class="inline-block"
+            />
         </h2>
         <p class="team-cta-description">
-            We are always looking for passionate community advocates, field coordinators, and partner organizations.
+            <x-editable-text
+                key="team_cta_description"
+                :value="$contexts['team_cta_description'] ?? 'We are always looking for passionate community advocates, field coordinators, and partner organizations.'"
+                tag="span"
+                class="block"
+            />
         </p>
 
         <div class="team-cta-buttons">
             <a href="#register" class="team-cta-btn-primary">
-                Become a Community Representative
+                <x-editable-text
+                    key="team_cta_btn_primary"
+                    :value="$contexts['team_cta_btn_primary'] ?? 'Become a Community Representative'"
+                    tag="span"
+                    class="inline-block"
+                />
             </a>
             <a href="#contact" class="team-cta-btn-secondary">
-                Visit Branch Office
+                <x-editable-text
+                    key="team_cta_btn_secondary"
+                    :value="$contexts['team_cta_btn_secondary'] ?? 'Visit Branch Office'"
+                    tag="span"
+                    class="inline-block"
+                />
             </a>
         </div>
     </div>
 </section>
 
-
+</div>
