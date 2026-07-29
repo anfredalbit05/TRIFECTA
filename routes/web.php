@@ -9,6 +9,7 @@ use App\Livewire\LandingPage\HowItWorks;
 use App\Livewire\LandingPage\Testimonials;
 use App\Livewire\LandingPage\NewsUpdates;
 use App\Livewire\LandingPage\Contact;
+use App\Models\Activation;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,20 +40,47 @@ Route::get('/contact', Contact::class)->name('contact');
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', function () {
-        return view('pages.member-pages.dashboard');
+        if (Auth::user()->RoleID == 1) {
+            return view('pages.admin-pages.dashboard');
+        }
+
+    return view('pages.member-pages.dashboard');
     })->name('dashboard');
 
+    Route::get('/genealogy-tree', function () {
+        return view('pages.member-pages.genealogy-tree');
+    })->name('genealogy-tree');
+
     Route::get('/masterlist', function () {
-        return view('pages.member-pages.masterlist');
+        return view('pages.admin-pages.masterlist');
     })->name('masterlist');
 
     Route::get('/post', function () {
-        return view('pages.member-pages.post');
+        return view('pages.admin-pages.post');
     })->name('post');
 
     Route::get('/report-settings', function () {
-        return view('pages.member-pages.report-settings');
+        return view('pages.admin-pages.report-settings');
     })->name('report-settings');
+
+
+    Route::get('/my-profile', function () {
+
+    $currentUserId = Auth::id();
+
+    $hasActivation = Activation::where('ProcessedBy', $currentUserId)
+        ->whereIn('status', [
+            'Pending',
+            'Approved'
+        ])
+        ->exists();
+
+    return view(
+        'pages.member-pages.my-profile',
+        compact('hasActivation')
+    );
+
+})->name('my-profile');
 
     Route::post('/logout', function () {
 

@@ -27,7 +27,7 @@
 }
 
 .contact-hero-description {
-    @apply mt-8 max-w-3xl mx-auto text-base sm:text-lg text-slate-300 leading-relaxed;
+     @apply mt-3 text-slate-600 leading-relaxed;
 }
 
 /* ===================================================

@@ -30,7 +30,7 @@ return new class extends Migration
 
             $table->date('birthdate');
 
-            $table->string('relationship', 50);
+            $table->string('relationship', 50)->nullable();
 
             // $table->enum('status', [
             //     'Active',

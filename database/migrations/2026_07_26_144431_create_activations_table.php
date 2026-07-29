@@ -1,3 +1,4 @@
+```php
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -15,25 +16,115 @@ return new class extends Migration
 
             $table->id('ActivationID');
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | Member Being Activated
+            |--------------------------------------------------------------------------
+            */
+
             $table->foreignId('UserID')
                 ->constrained('users', 'UserID')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
 
-            $table->decimal('amount', 12, 2);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Activation Amount
+            |--------------------------------------------------------------------------
+            */
+
+            $table->decimal(
+                'amount',
+                12,
+                2
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Activation Type
+            |
+            | W = Walk-in
+            | O = Online
+            |--------------------------------------------------------------------------
+            */
 
             $table->enum('type', [
                 'W',
                 'O',
             ]);
 
-            $table->string('referencecode', 100)->unique();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Payment Method
+            |--------------------------------------------------------------------------
+            */
+
+            $table->enum('payment_method', [
+                'Cash',
+                'GCash',
+                'Maya',
+                'Bank Transfer',
+            ]);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Referral Code
+            |
+            | Entered by the member.
+            | This is the uplineCode of the referral user.
+            |--------------------------------------------------------------------------
+            */
+
+            $table->string(
+                'referral_code',
+                100
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Payment Reference
+            |
+            | Required only for online payments.
+            | Null for Cash payments.
+            |--------------------------------------------------------------------------
+            */
+
+            $table->string(
+                'payment_reference',
+                100
+            )->nullable();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Referral User
+            |
+            | The UserID of the user whose
+            | uplineCode matches referral_code.
+            |--------------------------------------------------------------------------
+            */
 
             $table->foreignId('ProcessedBy')
                 ->nullable()
-                ->constrained('users', 'UserID')
+                ->constrained(
+                    'users',
+                    'UserID'
+                )
                 ->cascadeOnUpdate()
                 ->nullOnDelete();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Activation Status
+            |--------------------------------------------------------------------------
+            */
 
             $table->enum('status', [
                 'Pending',
@@ -41,16 +132,21 @@ return new class extends Migration
                 'Rejected',
             ])->default('Pending');
 
+
             $table->timestamps();
 
         });
     }
+
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('activations');
+        Schema::dropIfExists(
+            'activations'
+        );
     }
 };
+

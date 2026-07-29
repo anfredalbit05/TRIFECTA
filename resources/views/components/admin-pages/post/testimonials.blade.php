@@ -1,7 +1,4 @@
-<div class="testimonials-container">
-
-
-
+<div>
     <div class="testimonial-header">
 
 

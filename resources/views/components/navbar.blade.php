@@ -202,15 +202,17 @@
 
                             <!-- Logout Form -->
                             <div class="border-t border-slate-100 py-1">
-                                <form action="{{ route('logout') }}" method="POST">
-                                    @csrf
-                                    <button
-                                        type="submit"
-                                        class="flex w-full items-center gap-3 px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition">
-                                        <span>🚪</span>
-                                        <span>Logout</span>
-                                    </button>
-                                </form>
+                            <form id="navbarLogoutForm" action="{{ route('logout') }}" method="POST">
+                                @csrf
+
+                                <button
+                                    type="button"
+                                    onclick="confirmNavbarLogout()"
+                                    class="flex w-full items-center gap-3 px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition">
+                                    <span>🚪</span>
+                                    <span>Logout</span>
+                                </button>
+                            </form>
                             </div>
 
                         </div>
@@ -358,14 +360,16 @@
                             </a>
                         @endif
 
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button
-                                type="submit"
-                                class="w-full rounded-xl border border-red-400/50 py-3 font-bold text-red-300 transition hover:bg-red-500/20 hover:text-white">
-                                🚪 Logout
-                            </button>
-                        </form>
+                    <form id="mobileLogoutForm" action="{{ route('logout') }}" method="POST">
+                        @csrf
+
+                        <button
+                            type="button"
+                            onclick="confirmMobileLogout()"
+                            class="w-full rounded-xl border border-red-400/50 py-3 font-bold text-red-300 transition hover:bg-red-500/20 hover:text-white">
+                            🚪 Logout
+                        </button>
+                    </form>
 
                     @endguest
 
@@ -376,5 +380,37 @@
         </div>
 
     </div>
+
+<script>
+function showLogoutConfirmation(formId) {
+    Swal.fire({
+        title: 'Logout?',
+        text: 'Are you sure you want to logout?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Logout',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById(formId).submit();
+        }
+    });
+}
+
+function confirmSidebarLogout() {
+    showLogoutConfirmation('sidebarLogoutForm');
+}
+
+function confirmNavbarLogout() {
+    showLogoutConfirmation('navbarLogoutForm');
+}
+
+function confirmMobileLogout() {
+    showLogoutConfirmation('mobileLogoutForm');
+}
+</script>
 
 </nav>

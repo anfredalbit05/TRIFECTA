@@ -16,6 +16,7 @@
 @import "./pages/member-pages/masterlist.css";
 @import "./pages/member-pages/post.css";
 @import "./pages/member-pages/report-setting.css";
+@import "./pages/member-pages/genealogy-tree.css";
 
 /*Member Pages Dashbord Components*/
 @import "./components/member-pages/dashboard/members.css";

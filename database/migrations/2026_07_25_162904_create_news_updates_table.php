@@ -15,27 +15,42 @@ return new class extends Migration
 
             $table->id('ID');
 
+            // Post Information
             $table->string('title', 255);
+
             $table->longText('details');
 
-            $table->string('category', 100);
+            // Optional Post Image
+            $table->string('image')
+                ->nullable();
 
+            // Category (Restricted to specific allowed values)
+// Category (Nullable String)
+            $table->string('category', 100)
+                ->nullable()
+                ->default(null);
+
+            // Status
             $table->enum('status', [
                 'Published',
                 'Draft',
                 'Archived',
-            ])->default('Draft');
+            ])->default('Published');
 
-            $table->timestamps();
 
+            // Owner / Creator
             $table->foreignId('UserID')
                 ->nullable()
                 ->constrained('users', 'UserID')
                 ->cascadeOnUpdate()
                 ->nullOnDelete();
 
+
+            $table->timestamps();
+
         });
     }
+
 
     /**
      * Reverse the migrations.

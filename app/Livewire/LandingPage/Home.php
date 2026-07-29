@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Layout;
 use App\Models\Context;
+use App\Models\User;
 
 #[Layout('layouts.app')]
 class Home extends Component
@@ -33,6 +34,11 @@ class Home extends Component
 
     public function render()
     {
-        return view('livewire.landing-page.home');
+        // Query total registered users (or filter by status/RoleID if required, e.g. ->where('status', 'Active'))
+        $totalMembers = User::count();
+
+        return view('livewire.landing-page.home', [
+            'totalMembers' => $totalMembers,
+        ]);
     }
 }

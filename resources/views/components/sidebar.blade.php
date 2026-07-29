@@ -2,7 +2,10 @@
     $isAdmin = auth()->check() && auth()->user()->RoleID == 1;
 @endphp
 
-<div x-data="{ open: false }" class="sidebar-wrapper">
+<div
+    x-data="{ open: false }"
+    x-on:profile-updated.window="window.location.reload()"
+    class="sidebar-wrapper">
 
     <!-- Mobile Header -->
     <header class="mobile-header">
@@ -82,11 +85,34 @@
             <!-- Profile -->
             <div class="profile-section">
 
-                <div class="profile-image-box">
-                    <img
-                        src="{{ asset('images/user.png') }}"
-                        class="profile-image">
-                </div>
+              <div class="profile-image-box">
+
+    @php
+        $profilePic = auth()->user()->profilepic;
+        $defaultAvatar = 'images/profiles/default-avatar.png';
+    @endphp
+
+    @if(
+        empty($profilePic) ||
+        $profilePic === $defaultAvatar ||
+        $profilePic === 'images/profiles/default-avatar.png'
+    )
+
+        <img
+            src="{{ asset('images/profiles/default-avatar.png') }}"
+            class="profile-image"
+            alt="Default profile picture">
+
+    @else
+
+        <img
+            src="{{ asset('storage/' . $profilePic) }}"
+            class="profile-image"
+            alt="Profile picture">
+
+    @endif
+
+</div>
 
                 <h2 class="profile-name">
                     {{ Auth::user()->firstname ?? 'Member' }}
@@ -108,6 +134,12 @@
                     href="{{ route('dashboard') }}"
                     class="menu-item {{ request()->routeIs('dashboard') ? 'active-menu' : '' }}">
                     Dashboard
+                </a>
+
+                <a
+                    href="{{ route('genealogy-tree') }}"
+                    class="menu-item {{ request()->routeIs('genealogy-tree') ? 'active-menu' : '' }}">
+                    Genealogy
                 </a>
 
 
@@ -133,7 +165,7 @@
                    @endif
 
                 <a
-                    {{-- href="{{ route('my-profile') }}" --}}
+                    href="{{ route('my-profile') }}"
                     class="menu-item {{ request()->routeIs('my-profile') ? 'active-menu' : '' }}">
                     My Profile
                 </a>

@@ -27,17 +27,8 @@
             <a href="#"
                @click.prevent="tab='overview'"
                :class="tab === 'overview' ? 'active' : ''">
-                Overview
+                Dashboard
             </a>
-
-
-
-            <a href="#"
-               @click.prevent="tab='members'"
-               :class="tab === 'members' ? 'active' : ''">
-                Members
-            </a>
-
 
         </div>
 
@@ -49,20 +40,10 @@
             x-show="tab === 'overview'"
                   x-cloak>
 
-            <x-member-pages.dashboard.overview />
+            <livewire:member-pages.dashboard.newsupdates />
 
         </div>
 
-
-        <!-- MEMBERS -->
-        <div
-            x-show="tab === 'members'"
-            x-cloak
-            class="dashboard-main-card">
-
-            <x-member-pages.dashboard.members />
-
-        </div>
 
     </div>
 

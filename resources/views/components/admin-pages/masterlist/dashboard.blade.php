@@ -2,7 +2,7 @@
 
 
     <h2 class="masterlist-title">
-        Overview
+        Dashboard
     </h2>
 
 

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -14,6 +13,10 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Activation;
+use App\Models\Beneficiary;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @property int $id
@@ -28,9 +31,17 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
+
 #[Fillable([
+
+    // Account
     'username',
     'password',
+
+    // Generated Upline Code
+    'uplineCode',
+
+    // Personal Information
     'lastname',
     'firstname',
     'middlename',
@@ -40,42 +51,139 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
     'contactno',
     'address',
     'email',
+
+    // Profile Picture
+    'profilepic',
+
+    // Account Settings
     'RoleID',
     'branchCode',
-    'status'
+    'status',
+
 ])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
+
+#[Hidden([
+    'password',
+    'two_factor_secret',
+    'two_factor_recovery_codes',
+    'remember_token'
+])]
+
 class User extends Authenticatable implements PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-
-   protected $primaryKey = 'UserID';
+    use HasFactory,
+        Notifiable,
+        PasskeyAuthenticatable,
+        TwoFactorAuthenticatable;
 
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | Primary Key
+    |--------------------------------------------------------------------------
+    */
 
-    /**
-     * Get the user's initials
-     */
+    protected $primaryKey = 'UserID';
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attribute Casts
+    |--------------------------------------------------------------------------
+    */
+
+        protected function casts(): array
+        {
+            return [
+
+                // Email verification date
+                'email_verified_at' => 'datetime',
+
+                // Convert birthdate from a database string
+                // into a Carbon date object
+                'birthdate' => 'date',
+
+                // Laravel automatically hashes the password
+                'password' => 'hashed',
+
+            ];
+        }
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | User Initials
+    |--------------------------------------------------------------------------
+    */
+
     public function initials(): string
     {
-        $initials = Str::initials($this->name, true);
+        $name = trim(
+
+            ($this->firstname ?? '') . ' ' .
+
+            ($this->lastname ?? '')
+
+        );
+
+
+        $initials = Str::initials(
+            $name,
+            true
+        );
+
 
         return Str::length($initials) > 1
-            ? Str::substr($initials, 0, 1).Str::substr($initials, -1)
+
+            ? Str::substr($initials, 0, 1)
+
+                . Str::substr($initials, -1)
+
             : $initials;
     }
+
+
+
+     public function beneficiaries(): HasMany
+{
+    return $this->hasMany(
+        Beneficiary::class,
+        'UserID',
+        'UserID'
+    );
+}
+
+public function processedActivations()
+{
+    return $this->hasMany(
+        Activation::class,
+        'ProcessedBy',
+        'UserID'
+    );
+}
+
+public function directDownlines(): HasManyThrough
+    {
+        // Activations where THIS user was the referral owner (UserID)
+        // and ProcessedBy is the downline user who activated under them.
+        return $this->hasManyThrough(
+            User::class,
+            Activation::class,
+            'UserID',        // Foreign key on activations table (referral/upline)
+            'UserID',        // Foreign key on users table (downline)
+            'UserID',        // Local key on users table
+            'ProcessedBy'    // Local key on activations table (downline user ID)
+        );
+    }
+
+    /**
+     * Get all activations processed under this user's referral code.
+     */
+    public function referralActivations(): HasMany
+    {
+        return $this->hasMany(Activation::class, 'UserID', 'UserID');
+    }
+
 }

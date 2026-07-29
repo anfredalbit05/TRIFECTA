@@ -202,24 +202,17 @@
 
                         </div>
 
-
-
-
                         {{-- Members Card --}}
 
                         <div class="hero-card-members">
 
-                            <x-editable-text
-                                key="hero_members_count"
-                                :value="$contexts['hero_members_count'] ?? ''"
-                                tag="p"
-                                class="hero-card-title"
-                            />
-
+                            <p class="hero-card-title">
+                                {{ number_format($totalMembers) }}
+                            </p>
 
                             <x-editable-text
                                 key="hero_members_label"
-                                :value="$contexts['hero_members_label'] ?? ''"
+                                :value="$contexts['hero_members_label'] ?? 'Active Members'"
                                 tag="p"
                                 class="hero-card-subtext"
                             />

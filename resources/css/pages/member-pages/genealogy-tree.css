@@ -1,0 +1,97 @@
+/* =========================
+   GENEALOGY CONTAINER
+========================= */
+
+.genealogy-container {
+    @apply w-full min-h-screen;
+}
+
+
+/* =========================
+   GENEALOGY LAYOUT
+========================= */
+
+.genealogy-layout {
+    @apply w-full;
+}
+
+
+/* =========================
+   MAIN CARD / TAB CARD
+========================= */
+
+.genealogy-main-card,
+.tab-card {
+    @apply w-full min-h-full rounded-xl bg-white p-5 shadow;
+}
+
+.full-width-card {
+    @apply w-full min-h-[500px];
+}
+
+
+/* =========================
+   GENEALOGY NAVIGATION
+========================= */
+
+.genealogy-nav {
+    @apply sticky top-0 z-30
+    w-full
+    mt-0 mb-2
+    overflow-hidden;
+}
+
+.genealogy-nav-title {
+    @apply flex items-center justify-center bg-[#0C2C6B] py-3;
+}
+
+.genealogy-nav-title h1 {
+    @apply text-xl font-bold text-white;
+}
+
+.genealogy-nav-menu {
+    @apply sticky top-[60px] z-50
+    flex items-center
+    gap-2
+    bg-white
+    rounded-xl
+    shadow-md
+    px-6 py-3
+    ml-10;
+
+    width: calc(97% - 40px);
+}
+
+.genealogy-nav-menu a {
+    @apply rounded-lg
+    px-4 py-2
+    text-sm
+    font-semibold
+    text-gray-500
+    transition;
+}
+
+.genealogy-nav-menu a:hover {
+    @apply bg-gray-100 text-[#0C2C6B];
+}
+
+.genealogy-nav-menu .active {
+    @apply bg-[#0C2C6B] text-white;
+}
+
+
+/* =========================
+   TAB CONTENT & HELPERS
+========================= */
+
+[x-cloak] {
+    display: none !important;
+}
+
+.tab-title {
+    @apply text-xl font-bold text-[#0C2C6B];
+}
+
+.tab-description {
+    @apply mt-2 text-sm text-gray-500;
+}
