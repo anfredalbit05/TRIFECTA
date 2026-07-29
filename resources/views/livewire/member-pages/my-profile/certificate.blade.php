@@ -24,7 +24,7 @@
             <div>
                 @if(auth()->user()->status === 'Active')
                     <!-- Download Policy Document Button (Active Only) -->
-                    <a href="{{ asset('images/certificate/policy.jpg') }}"
+                    <a href="{{ route('policy.download') }}"
                        target="_blank"
                        class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 border border-slate-200 shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,9 +112,9 @@
 
             <div>
                 @if(auth()->user()->status === 'Active')
-                    <a href="{{ asset('images/certificate/certificate.jpg') }}"
-                    target="_blank"
-                    class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 shadow-sm">
+                    <a
+                        href="{{ route('certificate.download') }}"
+                        class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>

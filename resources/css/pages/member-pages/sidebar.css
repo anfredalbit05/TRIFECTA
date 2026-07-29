@@ -124,7 +124,7 @@
 
 
 .profile-name {
-    @apply mt-4 text-2xl font-bold;
+    @apply mt-4 text-lg sm:text-xl md:text-2xl font-bold;
 }
 
 
@@ -158,7 +158,7 @@
 
 
 .active-menu {
-    @apply bg-[#D79B10]
+    @apply bg-[#0C2C6B]
     font-semibold
     text-white
     shadow;

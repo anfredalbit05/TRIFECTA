@@ -53,7 +53,7 @@
                                     Surname *
                                 </label>
                                 <input
-                                    wire:model="surname"
+                                    wire:model.live="surname"
                                     type="text"
                                     placeholder="Dela Cruz"
                                     class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
@@ -66,7 +66,7 @@
                                     First Name *
                                 </label>
                                 <input
-                                    wire:model="first_name"
+                                    wire:model.live="first_name"
                                     type="text"
                                     placeholder="Juan"
                                     class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
@@ -79,7 +79,7 @@
                                     Middle Name (Optional)
                                 </label>
                                 <input
-                                    wire:model="middle_name"
+                                    wire:model.live="middle_name"
                                     type="text"
                                     placeholder="Santos"
                                     class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
@@ -137,7 +137,7 @@
                                     Complete Address *
                                 </label>
                                 <input
-                                    wire:model="address"
+                                    wire:model.live="address"
                                     type="text"
                                     placeholder="House No., Street, Barangay, City/Municipality, Province"
                                     class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
@@ -166,7 +166,7 @@
                                             Beneficiary {{ $i + 1 }} Full Name
                                         </label>
                                         <input
-                                            wire:model="beneficiaries.{{ $i }}.fullname"
+                                            wire:model.live="beneficiaries.{{ $i }}.fullname"
                                             type="text"
                                             placeholder="Full name of beneficiary"
                                             class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
@@ -191,7 +191,7 @@
                                             Relationship
                                         </label>
                                         <input
-                                            wire:model="beneficiaries.{{ $i }}.relationship"
+                                            wire:model.live="beneficiaries.{{ $i }}.relationship"
                                             type="text"
                                             placeholder="Father, Mother, Spouse..."
                                             class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
@@ -217,7 +217,7 @@
                                     Mobile Number *
                                 </label>
                                 <input
-                                    wire:model="mobile"
+                                    wire:model.live="mobile"
                                     type="tel"
                                     placeholder="0917XXXXXXX"
                                     class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
@@ -299,7 +299,7 @@
                         <label class="mt-3 flex cursor-pointer select-none items-start gap-3 sm:items-center">
                             <input
                                 type="checkbox"
-                                wire:model="agree"
+                                wire:model.live="agree"
                                 class="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#0B2A5B] focus:ring-[#0B2A5B] sm:mt-0"
                             >
                             <span class="text-xs font-semibold text-slate-700 sm:text-sm">
@@ -332,7 +332,8 @@
                             wire:click="submit"
                             wire:loading.attr="disabled"
                             type="button"
-                            class="flex w-1/2 items-center justify-center rounded-xl bg-[#D4A017] px-6 py-2.5 text-xs font-bold text-[#0B2A5B] shadow-md transition hover:bg-[#E8B923] disabled:cursor-not-allowed disabled:opacity-75 sm:w-auto"
+                            @disabled(!$agree)
+                            class="flex w-1/2 items-center justify-center rounded-xl bg-[#D4A017] px-6 py-2.5 text-xs font-bold text-[#0B2A5B] shadow-md transition hover:bg-[#E8B923] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                         >
                             {{-- NORMAL STATE --}}
                             <span wire:loading.remove wire:target="submit">
@@ -355,4 +356,36 @@
 
         </div>
     @endif
+
+    {{-- SweetAlert2 Listener Scripts --}}
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            // Listen for validation error dispatch
+            Livewire.on('validation-error', (event) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: event.title,
+                    html: event.html,
+                    confirmButtonColor: '#0B2A5B',
+                });
+            });
+
+            // Listen for confirmation dispatch before saving
+            Livewire.on('swal-confirm-submission', () => {
+                Swal.fire({
+                    title: 'Save Application?',
+                    text: 'Are you sure you want to submit this membership application?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0B2A5B',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, Submit it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        @this.dispatch('confirmed-save-application');
+                    }
+                });
+            });
+        });
+    </script>
 </div>

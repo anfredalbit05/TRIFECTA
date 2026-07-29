@@ -253,8 +253,15 @@ class ActivationModal extends Component
     | Submit Activation Process
     |--------------------------------------------------------------------------
     */
+    #[On('activate')]
     public function activate(): void
     {
+        // 🚀 Dispatch loading sweetalert before processing starts
+        $this->dispatch('swal:loading', [
+            'title' => 'Processing Activation...',
+            'text' => 'Please wait while we process your request.',
+        ]);
+
         Log::info('--- ACTIVATION PROCESS STARTED ---', [
             'authenticated' => Auth::check(),
             'current_user_id' => Auth::id(),
@@ -264,7 +271,7 @@ class ActivationModal extends Component
             'reference_code' => $this->reference_code,
         ]);
 
-        // 1. Form Validation (Added Maya to allowed payment methods)
+        // 1. Form Validation
         try {
             $this->validate([
                 'payment_method' => ['required', 'in:Cash,GCash,Maya,Bank Transfer'],
@@ -276,95 +283,50 @@ class ActivationModal extends Component
                 'beneficiaries.*.birthdate' => ['nullable', 'date'],
                 'beneficiaries.*.relationship' => ['nullable', 'string', 'max:50'],
             ]);
-            Log::info('Step 1: Form validation passed successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::warning('Step 1 FAILED: Form validation errors encountered.', [
-                'errors' => $e->errors()
-            ]);
             throw $e;
         }
 
-        /** @var User|null $currentUser */
         $currentUser = Auth::user();
-
-        if (!$currentUser) {
-            Log::error('Step 2 FAILED: No authenticated user found.');
-            $this->dispatch('toast', type: 'error', message: 'You must be logged in to activate an account.');
-            return;
-        }
-
         $selectedUser = User::find($this->selectedUserID);
 
-        if (!$selectedUser) {
-            Log::error('Step 2 FAILED: Selected user record not found.', ['selectedUserID' => $this->selectedUserID]);
-            $this->dispatch('toast', type: 'error', message: 'The selected member could not be found.');
+        if (!$currentUser || !$selectedUser) {
+            $this->dispatch('swal:close'); // Close loading alert
+            $this->dispatch('toast', type: 'error', message: 'Authentication or user error occurred.');
             return;
         }
-        Log::info('Step 2: Current and target users verified.', [
-            'current_user_id' => $currentUser->UserID,
-            'target_user_id' => $selectedUser->UserID
-        ]);
 
-        // 2. Find Upline/Referrer User from the entered upline code matching referral_code
-       // 2. Find Upline/Referrer User from the entered upline code matching referralCode
         $cleanUplineCode = trim($this->upline_code);
         $referralUser = User::where('referralCode', $cleanUplineCode)->first();
 
         if (!$referralUser) {
-            Log::warning('Step 3 FAILED: Referral/upline code does not exist in users table.', [
-                'upline_code' => $cleanUplineCode
-            ]);
-
+            $this->dispatch('swal:close'); // Close loading alert
             $this->addError('upline_code', 'The referral/upline code is invalid.');
             return;
         }
 
-        // Prevent self-referral
         if ((int) $referralUser->UserID === (int) $selectedUser->UserID) {
-            Log::warning('Step 3 FAILED: Attempted self-referral.', ['UserID' => $selectedUser->UserID]);
+            $this->dispatch('swal:close'); // Close loading alert
             $this->addError('upline_code', 'A user cannot use their own referral code.');
             return;
         }
-        Log::info('Step 3: Referral user successfully found.', ['referral_user_id' => $referralUser->UserID]);
 
-        // 3. Prevent Duplicate Activation Requests for the Target User
         $existingActivation = Activation::where('UserID', $selectedUser->UserID)
             ->whereIn('status', ['Pending', 'Approved'])
             ->first();
 
         if ($existingActivation) {
-            Log::warning('Step 4 FAILED: Duplicate active/pending activation found.', [
-                'UserID' => $selectedUser->UserID,
-                'ActivationID' => $existingActivation->ActivationID,
-                'status' => $existingActivation->status
-            ]);
-
+            $this->dispatch('swal:close'); // Close loading alert
             $this->dispatch('toast', type: 'error', message: 'This account already has an active or pending activation request.');
             return;
         }
-        Log::info('Step 4: No duplicate activations detected.');
 
         $activationType = ($this->payment_method === 'Cash') ? 'W' : 'O';
         $paymentReference = ($this->payment_method === 'Cash') ? null : trim($this->reference_code);
 
         DB::beginTransaction();
-        Log::info('Step 5: Database transaction started.');
-
-        Log::info('Activation data', [
-    'data' => [
-        'UserID' => $selectedUser->UserID,
-        'amount' => 1900,
-        'type' => $activationType,
-        'payment_method' => $this->payment_method,
-        'upline_code' => $cleanUplineCode,
-        'payment_reference' => $paymentReference,
-        'ProcessedBy' => $currentUser->UserID,
-        'status' => 'Pending',
-    ]
-]);
 
         try {
-            // 4. Create Activation Record assigned to the Target User
             $activation = Activation::create([
                 'UserID' => $selectedUser->UserID,
                 'amount' => 1900.00,
@@ -376,41 +338,31 @@ class ActivationModal extends Component
                 'status' => 'Pending',
             ]);
 
-            Log::info('Step 6: Activation record created.', ['ActivationID' => $activation->ActivationID]);
-
-            // Auto-activate selected user if processed by Admin (RoleID = 1)
             if ((int) $currentUser->RoleID === 1) {
                 $selectedUser->update([
                     'status' => 'Active',
                 ]);
-                Log::info('Step 6.1: Target user status auto-updated to Active by Admin.');
             }
 
-            // 5. Create Wallet Commission (20%) for the Upline/Referral User
             $walletAmount = $activation->amount * 0.20;
 
-            $wallet = Wallet::create([
+            Wallet::create([
                 'UserID' => $referralUser->UserID,
                 'ActivationID' => $activation->ActivationID,
                 'amount' => $walletAmount,
                 'status' => 'Active',
             ]);
-            Log::info('Step 7: Wallet commission created.', ['WalletID' => $wallet->WalletID ?? null, 'amount' => $walletAmount]);
 
-            // 6. Save Beneficiaries to the Target Selected User
             foreach ($this->beneficiaries as $index => $beneficiary) {
                 $fullname = trim($beneficiary['fullname'] ?? '');
                 $birthdate = trim($beneficiary['birthdate'] ?? '');
                 $relationship = trim($beneficiary['relationship'] ?? '');
 
-                $hasData = ($fullname !== '' || $birthdate !== '' || $relationship !== '');
-
-                if (!$hasData) {
+                if ($fullname === '' && $birthdate === '' && $relationship === '') {
                     continue;
                 }
 
                 if ($fullname === '' || $birthdate === '' || $relationship === '') {
-                    Log::warning("Step 8 FAILED: Incomplete beneficiary row at index {$index}");
                     throw ValidationException::withMessages([
                         "beneficiaries.$index.fullname" => 'Full name is required.',
                         "beneficiaries.$index.birthdate" => 'Birthdate is required.',
@@ -439,28 +391,30 @@ class ActivationModal extends Component
                     ]);
                 }
             }
-            Log::info('Step 8: Beneficiaries processed successfully.');
 
             DB::commit();
-            Log::info('--- TRANSACTION COMMITTED SUCCESSFULLY ---', [
-                'ActivationID' => $activation->ActivationID
-            ]);
 
-            $this->dispatch('toast', type: 'success', message: 'Account activated successfully.');
             $this->closeModal();
+
+            // 🔥 Dispatch the event to update the profile UI instantly
+            $this->dispatch('account-activated');
+
+            // 🎉 Dispatch success SweetAlert
+            $this->dispatch('swal:success', [
+                'title' => 'Success!',
+                'text' => 'Account activated successfully.',
+            ]);
 
         } catch (ValidationException $e) {
             DB::rollBack();
-            Log::warning('Transaction rolled back due to ValidationException.', ['errors' => $e->errors()]);
+            $this->dispatch('swal:close');
             throw $e;
         } catch (\Throwable $e) {
             DB::rollBack();
+            $this->dispatch('swal:close');
 
             Log::error('CRITICAL ERROR: Transaction rolled back due to exception.', [
                 'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
             $this->dispatch('toast', type: 'error', message: 'Activation failed. Please try again.');
@@ -469,14 +423,28 @@ class ActivationModal extends Component
 
     public function confirmActivate(): void
     {
-        // $this->dispatch('swal:confirm', [
-        //     'title' => 'Submit Activation?',
-        //     'text' => 'Please review your details before submitting your activation.',
-        //     'icon' => 'question',
-        //     'method' => 'activate'
-        // ]);
+        // Run form validation first before prompting the sweetalert popup
+        try {
+            $this->validate([
+                'payment_method' => ['required', 'in:Cash,GCash,Maya,Bank Transfer'],
+                'amount' => ['required', 'numeric', 'in:1900'],
+                'upline_code' => ['required', 'string', 'max:100'],
+                'reference_code' => ['nullable', 'string', 'max:100', 'required_unless:payment_method,Cash'],
+                'beneficiaries' => ['required', 'array', 'max:3'],
+                'beneficiaries.*.fullname' => ['nullable', 'string', 'max:150'],
+                'beneficiaries.*.birthdate' => ['nullable', 'date'],
+                'beneficiaries.*.relationship' => ['nullable', 'string', 'max:50'],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        }
 
-        $this->activate();
+        $this->dispatch('swal:confirm', [
+            'title' => 'Submit Activation?',
+            'text' => 'Please review your details before submitting your activation.',
+            'icon' => 'question',
+            'method' => 'activate'
+        ]);
     }
 
     /*

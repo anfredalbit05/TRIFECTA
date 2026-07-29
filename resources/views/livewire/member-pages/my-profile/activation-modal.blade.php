@@ -17,7 +17,7 @@
                         </p>
                         <div class="mt-3 inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2">
                             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-[#0B2A5B] text-xs font-bold text-[#E8B923]">
-                                {{ strtoupper(substr($member?->firstname ?? 'M', 0, 1)) }}
+                                {{ strtoupper(substr($selectedUserRecord?->firstname ?? 'M', 0, 1)) }}
                             </div>
                             <div>
                                 <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
@@ -185,7 +185,7 @@
                                 <input
                                     wire:model="upline_code"
                                     type="text"
-                                    placeholder="Enter referral code"
+                                    placeholder="Enter upline code"
                                     class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
                                 @error('upline_code')
                                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -260,16 +260,15 @@
                         </button>
 
                         <!-- ACTIVATE BUTTON -->
-                        <!-- ACTIVATE BUTTON -->
                         <button
-                            wire:click="activate"
-                            wire:loading.attr="disabled"
                             type="button"
+                            wire:click="confirmActivate"
+                            wire:loading.attr="disabled"
                             class="w-1/2 sm:w-auto px-6 py-2.5 bg-[#D4A017] hover:bg-[#E8B923] text-[#0B2A5B] font-bold text-xs rounded-xl shadow-md transition">
-                            <span wire:loading.remove wire:target="activate">
+                            <span wire:loading.remove wire:target="confirmActivate">
                                 Activate Account
                             </span>
-                            <span wire:loading wire:target="activate">
+                            <span wire:loading wire:target="confirmActivate">
                                 Processing...
                             </span>
                         </button>
@@ -280,8 +279,6 @@
         </div>
     @endif
 
-    <!-- SWEETALERT2 SCRIPT -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         window.addEventListener('swal:confirm', event => {
             Swal.fire({
@@ -298,6 +295,32 @@
                     Livewire.dispatch(event.detail[0].method);
                 }
             });
+        });
+
+        window.addEventListener('swal:loading', event => {
+            Swal.fire({
+                title: event.detail[0].title,
+                text: event.detail[0].text,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        });
+
+        window.addEventListener('swal:success', event => {
+            Swal.fire({
+                icon: 'success',
+                title: event.detail[0].title,
+                text: event.detail[0].text,
+                timer: 2000,
+                showConfirmButton: false
+            });
+        });
+
+        window.addEventListener('swal:close', event => {
+            Swal.close();
         });
     </script>
 </div>

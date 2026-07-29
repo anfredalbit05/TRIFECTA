@@ -1,5 +1,5 @@
 /* ===================================================
-   HERO SECTION
+    HERO SECTION
 =================================================== */
 
 .contact-hero {
@@ -27,15 +27,15 @@
 }
 
 .contact-hero-description {
-     @apply mt-3 text-slate-600 leading-relaxed;
+    @apply mt-3 text-slate-300 leading-relaxed max-w-2xl mx-auto text-base sm:text-lg;
 }
 
 /* ===================================================
-   COMMON SECTION HEADER
+    COMMON SECTION HEADER
 =================================================== */
 
 .contact-section-header {
-    @apply text-center max-w-3xl mx-auto mb-16;
+    @apply text-center max-w-3xl mx-auto mb-14;
 }
 
 .contact-section-label {
@@ -43,15 +43,15 @@
 }
 
 .contact-section-title {
-    @apply mt-2 text-2xl sm:text-4xl font-extrabold text-[#0B2A5B];
+    @apply mt-3 text-3xl sm:text-4xl font-black text-[#0B2A5B];
 }
 
 .contact-section-description {
-    @apply mt-3 text-slate-600 leading-relaxed;
+    @apply mt-4 text-slate-600 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed;
 }
 
 /* ===================================================
-   QUICK CONTACT CARDS
+    QUICK CONTACT CARDS
 =================================================== */
 
 .contact-quick-section {
@@ -75,15 +75,15 @@
 }
 
 .contact-card-text {
-    @apply mt-4 text-slate-600 leading-relaxed;
+    @apply mt-4 text-slate-600 text-sm sm:text-base leading-relaxed;
 }
 
 .contact-card-text-bold {
-    @apply text-slate-600 font-semibold;
+    @apply text-slate-700 font-semibold text-sm sm:text-base;
 }
 
 /* ===================================================
-   DETAILED OFFICES & CHANNELS
+    DETAILED OFFICES & CHANNELS
 =================================================== */
 
 .contact-details-section {
@@ -91,7 +91,7 @@
 }
 
 .contact-details-header {
-    @apply text-center mb-14;
+    @apply text-center mb-14 max-w-3xl mx-auto;
 }
 
 .contact-details-subtitle {
@@ -111,7 +111,7 @@
 }
 
 .contact-detail-card {
-    @apply bg-white rounded-3xl shadow-lg p-8 text-center border border-slate-100 flex flex-col items-center;
+    @apply bg-white rounded-3xl shadow-lg p-8 text-center border border-slate-100 flex flex-col items-center justify-between transition-all duration-300 hover:shadow-xl;
 }
 
 .contact-detail-title {
@@ -131,7 +131,7 @@
     @apply text-2xl sm:text-3xl font-bold;
 }
 
-.contact-facebook-{
+.contact-facebook-text {
     @apply mt-5 text-slate-300 text-base sm:text-lg leading-relaxed max-w-xl mx-auto;
 }
 
@@ -140,7 +140,7 @@
 }
 
 /* ===================================================
-   MAP SECTION
+    MAP SECTION
 =================================================== */
 
 .contact-map-section {
@@ -148,7 +148,7 @@
 }
 
 .contact-map-header {
-    @apply text-center;
+    @apply text-center max-w-3xl mx-auto;
 }
 
 .contact-map-subtitle {
@@ -169,4 +169,60 @@
 
 .contact-map-iframe {
     @apply w-full h-full border-0;
+}
+
+/* ===================================================
+    INQUIRY FORM SECTION
+=================================================== */
+
+.contact-form-section {
+    @apply py-12 sm:py-16 lg:py-20 bg-gray-50;
+}
+
+.contact-form-card {
+    @apply bg-white rounded-2xl shadow-xl p-6 sm:p-10 lg:p-12 border border-gray-100;
+}
+
+.contact-form-header {
+    @apply text-center mb-8 sm:mb-10;
+}
+
+.contact-form-label {
+    @apply text-blue-600 font-semibold tracking-wide uppercase text-xs sm:text-sm;
+}
+
+.contact-form-title {
+    @apply text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1;
+}
+
+.contact-form-desc {
+    @apply text-sm sm:text-base text-gray-600 mt-2;
+}
+
+.contact-form-alert {
+    @apply mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-center text-sm sm:text-base font-medium;
+}
+
+.contact-form-label-text {
+    @apply block text-sm font-medium text-gray-700 mb-1.5 sm:mb-2;
+}
+
+.contact-form-input {
+    @apply w-full px-4 py-2.5 text-sm sm:text-base rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none shadow-sm transition-all;
+}
+
+.contact-form-select {
+    @apply w-full px-4 py-2.5 text-sm sm:text-base rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none shadow-sm transition-all bg-white;
+}
+
+.contact-form-textarea {
+    @apply w-full px-4 py-2.5 text-sm sm:text-base rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none shadow-sm transition-all resize-y;
+}
+
+.contact-form-error {
+    @apply text-red-500 text-xs mt-1 block;
+}
+
+.contact-form-submit-btn {
+    @apply w-full py-3.5 px-6  bg-[#0C2C6B]/95 hover:bg-blue-700 active:bg-blue-800 text-white font-medium text-sm sm:text-base rounded-lg shadow-md transition duration-200;
 }

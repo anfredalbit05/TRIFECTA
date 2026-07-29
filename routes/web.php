@@ -5,11 +5,13 @@ use Illuminate\Support\Facades\Auth;
 use App\Livewire\LandingPage\Home;
 use App\Livewire\LandingPage\About;
 use App\Livewire\LandingPage\Team;
-use App\Livewire\LandingPage\HowItWorks;
+use App\Livewire\LandingPage\How;
 use App\Livewire\LandingPage\Testimonials;
 use App\Livewire\LandingPage\NewsUpdates;
 use App\Livewire\LandingPage\Contact;
 use App\Models\Activation;
+use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\PolicyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +25,7 @@ Route::get('/about', About::class)->name('about');
 
 Route::get('/team', Team::class)->name('team');
 
-Route::get('/how-it-works', HowItWorks::class)->name('how-it-works');
+Route::get('/how-it-works', How::class)->name('how-it-works');
 
 Route::get('/testimonials', Testimonials::class)->name('testimonials');
 
@@ -62,6 +64,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/report-settings', function () {
         return view('pages.admin-pages.report-settings');
     })->name('report-settings');
+
+         Route::get('/certificate/download', [CertificateController::class, 'download'])
+        ->name('certificate.download');
+
+        Route::get(
+    '/policy/download',
+    [PolicyController::class, 'download']
+)->middleware('auth')
+ ->name('policy.download');
+
 
 
     Route::get('/my-profile', function () {

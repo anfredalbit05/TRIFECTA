@@ -8,7 +8,7 @@ use Livewire\Attributes\Layout;
 use App\Models\Context;
 
 #[Layout('layouts.app')]
-class HowItWorks extends Component
+class How extends Component
 {
     public array $contexts = [];
 

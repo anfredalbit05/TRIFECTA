@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use App\Models\Context;
+use App\Models\Branch;
 
 #[Layout('layouts.app')]
 class Team extends Component
@@ -45,6 +46,8 @@ class Team extends Component
 
     public function render()
     {
-        return view('livewire.landing-page.team');
+        return view('livewire.landing-page.team', [
+            'branches' => Branch::where('status', true)->get()
+        ]);
     }
 }

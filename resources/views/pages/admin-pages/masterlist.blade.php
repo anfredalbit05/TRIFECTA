@@ -80,7 +80,7 @@
             x-cloak
             class="dashboard-main-card full-width-card"
         >
-            <x-admin-pages.masterlist.branches />
+             <livewire:admin-pages.masterlist.branches-list />
         </div>
 
         <!-- BENEFITS -->

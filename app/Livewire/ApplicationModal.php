@@ -23,17 +23,11 @@ class ApplicationModal extends Component
     */
 
     public $surname = '';
-
     public $first_name = '';
-
     public $middle_name = '';
-
     public $gender = '';
-
     public $civil_status = '';
-
     public $birthdate = '';
-
     public $address = '';
 
 
@@ -45,25 +39,21 @@ class ApplicationModal extends Component
     */
 
     public array $beneficiaries = [
-
         [
             'fullname' => '',
             'birthdate' => '',
             'relationship' => '',
         ],
-
         [
             'fullname' => '',
             'birthdate' => '',
             'relationship' => '',
         ],
-
         [
             'fullname' => '',
             'birthdate' => '',
             'relationship' => '',
         ],
-
     ];
 
 
@@ -76,13 +66,9 @@ class ApplicationModal extends Component
     */
 
     public $mobile = '';
-
     public $email = '';
-
     public $username = '';
-
     public $password = '';
-
     public $password_confirmation = '';
 
 
@@ -95,6 +81,59 @@ class ApplicationModal extends Component
     */
 
     public bool $agree = false;
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Real-time Format Hook
+    |--------------------------------------------------------------------------
+    */
+
+
+
+    public function updated($property, $value)
+    {
+        // 1. Mobile Number Formatting rules
+        if ($property === 'mobile') {
+            // Replace +63 or 63 prefix with 09
+            if (str_starts_with($value, '+63')) {
+                $value = '09' . substr($value, 3);
+            } elseif (str_starts_with($value, '63') && strlen($value) === 12) {
+                $value = '0' . substr($value, 2);
+            }
+
+            // Keep digits only
+            $value = preg_replace('/\D/', '', $value);
+
+            // Ensure it starts with '09' if user starts typing something else
+            if (strlen($value) > 0 && !str_starts_with($value, '0')) {
+                $value = '0' . $value;
+            }
+            if (strlen($value) > 1 && $value[1] !== '9') {
+                $value = '09' . substr($value, 2);
+            }
+
+            // Limit strictly to 11 digits
+            $this->mobile = substr($value, 0, 11);
+        }
+
+        // 2. Title Case Formatting for Applicant Names & Address
+        if (in_array($property, ['surname', 'first_name', 'middle_name', 'address'])) {
+            $this->{$property} = ucwords(strtolower($value));
+        }
+
+        // 3. Title Case Formatting for Beneficiary Fullname & Relationship
+        if (str_starts_with($property, 'beneficiaries.')) {
+            $parts = explode('.', $property);
+            if (isset($parts[2]) && in_array($parts[2], ['fullname', 'relationship'])) {
+                $index = $parts[1];
+                $field = $parts[2];
+                $this->beneficiaries[$index][$field] = ucwords(strtolower($value));
+            }
+        }
+    }
 
 
 
@@ -123,13 +162,9 @@ class ApplicationModal extends Component
 
     public function close()
     {
-
         $this->reset();
-
         $this->resetValidation();
-
         $this->open = false;
-
     }
 
 
@@ -138,366 +173,138 @@ class ApplicationModal extends Component
 
     /*
     |--------------------------------------------------------------------------
-    | Submit Application
+    | Validate and Prompt Confirmation
     |--------------------------------------------------------------------------
     */
 
     public function submit()
     {
-
-
         try {
 
-
             $this->validate([
-
-
-                /*
-                | Applicant
-                */
-
                 'surname' => 'required|string|max:255',
-
                 'first_name' => 'required|string|max:255',
-
                 'gender' => 'required',
-
                 'civil_status' => 'required',
-
                 'birthdate' => 'required|date',
-
                 'address' => 'required|string|max:500',
 
+                'beneficiaries.*.fullname' => 'nullable|string|max:150',
+                'beneficiaries.*.birthdate' => 'nullable|date',
+                'beneficiaries.*.relationship' => 'nullable|string|max:50',
 
-
-                /*
-                | Beneficiaries
-                */
-
-                'beneficiaries.*.fullname'
-                    => 'nullable|string|max:150',
-
-
-                'beneficiaries.*.birthdate'
-                    => 'nullable|date',
-
-
-                'beneficiaries.*.relationship'
-                    => 'nullable|string|max:50',
-
-
-
-
-                /*
-                | Security
-                */
-
-                'mobile'
-                    => 'required|string|max:20',
-
-
-                'email'
-                    => 'nullable|email|unique:users,email',
-
-
-                'username'
-                    => 'required|string|max:100|unique:users,username',
-
-
-                'password'
-                    => 'required|min:8|confirmed',
-
-
-
-                /*
-                | Terms
-                */
-
-                'agree'
-                    => 'accepted',
-
-
+                'mobile' => 'required|digits:11',
+                'email' => 'nullable|email|unique:users,email',
+                'username' => 'required|string|max:100|unique:users,username',
+                'password' => 'required|min:8|confirmed',
+                'agree' => 'accepted',
             ]);
 
+        } catch (ValidationException $e) {
 
+            $errors = $e->validator->errors()->all();
+            $html = '<ul style="text-align:left; list-style-type: disc; padding-left: 20px;">';
 
-        } catch(ValidationException $e) {
-
-
-            $errors = $e->validator
-                ->errors()
-                ->all();
-
-
-
-            $html = '<ul style="text-align:left;">';
-
-
-
-            foreach($errors as $error)
-            {
-
-                $html .= "
-                    <li style='margin-bottom:8px'>
-                        {$error}
-                    </li>
-                ";
-
+            foreach ($errors as $error) {
+                $html .= "<li style='margin-bottom:6px'>{$error}</li>";
             }
-
 
             $html .= '</ul>';
 
-
-
             $this->dispatch(
                 'validation-error',
-                title:'Please complete the form',
-                html:$html
+                title: 'Missing or Invalid Fields',
+                html: $html
             );
 
-
             return;
-
         }
 
-        DB::beginTransaction();
+        // Trigger SweetAlert Confirmation if validation passes
+        $this->dispatch('swal-confirm-submission');
+    }
 
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Save Application (Called after confirmation)
+    |--------------------------------------------------------------------------
+    */
+
+    #[On('confirmed-save-application')]
+    public function saveApplication()
+    {
+        DB::beginTransaction();
 
         try {
 
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Generate Upline Code
-            |--------------------------------------------------------------------------
-            */
-
-
             do {
-
-
-                $referralCode =
-                    $this->generateUplineCode();
-
-
-                $exists =
-                    User::where(
-                        'referralCode',
-                        $referralCode
-                    )->exists();
-
-
-
-            } while($exists);
-
-
-
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Create User
-            |--------------------------------------------------------------------------
-            */
-
+                $referralCode = $this->generateUplineCode();
+                $exists = User::where('referralCode', $referralCode)->exists();
+            } while ($exists);
 
             $user = User::create([
-
-
-                'username'
-                    => $this->username,
-
-
-                'password'
-                    => $this->password,
-
-
-                'referralCode'
-                    => $referralCode,
-
-
-
-                'lastname'
-                    => $this->surname,
-
-
-                'firstname'
-                    => $this->first_name,
-
-
-                'middlename'
-                    => $this->middle_name,
-
-
-
-                'gender'
-                    => $this->gender,
-
-
-                'civilstatus'
-                    => $this->civil_status,
-
-
-                'birthdate'
-                    => $this->birthdate,
-
-
-                'contactno'
-                    => $this->mobile,
-
-
-                'email'
-                    => filled($this->email)
-                        ? $this->email
-                        : null,
-
-
-                'address'
-                    => $this->address,
-
-
-
-                'RoleID'
-                    => 5,
-
-
-                'status'
-                    => 'Inactive',
-
-
+                'username' => $this->username,
+                'password' => $this->password,
+                'referralCode' => $referralCode,
+                'lastname' => $this->surname,
+                'firstname' => $this->first_name,
+                'middlename' => $this->middle_name,
+                'gender' => $this->gender,
+                'civilstatus' => $this->civil_status,
+                'birthdate' => $this->birthdate,
+                'contactno' => $this->mobile,
+                'email' => filled($this->email) ? $this->email : null,
+                'address' => $this->address,
+                'RoleID' => 5,
+                'status' => 'Inactive',
             ]);
 
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Save Beneficiaries
-            |--------------------------------------------------------------------------
-            */
-
-
-            foreach($this->beneficiaries as $beneficiary)
-            {
-
-
-
-                if(
-                    filled($beneficiary['fullname'])
-                    &&
-                    filled($beneficiary['birthdate'])
-                )
-                {
-
-
+            foreach ($this->beneficiaries as $beneficiary) {
+                if (filled($beneficiary['fullname']) && filled($beneficiary['birthdate'])) {
                     Beneficiary::create([
-
-
-                        /*
-                        | Change this according
-                        | to your benefits table
-                        */
-
-                        'BenefitID'
-                            =>1,
-
-
-                        'UserID'
-                            => $user->UserID,
-
-
-                        'fullname'
-                            => $beneficiary['fullname'],
-
-
-                        'birthdate'
-                            => $beneficiary['birthdate'],
-
-
-                        'relationship'
-                            => $beneficiary['relationship'],
-
-
-
-                        'status'
-                            => true,
-
-
+                        'BenefitID' => 1,
+                        'UserID' => $user->UserID,
+                        'fullname' => $beneficiary['fullname'],
+                        'birthdate' => $beneficiary['birthdate'],
+                        'relationship' => $beneficiary['relationship'],
+                        'status' => true,
                     ]);
-
                 }
-
-
             }
-
-
-
-
 
             DB::commit();
 
-
-
-
-
-            Log::info(
-                'Application created',
-                [
-                    'UserID'=>$user->UserID,
-                    'referralCode'=>$referralCode
-                ]
-            );
-
-
-
-
-
+            Log::info('Application created', [
+                'UserID' => $user->UserID,
+                'referralCode' => $referralCode
+            ]);
 
             $this->close();
 
-
-
-
             $this->dispatch(
                 'toast',
-                type:'success',
-                message:
-                'Application submitted successfully!'
+                type: 'success',
+                message: 'Application submitted successfully!'
             );
 
-
-
-
-
-
-        } catch(\Throwable $e) {
-
-
+        } catch (\Throwable $e) {
 
             DB::rollBack();
 
-
-
-            Log::error(
-                'Application failed',
-                [
-                    'error'=>$e->getMessage()
-                ]
-            );
-
-
+            Log::error('Application failed', [
+                'error' => $e->getMessage()
+            ]);
 
             $this->dispatch(
                 'toast',
-                type:'error',
-                message:
-                'Something went wrong. Please try again.'
+                type: 'error',
+                message: 'Something went wrong. Please try again.'
             );
-
         }
-
-
     }
 
 
@@ -512,25 +319,18 @@ class ApplicationModal extends Component
 
     private function generateUplineCode(): string
     {
-
         return strtoupper(
-
             substr(
-
                 md5(
                     uniqid(
                         mt_rand(),
                         true
                     )
                 ),
-
                 0,
-
                 6
             )
-
         );
-
     }
 
 
@@ -545,11 +345,6 @@ class ApplicationModal extends Component
 
     public function render()
     {
-
-        return view(
-            'livewire.application-modal'
-        );
-
+        return view('livewire.application-modal');
     }
-
 }

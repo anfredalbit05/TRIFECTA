@@ -259,145 +259,30 @@
 
         <div class="team-field-grid">
 
+            @foreach($branches as $branch)
             <div class="team-field-card">
                 <div class="team-field-icon-box team-icon-blue">
-                    <x-editable-text
-                        key="team_field_icon_1"
-                        :value="$contexts['team_field_icon_1'] ?? '📍'"
-                        tag="span"
-                        class="inline-block"
-                    />
+                    <span class="inline-block">
+                        📍
+                    </span>
                 </div>
                 <h3 class="team-field-card-title">
-                    <x-editable-text
-                        key="team_field_card_title_1"
-                        :value="$contexts['team_field_card_title_1'] ?? 'Tagum City Office'"
-                        tag="span"
-                        class="inline-block"
-                    />
+                    <span class="inline-block">
+                        {{ $branch->branchname }}
+                    </span>
                 </h3>
                 <span class="team-field-card-role">
-                    <x-editable-text
-                        key="team_field_card_role_1"
-                        :value="$contexts['team_field_card_role_1'] ?? 'Main Branch Team'"
-                        tag="span"
-                        class="inline-block"
-                    />
+                    <span class="inline-block">
+                        {{ $branch->type }} ({{ $branch->branchCode }})
+                    </span>
                 </span>
                 <p class="team-field-card-text">
-                    <x-editable-text
-                        key="team_field_card_text_1"
-                        :value="$contexts['team_field_card_text_1'] ?? 'Handles walk-in inquiries, membership renewals, and local health perk reimbursements.'"
-                        tag="span"
-                        class="block"
-                    />
+                    <span class="block">
+                        {{ $branch->address }}
+                    </span>
                 </p>
             </div>
-
-            <div class="team-field-card">
-                <div class="team-field-icon-box team-icon-amber">
-                    <x-editable-text
-                        key="team_field_icon_2"
-                        :value="$contexts['team_field_icon_2'] ?? '📍'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </div>
-                <h3 class="team-field-card-title">
-                    <x-editable-text
-                        key="team_field_card_title_2"
-                        :value="$contexts['team_field_card_title_2'] ?? 'Kapalong Branch'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </h3>
-                <span class="team-field-card-role">
-                    <x-editable-text
-                        key="team_field_card_role_2"
-                        :value="$contexts['team_field_card_role_2'] ?? 'Municipal Helpdesk'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </span>
-                <p class="team-field-card-text">
-                    <x-editable-text
-                        key="team_field_card_text_2"
-                        :value="$contexts['team_field_card_text_2'] ?? 'Assists rural communities with micro-insurance registration and family beneficiary updates.'"
-                        tag="span"
-                        class="block"
-                    />
-                </p>
-            </div>
-
-            <div class="team-field-card">
-                <div class="team-field-icon-box team-icon-emerald">
-                    <x-editable-text
-                        key="team_field_icon_3"
-                        :value="$contexts['team_field_icon_3'] ?? '🚑'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </div>
-                <h3 class="team-field-card-title">
-                    <x-editable-text
-                        key="team_field_card_title_3"
-                        :value="$contexts['team_field_card_title_3'] ?? 'Medical Assistance Officers'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </h3>
-                <span class="team-field-card-role">
-                    <x-editable-text
-                        key="team_field_card_role_3"
-                        :value="$contexts['team_field_card_role_3'] ?? 'Health Support Team'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </span>
-                <p class="team-field-card-text">
-                    <x-editable-text
-                        key="team_field_card_text_3"
-                        :value="$contexts['team_field_card_text_3'] ?? 'Coordinates hospital claim validations, P.E. reimbursements, and ultrasound support.'"
-                        tag="span"
-                        class="block"
-                    />
-                </p>
-            </div>
-
-            <div class="team-field-card">
-                <div class="team-field-icon-box team-icon-indigo">
-                    <x-editable-text
-                        key="team_field_icon_4"
-                        :value="$contexts['team_field_icon_4'] ?? '🤝'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </div>
-                <h3 class="team-field-card-title">
-                    <x-editable-text
-                        key="team_field_card_title_4"
-                        :value="$contexts['team_field_card_title_4'] ?? 'Community Organizers'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </h3>
-                <span class="team-field-card-role">
-                    <x-editable-text
-                        key="team_field_card_role_4"
-                        :value="$contexts['team_field_card_role_4'] ?? 'Field Coordinators'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </span>
-                <p class="team-field-card-text">
-                    <x-editable-text
-                        key="team_field_card_text_4"
-                        :value="$contexts['team_field_card_text_4'] ?? 'Engaging barangays and groups to bring affordable insurance education directly to households.'"
-                        tag="span"
-                        class="block"
-                    />
-                </p>
-            </div>
+            @endforeach
 
         </div>
     </div>

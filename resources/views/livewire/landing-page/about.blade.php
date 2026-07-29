@@ -92,86 +92,115 @@
     </div>
 </section>
 
+
 <!-- =========================
      DTI REGISTRATION CERTIFICATE
 ========================= -->
-<section class="py-20 bg-slate-50 border-y border-slate-200">
+<section class="py-20 bg-white">
     <div class="about-container">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
-            <!-- Left Side: Information -->
-            <div class="lg:col-span-6 text-left space-y-6">
-                <span class="about-section-label-gold">
-                    <x-editable-text
-                        key="about_cert_label"
-                        :value="$contexts['about_cert_label'] ?? 'Official Registration'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </span>
+        <!-- Section Header -->
+        <div class="about-container-center mb-14">
 
-                <h2 class="about-section-title-dark">
-                    <x-editable-text
-                        key="about_cert_title"
-                        :value="$contexts['about_cert_title'] ?? 'Certified & Registered DTI Enterprise'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </h2>
+            <span class="about-section-label-gold">
+                <x-editable-text
+                    key="about_dti_label"
+                    :value="$contexts['about_dti_label'] ?? 'Official Registration'"
+                    tag="span"
+                    class="inline-block"
+                />
+            </span>
 
-                <p class="text-slate-600 text-lg leading-relaxed">
-                    <x-editable-text
-                        key="about_cert_text"
-                        :value="$contexts['about_cert_text'] ?? 'TrueLife Dayongan Solidaritas is officially registered under the Department of Trade and Industry (DTI), ensuring legal compliance, transparency, and formal commitment to serving Filipino families nationwide.'"
-                        tag="span"
-                        class="block"
-                    />
-                </p>
+            <h2 class="about-section-title-dark mt-4">
+                <x-editable-text
+                    key="about_dti_title"
+                    :value="$contexts['about_dti_title'] ?? 'DTI Certificate of Business Registration'"
+                    tag="span"
+                    class="inline-block"
+                />
+            </h2>
 
-                <div class="pt-4 grid grid-cols-2 gap-4 text-sm text-slate-700 font-medium">
-                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                        <span class="block text-xs text-slate-400 uppercase tracking-wider">Business Name No.</span>
-                        <span class="font-bold text-[#0B2A5B] text-base">8368575</span>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                        <span class="block text-xs text-slate-400 uppercase tracking-wider">Validity</span>
-                        <span class="font-bold text-[#0B2A5B] text-base">July 22, 2031</span>
-                    </div>
+            <p class="mt-5 max-w-3xl mx-auto text-lg text-slate-600 leading-8">
+                <x-editable-text
+                    key="about_dti_description"
+                    :value="$contexts['about_dti_description'] ?? 'TrueLife Dayongan Solidaritas Social Welfare Services is officially registered with the Department of Trade and Industry (DTI). This certificate demonstrates our legal compliance, commitment to transparency, and dedication to providing trusted community-based welfare services for Filipino families.'"
+                    tag="span"
+                    class="block"
+                />
+            </p>
+
+        </div>
+
+        <!-- Certificate -->
+        <div class="max-w-5xl mx-auto">
+
+            <!-- Information Cards -->
+            <div class="grid md:grid-cols-3 gap-5 mb-8">
+
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 text-center">
+                    <p class="text-xs uppercase tracking-widest text-slate-400">
+                        Business Name
+                    </p>
+                    <p class="mt-2 font-bold text-[#0B2A5B]">
+                        TRUELIFE DAYONGAN
+                    </p>
                 </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 text-center">
+                    <p class="text-xs uppercase tracking-widest text-slate-400">
+                        Registration No.
+                    </p>
+                    <p class="mt-2 font-bold text-[#0B2A5B]">
+                        8368575
+                    </p>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 text-center">
+                    <p class="text-xs uppercase tracking-widest text-slate-400">
+                        Valid Until
+                    </p>
+                    <p class="mt-2 font-bold text-[#0B2A5B]">
+                        July 22, 2031
+                    </p>
+                </div>
+
             </div>
 
-            <!-- Right Side: Certificate Preview Card -->
-            <div class="lg:col-span-6 flex justify-center">
-                <div class="relative w-full max-w-lg bg-white p-4 sm:p-6 rounded-2xl shadow-xl border border-slate-200 group">
-                    <div class="absolute -inset-1 bg-gradient-to-r from-[#D4A017] to-blue-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+            <!-- Certificate Image -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+                <img
+                    src="{{ asset('images/dti-certificate.jpg') }}"
+                    alt="DTI Certificate"
+                    class="w-full h-auto">
+            </div>
 
-                    <div class="relative bg-slate-900 rounded-xl overflow-hidden p-6 text-center text-white flex flex-col items-center justify-center min-h-[320px]">
-                        <!-- Replace with your actual asset path for the certificate image/pdf display -->
-                        <div class="absolute inset-0 opacity-20 bg-cover bg-center" style="background-image: url('{{ asset('images/certificate-bg.jpg') }}');"></div>
+            <!-- Download Button -->
+            <div class="mt-8 flex justify-center">
+                <a
+                    href="{{ asset('images/dti-certificate.pdf') }}"
+                    download
+                    class="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-[#0B2A5B] hover:bg-[#123B78] text-white font-semibold shadow-lg transition">
 
-                        <div class="relative z-10 space-y-4">
-                            <span class="px-3 py-1 bg-[#D4A017] text-slate-950 font-bold text-xs uppercase tracking-widest rounded-full">
-                                DTI Philippines
-                            </span>
-                            <h3 class="text-xl font-bold text-white">
-                                Certificate of Business Name Registration
-                            </h3>
-                            <p class="text-sm text-slate-300 max-w-sm mx-auto">
-                                TRUELIFE DAYONGAN SOLIDARITAS SOCIAL WELFARE SERVICES
-                            </p>
-                            <div class="pt-2">
-                                <a href="{{ asset('images/dti-certificate.pdf') }}" target="_blank" class="inline-flex items-center justify-center px-5 py-2.5 bg-[#D4A017] hover:bg-[#b88b13] text-slate-950 font-semibold rounded-xl text-sm transition-colors shadow-md">
-                                    View Full Certificate PDF
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2">
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-4-4m4 4l4-4"/>
+                    </svg>
+
+                    Download Official Certificate
+                </a>
             </div>
 
         </div>
+
     </div>
 </section>
+
 
 <!-- =========================
      VISION & MISSION
