@@ -7,10 +7,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Members extends Component
 {
+    use WithPagination;
+
     public string $search = '';
+
+    protected $paginationTheme = 'tailwind';
 
     /*
     |--------------------------------------------------------------------------
@@ -42,77 +47,35 @@ class Members extends Component
     public function render()
     {
         $members = User::query()
+    ->where('RoleID', '!=', 1)
+    ->withExists([
+        'processedActivations as has_pending_activation' => function ($query) {
+            $query->where('status', 'Pending');
+        }
+    ])
+    ->when(filled($this->search), function ($query) {
+        $search = trim($this->search);
 
-            ->where('RoleID', '!=', 1)
+        $query->where(function ($q) use ($search) {
+            $q->where('firstname', 'like', "%{$search}%")
+              ->orWhere('middlename', 'like', "%{$search}%")
+              ->orWhere('lastname', 'like', "%{$search}%")
+              ->orWhere('username', 'like', "%{$search}%");
+        });
+    })
+    ->orderBy('lastname')
+    ->paginate(10);
 
-            ->withExists([
-                'processedActivations as has_pending_activation'
-                    => function ($query) {
-
-                        $query->where(
-                            'status',
-                            'Pending'
-                        );
-
-                    }
-            ])
-
-            ->when(
-                filled($this->search),
-
-                function ($query) {
-
-                    $search = trim($this->search);
-
-                    $query->where(
-                        function ($q) use ($search) {
-
-                            $q->where(
-                                'firstname',
-                                'like',
-                                '%' . $search . '%'
-                            )
-
-                            ->orWhere(
-                                'middlename',
-                                'like',
-                                '%' . $search . '%'
-                            )
-
-                            ->orWhere(
-                                'lastname',
-                                'like',
-                                '%' . $search . '%'
-                            )
-
-                            ->orWhere(
-                                'username',
-                                'like',
-                                '%' . $search . '%'
-                            );
-
-                        }
-                    );
-
-                }
-            )
-
-            ->orderBy(
-                'lastname',
-                'asc'
-            )
-
-            ->get();
-
-
-        return view(
-            'components.admin-pages.masterlist.members',
-            [
-                'members' => $members,
-            ]
-        );
+return view('components.admin-pages.masterlist.members', [
+    'members' => $members,
+]);
     }
 
+
+    public function updatingSearch()
+{
+    $this->resetPage();
+}
 
     /*
     |--------------------------------------------------------------------------

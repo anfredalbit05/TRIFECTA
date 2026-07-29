@@ -211,10 +211,10 @@
                             {{-- REFERRAL CODE --}}
                             <div>
                                 <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                    Referral Code
+                                    Upline Code
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
-                                    {{ $activation?->referral_code ?? '-' }}
+                                    {{ $activation?->upline_code ?? '-' }}
                                 </p>
                             </div>
 

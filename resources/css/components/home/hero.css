@@ -97,11 +97,11 @@
 }
 
 .hero-card-members {
-    @apply absolute -left-8 top-6 rounded-2xl bg-white/10 border border-white/20 p-4 backdrop-blur-xl shadow-xl;
+    @apply absolute -left-22 top-24 rounded-2xl bg-white/10 border border-white/20 p-4 backdrop-blur-xl shadow-xl;
 }
 
 .hero-card-support {
-    @apply absolute -right-8 bottom-6 rounded-2xl bg-white/10 border border-white/20 p-4 backdrop-blur-xl shadow-xl;
+    @apply absolute -right-30 bottom-42 rounded-2xl bg-white/10 border border-white/20 p-4 backdrop-blur-xl shadow-xl;
 }
 
 .hero-card-title {

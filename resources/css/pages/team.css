@@ -31,6 +31,115 @@
 }
 
 /* ===================================================
+   CEO SECTION
+=================================================== */
+
+.team-ceo-section {
+    @apply relative py-24 bg-white overflow-hidden;
+}
+
+.team-ceo-section::before {
+    content: "";
+    @apply absolute -top-24 -left-24 w-80 h-80 rounded-full bg-[#D4A017]/10 blur-3xl;
+}
+
+.team-ceo-section::after {
+    content: "";
+    @apply absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-blue-500/5 blur-3xl;
+}
+
+.team-ceo-card {
+    @apply relative z-10
+    grid lg:grid-cols-[340px_1fr]
+    gap-14
+    items-center
+    rounded-[2rem]
+    bg-white
+    border border-slate-200
+    shadow-xl
+    p-8 md:p-10 lg:p-14;
+}
+
+.team-ceo-image {
+    @apply flex justify-center;
+}
+
+.team-ceo-avatar {
+    @apply w-72 h-72
+    rounded-full
+    border-4
+    border-[#D4A017]
+    shadow-sm
+    object-cover
+
+
+
+}
+
+.team-ceo-content {
+    @apply text-center lg:text-left;
+}
+
+.team-ceo-subtitle {
+    @apply inline-flex
+    items-center
+    rounded-full
+    bg-[#0B2A5B]/10
+    px-4
+    py-2
+    text-xs
+    font-bold
+    uppercase
+    tracking-[0.18em]
+    text-[#0B2A5B];
+}
+
+.team-ceo-name {
+    @apply mt-5
+    text-4xl
+    lg:text-5xl
+    font-black
+    tracking-tight
+    text-[#0B2A5B];
+}
+
+.team-ceo-position {
+    @apply mt-3
+    text-lg
+    font-semibold
+    uppercase
+    tracking-wider
+    text-[#D4A017];
+}
+
+.team-ceo-description {
+    @apply mt-6
+    max-w-3xl
+    text-base
+    leading-8
+    text-slate-600;
+}
+
+.team-ceo-signature {
+    @apply mt-8
+    text-lg
+    font-bold
+    italic
+    text-[#0B2A5B];
+}
+
+.team-ceo-btn{
+    @apply inline-flex items-center
+    px-6 py-3
+    rounded-xl
+    bg-[#0B2A5B]
+    text-white
+    font-bold
+    hover:bg-blue-900
+    transition;
+}
+
+/* ===================================================
    BOARD MEMBERS SECTION
 =================================================== */
 

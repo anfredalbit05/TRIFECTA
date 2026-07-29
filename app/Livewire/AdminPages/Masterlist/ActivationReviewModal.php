@@ -198,6 +198,7 @@ class ActivationReviewModal extends Component
             ]
         );
 
+        $this->dispatch('members-refresh');
 
         $this->dispatch(
             'activation-reviewed',
@@ -278,6 +279,7 @@ class ActivationReviewModal extends Component
             ]
         );
 
+        $this->dispatch('members-refresh');
 
         $this->dispatch(
             'activation-reviewed',

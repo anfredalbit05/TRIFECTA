@@ -52,6 +52,105 @@
 </section>
 
 <!-- =========================
+     CEO SECTION
+========================== -->
+<section class="team-ceo-section">
+    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+
+        <div class="team-ceo-card">
+
+            <div class="team-ceo-image">
+                <img
+                    src="{{ asset('images/user.png') }}"
+                    alt="CEO"
+                    class="team-ceo-avatar">
+            </div>
+
+            <div class="team-ceo-content">
+
+                <span class="team-ceo-subtitle">
+                    <x-editable-text
+                        key="team_ceo_subtitle"
+                        :value="$contexts['team_ceo_subtitle'] ?? 'Chief Executive Officer'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </span>
+
+                <h2 class="team-ceo-name">
+                    <x-editable-text
+                        key="team_ceo_name"
+                        :value="$contexts['team_ceo_name'] ?? 'Juan Dela Cruz'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </h2>
+
+                <p class="team-ceo-position">
+                    <x-editable-text
+                        key="team_ceo_position"
+                        :value="$contexts['team_ceo_position'] ?? 'President & Chief Executive Officer'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </p>
+
+                <p class="team-ceo-description">
+                    <x-editable-text
+                        key="team_ceo_description"
+                        :value="$contexts['team_ceo_description'] ?? 'Leading TrueLife Dayongan Solidaritas Social Welfare Services, Inc. with a vision of empowering Filipino families through accessible protection, compassionate service, and community-driven programs. Our mission is to build trust, strengthen communities, and provide dependable support where it matters most.'"
+                        tag="span"
+                        class="block"
+                    />
+                </p>
+
+                <div class="mt-8 flex flex-wrap gap-4">
+
+                    <button
+                        wire:click="openCeoModal"
+                        class="team-ceo-btn">
+
+                        Read Full Story →
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+@if($showCeoModal)
+
+<div
+    class="fixed inset-0 z-[9999] bg-black/70 backdrop-blur-sm p-4 flex items-center justify-center">
+
+    <div
+        class="relative w-full max-w-7xl max-h-[95vh] overflow-y-auto rounded-3xl bg-white shadow-2xl">
+
+        <!-- Close -->
+
+        <button
+            wire:click="closeCeoModal"
+            class="absolute right-6 top-6 z-50 w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200">
+
+            ✕
+
+        </button>
+
+        @include('livewire.landing-page.partials.ceo-story')
+
+    </div>
+
+</div>
+
+@endif
+
+
+<!-- =========================
      BOARD MEMBERS SECTION
 ========================== -->
 <section class="team-board-section">

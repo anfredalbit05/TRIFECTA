@@ -21,6 +21,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Name</th>
                     <th>Contact</th>
                     <th>Gender</th>
@@ -30,84 +31,91 @@
                 </tr>
             </thead>
 
-            <tbody>
-                @forelse($members as $member)
-                    <tr>
-                        <td>
-                            {{ $member->firstname }}
-                            {{ $member->middlename }}
-                            {{ $member->lastname }}
-                        </td>
+          <tbody>
+    @forelse($members as $index => $member)
+        <tr>
+          <td>
+                {{ $members->firstItem() + $index }}
+            </td>
 
-                        <td>
-                            {{ $member->contactno }}
-                        </td>
+            <td>
+                {{ $member->firstname }}
+                {{ $member->middlename }}
+                {{ $member->lastname }}
+            </td>
 
-                        <td>
-                            {{ $member->gender }}
-                        </td>
+            <td>
+                {{ $member->contactno }}
+            </td>
 
-                        <td>
-                            {{ $member->birthdate ? \Carbon\Carbon::parse($member->birthdate)->format('F d Y') : '-' }}
-                        </td>
+            <td>
+                {{ $member->gender }}
+            </td>
 
-                        <td>
-                            @if(strtolower($member->status) === 'active')
-                                <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-sm font-semibold">
-                                    Active
-                                </span>
-                            @else
-                                <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-red-500 text-white text-sm font-semibold">
-                                    Inactive
-                                </span>
-                            @endif
-                        </td>
+            <td>
+                {{ $member->birthdate ? \Carbon\Carbon::parse($member->birthdate)->format('F d, Y') : '-' }}
+            </td>
 
-                        <td>
-                            <div class="flex gap-2 justify-center">
-                                {{-- UPDATE --}}
-                                <button
-                                    wire:click="editMember({{ $member->UserID }})"
-                                    title="Update Member"
-                                    class="w-10 h-10 flex items-center justify-center rounded bg-[#0C2C6B] text-white hover:bg-blue-600 cursor-pointer">
-                                    ✏️
-                                </button>
+            <td>
+                @if(strtolower($member->status) === 'active')
+                    <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-sm font-semibold">
+                        Active
+                    </span>
+                @else
+                    <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-red-500 text-white text-sm font-semibold">
+                        Inactive
+                    </span>
+                @endif
+            </td>
 
-                                {{-- STATUS / ACTIVATION --}}
-                                @if(strtolower($member->status) === 'active')
-                                    <button
-                                        wire:click="confirmStatus({{ $member->UserID }})"
-                                        title="Deactivate Member"
-                                        class="w-24 h-10 flex items-center justify-center rounded bg-red-500 text-white hover:bg-red-600 text-sm font-semibold cursor-pointer">
-                                        Deactivate
-                                    </button>
-                                @elseif($member->has_pending_activation)
-                                    <button
-                                        wire:click="openReview({{ $member->UserID }})"
-                                        title="Review Activation"
-                                        class="w-24 h-10 flex items-center justify-center rounded bg-amber-500 text-white hover:bg-amber-600 text-sm font-semibold cursor-pointer">
-                                        Pending
-                                    </button>
-                                @else
-                                    <button
-                                        wire:click="openActivation({{ $member->UserID }})"
-                                        title="Activate Member"
-                                        class="w-24 h-10 flex items-center justify-center rounded bg-[#0C2C6B] text-white hover:bg-blue-600 text-sm font-semibold cursor-pointer">
-                                        Activate
-                                    </button>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="text-center py-6">
-                            No members found.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
+            <td>
+                <div class="flex gap-2 justify-center">
+                    {{-- UPDATE --}}
+                    <button
+                        wire:click="editMember({{ $member->UserID }})"
+                        title="Update Member"
+                        class="w-10 h-10 flex items-center justify-center rounded bg-[#0C2C6B] text-white hover:bg-blue-600 cursor-pointer">
+                        ✏️
+                    </button>
+
+                    {{-- STATUS / ACTIVATION --}}
+                    @if(strtolower($member->status) === 'active')
+                        <button
+                            wire:click="confirmStatus({{ $member->UserID }})"
+                            title="Deactivate Member"
+                            class="w-24 h-10 flex items-center justify-center rounded bg-red-500 text-white hover:bg-red-600 text-sm font-semibold cursor-pointer">
+                            Deactivate
+                        </button>
+                    @elseif($member->has_pending_activation)
+                        <button
+                            wire:click="openReview({{ $member->UserID }})"
+                            title="Review Activation"
+                            class="w-24 h-10 flex items-center justify-center rounded bg-amber-500 text-white hover:bg-amber-600 text-sm font-semibold cursor-pointer">
+                            Pending
+                        </button>
+                    @else
+                        <button
+                            wire:click="openActivation({{ $member->UserID }})"
+                            title="Activate Member"
+                            class="w-24 h-10 flex items-center justify-center rounded bg-[#0C2C6B] text-white hover:bg-blue-600 text-sm font-semibold cursor-pointer">
+                            Activate
+                        </button>
+                    @endif
+                </div>
+            </td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan="7" class="text-center py-6">
+                No members found.
+            </td>
+        </tr>
+    @endforelse
+</tbody>
         </table>
+<div class="mt-6 flex justify-center">
+  {{ $members->links('pagination::tailwind') }}
+</div>
     </div>
 
     <livewire:member-pages.my-profile.activation-modal />

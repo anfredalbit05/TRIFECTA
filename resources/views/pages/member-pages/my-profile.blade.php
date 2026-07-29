@@ -86,6 +86,16 @@
 
         </a>
 
+
+        <a
+            href="#"
+            @click.prevent="tab = 'certificate'"
+            :class="tab === 'certificate' ? 'active' : ''">
+
+            Certificate
+
+        </a>
+
     </div>
 
 
@@ -134,6 +144,16 @@
             class="dashboard-main-card full-width-card">
 
             <livewire:member-pages.my-profile.activity />
+
+        </div>
+
+            <!-- ACTIVITY TAB -->
+        <div
+            x-show="tab === 'certificate'"
+            x-cloak
+            class="dashboard-main-card full-width-card">
+
+            <livewire:member-pages.my-profile.certificate />
 
         </div>
 
