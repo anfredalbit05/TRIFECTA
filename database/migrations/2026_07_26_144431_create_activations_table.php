@@ -81,7 +81,7 @@ return new class extends Migration
             */
 
             $table->string(
-                'referral_code',
+                'upline_code',
                 100
             );
 

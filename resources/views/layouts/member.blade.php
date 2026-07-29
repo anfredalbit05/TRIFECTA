@@ -36,6 +36,13 @@
 
    <livewire:application-modal />
 
+   <!-- Force SweetAlert to always render above Tailwind modals/sidebars -->
+    <style>
+        .swal2-container {
+            z-index: 99999 !important;
+        }
+    </style>
+
     @livewireScripts
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -24,58 +24,55 @@ class GenealogyTree extends Component
     }
 
    public function buildTree($userId, $depth = 1, $maxDepth = 2, $ancestors = [])
-    {
-        if ($depth > $maxDepth || in_array($userId, $ancestors)) {
-            return null;
-        }
-
-        $user = User::where('UserID', $userId)->first() ?? User::find($userId);
-
-        if (!$user) {
-            return null;
-        }
-
-        $ancestors[] = $user->UserID;
-        $children = [];
-
-        // 1. Get all activation rows where UserID matches the current user's ID
-        // 2. Pluck/get the ProcessedBy column values from those rows
-        $processedByValues = Activation::where('UserID', $user->UserID)
-            ->whereIn('status', ['Approved', 'approved', 'ACTIVE', 'Active'])
-            ->pluck('ProcessedBy')
-            ->unique()
-            ->toArray();
-
-        Log::info("GenealogyTree: Found ProcessedBy IDs for UserID {$user->UserID}", [
-            'userId' => $user->UserID,
-            'processedByValues' => $processedByValues
-        ]);
-
-        // 3. Match those ProcessedBy values against the users table (UserID)
-        foreach ($processedByValues as $processorId) {
-            if ($processorId !== $this->rootUserId && !in_array($processorId, $ancestors)) {
-                $processorUser = User::where('UserID', $processorId)->first() ?? User::find($processorId);
-
-                if ($processorUser) {
-                    $children[] = [
-                        'id' => $processorUser->UserID,
-                        'name' => trim(($processorUser->firstname ?? '') . ' ' . ($processorUser->lastname ?? '')),
-                        'upline_code' => $processorUser->uplineCode ?? '',
-                        'status' => $processorUser->status ?? 'Active',
-                        'downlines' => [],
-                    ];
-                }
-            }
-        }
-
-        return [
-            'id' => $user->UserID,
-            'name' => trim(($user->firstname ?? '') . ' ' . ($user->lastname ?? '')),
-            'upline_code' => $user->uplineCode ?? '',
-            'status' => $user->status ?? 'Active',
-            'downlines' => $children,
-        ];
+{
+    if ($depth > $maxDepth || in_array($userId, $ancestors)) {
+        return null;
     }
+
+    $user = User::find($userId);
+
+    if (!$user) {
+        return null;
+    }
+
+    $ancestors[] = $user->UserID;
+
+    $children = [];
+
+    $downlines = Activation::query()
+        ->where('upline_code', $user->referralCode)
+        ->whereIn('status', ['Approved', 'Pending'])
+        ->with('user')
+        ->get();
+
+    foreach ($downlines as $activation) {
+
+        $child = $activation->user;
+
+        if (!$child) {
+            continue;
+        }
+
+        if (in_array($child->UserID, $ancestors)) {
+            continue;
+        }
+
+        $children[] = $this->buildTree(
+            $child->UserID,
+            $depth + 1,
+            $maxDepth,
+            $ancestors
+        );
+    }
+
+    return [
+        'id' => $user->UserID,
+        'name' => trim($user->firstname . ' ' . $user->lastname),
+        'referral_code' => $user->referralCode,
+        'status' => $user->status,
+        'downlines' => array_filter($children),
+    ];
+}
 
     public function focusUser($userId)
     {

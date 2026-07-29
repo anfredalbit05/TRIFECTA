@@ -61,7 +61,7 @@ class Activation extends Model
         | by the activating member
         */
 
-        'referral_code',
+        'upline_code',
 
 
         /*

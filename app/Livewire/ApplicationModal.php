@@ -278,14 +278,14 @@ class ApplicationModal extends Component
             do {
 
 
-                $uplineCode =
+                $referralCode =
                     $this->generateUplineCode();
 
 
                 $exists =
                     User::where(
-                        'uplineCode',
-                        $uplineCode
+                        'referralCode',
+                        $referralCode
                     )->exists();
 
 
@@ -314,8 +314,8 @@ class ApplicationModal extends Component
                     => $this->password,
 
 
-                'uplineCode'
-                    => $uplineCode,
+                'referralCode'
+                    => $referralCode,
 
 
 
@@ -445,7 +445,7 @@ class ApplicationModal extends Component
                 'Application created',
                 [
                     'UserID'=>$user->UserID,
-                    'uplineCode'=>$uplineCode
+                    'referralCode'=>$referralCode
                 ]
             );
 

@@ -40,6 +40,8 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
     // Generated Upline Code
     'uplineCode',
+     // Generated Upline Code
+    'referralCode',
 
     // Personal Information
     'lastname',

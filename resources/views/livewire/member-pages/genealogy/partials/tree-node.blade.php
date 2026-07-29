@@ -25,7 +25,7 @@
         </span>
 
         <span class="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/60">
-            Ref: {{ $node['upline_code'] ?? 'N/A' }}
+            Ref: {{ $node['referral_code'] ?? 'N/A' }}
         </span>
 
 

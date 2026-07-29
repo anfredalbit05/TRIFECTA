@@ -23,7 +23,7 @@
                                 <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                                     Activating Member
                                 </p>
-                               <p class="text-sm font-extrabold text-[#0B2A5B]">
+                                <p class="text-sm font-extrabold text-[#0B2A5B]">
                                     {{ trim(($selectedUserRecord?->firstname ?? '') . ' ' . ($selectedUserRecord?->middlename ?? '') . ' ' . ($selectedUserRecord?->lastname ?? '')) ?: 'Member not selected' }}
                                 </p>
                             </div>
@@ -180,14 +180,14 @@
                             <!-- REFERRAL CODE -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">
-                                    Referral Code *
+                                    Upline Code *
                                 </label>
                                 <input
-                                    wire:model="referral_code"
+                                    wire:model="upline_code"
                                     type="text"
                                     placeholder="Enter referral code"
                                     class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
-                                @error('referral_code')
+                                @error('upline_code')
                                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -260,6 +260,7 @@
                         </button>
 
                         <!-- ACTIVATE BUTTON -->
+                        <!-- ACTIVATE BUTTON -->
                         <button
                             wire:click="activate"
                             wire:loading.attr="disabled"
@@ -278,4 +279,25 @@
             </div>
         </div>
     @endif
+
+    <!-- SWEETALERT2 SCRIPT -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        window.addEventListener('swal:confirm', event => {
+            Swal.fire({
+                title: event.detail[0].title,
+                text: event.detail[0].text,
+                icon: event.detail[0].icon,
+                showCancelButton: true,
+                confirmButtonColor: '#0B2A5B',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, proceed!',
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.dispatch(event.detail[0].method);
+                }
+            });
+        });
+    </script>
 </div>
