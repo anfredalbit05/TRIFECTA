@@ -51,68 +51,86 @@
 
 </section>
 
+
 <!-- =========================
      CEO SECTION
 ========================== -->
+
 <section class="team-ceo-section">
-    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+
+    <div class="max-w-7xl mx-auto px-6 lg:px-10">
 
         <div class="team-ceo-card">
 
-            <div class="team-ceo-image">
-                <img
-                    src="{{ asset('images/user.png') }}"
-                    alt="CEO"
-                    class="team-ceo-avatar">
-            </div>
+            <!-- LEFT CONTENT -->
 
             <div class="team-ceo-content">
 
-                <span class="team-ceo-subtitle">
+                <span class="team-ceo-badge">
+
                     <x-editable-text
                         key="team_ceo_subtitle"
-                        :value="$contexts['team_ceo_subtitle'] ?? 'Chief Executive Officer'"
+                        :value="$contexts['team_ceo_subtitle'] ?? 'Meet the CEO'"
                         tag="span"
                         class="inline-block"
                     />
+
                 </span>
 
                 <h2 class="team-ceo-name">
+
                     <x-editable-text
                         key="team_ceo_name"
-                        :value="$contexts['team_ceo_name'] ?? 'Juan Dela Cruz'"
+                        :value="$contexts['team_ceo_name'] ?? 'Anfred Albit'"
                         tag="span"
                         class="inline-block"
                     />
+
                 </h2>
 
-                <p class="team-ceo-position">
-                    <x-editable-text
-                        key="team_ceo_position"
-                        :value="$contexts['team_ceo_position'] ?? 'President & Chief Executive Officer'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </p>
+              <p class="team-ceo-description">
 
-                <p class="team-ceo-description">
                     <x-editable-text
                         key="team_ceo_description"
-                        :value="$contexts['team_ceo_description'] ?? 'Leading TrueLife Dayongan Solidaritas Social Welfare Services, Inc. with a vision of empowering Filipino families through accessible protection, compassionate service, and community-driven programs. Our mission is to build trust, strengthen communities, and provide dependable support where it matters most.'"
+                        :value="$contexts['team_ceo_description'] ?? 'The founder of TrueLife built the company from a personal promise: no family should be left unprepared when real pain arrives.'"
                         tag="span"
-                        class="block"
+                        class="block text-white"
                     />
+
                 </p>
 
-                <div class="mt-8 flex flex-wrap gap-4">
+                <div class="team-ceo-actions">
+
+                    <button
+                        class="team-ceo-primary-btn">
+
+                        Join the Community
+
+                    </button>
 
                     <button
                         wire:click="openCeoModal"
-                        class="team-ceo-btn">
+                        class="team-ceo-secondary-btn"
+                        >
 
-                        Read Full Story →
+                        View Compliance →
 
                     </button>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT IMAGE -->
+
+            <div class="team-ceo-image-wrapper">
+
+                <div class="team-ceo-image-card">
+
+                    <img
+                        src="{{ asset('images/ceo.png') }}"
+                        alt="CEO"
+                        class="team-ceo-avatar">
 
                 </div>
 
@@ -121,6 +139,7 @@
         </div>
 
     </div>
+
 </section>
 
 @if($showCeoModal)

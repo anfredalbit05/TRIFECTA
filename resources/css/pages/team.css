@@ -30,113 +30,149 @@
     @apply mt-8 max-w-3xl mx-auto text-base sm:text-lg text-slate-300 leading-relaxed;
 }
 
-/* ===================================================
+/* ==========================================
    CEO SECTION
-=================================================== */
+========================================== */
 
 .team-ceo-section {
-    @apply relative py-24 bg-white overflow-hidden;
+    @apply relative py-24 overflow-hidden bg-gradient-to-br from-[#0B2A5B] via-[#123B78] to-[#071D3F];
 }
 
 .team-ceo-section::before {
     content: "";
-    @apply absolute -top-24 -left-24 w-80 h-80 rounded-full bg-[#D4A017]/10 blur-3xl;
+    @apply absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#D4A017]/20 blur-3xl;
 }
 
 .team-ceo-section::after {
     content: "";
-    @apply absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-blue-500/5 blur-3xl;
+    @apply absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-blue-400/10 blur-3xl;
 }
 
 .team-ceo-card {
     @apply relative z-10
-    grid lg:grid-cols-[340px_1fr]
-    gap-14
-    items-center
-    rounded-[2rem]
-    bg-white
-    border border-slate-200
-    shadow-xl
-    p-8 md:p-10 lg:p-14;
+    grid
+    lg:grid-cols-2
+    gap-16
+    items-center;
 }
 
-.team-ceo-image {
-    @apply flex justify-center;
-}
-
-.team-ceo-avatar {
-    @apply w-72 h-72
-    rounded-full
-    border-4
-    border-[#D4A017]
-    shadow-sm
-    object-cover
-
-
-
-}
+/* =========================
+   LEFT CONTENT
+========================= */
 
 .team-ceo-content {
     @apply text-center lg:text-left;
 }
 
-.team-ceo-subtitle {
+.team-ceo-badge {
     @apply inline-flex
     items-center
-    rounded-full
-    bg-[#0B2A5B]/10
-    px-4
+    px-5
     py-2
+    rounded-full
+    border
+    border-[#D4A017]/30
+    bg-[#D4A017]/10
+    text-[#E8B923]
     text-xs
     font-bold
     uppercase
-    tracking-[0.18em]
-    text-[#0B2A5B];
+    tracking-[0.25em];
 }
 
 .team-ceo-name {
-    @apply mt-5
-    text-4xl
-    lg:text-5xl
+    @apply mt-6
+    text-5xl
+    sm:text-6xl
+    lg:text-7xl
     font-black
-    tracking-tight
-    text-[#0B2A5B];
+    leading-[1.05]
+    text-white;
 }
 
 .team-ceo-position {
-    @apply mt-3
+    @apply mt-4
     text-lg
-    font-semibold
     uppercase
-    tracking-wider
-    text-[#D4A017];
+    tracking-[0.2em]
+    font-semibold
+    text-[#E8B923];
 }
 
 .team-ceo-description {
-    @apply mt-6
-    max-w-3xl
-    text-base
-    leading-8
-    text-slate-600;
+    @apply mt-8 max-w-2xl text-lg leading-9;
+    color: white !important;
 }
 
-.team-ceo-signature {
-    @apply mt-8
-    text-lg
+/* =========================
+   BUTTONS
+========================= */
+
+.team-ceo-actions {
+    @apply mt-10
+    flex
+    flex-wrap
+    gap-5
+    justify-center
+    lg:justify-start;
+}
+
+.team-ceo-primary-btn {
+    @apply px-8
+    py-4
+    rounded-full
+    bg-[#D4A017]
+    text-[#0B2A5B]
     font-bold
-    italic
-    text-[#0B2A5B];
+    shadow-xl
+    hover:bg-[#E8B923]
+    hover:scale-105
+    transition-all
+    duration-300;
 }
 
-.team-ceo-btn{
-    @apply inline-flex items-center
-    px-6 py-3
-    rounded-xl
-    bg-[#0B2A5B]
+.team-ceo-secondary-btn {
+    @apply px-8
+    py-4
+    rounded-full
+    border
+    border-white/20
+    bg-white/5
+    backdrop-blur-md
     text-white
     font-bold
-    hover:bg-blue-900
-    transition;
+    hover:bg-white/10
+    transition-all
+    duration-300;
+}
+
+/* =========================
+   IMAGE
+========================= */
+
+.team-ceo-image-wrapper {
+    @apply flex justify-center lg:justify-end;
+}
+
+.team-ceo-image-card {
+    @apply relative
+    w-full
+    max-w-[550px]
+    rounded-[32px]
+    border
+    border-[#D4A017]/20
+    bg-white/5
+    backdrop-blur-xl
+    overflow-hidden
+    shadow-2xl
+    p-5;
+}
+
+.team-ceo-avatar {
+    @apply w-full
+    h-[700px]
+    object-cover
+    object-top;
 }
 
 /* ===================================================
@@ -303,3 +339,4 @@
 .team-cta-btn-secondary {
     @apply px-8 py-3.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-xl transition duration-200 text-sm sm:text-base;
 }
+

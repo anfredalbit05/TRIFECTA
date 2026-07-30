@@ -19,7 +19,7 @@
                 </span>
 
                 <h1 class="mt-6 text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-tight">
-                    Dr. Aiven A. <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FFD54A] to-amber-200">Tonacao</span>
+                    Anfred Albit <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FFD54A] to-amber-200">Tonacao</span>
                 </h1>
 
                 <p class="mt-4 text-xl sm:text-2xl text-[#FFD54A] font-semibold tracking-wide">
@@ -52,7 +52,7 @@
                 <div class="relative w-full max-w-sm sm:max-w-md">
                     <div class="absolute -inset-4 bg-gradient-to-tr from-[#D4A017] to-blue-400 rounded-3xl blur-xl opacity-30"></div>
                     <img
-                        src="{{ asset('images/user.png') }}"
+                        src="{{ asset('images/ceo.png') }}"
                         alt="Dr. Aiven A. Tonacao"
                         class="relative w-full h-auto rounded-full border-4 border-[#D4A017] shadow-2xl object-cover aspect-square">
                 </div>
