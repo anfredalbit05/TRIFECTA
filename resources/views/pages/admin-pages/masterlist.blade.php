@@ -98,7 +98,7 @@
             x-cloak
             class="dashboard-main-card full-width-card"
         >
-            <x-admin-pages.masterlist.inquiries />
+             <livewire:admin-pages.masterlist.inquiries />
         </div>
 
     </div>

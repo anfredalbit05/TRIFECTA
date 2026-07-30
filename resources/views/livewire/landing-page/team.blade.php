@@ -190,7 +190,7 @@
             @php
             $boardMembers = [
                 ['name'=>'Princes Manliguez','position'=>'Secretary'],
-                ['name'=>'Dr. Ma. Carnelita Robles','position'=>'Auditor'],
+                ['name'=>'Dr. Maria Carmelita','position'=>'Auditor', 'contact' => '09565003849'],
                 ['name'=>'Dr. Cherry Lynn Nierras-Dagala','position'=>'Treasurer'],
                 ['name'=>'Mr. Alfe Duron','position'=>'Board Member'],
                 ['name'=>'Ms. Ma. Daisy Colegado','position'=>'Board Member'],
@@ -211,6 +211,10 @@
                     <h3 class="team-board-name">
                         {{ $member['name'] }}
                     </h3>
+
+                    @isset($member['contact'])
+                        <p>{{ $member['contact'] }}</p>
+                    @endisset
 
                     <p class="team-board-position">
                         {{ $member['position'] }}

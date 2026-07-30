@@ -122,4 +122,15 @@ class Activation extends Model
             'UserID'
         );
     }
+
+
+    public function histories()
+{
+    return $this->hasMany(
+        ActivationHistory::class,
+        'ActivationID',
+        'ActivationID'
+    );
+}
+
 }

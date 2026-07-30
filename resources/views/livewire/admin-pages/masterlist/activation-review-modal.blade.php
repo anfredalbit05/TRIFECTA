@@ -330,14 +330,14 @@
                         <button
                             type="button"
                             wire:loading.attr="disabled"
-                            wire:target="reject"
+                            wire:target="rejectActivation"
                             onclick="confirmReject()"
                             class="rounded-xl bg-red-500 px-6 py-2.5 text-xs font-bold text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            <span wire:loading.remove wire:target="reject">
+                            <span wire:loading.remove wire:target="rejectActivation">
                                 Reject
                             </span>
-                            <span wire:loading wire:target="reject">
+                            <span wire:loading wire:target="rejectActivation">
                                 Rejecting...
                             </span>
                         </button>
@@ -364,55 +364,163 @@
         </div>
     @endif
 
-    @script
-    <script>
-        window.confirmApprove = function () {
-            Swal.fire({
-                title: 'Approve Activation?',
-                text: 'This member will be activated and the activation request will be approved.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, Approve',
-                cancelButtonText: 'Cancel',
-                confirmButtonColor: '#0B2A5B',
-                cancelButtonColor: '#64748b',
-                reverseButtons: true,
-                didOpen: () => {
-                    const swalContainer = document.querySelector('.swal2-container');
-                    if (swalContainer) {
-                        swalContainer.classList.add('!z-[10000]');
-                    }
-                },
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $wire.approve();
-                }
-            });
-        };
+   @script
+<script>
 
-        window.confirmReject = function () {
-            Swal.fire({
-                title: 'Reject Activation?',
-                text: 'The activation request will be rejected. This action may need a new activation request.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, Reject',
-                cancelButtonText: 'Cancel',
-                confirmButtonColor: '#dc2626',
-                cancelButtonColor: '#64748b',
-                reverseButtons: true,
-                didOpen: () => {
-                    const swalContainer = document.querySelector('.swal2-container');
-                    if (swalContainer) {
-                        swalContainer.classList.add('!z-[10000]');
-                    }
-                },
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $wire.reject();
+    window.confirmReject = function () {
+
+        Swal.fire({
+            title: 'Reject Activation?',
+            icon: 'warning',
+
+            input: 'textarea',
+            inputLabel: 'Rejection remarks',
+            inputPlaceholder: 'Enter the reason for rejection...',
+
+            inputAttributes: {
+                maxlength: 1000,
+                rows: 5
+            },
+
+            showCancelButton: true,
+            confirmButtonText: 'Reject',
+            cancelButtonText: 'Cancel',
+
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b',
+
+            reverseButtons: true,
+
+            inputValidator: (value) => {
+
+                if (!value || value.trim() === '') {
+                    return 'Remarks are required.';
                 }
-            });
-        };
-    </script>
-    @endscript
+
+            }
+
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                Swal.fire({
+                    title: 'Rejecting activation...',
+                    text: 'Sending email and updating records.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $wire.set('remarks', result.value);
+
+                $wire.rejectActivation();
+            }
+        });
+    };
+
+    window.confirmApprove = function () {
+
+        Swal.fire({
+            title: 'Approve activation?',
+            text: 'This will activate the member account and send email notifications.',
+            icon: 'question',
+
+            showCancelButton: true,
+            confirmButtonText: 'Approve',
+            cancelButtonText: 'Cancel',
+
+            confirmButtonColor: '#0B2A5B',
+            cancelButtonColor: '#64748b',
+
+            reverseButtons: true,
+
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                Swal.fire({
+                    title: 'Approving activation...',
+                    text: 'Sending emails and updating records.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $wire.approve();
+            }
+        });
+    };
+
+
+    window.confirmReject = function () {
+
+        Swal.fire({
+            title: 'Reject Activation?',
+            icon: 'warning',
+
+            input: 'textarea',
+            inputLabel: 'Rejection remarks',
+            inputPlaceholder: 'Enter the reason for rejection...',
+
+            showCancelButton: true,
+            confirmButtonText: 'Reject',
+            cancelButtonText: 'Cancel',
+
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b',
+
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                Swal.fire({
+                    title: 'Rejecting activation...',
+                    text: 'Sending email and updating records.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $wire.set('remarks', result.value);
+
+                $wire.rejectActivation();
+            }
+        });
+    };
+
+
+
+    window.addEventListener('swal:close', () => {
+
+        Swal.close();
+
+    });
+
+     window.addEventListener('swal:success', (event) => {
+
+        Swal.fire({
+            icon: 'success',
+            title: event.detail.title,
+            text: event.detail.message,
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#0B2A5B',
+            allowOutsideClick: false
+        });
+
+    });
+
+</script>
+@endscript
 </div>

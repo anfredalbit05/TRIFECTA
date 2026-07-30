@@ -12,6 +12,7 @@ use App\Livewire\LandingPage\Contact;
 use App\Models\Activation;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\PolicyController;
+use App\Livewire\MemberPages\MyProfile\MyProfile;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,21 +76,19 @@ Route::middleware(['auth'])->group(function () {
  ->name('policy.download');
 
 
-
-    Route::get('/my-profile', function () {
+Route::get('/my-profile', function () {
 
     $currentUserId = Auth::id();
 
-    $hasActivation = Activation::where('ProcessedBy', $currentUserId)
-        ->whereIn('status', [
-            'Pending',
-            'Approved'
-        ])
-        ->exists();
+    $activation = Activation::where('ProcessedBy', $currentUserId)
+        ->latest()
+        ->first();
+
+    $activationStatus = $activation?->status;
 
     return view(
         'pages.member-pages.my-profile',
-        compact('hasActivation')
+        compact('activationStatus')
     );
 
 })->name('my-profile');

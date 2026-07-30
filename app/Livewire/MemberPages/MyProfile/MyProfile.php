@@ -4,36 +4,35 @@ namespace App\Livewire\MemberPages\MyProfile;
 
 use App\Models\Activation;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class MyProfile extends Component
 {
-    public bool $hasActivation = false;
+    public ?string $activationStatus = null;
 
     public function mount(): void
     {
-        $currentUserId = Auth::id();
-
-        $this->hasActivation = Activation::where('ProcessedBy', $currentUserId)
-            ->whereIn('status', [
-                'Pending',
-                'Approved',
-            ])
-            ->exists();
-
-
-        // Send data to browser console
-        $this->dispatch('activation-check', [
-            'current_user_id' => $currentUserId,
-            'has_activation' => $this->hasActivation,
-        ]);
+        $this->loadActivationStatus();
     }
 
+    #[On('activation-updated')]
+    public function refreshActivation(): void
+    {
+        $this->loadActivationStatus();
+    }
+
+    private function loadActivationStatus(): void
+    {
+        $activation = Activation::where('ProcessedBy', Auth::id())
+            ->latest()
+            ->first();
+
+        $this->activationStatus = $activation?->status;
+    }
 
     public function render()
     {
-        return view('pages.member-pages.my-profile', [
-            'hasActivation' => $this->hasActivation
-        ]);
+        return view('livewire.member-pages.my-profile');
     }
 }

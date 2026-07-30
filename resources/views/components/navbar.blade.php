@@ -21,7 +21,7 @@
 
                 <div>
                     <p class="text-xs tracking-[0.25em] uppercase text-[#E5B83B]">
-                        TDSSWSI
+                        TrueLife
                     </p>
                     <h1 class="text-xl font-black tracking-wide text-white">
                         DAYONGAN
@@ -179,19 +179,7 @@
 
                             <!-- Links -->
                             <div class="py-1">
-                                @if($roleID === 1 || $roleID === 2)
-                                    <a href="{{ route('home') }}"
-                                       class="flex items-center gap-3 px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-100 transition">
-                                        <span>🏠</span>
-                                        <span>Member Landing Page</span>
-                                    </a>
-                                @else
-                                    <a href="{{ route('home') }}"
-                                       class="flex items-center gap-3 px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-100 transition">
-                                        <span>🏠</span>
-                                        <span>Member Landing Page</span>
-                                    </a>
-                                @endif
+
 
                                 <a href="{{ route('dashboard') }}"
                                    class="flex items-center gap-3 px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-100 transition">
@@ -348,17 +336,12 @@
                             </div>
                         </div>
 
-                        @if($mRoleID === 1 || $mRoleID === 2)
-                            <a href="{{ route('home') }}"
-                               class="block rounded-xl bg-white/10 py-3 text-center font-bold text-white hover:bg-white/20 transition">
-                                🏠 Member Landing Page
-                            </a>
-                        @else
+
                             <a href="{{ route('dashboard') }}"
                                class="block rounded-xl bg-[#D79B10] py-3 text-center font-bold text-white hover:bg-[#E5B83B] transition">
                                 📊 My Dashboard
                             </a>
-                        @endif
+
 
                     <form id="mobileLogoutForm" action="{{ route('logout') }}" method="POST">
                         @csrf

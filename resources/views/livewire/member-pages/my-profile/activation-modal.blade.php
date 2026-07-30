@@ -43,6 +43,37 @@
                 ====================================================== -->
                 <div class="p-4 sm:p-6 space-y-6 overflow-y-auto">
 
+                       <!-- =================================================
+                         REMARKS
+                    ================================================== -->
+
+                    <section class="space-y-4">
+
+                       <!-- =================================================
+                        REMARKS
+                    ================================================== -->
+
+                    @if(!empty($rejectionRemarks))
+
+    <section class="space-y-4">
+
+        <h3 class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
+            Reason For Rejections
+        </h3>
+
+        <div class="rounded-xl border border-red-200 bg-red-50 p-4">
+
+            <p class="mt-2 text-sm text-red-600">
+                {{ $rejectionRemarks }}
+            </p>
+
+        </div>
+
+    </section>
+
+@endif
+                    </section>
+
                     <!-- =================================================
                          BENEFICIARY INFORMATION
                     ================================================== -->
@@ -247,7 +278,7 @@
                 ====================================================== -->
                 <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <span class="text-xs text-slate-500">
-                        * Activation fee is fixed at ₱1,900
+                        * Activation fee is fixed at ₱1,999
                     </span>
 
                     <div class="flex gap-3 w-full sm:w-auto">

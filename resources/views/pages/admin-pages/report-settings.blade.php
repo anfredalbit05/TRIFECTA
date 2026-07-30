@@ -71,14 +71,10 @@
             class="dashboard-main-card full-width-card">
 
 
-            <x-member-pages.report-settings.overview />
+            <x-admin-pages.report-settings.overview />
 
 
         </div>
-
-
-
-
 
 
 
@@ -90,7 +86,7 @@
             class="dashboard-main-card full-width-card">
 
 
-            <x-member-pages.report-settings.general />
+            <x-admin-pages.report-settings.general />
 
 
         </div>
@@ -109,7 +105,7 @@
             class="dashboard-main-card full-width-card">
 
 
-            <x-member-pages.report-settings.users-accounts />
+            <x-admin-pages.report-settings.users-accounts />
 
 
         </div>
@@ -128,7 +124,7 @@
             class="dashboard-main-card full-width-card">
 
 
-            <x-member-pages.report-settings.reports />
+            <x-admin-pages.report-settings.reports />
 
 
         </div>

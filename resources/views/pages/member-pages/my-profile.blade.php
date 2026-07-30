@@ -42,6 +42,7 @@
                 Security
             </a>
 
+              @if(auth()->user()->RoleID != 1)
             <a
                 href="#"
                 @click.prevent="tab = 'activity'"
@@ -49,31 +50,50 @@
                 Activity
             </a>
 
+
             <a
-                href="#"
-                @click.prevent="tab = 'certificate'"
-                :class="tab === 'certificate' ? 'active' : ''">
-                Certificate
-            </a>
+                    href="#"
+                    @click.prevent="tab = 'certificate'"
+                    :class="tab === 'certificate' ? 'active' : ''">
+                    Certificate
+                </a>
+            @endif
         </div>
 
-        <!-- ACTIVATE ACCOUNT BUTTON (Pushed to the far right) -->
-        @if(auth()->user()->RoleID != 1)
-            <div
-                x-data="{ hasActivation: @js($hasActivation) }"
-                @account-activated.window="hasActivation = true"
-                class="ml-auto my-2 sm:my-0 mr-2 sm:mr-2">
+       @if(auth()->user()->RoleID != 1)
 
-                <template x-if="!hasActivation">
-                    <button
-                        type="button"
-                        onclick="Livewire.dispatch('open-activation-modal')"
-                        class="activate-account-btn px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md transition duration-300 text-center">
-                        Activate Account
-                    </button>
-                </template>
-            </div>
+    <div class="ml-auto my-2 sm:my-0 mr-2 sm:mr-2">
+        @if($activationStatus === null)
+
+            <button
+                type="button"
+                onclick="Livewire.dispatch('open-activation-modal')"
+                class="activate-account-btn px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md transition duration-300">
+                Activate Account
+            </button>
+
+        @elseif($activationStatus === 'Pending')
+
+            <button
+                disabled
+                class="px-4 py-2 bg-yellow-500 text-white rounded-xl font-bold text-xs sm:text-sm cursor-not-allowed">
+                Waiting for Review
+            </button>
+
+        @elseif($activationStatus === 'Rejected')
+
+        <button
+            type="button"
+            onclick="Livewire.dispatch('open-rejected-activation')"
+            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-xs sm:text-sm">
+            Edit & Resubmit
+        </button>
+
         @endif
+
+    </div>
+
+@endif
 
     </div>
 
@@ -103,6 +123,7 @@
             <livewire:member-pages.my-profile.security />
         </div>
 
+         @if(auth()->user()->RoleID != 1)
         <!-- ACTIVITY TAB -->
         <div
             x-show="tab === 'activity'"
@@ -111,13 +132,14 @@
             <livewire:member-pages.my-profile.activity />
         </div>
 
-        <!-- CERTIFICATE TAB -->
-        <div
-            x-show="tab === 'certificate'"
-            x-cloak
-            class="dashboard-main-card full-width-card">
-            <livewire:member-pages.my-profile.certificate />
-        </div>
+            <!-- CERTIFICATE TAB -->
+            <div
+                x-show="tab === 'certificate'"
+                x-cloak
+                class="dashboard-main-card full-width-card">
+                <livewire:member-pages.my-profile.certificate />
+            </div>
+        @endif
 
     </div>
 

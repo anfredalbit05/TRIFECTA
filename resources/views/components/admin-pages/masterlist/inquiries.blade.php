@@ -1,33 +1,226 @@
-<div class="inquiries-container">
+<div class="inquiries-container w-full px-4 sm:px-6 lg:px-8 py-6">
 
-
-    <h2 class="masterlist-title">
-        Inquiries
-    </h2>
-
-
-    <p class="masterlist-description">
-        Inquiry management content.
-    </p>
-
-
-
-
-    <div class="inquiry-card">
-
-
-        <h3>
-            Account Concern
-        </h3>
-
-
-        <p>
-            Member inquiry message here.
-        </p>
-
-
+    <!-- HEADER -->
+    <div class="members-header mb-2">
+        <h2 class="masterlist-title text-2xl font-bold text-slate-800">Inquiries</h2>
     </div>
 
+    <p class="masterlist-description text-sm text-slate-500 mb-6">
+        Manage and review member inquiries.
+    </p>
 
+    <!-- TABLE -->
+    <div class="member-table w-full overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-600">
+                    <th class="py-3 px-4">#</th>
+                    <th class="py-3 px-4">Name</th>
+                    <th class="py-3 px-4">Subject</th>
+                    <th class="py-3 px-4">Category</th>
+                    <th class="py-3 px-4">Date Read</th>
+                    <th class="py-3 px-4">Status</th>
+                    <th class="py-3 px-4 text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
+                @forelse ($inquiries as $index => $inquiry)
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-4 font-medium text-slate-500">
+                            {{ $index + 1 }}
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="font-semibold text-slate-900">
+                                {{ $inquiry->name }}
+                            </div>
+                            <div class="text-xs text-slate-500">
+                                {{ $inquiry->email }}
+                            </div>
+                        </td>
+                        <td class="py-4 px-4 font-medium text-slate-800">
+                            {{ $inquiry->subject }}
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
+                                {{ $inquiry->category ?: 'General' }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4 text-xs text-slate-500">
+                            {{ $inquiry->date_read ? \Carbon\Carbon::parse($inquiry->date_read)->format('M d, Y h:i A') : 'Not yet read' }}
+                        </td>
+                        <td class="py-4 px-4">
+                            @if (is_null($inquiry->date_read))
+                                <span class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-[#D79B10] text-white text-xs font-semibold">
+                                    Unread
+                                </span>
+                            @else
+                                <span class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-xs font-semibold">
+                                    Read
+                                </span>
+                            @endif
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <div class="flex justify-center">
+                                <button
+                                    wire:click="viewInquiry({{ $inquiry->ID }})"
+                                    class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-xs font-semibold shadow transition cursor-pointer"
+                                >
+                                    View
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="text-center py-8 text-slate-500">
+                            No inquiries found.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <!-- VIEW INQUIRY MODAL -->
+    @if ($showModal && $selectedInquiry)
+        <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm overflow-y-auto">
+
+            <div class="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl my-8">
+
+                <!-- MODAL HEADER -->
+                <div class="bg-[#0C2C6B] px-6 py-4 text-white flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold">Inquiry Details & Reply</h3>
+                        <p class="text-xs text-blue-100">Review member inquiry and send a response.</p>
+                    </div>
+                    <button
+                        wire:click="closeModal"
+                        class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition hover:bg-white/30 text-white font-bold cursor-pointer"
+                    >
+                        ✕
+                    </button>
+                </div>
+
+                <!-- MODAL BODY -->
+                <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+
+                    <!-- SUCCESS MESSAGE -->
+                    @if ($successMessage)
+                        <div class="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs font-semibold text-emerald-700">
+                            {{ $successMessage }}
+                        </div>
+                    @endif
+
+                    <!-- INFO GRID -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="rounded-xl border border-slate-200 p-3 bg-slate-50/50">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Full Name</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-800">{{ $selectedInquiry->name }}</p>
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 p-3 bg-slate-50/50">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Email Address</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-800 break-all">{{ $selectedInquiry->email }}</p>
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 p-3 bg-slate-50/50">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Subject</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-800">{{ $selectedInquiry->subject }}</p>
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 p-3 bg-slate-50/50">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Category</p>
+                            <div class="mt-1">
+                                <span class="inline-flex rounded-md bg-[#0C2C6B] px-2.5 py-0.5 text-xs font-semibold text-white">
+                                    {{ $selectedInquiry->category ?: 'General' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STATUS & DATE BLOCK -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-xl bg-slate-100 p-4 gap-2">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Status</p>
+                            <div class="mt-1">
+                                @if ($selectedInquiry->date_read)
+                                    <span class="inline-flex rounded-md bg-[#0C2C6B] px-2.5 py-0.5 text-xs font-semibold text-white">
+                                        Read
+                                    </span>
+                                @else
+                                    <span class="inline-flex rounded-md bg-[#D79B10] px-2.5 py-0.5 text-xs font-semibold text-white">
+                                        Unread
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="sm:text-right">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Date Read</p>
+                            <p class="mt-1 text-xs font-semibold text-slate-700">
+                                {{ $selectedInquiry->date_read ? \Carbon\Carbon::parse($selectedInquiry->date_read)->format('F d, Y h:i A') : 'Not yet viewed' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- MESSAGE BLOCK -->
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Original Message</h4>
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs sm:text-sm leading-relaxed text-slate-700 whitespace-pre-line max-h-36 overflow-y-auto">
+                            {{ $selectedInquiry->details }}
+                        </div>
+                    </div>
+
+                    <!-- REPLY FORM SECTION -->
+                    <div class="border-t border-slate-200 pt-4 mt-4 space-y-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-[#0C2C6B]">Send Email Reply</h4>
+
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Reply Subject*</label>
+                            <input
+                                type="text"
+                                placeholder="Type your subject here..."
+                                wire:model="replySubject"
+                                class="w-full rounded-xl border border-slate-200 p-2.5 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                            >
+                            @error('replySubject') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Reply Message*</label>
+                            <textarea
+                                wire:model="replyMessage"
+                                rows="4"
+                                placeholder="Type your response here..."
+                                class="w-full rounded-xl border border-slate-200 p-3 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                            ></textarea>
+                            @error('replyMessage') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button
+                                wire:click="sendReply"
+                                class="rounded-lg bg-[#D79B10] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#b8820c] cursor-pointer"
+                            >
+                                Send Reply
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- MODAL FOOTER -->
+                <div class="flex justify-end border-t border-slate-200 px-6 py-3 bg-slate-50">
+                    <button
+                        wire:click="closeModal"
+                        class="rounded-lg bg-[#0C2C6B] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#09204f] cursor-pointer"
+                    >
+                        Close
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    @endif
 
 </div>

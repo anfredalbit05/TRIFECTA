@@ -1,181 +1,203 @@
-<div class="members-container">
+<div class="members-container w-full px-4 sm:px-6 lg:px-8 py-6">
 
-    <div class="members-header">
-        <h2 class="masterlist-title">
+    <!-- HEADER -->
+    <div class="members-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
+        <h2 class="masterlist-title text-2xl font-bold text-slate-800">
             Members
         </h2>
 
-        <button class="masterlist-btn">
+        <button
+            wire:click="openCreateModal"
+            class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
             Add Member
         </button>
     </div>
 
-    <div class="masterlist-search">
-        <input
-            type="text"
-            wire:model.live="search"
-            placeholder="Search members...">
+    <p class="masterlist-description text-sm text-slate-500 mb-6">
+        Member management content and directory.
+    </p>
+
+    <!-- SEARCH BAR -->
+    <div class="masterlist-search mb-6">
+        <div class="relative max-w-sm">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                🔍
+            </span>
+            <input
+                type="text"
+                wire:model.live="search"
+                placeholder="Search members..."
+                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
+        </div>
     </div>
 
-    <div class="member-table">
-        <table>
+    <!-- MEMBERS TABLE -->
+    <div class="member-table overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
+        <table class="w-full text-left border-collapse">
             <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Contact</th>
-                    <th>Gender</th>
-                    <th>Birthday</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                <tr class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
+                    <th class="py-3 px-4">#</th>
+                    <th class="py-3 px-4">Name</th>
+                    <th class="py-3 px-4">Contact</th>
+                    <th class="py-3 px-4">Gender</th>
+                    <th class="py-3 px-4">Birthday</th>
+                    <th class="py-3 px-4">Status</th>
+                    <th class="py-3 px-4 text-center">Action</th>
                 </tr>
             </thead>
+            <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
+                @forelse($members as $index => $member)
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-4 font-medium text-slate-500">
+                            {{ $members->firstItem() + $index }}
+                        </td>
 
-          <tbody>
-    @forelse($members as $index => $member)
-        <tr>
-          <td>
-                {{ $members->firstItem() + $index }}
-            </td>
+                        <td class="py-4 px-4 font-semibold text-slate-900">
+                            {{ $member->firstname }}
+                            {{ $member->middlename }}
+                            {{ $member->lastname }}
+                        </td>
 
-            <td>
-                {{ $member->firstname }}
-                {{ $member->middlename }}
-                {{ $member->lastname }}
-            </td>
+                        <td class="py-4 px-4 text-slate-500">
+                            {{ $member->contactno }}
+                        </td>
 
-            <td>
-                {{ $member->contactno }}
-            </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
+                                {{ $member->gender }}
+                            </span>
+                        </td>
 
-            <td>
-                {{ $member->gender }}
-            </td>
+                        <td class="py-4 px-4 text-slate-500">
+                            {{ $member->birthdate ? \Carbon\Carbon::parse($member->birthdate)->format('F d, Y') : '-' }}
+                        </td>
 
-            <td>
-                {{ $member->birthdate ? \Carbon\Carbon::parse($member->birthdate)->format('F d, Y') : '-' }}
-            </td>
+                        <td class="py-4 px-4">
+                            @if(strtolower($member->status) === 'active')
+                                <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-xs font-semibold shadow-sm">
+                                    Active
+                                </span>
+                            @else
+                                <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-red-500 text-white text-xs font-semibold shadow-sm">
+                                    Inactive
+                                </span>
+                            @endif
+                        </td>
 
-            <td>
-                @if(strtolower($member->status) === 'active')
-                    <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-sm font-semibold">
-                        Active
-                    </span>
-                @else
-                    <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-red-500 text-white text-sm font-semibold">
-                        Inactive
-                    </span>
-                @endif
-            </td>
+                        <!-- Actions Column -->
+                        <td class="py-4 px-4 text-center">
+                            <div class="flex gap-2 justify-center items-center">
+                                {{-- UPDATE --}}
+                                <button
+                                    wire:click="editMember({{ $member->UserID }})"
+                                    title="Update Member"
+                                    class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
+                                    ✏️
+                                </button>
 
-            <td>
-                <div class="flex gap-2 justify-center">
-                    {{-- UPDATE --}}
-                    <button
-                        wire:click="editMember({{ $member->UserID }})"
-                        title="Update Member"
-                        class="w-10 h-10 flex items-center justify-center rounded bg-[#0C2C6B] text-white hover:bg-blue-600 cursor-pointer">
-                        ✏️
-                    </button>
-
-                    {{-- STATUS / ACTIVATION --}}
-                    @if(strtolower($member->status) === 'active')
-                        <button
-                            wire:click="confirmStatus({{ $member->UserID }})"
-                            title="Deactivate Member"
-                            class="w-24 h-10 flex items-center justify-center rounded bg-red-500 text-white hover:bg-red-600 text-sm font-semibold cursor-pointer">
-                            Deactivate
-                        </button>
-                    @elseif($member->has_pending_activation)
-                        <button
-                            wire:click="openReview({{ $member->UserID }})"
-                            title="Review Activation"
-                            class="w-24 h-10 flex items-center justify-center rounded bg-amber-500 text-white hover:bg-amber-600 text-sm font-semibold cursor-pointer">
-                            Pending
-                        </button>
-                    @else
-                        <button
-                            wire:click="openActivation({{ $member->UserID }})"
-                            title="Activate Member"
-                            class="w-24 h-10 flex items-center justify-center rounded bg-[#0C2C6B] text-white hover:bg-blue-600 text-sm font-semibold cursor-pointer">
-                            Activate
-                        </button>
-                    @endif
-                </div>
-            </td>
-        </tr>
-    @empty
-        <tr>
-            <td colspan="7" class="text-center py-6">
-                No members found.
-            </td>
-        </tr>
-    @endforelse
-</tbody>
+                                {{-- STATUS / ACTIVATION --}}
+                                @if(strtolower($member->status) === 'active')
+                                    <button
+                                        wire:click="confirmStatus({{ $member->UserID }})"
+                                        title="Deactivate Member"
+                                        class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition cursor-pointer text-xs font-semibold shadow">
+                                        Deactivate
+                                    </button>
+                                @elseif($member->has_pending_activation)
+                                    <button
+                                        wire:click="openReview({{ $member->UserID }})"
+                                        title="Review Activation"
+                                        class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow">
+                                        Pending
+                                    </button>
+                                @else
+                                    <button
+                                        wire:click="openActivation({{ $member->UserID }})"
+                                        title="Activate Member"
+                                        class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
+                                        Activate
+                                    </button>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="text-center py-8 text-slate-500">
+                            No members found.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
         </table>
-<div class="mt-6 flex justify-center">
-  {{ $members->links('pagination::tailwind') }}
-</div>
+
+        <!-- PAGINATION -->
+        @if($members->hasPages())
+            <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center">
+                {{ $members->links('pagination::tailwind') }}
+            </div>
+        @endif
     </div>
 
+    <!-- LIVEWIRE MODAL COMPONENT -->
     <livewire:member-pages.my-profile.activation-modal />
 
-@script
-<script>
-    $wire.on('confirm-status', (data) => {
-        const actionText = data.action === 'deactivate'
-            ? "I'm sure to deactivate"
-            : "I'm sure to activate";
+    @script
+    <script>
+        $wire.on('confirm-status', (data) => {
+            const actionText = data.action === 'deactivate'
+                ? "I'm sure to deactivate"
+                : "I'm sure to activate";
 
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'Type the confirmation text below to continue.',
-            icon: 'warning',
-            input: 'text',
-            inputPlaceholder: actionText,
-            inputAttributes: {
-                autocapitalize: 'off'
-            },
-            showCancelButton: true,
-            confirmButtonColor: '#0C2C6B',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Confirm ' + data.action,
-            cancelButtonText: 'Cancel',
-            preConfirm: (value) => {
-                if (value !== actionText) {
-                    Swal.showValidationMessage('Please type: ' + actionText);
-                    return false;
-                }
-                return true;
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Updating...',
-                    text: 'Please wait.',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    didOpen: () => {
-                        Swal.showLoading();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Type the confirmation text below to continue.',
+                icon: 'warning',
+                input: 'text',
+                inputPlaceholder: actionText,
+                inputAttributes: {
+                    autocapitalize: 'off'
+                },
+                showCancelButton: true,
+                confirmButtonColor: '#0C2C6B',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Confirm ' + data.action,
+                cancelButtonText: 'Cancel',
+                preConfirm: (value) => {
+                    if (value !== actionText) {
+                        Swal.showValidationMessage('Please type: ' + actionText);
+                        return false;
                     }
-                });
+                    return true;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Updating...',
+                        text: 'Please wait.',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
 
-                $wire.updateStatus(data.id);
-            }
+                    $wire.updateStatus(data.id);
+                }
+            });
         });
-    });
 
-    $wire.on('status-updated', () => {
-        Swal.fire({
-            title: 'Updated!',
-            text: 'Member status has been updated.',
-            icon: 'success',
-            timer: 1500,
-            showConfirmButton: false
+        $wire.on('status-updated', () => {
+            Swal.fire({
+                title: 'Updated!',
+                text: 'Member status has been updated.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
         });
-    });
-</script>
-@endscript
+    </script>
+    @endscript
 
 </div>

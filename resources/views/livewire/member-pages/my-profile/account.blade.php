@@ -256,7 +256,7 @@
                     uppercase tracking-wider
                     text-slate-500">
 
-                   Upline Code
+                   Referral Code
 
                 </p>
 
@@ -265,7 +265,7 @@
                     font-mono text-sm
                     font-semibold text-slate-800">
 
-                    {{ auth()->user()->uplineCode
+                    {{ auth()->user()->referralCode
                         ?? 'Not available' }}
 
                 </p>

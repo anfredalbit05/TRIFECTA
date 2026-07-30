@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Beneficiary;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class ApplicationModal extends Component
@@ -278,6 +279,51 @@ class ApplicationModal extends Component
 
             DB::commit();
 
+            // Prepare Beneficiaries details text for the email body
+            $beneficiariesText = "";
+            foreach ($this->beneficiaries as $index => $beneficiary) {
+                if (filled($beneficiary['fullname']) || filled($beneficiary['birthdate']) || filled($beneficiary['relationship'])) {
+                    $num = $index + 1;
+                    $beneficiariesText .= "  - Beneficiary {$num}:\n";
+                    $beneficiariesText .= "    Fullname: " . ($beneficiary['fullname'] ?: 'N/A') . "\n";
+                    $beneficiariesText .= "    Birthdate: " . ($beneficiary['birthdate'] ?: 'N/A') . "\n";
+                    $beneficiariesText .= "    Relationship: " . ($beneficiary['relationship'] ?: 'N/A') . "\n";
+                }
+            }
+            if (empty($beneficiariesText)) {
+                $beneficiariesText = "  None provided\n";
+            }
+
+            // Send Notification Email to Admin with all information
+            try {
+                Mail::raw(
+                    "A new user registration has been submitted.\n\n" .
+                    "=== APPLICANT INFORMATION ===\n" .
+                    "Name: {$this->first_name} {$this->middle_name} {$this->surname}\n" .
+                    "Gender: {$this->gender}\n" .
+                    "Civil Status: {$this->civil_status}\n" .
+                    "Birthdate: {$this->birthdate}\n" .
+                    "Address: {$this->address}\n\n" .
+                    "=== SECURITY & CONTACT ===\n" .
+                    "Username: {$this->username}\n" .
+                    "Mobile: {$this->mobile}\n" .
+                    "Email: " . ($this->email ?: 'N/A') . "\n" .
+                    "Referral Code: {$referralCode}\n\n" .
+                    "=== BENEFICIARIES ===\n" .
+                    $beneficiariesText,
+                    function ($message) {
+                        $message->to('anfredalbit110525@gmail.com')
+                                ->subject('New User Registration: ' . $this->first_name . ' ' . $this->surname);
+
+                        if (filled($this->email)) {
+                            $message->replyTo($this->email, "{$this->first_name} {$this->surname}");
+                        }
+                    }
+                );
+            } catch (\Throwable $mailEx) {
+                Log::error('Registration notification email failed: ' . $mailEx->getMessage());
+            }
+
             Log::info('Application created', [
                 'UserID' => $user->UserID,
                 'referralCode' => $referralCode
@@ -332,9 +378,6 @@ class ApplicationModal extends Component
             )
         );
     }
-
-
-
 
 
     /*
