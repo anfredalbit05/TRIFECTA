@@ -76,20 +76,15 @@
 
         </div>
 
+<!-- GENERAL -->
+<div
+    x-show="tab === 'general'"
+    x-cloak
+    class="dashboard-main-card full-width-card">
 
+    @livewire('admin-pages.report-settings.general-settings')
 
-        <!-- GENERAL -->
-
-        <div
-            x-show="tab === 'general'"
-            x-cloak
-            class="dashboard-main-card full-width-card">
-
-
-            <x-admin-pages.report-settings.general />
-
-
-        </div>
+</div>
 
 
 

@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Layout;
 use App\Models\Context;
+use App\Models\Faq;
 
 #[Layout('layouts.app')]
 class How extends Component
@@ -33,6 +34,10 @@ class How extends Component
 
     public function render()
     {
-        return view('livewire.landing-page.how-it-works');
+        return view('livewire.landing-page.how-it-works', [
+            'faqs' => Faq::where('status', true)
+                ->latest('FaqID')
+                ->get(),
+        ]);
     }
 }

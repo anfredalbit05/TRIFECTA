@@ -52,6 +52,8 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
     'birthdate',
     'contactno',
     'address',
+    'latitude',
+    'longitude',
     'email',
 
     // Profile Picture

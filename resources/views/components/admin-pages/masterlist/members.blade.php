@@ -7,7 +7,7 @@
         </h2>
 
         <button
-            wire:click="openCreateModal"
+             onclick="Livewire.dispatch('open-application-modal')"
             class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
             Add Member
         </button>

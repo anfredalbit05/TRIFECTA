@@ -41,7 +41,7 @@
                 @forelse($benefits as $index => $benefit)
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="py-4 px-4 font-medium text-slate-500">
-                            {{ $index + 1 }}
+                            {{ $benefits->firstItem() + $index }}
                         </td>
 
                         <td class="py-4 px-4 font-semibold text-slate-900">
@@ -92,6 +92,11 @@
                 @endforelse
             </tbody>
         </table>
+        @if($benefits->hasPages())
+    <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center">
+        {{ $benefits->links('pagination::tailwind') }}
+    </div>
+@endif
     </div>
 
     <!-- ADD/EDIT BENEFIT MODAL -->
@@ -137,9 +142,8 @@
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Holder Type</label>
                             <select wire:model="holdertype" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white">
-                                <option value="Principal">Principal</option>
-                                <option value="Dependent">Dependent</option>
-                                <option value="Both">Both</option>
+                                <option value="Primary Owner">Primary Owner</option>
+                                <option value="Beneficiaries">Beneficiaries</option>
                             </select>
                             @error('holdertype') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>

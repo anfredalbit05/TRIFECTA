@@ -310,48 +310,59 @@
         </div>
     @endif
 
-    <script>
-        window.addEventListener('swal:confirm', event => {
-            Swal.fire({
-                title: event.detail[0].title,
-                text: event.detail[0].text,
-                icon: event.detail[0].icon,
-                showCancelButton: true,
-                confirmButtonColor: '#0B2A5B',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, proceed!',
-                allowOutsideClick: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Livewire.dispatch(event.detail[0].method);
-                }
-            });
-        });
+<script>
+    window.addEventListener('swal:confirm', event => {
+        Swal.fire({
+            title: event.detail[0].title,
+            text: event.detail[0].text,
+            icon: event.detail[0].icon,
+            showCancelButton: true,
+            confirmButtonColor: '#0B2A5B',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, proceed!',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading spinner immediately upon confirmation
+                Swal.fire({
+                    title: 'Processing Activation...',
+                    text: 'Please wait while we process your request.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
-        window.addEventListener('swal:loading', event => {
-            Swal.fire({
-                title: event.detail[0].title,
-                text: event.detail[0].text,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
+                Livewire.dispatch(event.detail[0].method);
+            }
         });
+    });
 
-        window.addEventListener('swal:success', event => {
-            Swal.fire({
-                icon: 'success',
-                title: event.detail[0].title,
-                text: event.detail[0].text,
-                timer: 2000,
-                showConfirmButton: false
-            });
+    window.addEventListener('swal:loading', event => {
+        Swal.fire({
+            title: event.detail[0].title,
+            text: event.detail[0].text,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
+    });
 
-        window.addEventListener('swal:close', event => {
-            Swal.close();
+    window.addEventListener('swal:success', event => {
+        Swal.fire({
+            icon: 'success',
+            title: event.detail[0].title,
+            text: event.detail[0].text,
+            timer: 2000,
+            showConfirmButton: false
         });
-    </script>
+    });
+
+    window.addEventListener('swal:close', event => {
+        Swal.close();
+    });
+</script>
 </div>

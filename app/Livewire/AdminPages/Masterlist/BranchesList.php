@@ -100,10 +100,12 @@ class BranchesList extends Component
         $this->dispatch('branch-deleted');
     }
 
-    public function render()
-    {
-        return view('components.admin-pages.masterlist.branches', [
-            'branches' => Branch::where('status', true)->get()
-        ]);
-    }
+ public function render()
+{
+    return view('components.admin-pages.masterlist.branches', [
+        'branches' => Branch::where('status', true)
+            ->latest('BranchID')
+            ->get()
+    ]);
+}
 }

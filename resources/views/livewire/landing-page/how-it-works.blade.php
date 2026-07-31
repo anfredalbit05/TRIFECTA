@@ -577,89 +577,35 @@
 
         <div class="hiw-faq-list">
 
-            <!-- FAQ 1 -->
-            <div class="hiw-faq-card">
-                <h3 class="hiw-faq-question">
-                    <x-editable-text
-                        key="hiw_faq1_question"
-                        :value="$contexts['hiw_faq1_question'] ?? ''"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </h3>
+            @forelse($faqs as $faq)
 
-                <p class="hiw-faq-answer">
-                    <x-editable-text
-                        key="hiw_faq1_answer"
-                        :value="$contexts['hiw_faq1_answer'] ?? ''"
-                        tag="span"
-                        class="block"
-                    />
-                </p>
-            </div>
+                <div class="hiw-faq-card">
 
-            <!-- FAQ 2 -->
-            <div class="hiw-faq-card">
-                <h3 class="hiw-faq-question">
-                    <x-editable-text
-                        key="hiw_faq2_question"
-                        :value="$contexts['hiw_faq2_question'] ?? ''"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </h3>
+                    <h3 class="hiw-faq-question">
+                        {{ $faq->question }}
+                    </h3>
 
-                <p class="hiw-faq-answer">
-                    <x-editable-text
-                        key="hiw_faq2_answer"
-                        :value="$contexts['hiw_faq2_answer'] ?? ''"
-                        tag="span"
-                        class="block"
-                    />
-                </p>
-            </div>
+                    <p class="hiw-faq-answer">
+                        {{ $faq->answer }}
+                    </p>
 
-            <!-- FAQ 3 -->
-            <div class="hiw-faq-card">
-                <h3 class="hiw-faq-question">
-                    <x-editable-text
-                        key="hiw_faq3_question"
-                        :value="$contexts['hiw_faq3_question'] ?? ''"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </h3>
+                </div>
 
-                <p class="hiw-faq-answer">
-                    <x-editable-text
-                        key="hiw_faq3_answer"
-                        :value="$contexts['hiw_faq3_answer'] ?? ''"
-                        tag="span"
-                        class="block"
-                    />
-                </p>
-            </div>
+            @empty
 
-            <!-- FAQ 4 -->
-            <div class="hiw-faq-card">
-                <h3 class="hiw-faq-question">
-                    <x-editable-text
-                        key="hiw_faq4_question"
-                        :value="$contexts['hiw_faq4_question'] ?? ''"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </h3>
+                <div class="hiw-faq-card">
 
-                <p class="hiw-faq-answer">
-                    <x-editable-text
-                        key="hiw_faq4_answer"
-                        :value="$contexts['hiw_faq4_answer'] ?? ''"
-                        tag="span"
-                        class="block"
-                    />
-                </p>
-            </div>
+                    <h3 class="hiw-faq-question">
+                        No FAQs available.
+                    </h3>
+
+                    <p class="hiw-faq-answer">
+                        Please check back later.
+                    </p>
+
+                </div>
+
+            @endforelse
 
         </div>
     </div>

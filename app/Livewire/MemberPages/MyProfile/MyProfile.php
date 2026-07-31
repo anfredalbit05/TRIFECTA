@@ -16,18 +16,19 @@ class MyProfile extends Component
         $this->loadActivationStatus();
     }
 
-    #[On('activation-updated')]
+    #[On('account-activated')]
     public function refreshActivation(): void
     {
         $this->loadActivationStatus();
     }
 
-    private function loadActivationStatus(): void
+    public function loadActivationStatus(): void
     {
-        $activation = Activation::where('ProcessedBy', Auth::id())
+        $activation = Activation::where('UserID', Auth::id())
             ->latest()
             ->first();
 
+        // This should store 'Pending', 'Approved', 'Rejected', or null
         $this->activationStatus = $activation?->status;
     }
 

@@ -21,11 +21,10 @@ return new class extends Migration
 
             $table->decimal('amount',12,2)->default(0);
 
-            $table->enum('holdertype',[
-                'Principal',
-                'Dependent',
-                'Both'
-            ])->default('Principal');
+            $table->enum('holdertype', [
+                'Primary Owner',
+                'Beneficiaries',
+            ]);
 
             $table->boolean('status')->default(true);
 

@@ -6,7 +6,8 @@
 
 <div
     class="dashboard-container"
-    x-data="{ tab: 'profile' }">
+    x-data="{ tab: 'profile' }"
+    @account-activated.window="$wire.$refresh()">
 
     <!-- MY PROFILE NAVIGATION -->
     <nav class="dashboard-nav">
@@ -60,40 +61,8 @@
             @endif
         </div>
 
-       @if(auth()->user()->RoleID != 1)
-
-    <div class="ml-auto my-2 sm:my-0 mr-2 sm:mr-2">
-        @if($activationStatus === null)
-
-            <button
-                type="button"
-                onclick="Livewire.dispatch('open-activation-modal')"
-                class="activate-account-btn px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md transition duration-300">
-                Activate Account
-            </button>
-
-        @elseif($activationStatus === 'Pending')
-
-            <button
-                disabled
-                class="px-4 py-2 bg-yellow-500 text-white rounded-xl font-bold text-xs sm:text-sm cursor-not-allowed">
-                Waiting for Review
-            </button>
-
-        @elseif($activationStatus === 'Rejected')
-
-        <button
-            type="button"
-            onclick="Livewire.dispatch('open-rejected-activation')"
-            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-xs sm:text-sm">
-            Edit & Resubmit
-        </button>
-
-        @endif
-
-    </div>
-
-@endif
+            <!-- Replace your old button block with this: -->
+        <livewire:member-pages.my-profile.activation-button />
 
     </div>
 
@@ -142,10 +111,10 @@
         @endif
 
     </div>
-
-</div>
-
 <!-- ACTIVATION MODAL -->
 <livewire:member-pages.my-profile.activation-modal />
+</div>
+
+
 
 @endsection

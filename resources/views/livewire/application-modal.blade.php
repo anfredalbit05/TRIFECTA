@@ -13,6 +13,7 @@
                 {{-- ================================================= --}}
                 {{-- HEADER --}}
                 {{-- ================================================= --}}
+
                 <div class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4 shadow-sm">
                     <div>
                         <h2 class="text-lg font-extrabold text-[#0B2A5B] sm:text-xl">
@@ -118,31 +119,201 @@
                                     <option value="Separated">Separated</option>
                                 </select>
                             </div>
+{{-- BIRTHDATE WITH FULL YEAR, MONTH, & DAY PICKER --}}
+<div x-data="{
+    openPicker: false,
+    step: 'year',
+    selectedYear: '2000',
+    selectedMonth: '01',
+    selectedDay: '01',
+    years: Array.from({length: 80}, (_, i) => 2026 - i),
+    months: [
+        {name: 'January', val: '01'}, {name: 'February', val: '02'}, {name: 'March', val: '03'},
+        {name: 'April', val: '04'}, {name: 'May', val: '05'}, {name: 'June', val: '06'},
+        {name: 'July', val: '07'}, {name: 'August', val: '08'}, {name: 'September', val: '09'},
+        {name: 'October', val: '10'}, {name: 'November', val: '11'}, {name: 'December', val: '12'}
+    ],
+    get daysInMonth() {
+        return Array.from({length: new Date(this.selectedYear, this.selectedMonth, 0).getDate()}, (_, i) => String(i + 1).padStart(2, '0'));
+    },
+    get formattedDate() {
+        return `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
+    },
+    init() {
+        let currentVal = @entangle('birthdate');
+        if(currentVal) {
+            let parts = currentVal.split('-');
+            if(parts.length === 3) {
+                this.selectedYear = parts[0];
+                this.selectedMonth = parts[1];
+                this.selectedDay = parts[2];
+            }
+        }
+    },
+    confirmDate() {
+        let formatted = `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
+        @this.set('birthdate', formatted);
+        this.openPicker = false;
+        this.step = 'year';
+    }
+}" class="relative">
+    <label class="mb-1 block text-xs font-bold text-slate-700">
+        Birthdate *
+    </label>
 
-                            {{-- BIRTHDATE --}}
-                            <div>
-                                <label class="mb-1 block text-xs font-bold text-slate-700">
-                                    Birthdate *
-                                </label>
-                                <input
-                                    wire:model="birthdate"
-                                    type="date"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                >
-                            </div>
+    {{-- Trigger Input Box --}}
+    <div
+        @click="openPicker = true"
+        class="flex w-full cursor-pointer items-center justify-between rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+    >
+        <span x-text="$wire.birthdate || 'Select Date of Birth'"></span>
+        <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+    </div>
+
+    {{-- CUSTOM MATERIAL-STYLE POPUP MODAL --}}
+    <div x-show="openPicker" x-cloak class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+        <div @click.away="openPicker = false" class="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+
+            {{-- Header Banner --}}
+            <div class="bg-[#E8B923] p-5 text-[#0B2A5B]">
+                <span class="text-[10px] font-bold uppercase tracking-widest opacity-80">Select Date of Birth</span>
+                <div class="mt-1 flex items-center justify-between">
+                    <h2 class="text-xl font-extrabold" x-text="formattedDate"></h2>
+                </div>
+                <div class="mt-2 flex gap-2 text-xs font-bold">
+                    <button type="button" @click="step = 'year'" :class="step == 'year' ? 'underline opacity-100' : 'opacity-70'" class="hover:opacity-100">Year</button>
+                    <span>/</span>
+                    <button type="button" @click="step = 'month'" :class="step == 'month' ? 'underline opacity-100' : 'opacity-70'" class="hover:opacity-100">Month</button>
+                    <span>/</span>
+                    <button type="button" @click="step = 'day'" :class="step == 'day' ? 'underline opacity-100' : 'opacity-70'" class="hover:opacity-100">Day</button>
+                </div>
+            </div>
+
+            {{-- Body Content --}}
+            <div class="p-4">
+                {{-- Year Grid --}}
+                <div x-show="step == 'year'">
+                    <div class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
+                        <span>Select Year</span>
+                        <button type="button" @click="step = 'month'" class="text-xs text-[#0B2A5B] hover:underline">Next: Month &rarr;</button>
+                    </div>
+                    <div class="grid h-64 grid-cols-3 gap-2 overflow-y-auto pr-1 text-center">
+                        <template x-for="yr in years" :key="yr">
+                            <button
+                                type="button"
+                                @click="selectedYear = yr; step = 'month'"
+                                :class="selectedYear == yr ? 'bg-[#0B2A5B] text-white font-bold' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                                class="rounded-lg py-2.5 text-sm transition"
+                                x-text="yr"
+                            ></button>
+                        </template>
+                    </div>
+                </div>
+
+                {{-- Month Grid --}}
+                <div x-show="step == 'month'">
+                    <div class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
+                        <button type="button" @click="step = 'year'" class="text-xs text-slate-500 hover:underline">&larr; Back</button>
+                        <span>Select Month</span>
+                        <button type="button" @click="step = 'day'" class="text-xs text-[#0B2A5B] hover:underline">Next: Day &rarr;</button>
+                    </div>
+                    <div class="grid h-64 grid-cols-2 gap-2 overflow-y-auto pr-1 text-center">
+                        <template x-for="m in months" :key="m.val">
+                            <button
+                                type="button"
+                                @click="selectedMonth = m.val; step = 'day'"
+                                :class="selectedMonth == m.val ? 'bg-[#0B2A5B] text-white font-bold' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                                class="rounded-lg py-3 text-sm transition"
+                                x-text="m.name"
+                            ></button>
+                        </template>
+                    </div>
+                </div>
+
+                {{-- Day Grid --}}
+                <div x-show="step == 'day'">
+                    <div class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
+                        <button type="button" @click="step = 'month'" class="text-xs text-slate-500 hover:underline">&larr; Back</button>
+                        <span>Select Day</span>
+                        <span></span>
+                    </div>
+                    <div class="grid h-64 grid-cols-5 gap-2 overflow-y-auto pr-1 text-center">
+                        <template x-for="d in daysInMonth" :key="d">
+                            <button
+                                type="button"
+                                @click="selectedDay = d"
+                                :class="selectedDay == d ? 'bg-[#0B2A5B] text-white font-bold' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                                class="rounded-lg py-2.5 text-sm transition"
+                                x-text="d"
+                            ></button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Footer Actions --}}
+            <div class="flex items-center justify-between border-t bg-slate-50 px-5 py-3">
+                <button type="button" @click="openPicker = false" class="rounded-lg px-4 py-2 text-xs font-bold text-slate-500 transition hover:bg-slate-200">
+                    Cancel
+                </button>
+                <button type="button" @click="confirmDate()" class="rounded-lg bg-[#0B2A5B] px-6 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123b7a]">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
                             {{-- COMPLETE ADDRESS --}}
-                            <div class="sm:col-span-2 lg:col-span-3">
-                                <label class="mb-1 block text-xs font-bold text-slate-700">
-                                    Complete Address *
-                                </label>
-                                <input
-                                    wire:model.live="address"
-                                    type="text"
-                                    placeholder="House No., Street, Barangay, City/Municipality, Province"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                >
-                            </div>
+{{-- COMPLETE ADDRESS --}}
+<div class="sm:col-span-2 lg:col-span-3 space-y-2">
+    <label class="mb-1 block text-xs font-bold text-slate-700">
+        Complete Address *
+    </label>
+    <div class="flex gap-2">
+        <input
+            wire:model.live="address"
+            type="text"
+            placeholder="House No., Street, Barangay, City/Municipality, Province"
+            class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+        >
+
+        {{-- MAP PIN BUTTON --}}
+<button
+    type="button"
+    wire:click="toggleMap"
+    class="flex items-center gap-1.5 shrink-0 px-4 py-2 bg-[#0B2A5B] hover:bg-[#123b7a] text-white text-xs font-bold rounded-xl shadow-sm transition"
+>
+    {{ $showMapModal ? 'Close Map' : 'Pin Map' }}
+</button>
+    </div>
+
+<div
+    x-data
+    x-show="$wire.showMapModal"
+    class="mt-3 overflow-hidden rounded-xl border border-slate-300 bg-white p-3 shadow-sm"
+>
+
+    <h4 class="mb-2 text-sm font-bold text-[#0B2A5B]">
+        Select Location
+    </h4>
+
+    <div class="h-[350px] rounded-lg border">
+        <div
+            id="map"
+            wire:ignore
+            class="h-full w-full"
+        ></div>
+    </div>
+
+</div>
+</div>
+
+
+
+
                         </div>
                     </div>
 
@@ -173,17 +344,153 @@
                                         >
                                     </div>
 
-                                    {{-- BIRTHDATE --}}
-                                    <div>
-                                        <label class="mb-1 block text-xs font-bold text-slate-700">
-                                            Birthdate
-                                        </label>
-                                        <input
-                                            wire:model="beneficiaries.{{ $i }}.birthdate"
-                                            type="date"
-                                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                        >
-                                    </div>
+                               {{-- BENEFICIARY BIRTHDATE WITH CUSTOM YEAR-GRID PICKER --}}
+{{-- BENEFICIARY BIRTHDATE WITH FULL YEAR, MONTH, & DAY PICKER --}}
+<div x-data="{
+    openPicker: false,
+    step: 'year',
+    selectedYear: '2000',
+    selectedMonth: '01',
+    selectedDay: '01',
+    years: Array.from({length: 90}, (_, i) => 2026 - i),
+    months: [
+        {name: 'January', val: '01'}, {name: 'February', val: '02'}, {name: 'March', val: '03'},
+        {name: 'April', val: '04'}, {name: 'May', val: '05'}, {name: 'June', val: '06'},
+        {name: 'July', val: '07'}, {name: 'August', val: '08'}, {name: 'September', val: '09'},
+        {name: 'October', val: '10'}, {name: 'November', val: '11'}, {name: 'December', val: '12'}
+    ],
+    get daysInMonth() {
+        return Array.from({length: new Date(this.selectedYear, this.selectedMonth, 0).getDate()}, (_, i) => String(i + 1).padStart(2, '0'));
+    },
+    get formattedDate() {
+        return `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
+    },
+    init() {
+        let currentVal = @entangle('beneficiaries.' . $i . '.birthdate');
+        if(currentVal) {
+            let parts = currentVal.split('-');
+            if(parts.length === 3) {
+                this.selectedYear = parts[0];
+                this.selectedMonth = parts[1];
+                this.selectedDay = parts[2];
+            }
+        }
+    },
+    confirmDate() {
+        let formatted = `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
+        @this.set('beneficiaries.{{ $i }}.birthdate', formatted);
+        this.openPicker = false;
+        this.step = 'year';
+    }
+}" class="relative">
+    <label class="mb-1 block text-xs font-bold text-slate-700">
+        Birthdate
+    </label>
+
+    {{-- Trigger Input Box --}}
+    <div
+        @click="openPicker = true"
+        class="flex w-full cursor-pointer items-center justify-between rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+    >
+        <span x-text="$wire.get('beneficiaries.{{ $i }}.birthdate') || 'Select Birthdate'"></span>
+        <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+    </div>
+
+    {{-- CUSTOM MATERIAL-STYLE POPUP MODAL --}}
+    <div x-show="openPicker" x-cloak class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+        <div @click.away="openPicker = false" class="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+
+            {{-- Header Banner --}}
+            <div class="bg-[#E8B923] p-5 text-[#0B2A5B]">
+                <span class="text-[10px] font-bold uppercase tracking-widest opacity-80">Select Beneficiary Birthdate</span>
+                <div class="mt-1 flex items-center justify-between">
+                    <h2 class="text-xl font-extrabold" x-text="formattedDate"></h2>
+                </div>
+                <div class="mt-2 flex gap-2 text-xs font-bold">
+                    <button type="button" @click="step = 'year'" :class="step == 'year' ? 'underline opacity-100' : 'opacity-70'" class="hover:opacity-100">Year</button>
+                    <span>/</span>
+                    <button type="button" @click="step = 'month'" :class="step == 'month' ? 'underline opacity-100' : 'opacity-70'" class="hover:opacity-100">Month</button>
+                    <span>/</span>
+                    <button type="button" @click="step = 'day'" :class="step == 'day' ? 'underline opacity-100' : 'opacity-70'" class="hover:opacity-100">Day</button>
+                </div>
+            </div>
+
+            {{-- Body Content --}}
+            <div class="p-4">
+                {{-- Year Grid --}}
+                <div x-show="step == 'year'">
+                    <div class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
+                        <span>Select Year</span>
+                        <button type="button" @click="step = 'month'" class="text-xs text-[#0B2A5B] hover:underline">Next: Month &rarr;</button>
+                    </div>
+                    <div class="grid h-64 grid-cols-3 gap-2 overflow-y-auto pr-1 text-center">
+                        <template x-for="yr in years" :key="yr">
+                            <button
+                                type="button"
+                                @click="selectedYear = yr; step = 'month'"
+                                :class="selectedYear == yr ? 'bg-[#0B2A5B] text-white font-bold' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                                class="rounded-lg py-2.5 text-sm transition"
+                                x-text="yr"
+                            ></button>
+                        </template>
+                    </div>
+                </div>
+
+                {{-- Month Grid --}}
+                <div x-show="step == 'month'">
+                    <div class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
+                        <button type="button" @click="step = 'year'" class="text-xs text-slate-500 hover:underline">&larr; Back</button>
+                        <span>Select Month</span>
+                        <button type="button" @click="step = 'day'" class="text-xs text-[#0B2A5B] hover:underline">Next: Day &rarr;</button>
+                    </div>
+                    <div class="grid h-64 grid-cols-2 gap-2 overflow-y-auto pr-1 text-center">
+                        <template x-for="m in months" :key="m.val">
+                            <button
+                                type="button"
+                                @click="selectedMonth = m.val; step = 'day'"
+                                :class="selectedMonth == m.val ? 'bg-[#0B2A5B] text-white font-bold' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                                class="rounded-lg py-3 text-sm transition"
+                                x-text="m.name"
+                            ></button>
+                        </template>
+                    </div>
+                </div>
+
+                {{-- Day Grid --}}
+                <div x-show="step == 'day'">
+                    <div class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
+                        <button type="button" @click="step = 'month'" class="text-xs text-slate-500 hover:underline">&larr; Back</button>
+                        <span>Select Day</span>
+                        <span></span>
+                    </div>
+                    <div class="grid h-64 grid-cols-5 gap-2 overflow-y-auto pr-1 text-center">
+                        <template x-for="d in daysInMonth" :key="d">
+                            <button
+                                type="button"
+                                @click="selectedDay = d"
+                                :class="selectedDay == d ? 'bg-[#0B2A5B] text-white font-bold' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                                class="rounded-lg py-2.5 text-sm transition"
+                                x-text="d"
+                            ></button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Footer Actions --}}
+            <div class="flex items-center justify-between border-t bg-slate-50 px-5 py-3">
+                <button type="button" @click="openPicker = false" class="rounded-lg px-4 py-2 text-xs font-bold text-slate-500 transition hover:bg-slate-200">
+                    Cancel
+                </button>
+                <button type="button" @click="confirmDate()" class="rounded-lg bg-[#0B2A5B] px-6 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123b7a]">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
                                     {{-- RELATIONSHIP --}}
                                     <div>
@@ -281,6 +588,7 @@
                         </div>
                     </div>
 
+
                     {{-- ================================================= --}}
                     {{-- ACCEPTANCE OF TERMS --}}
                     {{-- ================================================= --}}
@@ -307,6 +615,8 @@
                             </span>
                         </label>
                     </div>
+
+
 
                 </div>
 
@@ -355,37 +665,70 @@
             </div>
 
         </div>
+
     @endif
 
-    {{-- SweetAlert2 Listener Scripts --}}
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            // Listen for validation error dispatch
-            Livewire.on('validation-error', (event) => {
-                Swal.fire({
-                    icon: 'error',
-                    title: event.title,
-                    html: event.html,
-                    confirmButtonColor: '#0B2A5B',
-                });
-            });
 
-            // Listen for confirmation dispatch before saving
-            Livewire.on('swal-confirm-submission', () => {
-                Swal.fire({
-                    title: 'Save Application?',
-                    text: 'Are you sure you want to submit this membership application?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#0B2A5B',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, Submit it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        @this.dispatch('confirmed-save-application');
+    <script>
+    let map = null;
+    let marker = null;
+
+    document.addEventListener('livewire:initialized', () => {
+
+        Livewire.on('map-opened', (data) => {
+
+            setTimeout(() => {
+
+                if (map) {
+                    map.invalidateSize();
+                    return;
+                }
+
+                map = L.map('map').setView([15.4861, 120.9666], 13);
+
+                L.tileLayer(
+                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    {
+                        attribution: '&copy; OpenStreetMap'
                     }
+                ).addTo(map);
+
+                // Restore marker if coordinates already exist
+
+                if (data.latitude && data.longitude) {
+
+                    marker = L.marker([
+                        data.latitude,
+                        data.longitude
+                    ]).addTo(map);
+
+                    map.setView([
+                        data.latitude,
+                        data.longitude
+                    ], 16);
+                }
+
+                map.on('click', function (e) {
+
+                    const lat = e.latlng.lat;
+                    const lng = e.latlng.lng;
+
+                    if (marker) {
+                        marker.setLatLng(e.latlng);
+                    } else {
+                        marker = L.marker(e.latlng).addTo(map);
+                    }
+
+                    Livewire.dispatch('set-coordinates', {
+                        lat: lat,
+                        lng: lng
+                    });
                 });
-            });
+
+            }, 300);
+
         });
-    </script>
+
+    });
+</script>
 </div>

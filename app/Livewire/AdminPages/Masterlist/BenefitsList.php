@@ -4,9 +4,14 @@ namespace App\Livewire\AdminPages\Masterlist;
 
 use App\Models\Benefit;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class BenefitsList extends Component
 {
+
+    use WithPagination;
+
+    protected $paginationTheme = 'tailwind';
     public $isOpen = false;
     public $benefit_id;
 
@@ -14,7 +19,7 @@ class BenefitsList extends Component
     public $name;
     public $details;
     public $amount = 0;
-    public $holdertype = 'Principal';
+    public $holdertype = '';
     public $status = true;
 
     // Validation rules
@@ -22,14 +27,24 @@ class BenefitsList extends Component
         'name' => 'required|string|max:150',
         'details' => 'nullable|string',
         'amount' => 'required|numeric|min:0',
-        'holdertype' => 'required|in:Principal,Dependent,Both',
+        'holdertype' => 'required|in:Primary Owner,Beneficiaries',
         'status' => 'boolean',
     ];
 
     public function openCreateModal()
     {
         $this->resetValidation();
-        $this->reset(['name', 'details', 'amount', 'holdertype', 'status', 'benefit_id']);
+
+        $this->reset([
+            'name',
+            'details',
+            'amount',
+            'benefit_id'
+        ]);
+
+        $this->holdertype = 'Primary Owner';
+        $this->status = true;
+
         $this->isOpen = true;
     }
 
@@ -102,7 +117,9 @@ class BenefitsList extends Component
     public function render()
     {
         return view('components.admin-pages.masterlist.benefits', [
-            'benefits' => Benefit::where('status', true)->get()
+            'benefits' => Benefit::where('status', true)
+                ->latest('BentID')
+                ->paginate(10)
         ]);
     }
 }

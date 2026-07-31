@@ -4,7 +4,8 @@
 
 @section('content')
 
-<div class="dashboard-container" x-data="{ tab: 'overview' }">
+<div class="dashboard-container"
+     x-data="{ tab: $persist('overview').as('masterlist-tab') }">
 
     <!-- MASTERLIST NAVIGATION -->
     <nav class="dashboard-nav">
@@ -53,6 +54,16 @@
         >
             Inquiries
         </a>
+
+
+        <a
+            href="#"
+            @click.prevent="tab = 'faqs'"
+            :class="tab === 'faqs' ? 'active' : ''"
+        >
+            FAQs
+        </a>
+
     </div>
 
     <div class="dashboard-layout px-10 pt-4">
@@ -100,6 +111,16 @@
         >
              <livewire:admin-pages.masterlist.inquiries />
         </div>
+
+          <!-- FAQs -->
+        <div
+            x-show="tab === 'faqs'"
+            x-cloak
+            class="dashboard-main-card full-width-card"
+        >
+             <livewire:admin-pages.masterlist.faq-list />
+        </div>
+
 
     </div>
 

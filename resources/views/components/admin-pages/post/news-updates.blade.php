@@ -130,6 +130,9 @@
                             <option value="Insurance">Insurance</option>
                             <option value="Member Benefits">Member Benefits</option>
                             <option value="Maintenance">Maintenance</option>
+                            <option value="Maintenance">Advisory</option>
+                            <option value="Maintenance">Event</option>
+                            <option value="Maintenance">Other</option>
                         </select>
                         @error('category')
                             <p class="text-xs text-rose-500 font-medium mt-1">{{ $message }}</p>

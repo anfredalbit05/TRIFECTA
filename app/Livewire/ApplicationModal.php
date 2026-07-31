@@ -30,6 +30,10 @@ class ApplicationModal extends Component
     public $civil_status = '';
     public $birthdate = '';
     public $address = '';
+    public ?float $latitude = null;
+    public ?float $longitude = null;
+    public bool $showMapModal = false;
+    public bool $isSubmitting = false;
 
 
 
@@ -180,6 +184,8 @@ class ApplicationModal extends Component
 
     public function submit()
     {
+
+
         try {
 
             $this->validate([
@@ -217,6 +223,8 @@ class ApplicationModal extends Component
                 title: 'Missing or Invalid Fields',
                 html: $html
             );
+
+
 
             return;
         }
@@ -260,6 +268,8 @@ class ApplicationModal extends Component
                 'contactno' => $this->mobile,
                 'email' => filled($this->email) ? $this->email : null,
                 'address' => $this->address,
+                'latitude' => $this->latitude,       // <--- Add this line
+                'longitude' => $this->longitude,     // <--- Add this line
                 'RoleID' => 5,
                 'status' => 'Inactive',
             ]);
@@ -329,13 +339,18 @@ class ApplicationModal extends Component
                 'referralCode' => $referralCode
             ]);
 
-            $this->close();
 
-            $this->dispatch(
-                'toast',
-                type: 'success',
-                message: 'Application submitted successfully!'
-            );
+
+$this->dispatch('swal-close'); // Close loading SweetAlert
+
+$this->open = false; // Close Livewire modal
+
+$this->dispatch(
+    'show-success-after-close',
+    title: 'Success!',
+    text: 'Application submitted successfully!'
+);
+
 
         } catch (\Throwable $e) {
 
@@ -345,11 +360,13 @@ class ApplicationModal extends Component
                 'error' => $e->getMessage()
             ]);
 
-            $this->dispatch(
-                'toast',
-                type: 'error',
-                message: 'Something went wrong. Please try again.'
-            );
+           $this->dispatch('swal-close');
+
+$this->dispatch(
+    'validation-error',
+    title: 'Error',
+    html: 'Something went wrong. Please try again.'
+);
         }
     }
 
@@ -390,4 +407,32 @@ class ApplicationModal extends Component
     {
         return view('livewire.application-modal');
     }
+
+    public function toggleMap(): void
+{
+    $this->showMapModal = ! $this->showMapModal;
+
+    if ($this->showMapModal) {
+
+        $this->dispatch(
+            'map-opened',
+            latitude: $this->latitude,
+            longitude: $this->longitude
+        );
+    }
+}
+
+  #[On('set-coordinates')]
+public function setCoordinates($lat, $lng): void
+{
+    $this->latitude = (float) $lat;
+    $this->longitude = (float) $lng;
+
+    logger([
+        'latitude' => $this->latitude,
+        'longitude' => $this->longitude,
+    ]);
+}
+
+
 }

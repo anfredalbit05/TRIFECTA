@@ -56,81 +56,294 @@
      CEO SECTION
 ========================== -->
 
-<section class="team-ceo-section">
+<section class="relative overflow-hidden bg-slate-100 py-24">
 
-    <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <!-- background decoration -->
 
-        <div class="team-ceo-card">
 
-            <!-- LEFT CONTENT -->
+    <div class="absolute top-0 left-0 h-96 w-96 rounded-full bg-blue-100 blur-3xl opacity-40"></div>
 
-            <div class="team-ceo-content">
+    <div class="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-yellow-100 blur-3xl opacity-40"></div>
 
-                <span class="team-ceo-badge">
+    <div class="max-w-7xl mx-auto px-6">
 
-                    <x-editable-text
-                        key="team_ceo_subtitle"
-                        :value="$contexts['team_ceo_subtitle'] ?? 'Meet the CEO'"
-                        tag="span"
-                        class="inline-block"
-                    />
+        <div class="overflow-hidden rounded-[40px] bg-white shadow-2xl">
 
-                </span>
+            <div class="grid lg:grid-cols-12 min-h-[950px]">
 
-                <h2 class="team-ceo-name">
+                <!-- ========================= -->
+                <!-- LEFT CONTENT -->
+                <!-- ========================= -->
 
-                    <x-editable-text
-                        key="team_ceo_name"
-                        :value="$contexts['team_ceo_name'] ?? 'Anfred Albit'"
-                        tag="span"
-                        class="inline-block"
-                    />
+                <div class="lg:col-span-7 p-8 lg:p-14 flex flex-col">
 
-                </h2>
+                    <!-- Badge -->
 
-              <p class="team-ceo-description">
+                    <div>
 
-                    <x-editable-text
-                        key="team_ceo_description"
-                        :value="$contexts['team_ceo_description'] ?? 'The founder of TrueLife built the company from a personal promise: no family should be left unprepared when real pain arrives.'"
-                        tag="span"
-                        class="block text-white"
-                    />
+                        <span class="inline-flex items-center gap-2 rounded-full bg-blue-900 px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white">
 
-                </p>
+                            The Leadership Team
 
-                <div class="team-ceo-actions">
+                        </span>
 
-                    <button
-                        class="team-ceo-primary-btn">
+                    </div>
 
-                        Join the Community
+                    <!-- Heading -->
 
-                    </button>
+                    <h1 class="mt-8 text-5xl lg:text-7xl font-black leading-[0.95] text-slate-900">
 
+                        STRONG
+
+                        <span class="text-blue-900">
+
+                            LEADERSHIP.
+
+                        </span>
+
+                        <br>
+
+                        GREATER
+
+                        <span class="text-yellow-500">
+
+                            IMPACT.
+
+                        </span>
+
+                    </h1>
+
+                    <!-- Description -->
+
+                    <p class="mt-8 max-w-2xl text-lg leading-relaxed text-slate-600">
+
+                        <x-editable-text
+                            key="team_ceo_description"
+                            :value="$contexts['team_ceo_description'] ?? 'Driven by purpose and dedicated to service, our leadership continues to inspire communities through integrity, professionalism, and compassion.'"
+                            tag="span"
+                        />
+
+                    </p>
+
+                    <!-- CEO Card -->
+
+                    <div class="mt-10 rounded-[30px] border border-slate-200 bg-slate-50 p-8">
+
+                        <p class="text-sm font-bold uppercase tracking-[0.3em] text-blue-900">
+
+                             THE CEO
+
+                        </p>
+
+                        <h2 class="mt-3 text-4xl font-black text-slate-900">
+
+                            <x-editable-text
+                                key="team_ceo_name"
+                                :value="$contexts['team_ceo_name'] ?? 'RENANTE SUAYBAGUIO-ROBLES, MPA, LFA'"
+                                tag="span"
+                            />
+
+                        </h2>
+
+                        <p class="mt-4 text-xl font-bold text-yellow-600">
+
+                           Leader • Servant • Professional
+
+                        </p>
+
+                    </div>
+
+                    <!-- Experience -->
+
+                    <div class="mt-10 grid gap-6 md:grid-cols-2">
+
+                        <!-- Public -->
+
+                        <div class="rounded-3xl border border-slate-200 p-6 shadow-sm">
+
+                            <div class="mb-4 flex items-center gap-4">
+
+                                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-900 text-2xl text-white">
+
+                                    🏛️
+
+                                </div>
+
+                                <div>
+
+                                    <h3 class="font-bold uppercase text-slate-900">
+
+                                        Public Service
+
+                                    </h3>
+
+                                    <p class="text-sm text-slate-500">
+
+                                        Experience
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            <ul class="space-y-2 text-slate-600">
+
+                                <li>• Former SK Chairman</li>
+
+                                <li>• Former Barangay Kagawad</li>
+
+                                <li>• Former Barangay Captain</li>
+
+                                <li>• Former City Councilor of Tagum City</li>
+
+
+                            </ul>
+
+                        </div>
+
+                        <!-- Professional -->
+
+                        <div class="rounded-3xl border border-slate-200 p-6 shadow-sm">
+
+                            <div class="mb-4 flex items-center gap-4">
+
+                                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-yellow-500 text-2xl text-white">
+
+                                    💼
+
+                                </div>
+
+                                <div>
+
+                                    <h3 class="font-bold uppercase text-slate-900">
+
+                                        Professional
+
+                                    </h3>
+
+                                    <p class="text-sm text-slate-500">
+
+                                        Experience
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            <ul class="space-y-2 text-slate-600">
+
+                                <li>• Government-Licensed Financial Advisor</li>
+
+                                <li>• Unit Head, Manulife Philippines</li>
+
+                                <li>• Marketing Director, IMG (International Marketing Group)</li>
+
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Academic -->
+
+                    <div class="mt-6 rounded-3xl bg-blue-900 p-8 text-white">
+
+                        <div class="flex items-center gap-4">
+
+                            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-white text-2xl">
+
+                                🎓
+
+                            </div>
+
+                            <div>
+
+                                <h3 class="text-2xl font-bold">
+
+                                    Academic Background
+
+                                </h3>
+
+                                <p class="text-blue-100">
+
+                                    College Professor specializing in
+
+                                    <strong>Business and Marketing</strong>
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Leadership Profile -->
+
+                    <div class="mt-6 rounded-[30px] bg-gradient-to-r from-slate-900 to-blue-950 p-8 text-white">
+
+                        <h3 class="text-2xl font-bold text-yellow-400">
+
+                            Leadership Profile
+
+                        </h3>
+
+                        <div class="mt-4 h-1 w-24 rounded bg-yellow-500"></div>
+
+                        <p class="mt-5 leading-relaxed text-slate-300">
+
+                            With extensive experience in public service,
+                            financial advisory, leadership development,
+                            and higher education, our leaders empower
+                            communities through service, financial literacy,
+                            and professional excellence.
+
+                        </p>
+
+                    </div>
+
+                    <!-- Button -->
+{{--
                     <button
                         wire:click="openCeoModal"
-                        class="team-ceo-secondary-btn"
-                        >
+                        class="mt-8 w-fit rounded-2xl bg-yellow-500 px-8 py-4 font-bold text-slate-900 transition hover:scale-105">
 
-                        View Compliance →
+                        Learn More →
 
-                    </button>
+                    </button> --}}
 
                 </div>
 
-            </div>
+                <!-- ========================= -->
+                <!-- RIGHT SIDE -->
+                <!-- ========================= -->
 
-            <!-- RIGHT IMAGE -->
+                <div class="relative lg:col-span-5 overflow-hidden bg-gradient-to-b from-blue-950 via-blue-900 to-slate-900">
 
-            <div class="team-ceo-image-wrapper">
+                    <!-- decorative -->
 
-                <div class="team-ceo-image-card">
+                    <div class="absolute top-0 right-0 h-96 w-96 rounded-full bg-yellow-400/20 blur-3xl"></div>
 
-                    <img
-                        src="{{ asset('images/ceo.png') }}"
-                        alt="CEO"
-                        class="team-ceo-avatar">
+                    <div class="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl"></div>
+
+                    <!-- vertical line -->
+
+                    <div class="absolute left-0 top-20 h-40 w-1 bg-yellow-500"></div>
+
+                    <!-- image -->
+
+                    <div class="flex h-full items-end justify-center">
+
+                        <img
+                            src="{{ asset('images/ceo.png') }}"
+                            alt="CEO"
+                            class="relative z-10 h-[1200px] object-contain object-bottom"
+                        >
+
+                    </div>
 
                 </div>
 
@@ -142,7 +355,207 @@
 
 </section>
 
-@if($showCeoModal)
+<!-- =========================
+     COO SECTION
+========================== -->
+
+<section class="py-24 bg-slate-100">
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="overflow-hidden rounded-[40px] bg-white shadow-2xl">
+
+            <div class="grid lg:grid-cols-12 min-h-[850px]">
+
+                   <!-- ========================= -->
+                <!-- RIGHT IMAGE -->
+                <!-- ========================= -->
+
+                <div class="relative lg:col-span-5 bg-gradient-to-b from-blue-950 to-slate-900">
+
+                    <!-- Decorations -->
+
+                    <div class="absolute top-10 right-10 h-40 w-40 rounded-full bg-yellow-400/20 blur-3xl"></div>
+
+                    <div class="absolute bottom-10 left-10 h-40 w-40 rounded-full bg-blue-400/20 blur-3xl"></div>
+
+                    <!-- Gold line -->
+
+                    <div class="absolute left-0 top-0 h-full w-1 bg-yellow-500"></div>
+
+                    <!-- Image -->
+
+                    <div class="flex h-full items-end justify-center">
+
+                        <img
+                            src="{{ asset('images/coo.png') }}"
+                            alt="COO"
+                            class="h-[950px] object-contain object-bottom"
+                        >
+
+                    </div>
+
+                </div>
+
+                <div class="lg:col-span-7 p-10 lg:p-14 flex flex-col justify-center">
+
+                    <!-- Badge -->
+
+                    <div>
+
+                        <span class="inline-flex rounded-full bg-blue-900 px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white">
+
+                            Vice President for
+
+                        </span>
+
+                    </div>
+
+                    <!-- Position -->
+
+                    <h2 class="mt-5 text-4xl lg:text-5xl font-black uppercase leading-tight text-slate-900">
+
+                        Marketing & Operations
+
+                    </h2>
+
+                    <!-- Name -->
+
+                    <h1 class="mt-6 text-5xl font-black uppercase text-blue-900">
+
+                        Bobby Paulo Dagala
+
+                    </h1>
+
+                    <!-- Subtitle -->
+
+                    <p class="mt-4 text-2xl font-semibold text-yellow-600">
+
+                        Government Licensed Financial Advisor
+
+                    </p>
+
+                    <!-- Divider -->
+
+                    <div class="mt-8 h-1 w-32 rounded-full bg-yellow-500"></div>
+
+                    <!-- Cards -->
+
+                    <div class="mt-10 grid gap-6">
+
+                        <!-- Experience -->
+
+                        <div class="rounded-3xl border border-slate-200 p-6 shadow-sm">
+
+                            <div class="flex items-center gap-4">
+
+                                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-900 text-white text-2xl">
+
+                                    🛡️
+
+                                </div>
+
+                                <div>
+
+                                    <h3 class="text-2xl font-bold text-slate-900">
+
+                                        20 Years
+
+                                    </h3>
+
+                                    <p class="text-slate-500">
+
+                                        in Insurance Industry
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Manager -->
+
+                        <div class="rounded-3xl border border-slate-200 p-6 shadow-sm">
+
+                            <div class="flex items-center gap-4">
+
+                                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-900 text-white text-2xl">
+
+                                    🏦
+
+                                </div>
+
+                                <div>
+
+                                    <h3 class="text-2xl font-bold text-slate-900">
+
+                                        Manager
+
+                                    </h3>
+
+                                    <p class="text-slate-500">
+
+                                        Allianz PNB Insurance Inc.
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Business -->
+
+                        <div class="rounded-3xl border border-slate-200 p-6 shadow-sm">
+
+                            <div class="flex items-center gap-4">
+
+                                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-yellow-500 text-white text-2xl">
+
+                                    🏢
+
+                                </div>
+
+                                <div>
+
+                                    <h3 class="text-2xl font-bold text-slate-900">
+
+                                        Businessman
+
+                                    </h3>
+
+                                    <p class="text-slate-500 leading-relaxed">
+
+                                        Owner of Ultrasound Clinics in
+                                        Davao del Norte, Davao City,
+                                        and Davao de Oro.
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{{-- @if($showCeoModal)
 
 <div
     class="fixed inset-0 z-[9999] bg-black/70 backdrop-blur-sm p-4 flex items-center justify-center">
@@ -166,7 +579,7 @@
 
 </div>
 
-@endif
+@endif --}}
 
 
 <!-- =========================

@@ -11,16 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Schema::create('users', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->string('name');
-        //     $table->string('email')->unique();
-        //     $table->timestamp('email_verified_at')->nullable();
-        //     $table->string('password');
-        //     $table->rememberToken();
-        //     $table->timestamps();
-        // });
-
         Schema::create('users', function (Blueprint $table) {
 
             $table->id('UserID');
@@ -42,6 +32,10 @@ return new class extends Migration
             $table->string('contactno', 20)->nullable();
 
             $table->text('address')->nullable();
+
+            // Location Information
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
 
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
