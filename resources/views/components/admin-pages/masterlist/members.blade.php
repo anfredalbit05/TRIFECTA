@@ -100,7 +100,22 @@
                                     ✏️
                                 </button>
 
+                                
+                                    {{-- <button
+                                        wire:click="openReview({{ $member->UserID }})"
+                                        title="Review Activation"
+                                        class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow">
+                                        Pending
+                                    </button> --}}
+
                                 {{-- STATUS / ACTIVATION --}}
+                                
+                                    <button
+                                        wire:click="openReview({{ $member->UserID }})"
+                                        title="Review Activation"
+                                        class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow">
+                                        Pending
+                                    </button>
                                 @if(strtolower($member->status) === 'active')
                                     <button
                                         wire:click="confirmStatus({{ $member->UserID }})"
@@ -108,6 +123,10 @@
                                         class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition cursor-pointer text-xs font-semibold shadow">
                                         Deactivate
                                     </button>
+
+                                        {{-- {{ strtolower($member->status) }}
+                                        {{ $member->has_pending_activation == true ? 'true' : 'false' }} --}}
+                                        
                                 @elseif($member->has_pending_activation)
                                     <button
                                         wire:click="openReview({{ $member->UserID }})"
