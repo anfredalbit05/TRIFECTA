@@ -22,7 +22,7 @@ class RolesSeeder extends Seeder
             ],
             [
                 'rolename'   => 'Administrator',
-                'description'=> 'Overall system management and user administration.',
+                'description'=> 'Overall system management for CEO and COO',
                 'status'      => true,
                 'created_at'  => now(),
                 'updated_at'  => now(),
