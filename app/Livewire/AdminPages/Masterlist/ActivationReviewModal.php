@@ -145,62 +145,109 @@ class ActivationReviewModal extends Component
     |--------------------------------------------------------------------------
     */
 
-    public function approve(): void
-    {
-        if (
-            !$this->activation
-            ||
-            !$this->selectedUserID
-        ) {
-            return;
+   public function approve(): void
+{
+    if (
+        !$this->activation ||
+        !$this->selectedUserID
+    ) {
+        Log::warning('Approval failed: activation or selected user missing.', [
+            'selectedUserID' => $this->selectedUserID,
+            'activation' => $this->activation?->ActivationID,
+        ]);
+
+        return;
+    }
+
+    DB::transaction(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update Activation
+        |--------------------------------------------------------------------------
+        */
+
+        Activation::where(
+            'ActivationID',
+            $this->activation->ActivationID
+        )->update([
+            'status' => 'Approved',
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Activate Member
+        |--------------------------------------------------------------------------
+        */
+
+        User::where(
+            'UserID',
+            $this->selectedUserID
+        )->update([
+            'status' => 'Active',
+        ]);
+
+        $activatedUser = User::find($this->selectedUserID);
+
+        Log::info('Activated user found.', [
+            'user_id' => $activatedUser?->UserID,
+            'username' => $activatedUser?->username,
+            'email' => $activatedUser?->email,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Send email to activated user
+        |--------------------------------------------------------------------------
+        */
+
+        if ($activatedUser && filled($activatedUser->email)) {
+
+            try {
+
+                Mail::raw(
+                    "Congratulations!\n\n" .
+                    "Your account has been approved successfully.\n\n" .
+                    "You can now log in and access all features.",
+                    function ($message) use ($activatedUser) {
+                        $message->to($activatedUser->email)
+                            ->subject('Account Approved');
+                    }
+                );
+
+                Log::info('Approval email sent to activated user.', [
+                    'email' => $activatedUser->email,
+                ]);
+
+            } catch (\Throwable $e) {
+
+                Log::error('Failed to send approval email to activated user.', [
+                    'user_id' => $activatedUser->UserID,
+                    'email' => $activatedUser->email,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Send email to upline
+        |--------------------------------------------------------------------------
+        */
 
-        DB::transaction(function () {
+        $referralUser = User::where(
+            'referralCode',
+            $this->activation->upline_code
+        )->first();
 
-            /*
-            |--------------------------------------------------------------------------
-            | Update Activation
-            |--------------------------------------------------------------------------
-            */
+        Log::info('Referral user found.', [
+            'user_id' => $referralUser?->UserID,
+            'email' => $referralUser?->email,
+        ]);
 
-            Activation::where(
-                'ActivationID',
-                $this->activation->ActivationID
-            )
+        if ($referralUser && filled($referralUser->email)) {
 
-            ->update([
-
-                'status' => 'Approved',
-
-            ]);
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Activate Member
-            |--------------------------------------------------------------------------
-            */
-
-            User::where(
-                'UserID',
-                $this->selectedUserID
-            )
-
-            ->update([
-
-                'status' => 'Active',
-
-            ]);
-
-            $activatedUser = User::find($this->selectedUserID);
-
-            $referralUser = User::where(
-                'referralCode',
-                $this->activation->upline_code
-            )->first();
-
-            if ($referralUser && $referralUser->email) {
+            try {
 
                 Mail::to($referralUser->email)->send(
 
@@ -211,32 +258,40 @@ class ActivationReviewModal extends Component
                     )
 
                 );
+
+                Log::info('Approval email sent to upline.', [
+                    'email' => $referralUser->email,
+                ]);
+
+            } catch (\Throwable $e) {
+
+                Log::error('Failed to send approval email to upline.', [
+                    'user_id' => $referralUser->UserID,
+                    'email' => $referralUser->email,
+                    'error' => $e->getMessage(),
+                ]);
             }
+        }
+    });
 
-        });
+    Log::info(
+        'Activation approved.',
+        [
+            'UserID' => $this->selectedUserID,
+            'ActivationID' => $this->activation->ActivationID,
+        ]
+    );
 
+    $this->dispatch('members-refresh');
 
-        Log::info(
-            'Activation approved.',
-            [
-                'UserID' =>
-                    $this->selectedUserID,
+    $this->dispatch(
+        'swal:success',
+        title: 'Success!',
+        message: 'Activation approved successfully.'
+    );
 
-                'ActivationID' =>
-                    $this->activation->ActivationID,
-            ]
-        );
-
-        $this->dispatch('members-refresh');
-       $this->dispatch(
-            'swal:success',
-            title: 'Success!',
-            message: 'Activation approved successfully.'
-        );
-
-
-        $this->closeModal();
-    }
+    $this->closeModal();
+}
 
 
    /*

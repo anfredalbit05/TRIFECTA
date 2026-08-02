@@ -15,11 +15,6 @@ return new class extends Migration
 
             $table->id('BeneficiaryID');
 
-            $table->foreignId('BenefitID')
-                ->constrained('benefits', 'BentID')
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
-
             $table->foreignId('UserID')
                 ->constrained('users', 'UserID')
                 ->cascadeOnUpdate()

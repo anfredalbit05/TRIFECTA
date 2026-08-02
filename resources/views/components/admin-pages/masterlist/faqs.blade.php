@@ -84,7 +84,7 @@
 
                                 <button
                                     wire:click="confirmDeleteFaq({{ $faq->FaqID }})"
-                                    class="px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 text-xs shadow cursor-pointer">
+                                    class="px-3 py-2 rounded-lg border-amber-400 bg-amber-500 text-white hover:amber-500 text-xs shadow cursor-pointer">
                                     🗑️
                                 </button>
 
@@ -232,7 +232,7 @@
                 text: "You won't be able to revert this!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
+                confirmButtonColor: '#E5B83B',
                 cancelButtonColor: '#6b7280',
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {

@@ -18,63 +18,31 @@ class CreateNewsUpdates extends Component
     public $category = 'General';
     public $image = null;
 
-    // Form toggle state
-    public bool $showCreateForm = false;
-
-    // Modal state for viewing post details
+    public bool $showCreateModal = false;
     public $selectedPost = null;
 
-    /**
-     * Create a new news update post.
-     */
+    protected $listeners = ['confirmedDelete' => 'deletePost'];
+
     public function createPost(): void
     {
         $this->validate([
-            'title' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'details' => [
-                'required',
-                'string',
-            ],
-            'category' => [
-                'required',
-                'string',
-                'max:100',
-            ],
-            'image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:5120',
-            ],
-        ], [
-            'image.image' => 'The selected file must be an image.',
-            'image.mimes' => 'Only JPG, JPEG, PNG, and WEBP images are allowed.',
-            'image.max'   => 'The image must not exceed 5MB.',
+            'title' => ['required', 'string', 'max:255'],
+            'details' => ['required', 'string'],
+            'category' => ['required', 'string', 'max:100'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         /** @var User|null $user */
         $user = Auth::user();
 
         if (!$user instanceof User) {
-            $this->addError(
-                'title',
-                'You must be logged in to create a post.'
-            );
+            $this->addError('title', 'You must be logged in to create a post.');
             return;
         }
 
         $imagePath = null;
-
-        // Store post image
         if ($this->image) {
-            $imagePath = $this->image->store(
-                'news-images',
-                'public'
-            );
+            $imagePath = $this->image->store('news-images', 'public');
         }
 
         NewsUpdate::create([
@@ -86,39 +54,25 @@ class CreateNewsUpdates extends Component
             'UserID'   => $user->UserID,
         ]);
 
-        $this->reset([
-            'title',
-            'details',
-            'image',
-        ]);
-
+        $this->reset(['title', 'details', 'image']);
         $this->category = 'General';
-        $this->showCreateForm = false;
+        $this->showCreateModal = false;
 
-        session()->flash(
-            'success',
-            'News update published successfully.'
-        );
+        session()->flash('success', 'News update published successfully.');
     }
 
-    /**
-     * Open detailed view for a specific news post.
-     */
     public function openDetails($id): void
     {
         $this->selectedPost = NewsUpdate::with('user')->find($id);
     }
 
-    /**
-     * Close detailed view modal.
-     */
     public function closeDetails(): void
     {
         $this->selectedPost = null;
     }
 
     /**
-     * Delete a news update post.
+     * Delete the news update post.
      */
     public function deletePost($id): void
     {
@@ -136,22 +90,16 @@ class CreateNewsUpdates extends Component
         }
 
         if ($news->image) {
-            Storage::disk('public')->delete(
-                $news->image
-            );
+            Storage::disk('public')->delete($news->image);
         }
 
         $news->delete();
 
-        // Close details if the deleted post was currently being viewed
         if ($this->selectedPost && $this->selectedPost->ID == $id) {
             $this->selectedPost = null;
         }
 
-        session()->flash(
-            'success',
-            'News update deleted successfully.'
-        );
+        session()->flash('success', 'News update deleted successfully.');
     }
 
     public function render()
@@ -161,11 +109,8 @@ class CreateNewsUpdates extends Component
             ->latest()
             ->get();
 
-        return view(
-            'components.admin-pages.post.news-updates',
-            [
-                'newsUpdates' => $newsUpdates,
-            ]
-        );
+        return view('components.admin-pages.post.news-updates', [
+            'newsUpdates' => $newsUpdates,
+        ]);
     }
 }

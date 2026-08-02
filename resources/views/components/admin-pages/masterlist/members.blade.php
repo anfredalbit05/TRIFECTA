@@ -17,19 +17,17 @@
         Member management content and directory.
     </p>
 
-    <!-- SEARCH BAR -->
-    <div class="masterlist-search mb-6">
-        <div class="relative max-w-sm">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-                🔍
-            </span>
-            <input
-                type="text"
-                wire:model.live="search"
-                placeholder="Search members..."
-                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
-        </div>
-    </div>
+   <div class="relative max-w-sm">
+    <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
+        🔍
+    </span>
+
+    <input
+        type="text"
+        wire:model.live="search"
+        placeholder="Search members..."
+        class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
+</div>
 
     <!-- MEMBERS TABLE -->
     <div class="member-table overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
@@ -78,7 +76,7 @@
                                     Active
                                 </span>
                             @else
-                                <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-red-500 text-white text-xs font-semibold shadow-sm">
+                                <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md  bg-slate-600 text-white text-xs font-semibold shadow-sm">
                                     Inactive
                                 </span>
                             @endif
@@ -87,6 +85,13 @@
                         <!-- Actions Column -->
                         <td class="py-4 px-4 text-center">
                             <div class="flex gap-2 justify-center items-center">
+
+                                <button
+                                    wire:click="viewMember({{ $member->UserID }})"
+                                    class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-slate-600 text-white hover:bg-slate-700">
+
+                                    👁️
+                                </button>
                                 {{-- UPDATE --}}
                                 <button
                                     wire:click="editMember({{ $member->UserID }})"

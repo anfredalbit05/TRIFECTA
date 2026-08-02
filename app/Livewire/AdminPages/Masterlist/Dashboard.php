@@ -12,11 +12,23 @@ class Dashboard extends Component
 {
     public function render()
     {
+        $mapUsers = User::where('RoleID', 5)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get([
+                'FirstName',
+                'LastName',
+                'address',
+                'longitude',
+                'latitude',
+            ]);
+
         return view('components.admin-pages.masterlist.dashboard', [
             'totalMembers' => User::where('RoleID', '!=', 1)->count(),
             'activeBranches' => Branch::where('status', true)->count(),
             'totalBenefits' => Benefit::where('status', true)->count(),
             'totalInquiries' => Inquiry::count(),
+            'mapUsers' => $mapUsers,
         ]);
     }
 }

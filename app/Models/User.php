@@ -33,14 +33,12 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  */
 
 #[Fillable([
-
     // Account
     'username',
     'password',
 
-    // Generated Upline Code
+    // Generated Codes
     'uplineCode',
-     // Generated Upline Code
     'referralCode',
 
     // Personal Information
@@ -63,7 +61,6 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
     'RoleID',
     'branchCode',
     'status',
-
 ])]
 
 #[Hidden([

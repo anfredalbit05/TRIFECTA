@@ -63,7 +63,7 @@ class Members extends Component
               ->orWhere('username', 'like', "%{$search}%");
         });
     })
-    ->orderBy('lastname')
+    ->latest()
     ->paginate(10);
 
 return view('components.admin-pages.masterlist.members', [
@@ -339,4 +339,19 @@ return view('components.admin-pages.masterlist.members', [
             UserID: $member->UserID
         );
     }
+
+    public function viewMember($id): void
+{
+    $member = User::find($id);
+
+    if (! $member) {
+        return;
+    }
+
+    $this->dispatch(
+        'open-view-member',
+        UserID: $member->UserID
+    );
+}
+
 }

@@ -22,7 +22,7 @@ class BranchesList extends Component
     protected $rules = [
         'branchCode' => 'required|string|max:20',
         'branchname' => 'required|string|max:150',
-        'type' => 'required|string|max:50',
+       'type' => 'required|in:Branch,Satellite', // Updated to restrict values to Branch or Satellite
         'address' => 'required|string',
         'status' => 'boolean',
         'UserID' => 'nullable|exists:users,UserID',

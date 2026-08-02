@@ -6,7 +6,7 @@ use App\Models\Activation;
 use App\Models\Beneficiary;
 use App\Models\User;
 use App\Models\Wallet;
-use App\Models\Setting; // <-- Make sure to import the Setting model
+use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,6 +20,7 @@ class ActivationModal extends Component
 {
     public bool $open = false;
     public $activationData;
+    public bool $isReactivation = false;
 
     public ?string $rejectionRemarks = null;
     public ?User $selectedUserRecord = null;
@@ -69,6 +70,7 @@ class ActivationModal extends Component
     #[On('open-activation-modal')]
     public function openModal($UserID = null): void
     {
+        $this->isReactivation = false;
         $UserID = $UserID ?? Auth::id();
 
         Log::info('Activation modal opened', [
@@ -83,7 +85,7 @@ class ActivationModal extends Component
         $this->resetValidation();
 
         $this->payment_method = '';
-        $this->amount = $this->getMembershipFee(); // <-- Fetch dynamically here
+        $this->amount = $this->getMembershipFee();
         $this->upline_code = '';
         $this->reference_code = '';
 
@@ -95,6 +97,7 @@ class ActivationModal extends Component
     #[On('open-rejected-activation')]
     public function openRejectedActivation($UserID = null): void
     {
+        $this->isReactivation = true;
         $UserID = $UserID ?? Auth::id();
 
         $this->selectedUserID = $UserID;
@@ -117,7 +120,7 @@ class ActivationModal extends Component
             $this->rejectionRemarks = $history?->remarks;
         }
 
-        $this->amount = $this->getMembershipFee(); // <-- Fetch dynamically here
+        $this->amount = $this->getMembershipFee();
         $this->loadBeneficiaries();
         $this->resetValidation();
 
@@ -141,7 +144,7 @@ class ActivationModal extends Component
             ->latest()
             ->first();
 
-        $this->amount = $this->getMembershipFee(); // <-- Fetch dynamically here
+        $this->amount = $this->getMembershipFee();
         $this->loadBeneficiaries();
 
         $this->open = true;
@@ -234,54 +237,260 @@ class ActivationModal extends Component
             'rejectionRemarks',
         ]);
 
-        $this->amount = $this->getMembershipFee(); // <-- Fetch dynamically here
+        $this->isReactivation = false;
+
+        $this->amount = $this->getMembershipFee();
         $this->resetValidation();
         $this->open = false;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Approve Activation Request
-    |--------------------------------------------------------------------------
-    */
-    public function approveActivation(): void
-    {
-        $activation = Activation::where('UserID', $this->selectedUserID)
+ public function approveActivation($UserID = null): void
+{
+    Log::info('=== APPROVE ACTIVATION STARTED ===', [
+        'received_user_id' => $UserID,
+        'selected_user_id' => $this->selectedUserID,
+    ]);
+
+    // Determine which user to approve
+    $userIdToApprove = $UserID ?? $this->selectedUserID;
+
+    Log::info('User ID to approve', [
+        'user_id_to_approve' => $userIdToApprove,
+    ]);
+
+    // Find activation
+    $activation = Activation::where('UserID', $userIdToApprove)
+        ->latest()
+        ->first();
+
+    Log::info('Activation lookup result', [
+        'found' => $activation !== null,
+        'activation_id' => $activation?->ActivationID,
+        'activation_user_id' => $activation?->UserID,
+        'status' => $activation?->status,
+    ]);
+
+    // Fallback
+    if (! $activation && ! $UserID) {
+        Log::warning('No activation found. Looking for latest pending activation.');
+
+        $activation = Activation::where('status', 'Pending')
             ->latest()
             ->first();
 
-        if (!$activation) {
+        Log::info('Fallback activation result', [
+            'found' => $activation !== null,
+            'activation_id' => $activation?->ActivationID,
+            'activation_user_id' => $activation?->UserID,
+        ]);
+    }
+
+    if (! $activation) {
+        Log::error('Approval failed: activation not found.');
+
+        return;
+    }
+
+    $targetUserID = $activation->UserID;
+
+    Log::info('Target user determined', [
+        'target_user_id' => $targetUserID,
+    ]);
+
+    DB::transaction(function () use ($activation, $targetUserID) {
+
+        Log::info('Updating activation status', [
+            'activation_id' => $activation->ActivationID,
+        ]);
+
+        $activation->update([
+            'status' => 'Approved',
+        ]);
+
+        Log::info('Updating user status to Active', [
+            'user_id' => $targetUserID,
+        ]);
+
+        User::where('UserID', $targetUserID)->update([
+            'status' => 'Active',
+        ]);
+    });
+
+    // Fetch user
+    $user = User::find($targetUserID);
+
+    Log::info('Selected user information', [
+        'user_exists' => $user !== null,
+        'user_id' => $user?->UserID,
+        'username' => $user?->username,
+        'email' => $user?->email,
+    ]);
+
+    // Fetch upline
+    $upline = User::where(
+        'referralCode',
+        $activation->upline_code
+    )->first();
+
+    Log::info('Upline information', [
+        'upline_exists' => $upline !== null,
+        'upline_id' => $upline?->UserID,
+        'upline_username' => $upline?->username,
+        'upline_email' => $upline?->email,
+        'upline_code' => $activation->upline_code,
+    ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Send email to selected user
+    |--------------------------------------------------------------------------
+    */
+
+    if ($user && filled($user->email)) {
+
+        Log::info('Attempting to send approval email to selected user', [
+            'to' => $user->email,
+        ]);
+
+        try {
+
+            Mail::raw(
+                "Congratulations!\n\n" .
+                "Your account has been activated successfully.\n\n" .
+                "You can now log in and access all features.",
+                function ($message) use ($user) {
+                    $message->to($user->email)
+                        ->subject('Account Activated');
+                }
+            );
+
+            Log::info('Approval email sent successfully', [
+                'to' => $user->email,
+            ]);
+
+        } catch (\Throwable $e) {
+
+            Log::error('Failed to send approval email to selected user', [
+                'user_id' => $user->UserID,
+                'email' => $user->email,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
+
+    } else {
+
+        Log::warning('Selected user email missing', [
+            'user_exists' => $user !== null,
+            'email' => $user?->email,
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Send email to upline
+    |--------------------------------------------------------------------------
+    */
+
+    if ($upline && filled($upline->email) && $user) {
+
+        Log::info('Attempting to send email to upline', [
+            'to' => $upline->email,
+        ]);
+
+        try {
+
+            Mail::raw(
+                "Your downline {$user->username} has been approved.",
+                function ($message) use ($upline) {
+                    $message->to($upline->email)
+                        ->subject('Downline Approved');
+                }
+            );
+
+            Log::info('Upline email sent successfully', [
+                'to' => $upline->email,
+            ]);
+
+        } catch (\Throwable $e) {
+
+            Log::error('Failed to send approval email to upline', [
+                'upline_id' => $upline->UserID,
+                'email' => $upline->email,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
+
+    } else {
+
+        Log::warning('Cannot send email to upline', [
+            'upline_exists' => $upline !== null,
+            'email' => $upline?->email,
+        ]);
+    }
+
+    Log::info('=== APPROVE ACTIVATION COMPLETED ===');
+
+    $this->dispatch('activation-approved');
+
+    $this->closeModal();
+}
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reject Activation Request
+    |--------------------------------------------------------------------------
+    */
+    public function rejectActivation($UserID = null): void
+    {
+        // Fallback safely to ensure we always have an ID
+        $userIdToReject = $UserID ?? $this->selectedUserID;
+
+        $activation = Activation::where('UserID', $userIdToReject)
+            ->latest()
+            ->first();
+
+        if (! $activation) {
             return;
         }
 
-        DB::transaction(function () use ($activation) {
-            $activation->update([
-                'status' => 'Approved',
-            ]);
-        });
-
-        Mail::raw(
-            "Congratulations!\n\n" .
-            "Your account has been activated successfully.\n\n" .
-            "You can now log in and access all features.",
-            function ($message) {
-                $user = User::find($this->selectedUserID);
-
-                if ($user && filled($user->email)) {
-                    $message->to($user->email)
-                            ->subject('Account Activated');
-                }
-            }
-        );
-
-        User::where('UserID', $this->selectedUserID)->update([
-            'status' => 'Active',
+        $activation->update([
+            'status' => 'Rejected',
         ]);
 
-        $this->dispatch('activation-approved');
+        $user = User::find($userIdToReject);
+
+        $upline = User::where(
+            'referralCode',
+            $activation->upline_code
+        )->first();
+
+        // Send email to the selected user
+        if ($user && filled($user->email)) {
+            Mail::raw(
+                "Unfortunately, your activation request has been rejected.",
+                function ($message) use ($user) {
+                    $message->to($user->email)
+                        ->subject('Activation Rejected');
+                }
+            );
+        }
+
+        // Send email to the upline
+        if ($upline && filled($upline->email) && $user) {
+            Mail::raw(
+                "The activation request for your downline {$user->username} has been rejected.",
+                function ($message) use ($upline) {
+                    $message->to($upline->email)
+                        ->subject('Downline Activation Rejected');
+                }
+            );
+        }
+
+        $this->dispatch('activation-rejected');
         $this->closeModal();
     }
-
     /*
     |--------------------------------------------------------------------------
     | Submit Activation Process
@@ -305,7 +514,7 @@ class ActivationModal extends Component
         try {
             $this->validate([
                 'payment_method' => ['required', 'in:Cash,GCash,Maya,Bank Transfer'],
-                'amount' => ['required', 'numeric', 'in:' . $membershipFee], // Validate against dynamic fee
+                'amount' => ['required', 'numeric', 'in:' . $membershipFee],
                 'upline_code' => ['required', 'string', 'max:100'],
                 'reference_code' => ['nullable', 'string', 'max:100', 'required_unless:payment_method,Cash'],
                 'beneficiaries' => ['required', 'array', 'max:3'],
@@ -365,26 +574,52 @@ class ActivationModal extends Component
             $isNewActivation = false;
             $adminEmail = config('mail.from.address', 'anfredalbit110525@gmail.com');
 
+            // 1. Save / Update Beneficiaries first so they are fully persisted and captured
             $cleanBeneficiaries = [];
-            foreach ($this->beneficiaries as $b) {
-                if (filled($b['fullname']) || filled($b['birthdate']) || filled($b['relationship'])) {
-                    $cleanBeneficiaries[] = [
-                        'fullname' => $b['fullname'] ?: 'N/A',
-                        'birthdate' => $b['birthdate'] ?: 'N/A',
-                        'relationship' => $b['relationship'] ?: 'N/A',
-                    ];
+            foreach ($this->beneficiaries as $index => $beneficiary) {
+                $fullname = trim($beneficiary['fullname'] ?? '');
+                $birthdate = trim($beneficiary['birthdate'] ?? '');
+                $relationship = trim($beneficiary['relationship'] ?? '');
+
+                if ($fullname === '' && $birthdate === '' && $relationship === '') {
+                    continue;
+                }
+
+                if ($fullname === '' || $birthdate === '' || $relationship === '') {
+                    throw ValidationException::withMessages([
+                        "beneficiaries.$index.fullname" => 'Full name is required.',
+                        "beneficiaries.$index.birthdate" => 'Birthdate is required.',
+                        "beneficiaries.$index.relationship" => 'Relationship is required.',
+                    ]);
+                }
+
+                $cleanBeneficiaries[] = [
+                    'fullname' => $fullname,
+                    'birthdate' => $birthdate,
+                    'relationship' => $relationship,
+                ];
+
+                $existingBeneficiary = Beneficiary::where('UserID', $selectedUser->UserID)
+                    ->where('fullname', $fullname)
+                    ->first();
+
+                if ($existingBeneficiary) {
+                    $existingBeneficiary->update([
+                        'birthdate' => $birthdate,
+                        'relationship' => $relationship,
+                        'status' => true,
+                    ]);
+                } else {
+                    Beneficiary::create([
+                        'BenefitID' => 1,
+                        'UserID' => $selectedUser->UserID,
+                        'fullname' => $fullname,
+                        'birthdate' => $birthdate,
+                        'relationship' => $relationship,
+                        'status' => true,
+                    ]);
                 }
             }
-
-            $mailData = [
-                'selectedUser' => $selectedUser,
-                'currentUser' => $currentUser,
-                'payment_method' => $this->payment_method,
-                'amount' => $membershipFee,
-                'upline_code' => $cleanUplineCode,
-                'reference_code' => $paymentReference,
-                'formattedBeneficiaries' => $cleanBeneficiaries,
-            ];
 
             if ($rejectedActivation) {
                 $rejectedActivation->update([
@@ -422,6 +657,17 @@ class ActivationModal extends Component
                 $adminSubject = 'New Activation Request Submitted (Admin Notice)';
             }
 
+            // 2. Prepare comprehensive mail payload containing all captured details
+            $mailData = [
+                'selectedUser' => $selectedUser,
+                'currentUser' => $currentUser,
+                'payment_method' => $this->payment_method,
+                'amount' => $membershipFee,
+                'upline_code' => $cleanUplineCode,
+                'reference_code' => $paymentReference,
+                'formattedBeneficiaries' => $cleanBeneficiaries,
+            ];
+
             if (filled($selectedUser->email)) {
                 $mailData['emailTitle'] = "Activation Request Status";
                 $mailData['introMessage'] = "Your activation request has been {$actionLabel}. Below are your complete details:";
@@ -449,10 +695,13 @@ class ActivationModal extends Component
                 });
             }
 
-            if ((int) $currentUser->RoleID === 1) {
-                $selectedUser->update([
-                    'status' => 'Active',
-                ]);
+            if ($currentUser && filled($currentUser->email) && $currentUser->UserID !== $selectedUser->UserID) {
+                $mailData['emailTitle'] = "Action Notice: Activation Submission";
+                $mailData['introMessage'] = "You have successfully submitted an activation request for " . $selectedUser->username . ". Here are the details:";
+
+                Mail::send('emails.activation-request', $mailData, function ($message) use ($currentUser) {
+                    $message->to($currentUser->email)->subject('Activation Request Submitted on Behalf');
+                });
             }
 
             if ($isNewActivation) {
@@ -462,45 +711,6 @@ class ActivationModal extends Component
                     'amount' => $activation->amount - 1899,
                     'status' => 'Active',
                 ]);
-            }
-
-            foreach ($this->beneficiaries as $index => $beneficiary) {
-                $fullname = trim($beneficiary['fullname'] ?? '');
-                $birthdate = trim($beneficiary['birthdate'] ?? '');
-                $relationship = trim($beneficiary['relationship'] ?? '');
-
-                if ($fullname === '' && $birthdate === '' && $relationship === '') {
-                    continue;
-                }
-
-                if ($fullname === '' || $birthdate === '' || $relationship === '') {
-                    throw ValidationException::withMessages([
-                        "beneficiaries.$index.fullname" => 'Full name is required.',
-                        "beneficiaries.$index.birthdate" => 'Birthdate is required.',
-                        "beneficiaries.$index.relationship" => 'Relationship is required.',
-                    ]);
-                }
-
-                $existingBeneficiary = Beneficiary::where('UserID', $selectedUser->UserID)
-                    ->where('fullname', $fullname)
-                    ->first();
-
-                if ($existingBeneficiary) {
-                    $existingBeneficiary->update([
-                        'birthdate' => $birthdate,
-                        'relationship' => $relationship,
-                        'status' => true,
-                    ]);
-                } else {
-                    Beneficiary::create([
-                        'BenefitID' => 1,
-                        'UserID' => $selectedUser->UserID,
-                        'fullname' => $fullname,
-                        'birthdate' => $birthdate,
-                        'relationship' => $relationship,
-                        'status' => true,
-                    ]);
-                }
             }
 
             DB::commit();

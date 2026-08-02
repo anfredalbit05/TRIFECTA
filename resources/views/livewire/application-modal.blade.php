@@ -120,7 +120,9 @@
                                 </select>
                             </div>
 {{-- BIRTHDATE WITH FULL YEAR, MONTH, & DAY PICKER --}}
-<div x-data="{
+<div
+   wire:key="birthdate-picker-{{ $userId ?? 'new' }}"
+x-data="{
     openPicker: false,
     step: 'year',
     selectedYear: '2000',
@@ -139,17 +141,27 @@
     get formattedDate() {
         return `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
     },
-    init() {
-        let currentVal = @entangle('birthdate');
-        if(currentVal) {
-            let parts = currentVal.split('-');
-            if(parts.length === 3) {
-                this.selectedYear = parts[0];
-                this.selectedMonth = parts[1];
-                this.selectedDay = parts[2];
-            }
+  init() {
+    this.$watch('$wire.birthdate', (value) => {
+        if (!value) return;
+
+        let parts = value.split('-');
+
+        if (parts.length === 3) {
+            this.selectedYear = parts[0];
+            this.selectedMonth = parts[1];
+            this.selectedDay = parts[2];
         }
-    },
+    });
+
+    if (this.$wire.birthdate) {
+        let parts = this.$wire.birthdate.split('-');
+
+        this.selectedYear = parts[0];
+        this.selectedMonth = parts[1];
+        this.selectedDay = parts[2];
+    }
+},
     confirmDate() {
         let formatted = `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
         @this.set('birthdate', formatted);
@@ -346,39 +358,81 @@
 
                                {{-- BENEFICIARY BIRTHDATE WITH CUSTOM YEAR-GRID PICKER --}}
 {{-- BENEFICIARY BIRTHDATE WITH FULL YEAR, MONTH, & DAY PICKER --}}
-<div x-data="{
+<div
+
+    wire:key="beneficiary-picker-{{ $i }}-{{ $userId ?? 'new' }}"
+x-data="{
+    birthdate: @entangle('beneficiaries.' . $i . '.birthdate'),
+
     openPicker: false,
     step: 'year',
+
     selectedYear: '2000',
     selectedMonth: '01',
     selectedDay: '01',
-    years: Array.from({length: 90}, (_, i) => 2026 - i),
+
+    years: Array.from({ length: 90 }, (_, i) => 2026 - i),
+
     months: [
-        {name: 'January', val: '01'}, {name: 'February', val: '02'}, {name: 'March', val: '03'},
-        {name: 'April', val: '04'}, {name: 'May', val: '05'}, {name: 'June', val: '06'},
-        {name: 'July', val: '07'}, {name: 'August', val: '08'}, {name: 'September', val: '09'},
-        {name: 'October', val: '10'}, {name: 'November', val: '11'}, {name: 'December', val: '12'}
+        { name: 'January', val: '01' },
+        { name: 'February', val: '02' },
+        { name: 'March', val: '03' },
+        { name: 'April', val: '04' },
+        { name: 'May', val: '05' },
+        { name: 'June', val: '06' },
+        { name: 'July', val: '07' },
+        { name: 'August', val: '08' },
+        { name: 'September', val: '09' },
+        { name: 'October', val: '10' },
+        { name: 'November', val: '11' },
+        { name: 'December', val: '12' }
     ],
+
     get daysInMonth() {
-        return Array.from({length: new Date(this.selectedYear, this.selectedMonth, 0).getDate()}, (_, i) => String(i + 1).padStart(2, '0'));
+        return Array.from(
+            {
+                length: new Date(
+                    this.selectedYear,
+                    this.selectedMonth,
+                    0
+                ).getDate()
+            },
+            (_, i) => String(i + 1).padStart(2, '0')
+        );
     },
+
     get formattedDate() {
         return `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
     },
+
     init() {
-        let currentVal = @entangle('beneficiaries.' . $i . '.birthdate');
-        if(currentVal) {
-            let parts = currentVal.split('-');
-            if(parts.length === 3) {
+        this.$watch('birthdate', (value) => {
+            if (typeof value !== 'string') return;
+
+            let parts = value.split('-');
+
+            if (parts.length === 3) {
+                this.selectedYear = parts[0];
+                this.selectedMonth = parts[1];
+                this.selectedDay = parts[2];
+            }
+        });
+
+        if (typeof this.birthdate === 'string') {
+            let parts = this.birthdate.split('-');
+
+            if (parts.length === 3) {
                 this.selectedYear = parts[0];
                 this.selectedMonth = parts[1];
                 this.selectedDay = parts[2];
             }
         }
     },
+
     confirmDate() {
-        let formatted = `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
-        @this.set('beneficiaries.{{ $i }}.birthdate', formatted);
+        this.birthdate =
+            `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
+
         this.openPicker = false;
         this.step = 'year';
     }
@@ -392,7 +446,7 @@
         @click="openPicker = true"
         class="flex w-full cursor-pointer items-center justify-between rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
     >
-        <span x-text="$wire.get('beneficiaries.{{ $i }}.birthdate') || 'Select Birthdate'"></span>
+       <span x-text="birthdate || 'Select Birthdate'"></span>
         <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
         </svg>
@@ -637,28 +691,39 @@
                             Cancel
                         </button>
 
-                        {{-- SUBMIT BUTTON --}}
-                        <button
-                            wire:click="submit"
-                            wire:loading.attr="disabled"
-                            type="button"
-                            @disabled(!$agree)
-                            class="flex w-1/2 items-center justify-center rounded-xl bg-[#D4A017] px-6 py-2.5 text-xs font-bold text-[#0B2A5B] shadow-md transition hover:bg-[#E8B923] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
-                        >
-                            {{-- NORMAL STATE --}}
-                            <span wire:loading.remove wire:target="submit">
-                                Submit Application
-                            </span>
+                <button
+    wire:click="{{ $isEditMode ? 'confirmUpdate' : 'submit' }}"
+    wire:loading.attr="disabled"
+    type="button"
+    @disabled(!$agree && !$isEditMode)
+    class="flex w-1/2 items-center justify-center rounded-xl bg-[#D4A017] px-6 py-2.5 text-xs font-bold text-[#0B2A5B] shadow-md transition hover:bg-[#E8B923] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+>
+    <span
+        wire:loading.remove
+        wire:target="{{ $isEditMode ? 'confirmUpdate' : 'submit' }}"
+    >
+        {{ $isEditMode ? 'Update Member' : 'Submit Application' }}
+    </span>
 
-                            {{-- LOADING STATE --}}
-                            <div wire:loading.flex wire:target="submit" class="items-center justify-center gap-2">
-                                <svg class="h-4 w-4 shrink-0 animate-spin text-[#0B2A5B]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <span class="whitespace-nowrap">Submitting...</span>
-                            </div>
-                        </button>
+    <div
+        wire:loading.flex
+        wire:target="{{ $isEditMode ? 'confirmUpdate' : 'submit' }}"
+        class="items-center justify-center gap-2"
+    >
+        <svg
+            class="h-4 w-4 shrink-0 animate-spin text-[#0B2A5B]"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+        >
+            ...
+        </svg>
+
+        <span class="whitespace-nowrap">
+            {{ $isEditMode ? 'Updating...' : 'Submitting...' }}
+        </span>
+    </div>
+</button>
                     </div>
                 </div>
 
@@ -669,22 +734,39 @@
     @endif
 
 
-    <script>
+  <script>
     let map = null;
     let marker = null;
 
     document.addEventListener('livewire:initialized', () => {
 
+        Livewire.on('destroy-map', () => {
+
+            if (map) {
+                map.remove();
+                map = null;
+                marker = null;
+            }
+
+        });
+
         Livewire.on('map-opened', (data) => {
 
             setTimeout(() => {
 
+                const defaultLat = 7.442294461028405;
+                const defaultLng = 125.81370503321095;
+
+                const lat = data.latitude ?? defaultLat;
+                const lng = data.longitude ?? defaultLng;
+
                 if (map) {
-                    map.invalidateSize();
-                    return;
+                    map.remove();
+                    map = null;
+                    marker = null;
                 }
 
-                map = L.map('map').setView([15.4861, 120.9666], 13);
+                map = L.map('map').setView([lat, lng], 15);
 
                 L.tileLayer(
                     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -693,25 +775,16 @@
                     }
                 ).addTo(map);
 
-                // Restore marker if coordinates already exist
+                if (
+                    data.latitude !== null &&
+                    data.longitude !== null
+                ) {
+                    marker = L.marker([lat, lng]).addTo(map);
 
-                if (data.latitude && data.longitude) {
-
-                    marker = L.marker([
-                        data.latitude,
-                        data.longitude
-                    ]).addTo(map);
-
-                    map.setView([
-                        data.latitude,
-                        data.longitude
-                    ], 16);
+                    map.setView([lat, lng], 16);
                 }
 
                 map.on('click', function (e) {
-
-                    const lat = e.latlng.lat;
-                    const lng = e.latlng.lng;
 
                     if (marker) {
                         marker.setLatLng(e.latlng);
@@ -720,10 +793,15 @@
                     }
 
                     Livewire.dispatch('set-coordinates', {
-                        lat: lat,
-                        lng: lng
+                        lat: e.latlng.lat,
+                        lng: e.latlng.lng
                     });
+
                 });
+
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 100);
 
             }, 300);
 

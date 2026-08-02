@@ -10,8 +10,6 @@ class Beneficiary extends Model
 
     protected $fillable = [
 
-        'BenefitID',
-
         'UserID',
 
         'fullname',
@@ -33,12 +31,5 @@ class Beneficiary extends Model
         );
     }
 
-    public function benefit()
-    {
-        return $this->belongsTo(
-            Benefit::class,
-            'BenefitID',
-            'BentID'
-        );
-    }
+
 }

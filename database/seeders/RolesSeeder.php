@@ -21,7 +21,7 @@ class RolesSeeder extends Seeder
                 'updated_at'  => now(),
             ],
             [
-                'rolename'   => 'Administrator',
+                'rolename'   => 'CEO',
                 'description'=> 'Manages users, modules, and system settings.',
                 'status'      => true,
                 'created_at'  => now(),

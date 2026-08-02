@@ -125,6 +125,7 @@
     </div>
 
     <livewire:admin-pages.masterlist.activation-review-modal />
+    <livewire:view-member-modal />
 
 </div>
 

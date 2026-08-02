@@ -31,9 +31,15 @@
             </a>
 
             <a href="#"
-               @click.prevent="tab='members'"
-               :class="tab === 'members' ? 'active' : ''">
-                Members
+               @click.prevent="tab='my-dashboard'"
+               :class="tab === 'my-dashboard' ? 'active' : ''">
+                My Dashboard
+            </a>
+
+            <a href="#"
+               @click.prevent="tab='all-users'"
+               :class="tab === 'all-users' ? 'active' : ''">
+                All Users
             </a>
 
 
@@ -48,17 +54,27 @@
                 x-cloak
                 class="dashboard-main-card full-width-card">
 
-            <x-admin-pages.dashboard.overview />
+           <livewire:admin-pages.dashboard.overview-analytics />
 
         </div>
 
         <!-- MEMBERS -->
         <div
-            x-show="tab === 'members'"
+            x-show="tab === 'my-dashboard'"
             x-cloak
             class="dashboard-main-card full-width-card">
 
-            <x-admin-pages.dashboard.members />
+             <livewire:member-pages.dashboard.news-updates />
+
+        </div>
+
+          <!-- MEMBERS -->
+        <div
+            x-show="tab === 'all-users'"
+            x-cloak
+            class="dashboard-main-card full-width-card">
+
+             <livewire:admin-pages.dashboard.all-users />
 
         </div>
 

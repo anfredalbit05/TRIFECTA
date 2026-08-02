@@ -599,10 +599,6 @@
                         No FAQs available.
                     </h3>
 
-                    <p class="hiw-faq-answer">
-                        Please check back later.
-                    </p>
-
                 </div>
 
             @endforelse

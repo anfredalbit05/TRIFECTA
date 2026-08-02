@@ -31,7 +31,6 @@ class LoginModal extends Component
         ]);
 
         $this->resetValidation();
-
         $this->openLogin = false;
     }
 
@@ -46,6 +45,12 @@ class LoginModal extends Component
             'password.required' => 'Please enter your password.',
         ]);
 
+        // Trigger loading SweetAlert on frontend
+        $this->dispatch('swal:loading');
+
+        // Add a small artificial pause (e.g., ~1.5 to 3 seconds) to let users see the loading state smoothly
+        usleep(1500000); // 1.5 seconds delay
+
         // 2. Find account using email, mobile number, or username
         $user = User::where('email', $this->email)
             ->orWhere('contactno', $this->email)
@@ -53,44 +58,33 @@ class LoginModal extends Component
             ->first();
 
         if (!$user) {
+            $this->dispatch('swal:close');
             $this->addError('email', 'Account not found.');
             return;
         }
 
         // 3. Verify password
         if (!Hash::check($this->password, $user->password)) {
+            $this->dispatch('swal:close');
             $this->addError('password', 'Incorrect password.');
             return;
         }
 
-        // Optional: Check account status if enabled
-        // if ($user->status !== 'Active') {
-        //     $this->addError('email', 'Your account is currently inactive.');
-        //     return;
-        // }
-
         // 4. Authenticate user session
         Auth::login($user, $this->remember);
-
         session()->regenerate();
 
-        // 5. Reset inputs & close modal
+        // 5. Reset inputs & close modal view backdrop
         $this->reset([
             'email',
             'password',
             'remember',
         ]);
-
         $this->resetValidation();
-
         $this->openLogin = false;
 
-        // if ($user->RoleID == 1) {
-        //     return $this->redirect(route('home'), navigate: true);
-        // }
-
-         return $this->redirect(route('home'), navigate: true);
-        // return redirect()->route('dashboard');
+        // Trigger success SweetAlert with message (displays for 3 seconds then redirects)
+        $this->dispatch('swal:success', message: 'Welcome back, ' . ($user->name ?? $user->firstname) . '!');
     }
 
     public function switchToRegister()

@@ -77,7 +77,7 @@
                                 <button
                                     wire:click="confirmDeleteBranch({{ $branch->BranchID }})"
                                     title="Delete Branch"
-                                    class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition cursor-pointer text-xs font-semibold shadow">
+                                    class="inline-flex items-center justify-center px-3 py-2 rounded-lg  border-amber-400 bg-amber-500 text-white hover:bg-amber-500 transition cursor-pointer text-xs font-semibold shadow">
                                     🗑️
                                 </button>
                             </div>
@@ -133,12 +133,16 @@
                             @error('branchname') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
-                        <!-- Type -->
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Type</label>
-                            <input type="text" wire:model="type" placeholder="e.g., Main, Satellite" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]">
-                            @error('type') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                        </div>
+<!-- Type -->
+<div>
+    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Type</label>
+    <select wire:model="type" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white">
+        <option value="">Select Type</option>
+        <option value="Branch">Branch</option>
+        <option value="Satellite">Satellite</option>
+    </select>
+    @error('type') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+</div>
 
                         <!-- Address -->
                         <div>
@@ -177,7 +181,7 @@
                 text: "You won't be able to revert this!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
+                confirmButtonColor: '#E5B83B',
                 cancelButtonColor: '#6b7280',
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {

@@ -1,29 +1,29 @@
 <div>
     @if($open)
-        <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-3 sm:p-4 backdrop-blur-sm overflow-y-auto">
+        <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-2 sm:p-4 backdrop-blur-sm overflow-y-auto">
             <!-- MODAL CONTAINER -->
-            <div class="bg-white rounded-2xl w-full max-w-4xl my-auto max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden">
+            <div class="bg-white rounded-2xl w-full max-w-4xl my-auto max-h-[92vh] sm:max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden">
 
                 <!-- =====================================================
-                     HEADER
+                    HEADER
                 ====================================================== -->
-                <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200 sticky top-0 bg-white z-10 shadow-sm">
-                    <div>
-                        <h2 class="font-extrabold text-lg sm:text-xl text-[#0B2A5B]">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 sm:px-6 py-4 border-b border-slate-200 sticky top-0 bg-white z-10 shadow-sm">
+                    <div class="w-full sm:w-auto">
+                        <h2 class="font-extrabold text-base sm:text-xl text-[#0B2A5B]">
                             Account Activation
                         </h2>
-                        <p class="mt-1 text-xs text-slate-500">
+                        <p class="mt-0.5 text-[11px] sm:text-xs text-slate-500">
                             Dayongan Solidaritas • Membership Activation
                         </p>
-                        <div class="mt-3 inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2">
-                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-[#0B2A5B] text-xs font-bold text-[#E8B923]">
+                        <div class="mt-3 flex items-center gap-2.5 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2">
+                            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0B2A5B] text-xs font-bold text-[#E8B923]">
                                 {{ strtoupper(substr($selectedUserRecord?->firstname ?? 'M', 0, 1)) }}
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                                     Activating Member
                                 </p>
-                                <p class="text-sm font-extrabold text-[#0B2A5B]">
+                                <p class="text-xs sm:text-sm font-extrabold text-[#0B2A5B] truncate">
                                     {{ trim(($selectedUserRecord?->firstname ?? '') . ' ' . ($selectedUserRecord?->middlename ?? '') . ' ' . ($selectedUserRecord?->lastname ?? '')) ?: 'Member not selected' }}
                                 </p>
                             </div>
@@ -33,52 +33,37 @@
                     <button
                         wire:click="closeModal"
                         type="button"
-                        class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-rose-100 hover:text-rose-600 font-bold transition">
+                        class="absolute top-4 right-4 sm:relative sm:top-0 sm:right-0 w-9 h-9 shrink-0 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-rose-100 hover:text-rose-600 font-bold transition">
                         ✕
                     </button>
                 </div>
 
                 <!-- =====================================================
-                     MODAL BODY
+                    MODAL BODY
                 ====================================================== -->
                 <div class="p-4 sm:p-6 space-y-6 overflow-y-auto">
 
-                       <!-- =================================================
-                         REMARKS
-                    ================================================== -->
-
-                    <section class="space-y-4">
-
-                       <!-- =================================================
+                    <!-- =================================================
                         REMARKS
                     ================================================== -->
-
                     @if(!empty($rejectionRemarks))
-
-    <section class="space-y-4">
-
-        <h3 class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
-            Reason For Rejections
-        </h3>
-
-        <div class="rounded-xl border border-red-200 bg-red-50 p-4">
-
-            <p class="mt-2 text-sm text-red-600">
-                {{ $rejectionRemarks }}
-            </p>
-
-        </div>
-
-    </section>
-
-@endif
-                    </section>
+                        <section class="space-y-4">
+                            <h3 class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
+                                Reason For Rejections
+                            </h3>
+                            <div class="rounded-xl border border-red-200 bg-red-50 p-4">
+                                <p class="text-xs sm:text-sm text-red-600">
+                                    {{ $rejectionRemarks }}
+                                </p>
+                            </div>
+                        </section>
+                    @endif
 
                     <!-- =================================================
-                         BENEFICIARY INFORMATION
+                        BENEFICIARY INFORMATION
                     ================================================== -->
                     <section class="space-y-4">
-                        <h3 class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm flex items-center justify-between">
+                        <h3 class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                             <span>Beneficiary Information</span>
                             <span class="text-[10px] font-normal text-slate-200 uppercase">Maximum 3 Dependents</span>
                         </h3>
@@ -87,7 +72,7 @@
                             @foreach($beneficiaries as $index => $beneficiary)
                                 <div class="p-3 sm:p-4 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <!-- FULL NAME -->
-                                    <div>
+                                    <div class="sm:col-span-2">
                                         <label class="block text-xs font-bold text-slate-700 mb-1">
                                             Beneficiary {{ $index + 1 }} Full Name
                                         </label>
@@ -95,7 +80,7 @@
                                             wire:model="beneficiaries.{{ $index }}.fullname"
                                             type="text"
                                             placeholder="Full name of beneficiary"
-                                            class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none bg-white">
+                                            class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none bg-white">
                                         @error("beneficiaries.$index.fullname")
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                         @enderror
@@ -109,14 +94,14 @@
                                         <input
                                             wire:model="beneficiaries.{{ $index }}.birthdate"
                                             type="date"
-                                            class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none bg-white">
+                                            class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none bg-white">
                                         @error("beneficiaries.$index.birthdate")
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>
 
                                     <!-- RELATIONSHIP -->
-                                    <div class="sm:col-span-2">
+                                    <div>
                                         <label class="block text-xs font-bold text-slate-700 mb-1">
                                             Relationship
                                         </label>
@@ -124,7 +109,7 @@
                                             wire:model="beneficiaries.{{ $index }}.relationship"
                                             type="text"
                                             placeholder="Mother, Father, Spouse..."
-                                            class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none bg-white">
+                                            class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none bg-white">
                                         @error("beneficiaries.$index.relationship")
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                         @enderror
@@ -135,7 +120,7 @@
                     </section>
 
                     <!-- =================================================
-                         PAYMENT INFORMATION
+                        PAYMENT INFORMATION
                     ================================================== -->
                     <section class="space-y-5">
                         <h3 class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
@@ -150,12 +135,12 @@
 
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <!-- CASH -->
-                                <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-300 rounded-xl hover:border-[#0B2A5B] hover:bg-slate-50 transition">
+                                <label class="flex items-center gap-3 cursor-pointer p-3.5 bg-white border border-slate-300 rounded-xl hover:border-[#0B2A5B] hover:bg-slate-50 transition">
                                     <input
                                         type="radio"
                                         wire:model.live="payment_method"
                                         value="Cash"
-                                        class="w-4 h-4 text-[#0B2A5B]">
+                                        class="w-4 h-4 text-[#0B2A5B] shrink-0">
                                     <div>
                                         <span class="block text-sm font-bold text-slate-700">Cash</span>
                                         <span class="block text-[11px] text-slate-500">Walk-in Payment</span>
@@ -163,12 +148,12 @@
                                 </label>
 
                                 <!-- GCASH -->
-                                <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-300 rounded-xl hover:border-[#0B2A5B] hover:bg-slate-50 transition">
+                                <label class="flex items-center gap-3 cursor-pointer p-3.5 bg-white border border-slate-300 rounded-xl hover:border-[#0B2A5B] hover:bg-slate-50 transition">
                                     <input
                                         type="radio"
                                         wire:model.live="payment_method"
                                         value="GCash"
-                                        class="w-4 h-4 text-[#0B2A5B]">
+                                        class="w-4 h-4 text-[#0B2A5B] shrink-0">
                                     <div>
                                         <span class="block text-sm font-bold text-slate-700">GCash</span>
                                         <span class="block text-[11px] text-slate-500">Online Payment</span>
@@ -176,12 +161,12 @@
                                 </label>
 
                                 <!-- BANK TRANSFER -->
-                                <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-300 rounded-xl hover:border-[#0B2A5B] hover:bg-slate-50 transition">
+                                <label class="flex items-center gap-3 cursor-pointer p-3.5 bg-white border border-slate-300 rounded-xl hover:border-[#0B2A5B] hover:bg-slate-50 transition">
                                     <input
                                         type="radio"
                                         wire:model.live="payment_method"
                                         value="Bank Transfer"
-                                        class="w-4 h-4 text-[#0B2A5B]">
+                                        class="w-4 h-4 text-[#0B2A5B] shrink-0">
                                     <div>
                                         <span class="block text-sm font-bold text-slate-700">Bank Transfer</span>
                                         <span class="block text-[11px] text-slate-500">Online Payment</span>
@@ -205,7 +190,7 @@
                                     wire:model="amount"
                                     readonly
                                     type="text"
-                                    class="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-700">
+                                    class="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5 text-sm text-slate-700">
                             </div>
 
                             <!-- REFERRAL CODE -->
@@ -217,7 +202,7 @@
                                     wire:model="upline_code"
                                     type="text"
                                     placeholder="Enter upline code"
-                                    class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                                    class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
                                 @error('upline_code')
                                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                 @enderror
@@ -228,7 +213,7 @@
                         @if($payment_method === 'Cash')
                             <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
                                 <p class="text-sm font-bold text-amber-800">Cash Payment — Walk-in</p>
-                                <p class="mt-1 text-xs text-amber-700">Please pay the ₱1,900 activation fee at the authorized office or designated payment location.</p>
+                                <p class="mt-1 text-xs text-amber-700">Please pay the ₱1,999 activation fee at the authorized office or designated payment location.</p>
                                 <p class="mt-2 text-[11px] text-amber-600">Your activation will be recorded as Walk-in (W).</p>
                             </div>
                         @endif
@@ -249,7 +234,7 @@
                                         wire:model="reference_code"
                                         type="text"
                                         placeholder="Enter GCash or bank transaction reference"
-                                        class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                                        class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
                                     @error('reference_code')
                                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                     @enderror
@@ -261,32 +246,32 @@
                     </section>
 
                     <!-- =================================================
-                         CONFIRMATION
+                        CONFIRMATION
                     ================================================== -->
                     <section class="space-y-3">
                         <h3 class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
                             Confirmation
                         </h3>
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-600">
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs sm:text-sm text-slate-600">
                             Please verify all beneficiary information and payment details before activating your account.
                         </div>
                     </section>
                 </div>
 
                 <!-- =====================================================
-                     FOOTER
+                    FOOTER
                 ====================================================== -->
                 <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <span class="text-xs text-slate-500">
+                    <span class="text-xs text-slate-500 text-center sm:text-left">
                         * Activation fee is fixed at ₱1,999
                     </span>
 
-                    <div class="flex gap-3 w-full sm:w-auto">
+                    <div class="flex flex-col-reverse sm:flex-row gap-2.5 w-full sm:w-auto">
                         <!-- CANCEL BUTTON -->
                         <button
                             wire:click="closeModal"
                             type="button"
-                            class="w-1/2 sm:w-auto px-5 py-2.5 border border-slate-300 rounded-xl text-slate-600 text-xs font-bold hover:bg-slate-100 transition">
+                            class="w-full sm:w-auto px-5 py-2.5 border border-slate-300 rounded-xl text-slate-600 text-xs font-bold hover:bg-slate-100 transition">
                             Cancel
                         </button>
 
@@ -295,9 +280,9 @@
                             type="button"
                             wire:click="confirmActivate"
                             wire:loading.attr="disabled"
-                            class="w-1/2 sm:w-auto px-6 py-2.5 bg-[#D4A017] hover:bg-[#E8B923] text-[#0B2A5B] font-bold text-xs rounded-xl shadow-md transition">
+                            class="w-full sm:w-auto px-6 py-2.5 bg-[#D4A017] hover:bg-[#E8B923] text-[#0B2A5B] font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center">
                             <span wire:loading.remove wire:target="confirmActivate">
-                                Activate Account
+                                {{ $isReactivation ? 'Reactivate Account' : 'Activate Account' }}
                             </span>
                             <span wire:loading wire:target="confirmActivate">
                                 Processing...
@@ -323,7 +308,6 @@
             allowOutsideClick: false
         }).then((result) => {
             if (result.isConfirmed) {
-                // Show loading spinner immediately upon confirmation
                 Swal.fire({
                     title: 'Processing Activation...',
                     text: 'Please wait while we process your request.',

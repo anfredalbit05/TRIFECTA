@@ -28,7 +28,7 @@
 
                     <!-- Email Input -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Email or Mobile Number</label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Email or Username or Mobile Number</label>
                         <input
                             wire:model="email"
                             type="text"
@@ -73,7 +73,7 @@
                             Sign In
                         </span>
 
-                        <!-- Loading State (Forced Flex Layout on Trigger) -->
+                        <!-- Loading State -->
                         <div wire:loading.flex wire:target="login" class="items-center justify-center gap-2">
                             <svg class="animate-spin h-4 w-4 text-white shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -107,4 +107,43 @@
 
         </div>
     @endif
+
+    <!-- SweetAlert Listeners Script -->
+    @script
+    <script>
+        $wire.on('swal:loading', () => {
+            Swal.fire({
+                title: 'Signing In...',
+                text: 'Please wait while we verify your account.',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        });
+
+        $wire.on('swal:close', () => {
+            Swal.close();
+        });
+
+        $wire.on('swal:success', (event) => {
+            const message = event.message || event[0]?.message || 'Login successful!';
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: message,
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then(() => {
+                Livewire.navigate('{{ route('home') }}');
+            });
+        });
+    </script>
+    @endscript
 </div>

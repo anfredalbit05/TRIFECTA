@@ -45,7 +45,103 @@
 
     @livewireScripts
 
+    <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+document.addEventListener('livewire:init', () => {
+
+    // SUBMIT APPLICATION
+    Livewire.on('swal-confirm-submission', () => {
+
+        Swal.fire({
+            title: 'Save Application?',
+            text: 'Are you sure you want to submit this application?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, submit it!',
+            confirmButtonColor: '#0B2A5B',
+            cancelButtonColor: '#d33'
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                Swal.fire({
+                    title: 'Submitting...',
+                    text: 'Please wait.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                Livewire.dispatch('confirmed-save-application');
+            }
+
+        });
+
+    });
+
+    // UPDATE MEMBER
+    Livewire.on('swal-confirm-update', () => {
+
+        Swal.fire({
+            title: 'Update Member?',
+            text: 'Are you sure you want to update this member?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update it!',
+            confirmButtonColor: '#0B2A5B',
+            cancelButtonColor: '#d33'
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                Swal.fire({
+                    title: 'Updating...',
+                    text: 'Please wait.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                Livewire.dispatch('confirmed-update-member');
+            }
+
+        });
+
+    });
+
+    // CLOSE LOADING
+    Livewire.on('swal-close', () => {
+        Swal.close();
+    });
+
+    // SUCCESS ALERT
+    Livewire.on('show-success-after-close', (event) => {
+
+        const data = Array.isArray(event) ? event[0] : event;
+
+        Swal.fire({
+            icon: 'success',
+            title: data.title,
+            text: data.text,
+            confirmButtonColor: '#0B2A5B'
+        });
+
+    });
+
+});
+</script>
+
 
 </body>
 </html>

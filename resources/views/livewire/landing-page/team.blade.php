@@ -329,9 +329,6 @@
 
                     <div class="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl"></div>
 
-                    <!-- vertical line -->
-
-                    <div class="absolute left-0 top-20 h-40 w-1 bg-yellow-500"></div>
 
                     <!-- image -->
 
