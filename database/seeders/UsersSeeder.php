@@ -30,11 +30,43 @@ class UsersSeeder extends Seeder
 
             // Super Administrator
             [
-                'username' => 'superadmin',
-                'password' => Hash::make('Admin@2026'),
+                'username' => 'sysadmin.ebs',
+                'password' => Hash::make('Admin@c0nf3d3nt!47'),
 
                 'lastname' => 'Administrator',
                 'firstname' => 'Super',
+                'middlename' => null,
+
+                'birthdate' => '1992-07-01',
+
+                'contactno' => '09978251816',
+                'address' => 'Head Office',
+
+                'email' => 'dtechmsolution@gmail.com',
+                'email_verified_at' => now(),
+
+                'profilepic' => 'profiles/default-avatar.png',
+
+                'referralCode' => strtoupper(Str::random(8)),
+                'uplineCode' => null,
+
+                'branchCode' => null,
+
+                'RoleID' => $superAdminRoleId,
+
+                'status' => 'Active',
+
+                'remember_token' => null,
+
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'username' => 'sysadmin.albit',
+                'password' => Hash::make('Admin@2026'),
+
+                'lastname' => 'Albit',
+                'firstname' => 'Anfrid',
                 'middlename' => null,
 
                 'birthdate' => '1990-01-01',
@@ -42,7 +74,7 @@ class UsersSeeder extends Seeder
                 'contactno' => '09123456789',
                 'address' => 'Head Office',
 
-                'email' => 'dtechmsolution@gmail.com',
+                'email' => 'anfredalbit110525@gmail.com',
                 'email_verified_at' => now(),
 
                 'profilepic' => 'profiles/default-avatar.png',
