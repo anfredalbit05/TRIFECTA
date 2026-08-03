@@ -15,11 +15,25 @@ return new class extends Migration
 
             $table->id('TransactionID');
 
-            $table->unsignedBigInteger('RefID');
+            $table->unsignedBigInteger('RefID'); //Membership Fee
 
             $table->decimal('amount', 12, 2);
 
-            $table->string('Source', 100);
+            $table->enum('Source', [
+                'MF', // Membership Fee
+                'DR', // Direct Referral
+                'OV', // Overrides
+                'CL', // Claim
+                'RF', // Refund
+                'OT', // Others
+            ])->default('OT');
+
+
+
+            $table->foreignId('ActivationID')
+                ->constrained('activations', 'ActivationID')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
 
             $table->enum('status', [
                 'Pending',
