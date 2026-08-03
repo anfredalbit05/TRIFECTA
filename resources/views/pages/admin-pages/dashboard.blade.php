@@ -36,12 +36,13 @@
                 My Dashboard
             </a>
 
+              @if(auth()->user()->RoleID == 1)
             <a href="#"
                @click.prevent="tab='all-users'"
                :class="tab === 'all-users' ? 'active' : ''">
                 All Users
             </a>
-
+              @endif
 
         </div>
 

@@ -7,15 +7,25 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Layout;
 use App\Models\Context;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 #[Layout('layouts.app')]
 class Home extends Component
 {
     public array $contexts = [];
 
+    public ?string $referralCode = null;
+
     public function mount()
     {
         $this->loadContexts();
+
+        $this->referralCode = request()->query('ref');
+
+        Log::info('Referral code detected', [
+            'referralCode' => $this->referralCode,
+            'url' => request()->fullUrl(),
+        ]);
     }
 
     public function loadContexts()
@@ -34,11 +44,11 @@ class Home extends Component
 
     public function render()
     {
-        // Query total registered users (or filter by status/RoleID if required, e.g. ->where('status', 'Active'))
         $totalMembers = User::count();
 
         return view('livewire.landing-page.home', [
             'totalMembers' => $totalMembers,
+            'referralCode' => $this->referralCode,
         ]);
     }
 }

@@ -30,10 +30,11 @@ return new class extends Migration
 
 
 
-            $table->foreignId('ActivationID')
-                ->constrained('activations', 'ActivationID')
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
+        $table->foreignId('ActivationID')
+            ->nullable()
+            ->constrained('activations', 'ActivationID')
+            ->cascadeOnUpdate()
+            ->cascadeOnDelete();
 
             $table->enum('status', [
                 'Pending',

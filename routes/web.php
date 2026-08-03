@@ -34,6 +34,15 @@ Route::get('/news', NewsUpdates::class)->name('news');
 
 Route::get('/contact', Contact::class)->name('contact');
 
+Route::get('/register/{referralCode}', function ($referralCode) {
+
+    return redirect()->route(
+        'home',
+        ['ref' => $referralCode]
+    );
+
+})->name('register.referral');
+
 /*
 |--------------------------------------------------------------------------
 | Member Dashboard

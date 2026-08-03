@@ -7,6 +7,7 @@ use App\Models\Beneficiary;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Ledger;
+use App\Models\MembershipFee;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
@@ -119,16 +120,43 @@ class ActivationReviewModal extends Component
 
             /*
             |--------------------------------------------------------------------------
+            | Record Membership Fees (MF) into Ledger for the Activated User
+            |--------------------------------------------------------------------------
+            */
+            $membershipFees = MembershipFee::all();
+
+            foreach ($membershipFees as $fee) {
+                // Skip Direct Referral and Overrides from individual fee ledger records if handled via multi-tier loop,
+                // or include them if every item from membership_fees should be individually logged for the user.
+                // Based on your seeder, we will loop through all membership fees and insert them with Source 'MF'.
+
+                Ledger::create([
+                    'RefID'        => $this->selectedUserID,
+                    'amount'       => $fee->Cost,
+                    'Source'       => 'MF', // Membership Fee
+                    'ActivationID' => $this->activation->ActivationID,
+                    'status'       => 'Completed',
+                ]);
+
+                Log::info("Membership Fee ledger entry [{$fee->FeeName}] written for UserID: {$this->selectedUserID} with amount: {$fee->Cost}");
+            }
+
+            /*
+            |--------------------------------------------------------------------------
             | Multi-Tier Referral Commission Structure (6 Levels)
+            | Dynamic rates fetched from membership_fees table
             |--------------------------------------------------------------------------
             */
             $currentUplineCode = $this->activation->upline_code;
             $level = 1;
             $maxLevels = 6;
 
+            $drFee = MembershipFee::where('FeeName', 'Direct Referral')->value('Cost') ?? 400.00;
+            $ovFee = MembershipFee::where('FeeName', 'Overrides')->value('Cost') ?? 150.00;
+
             $commissionRates = [
-                1 => 400.00,
-                2 => 50.00,
+                1 => (float) $drFee,
+                2 => (float) $ovFee,
                 3 => 40.00,
                 4 => 30.00,
                 5 => 20.00,
@@ -150,24 +178,24 @@ class ActivationReviewModal extends Component
                 Log::info("Processing Level {$level}: Upline UserID {$uplineUser->UserID}, Commission: {$commissionAmount}");
 
                 if ($commissionAmount > 0) {
-                    // Determine source code: 'DC' for Level 1 (Direct Owner), 'O' for Levels 2-6 (Override)
                     $sourceType = ($level === 1) ? 'DR' : 'OV';
 
-                    // Create Wallet Entry with Source (DC or O)
+                    // Create Wallet Entry for Upline
                     Wallet::create([
                         'UserID'       => $uplineUser->UserID,
                         'ActivationID' => $this->activation->ActivationID,
                         'amount'       => $commissionAmount,
-                        'source'       => $sourceType, // Added DC / O
+                        'source'       => $sourceType,
                         'status'       => 'Active',
                     ]);
 
-                    // Create Ledger Entry
+                    // Create Ledger Entry for Upline Commission/Override
                     Ledger::create([
-                        'RefID'  => $uplineUser->UserID,
-                        'amount' => $commissionAmount,
-                        'Source' => "Level {$level} Referral Commission [{$sourceType}] (Activation ID: {$this->activation->ActivationID})",
-                        'status' => 'Completed',
+                        'RefID'        => $uplineUser->UserID,
+                        'amount'       => $commissionAmount,
+                        'Source'       => $sourceType,
+                        'ActivationID' => $this->activation->ActivationID,
+                        'status'       => 'Completed',
                     ]);
 
                     Log::info("Ledger & Wallet successfully written for UserID: {$uplineUser->UserID} at Level {$level} as type [{$sourceType}] with amount: {$commissionAmount}");
