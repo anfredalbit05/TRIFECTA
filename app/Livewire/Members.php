@@ -94,8 +94,8 @@ class Members extends Component
 
     public function render()
     {
-        $members = User::query()
-            ->where('RoleID', '!=', 1)
+       $members = User::query()
+       ->where('RoleID', 4)
             ->withExists([
                 'activations as has_pending_activation' => function ($query) {
                     $query->where('status', 'Pending');

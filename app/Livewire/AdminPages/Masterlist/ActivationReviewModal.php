@@ -116,15 +116,28 @@ class ActivationReviewModal extends Component
 
             /*
             |--------------------------------------------------------------------------
-            | Multi-Tier Referral Commission Structure
+            | Multi-Tier Referral Commission Structure (6 Levels)
             |--------------------------------------------------------------------------
-            | - Level 1 (Direct Upline): 400
-            | - Levels 2 to 5 (Indirect Uplines): 50 each
-            | - Level 6+: 0 (Loop stops completely)
+            | - Level 1: 400
+            | - Level 2: 50
+            | - Level 3: 40
+            | - Level 4: 30
+            | - Level 5: 20
+            | - Level 6: 10
+            | - Level 7+: 0 (Loop stops completely)
             */
             $currentUplineCode = $this->activation->upline_code;
             $level = 1;
-            $maxLevels = 5;
+            $maxLevels = 6;
+
+            $commissionRates = [
+                1 => 400.00,
+                2 => 50.00,
+                3 => 40.00,
+                4 => 30.00,
+                5 => 20.00,
+                6 => 10.00,
+            ];
 
             while ($currentUplineCode && $level <= $maxLevels) {
                 $uplineUser = User::where('referralCode', $currentUplineCode)->first();
@@ -133,16 +146,18 @@ class ActivationReviewModal extends Component
                     break;
                 }
 
-                $commissionAmount = ($level === 1) ? 400.00 : 50.00;
+                $commissionAmount = $commissionRates[$level] ?? 0.00;
 
-                Wallet::create([
-                    'UserID'       => $uplineUser->UserID,
-                    'ActivationID' => $this->activation->ActivationID,
-                    'amount'       => $commissionAmount,
-                    'status'       => 'Active',
-                ]);
+                if ($commissionAmount > 0) {
+                    Wallet::create([
+                        'UserID'       => $uplineUser->UserID,
+                        'ActivationID' => $this->activation->ActivationID,
+                        'amount'       => $commissionAmount,
+                        'status'       => 'Active',
+                    ]);
 
-                Log::info("Admin Review: Level {$level} commission of {$commissionAmount} awarded to User ID: {$uplineUser->UserID}");
+                    Log::info("Admin Review: Level {$level} commission of {$commissionAmount} awarded to User ID: {$uplineUser->UserID}");
+                }
 
                 $currentUplineCode = $uplineUser->upline_code ?? null;
                 $level++;

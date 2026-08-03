@@ -5,7 +5,6 @@ namespace App\Livewire\MemberPages\MyProfile;
 use App\Models\Activation;
 use App\Models\Beneficiary;
 use App\Models\User;
-use App\Models\Wallet;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +14,6 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use App\Models\ActivationHistory;
 use Illuminate\Support\Facades\Mail;
-use App\Livewire\Members;
 
 class ActivationModal extends Component
 {
@@ -304,41 +302,6 @@ class ActivationModal extends Component
             User::where('UserID', $targetUserID)->update([
                 'status' => 'Active',
             ]);
-
-            /*
-            |--------------------------------------------------------------------------
-            | Multi-Tier Referral Commission Structure
-            |--------------------------------------------------------------------------
-            | - Level 1 (Direct Upline): 400
-            | - Levels 2 to 5 (Indirect Uplines): 50 each
-            | - Level 6+: 0 (Loop stops completely)
-            */
-
-            $currentUplineCode = $activation->upline_code;
-            $level = 1;
-            $maxLevels = 5;
-
-            while ($currentUplineCode && $level <= $maxLevels) {
-                $uplineUser = User::where('referralCode', $currentUplineCode)->first();
-
-                if (!$uplineUser) {
-                    break;
-                }
-
-                $commissionAmount = ($level === 1) ? 400.00 : 50.00;
-
-                Wallet::create([
-                    'UserID'       => $uplineUser->UserID,
-                    'ActivationID' => $activation->ActivationID,
-                    'amount'       => $commissionAmount,
-                    'status'       => 'Active',
-                ]);
-
-                Log::info("Level {$level} commission of {$commissionAmount} awarded to User ID: {$uplineUser->UserID}");
-
-                $currentUplineCode = $uplineUser->upline_code ?? null;
-                $level++;
-            }
         });
 
         $user = User::find($targetUserID);
@@ -577,7 +540,6 @@ class ActivationModal extends Component
                 ->latest()
                 ->first();
 
-            $isNewActivation = false;
             $adminEmail = config('mail.from.address', 'anfredalbit110525@gmail.com');
 
             $cleanBeneficiaries = [];
@@ -637,13 +599,12 @@ class ActivationModal extends Component
                     'status' => 'Pending',
                 ]);
 
-                $activation = $rejectedActivation;
                 $actionLabel = 'resubmitted successfully';
                 $userSubject = 'Activation Request Resubmitted';
                 $uplineSubject = 'Downline Activation Resubmitted';
                 $adminSubject = 'Activation Request Resubmitted (Admin Notice)';
             } else {
-                $activation = Activation::create([
+                Activation::create([
                     'UserID' => $selectedUser->UserID,
                     'amount' => (float) $membershipFee,
                     'type' => $activationType,
@@ -654,7 +615,6 @@ class ActivationModal extends Component
                     'status' => 'Pending',
                 ]);
 
-                $isNewActivation = true;
                 $actionLabel = 'submitted successfully';
                 $userSubject = 'Activation Request Submitted';
                 $uplineSubject = 'New Downline Activation Request';
