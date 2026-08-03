@@ -3,6 +3,8 @@
 namespace App\Livewire\AdminPages\Masterlist;
 
 use App\Models\Faq;
+use App\Models\Privilege;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -20,7 +22,6 @@ class FaqList extends Component
     public $answer;
     public $status = true;
 
-
     // Validation rules
     protected $rules = [
         'question' => 'required|string|max:255',
@@ -28,9 +29,77 @@ class FaqList extends Component
         'status' => 'boolean',
     ];
 
+    /*
+    |--------------------------------------------------------------------------
+    | Permission Checkers (ModuleID assumed, e.g., 5 or matching your DB schema)
+    |--------------------------------------------------------------------------
+    */
+
+    protected function hasPermission($action): bool
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return false;
+        }
+
+        // Super Admin override (RoleID 1)
+        if ((int) $user->RoleID === 1) {
+            return true;
+        }
+
+        $column = 'can_' . $action;
+        $moduleID = 6; // Adjust this ID to match your FAQs module ID in the database
+
+        if ($user->role && method_exists($user->role, 'permissions')) {
+            $hasPerm = optional($user->role->permissions)
+                ->where('ModuleID', $moduleID)
+                ->where($column, 1)
+                ->isNotEmpty();
+
+            if ($hasPerm) {
+                return true;
+            }
+        }
+
+        return Privilege::where('RoleID', $user->RoleID)
+            ->where('ModuleID', $moduleID)
+            ->where($column, 1)
+            ->exists();
+    }
+
+    public function getCanCreateProperty(): bool
+    {
+        return $this->hasPermission('create');
+    }
+
+    public function getCanReadProperty(): bool
+    {
+        return $this->hasPermission('read');
+    }
+
+    public function getCanUpdateProperty(): bool
+    {
+        return $this->hasPermission('update');
+    }
+
+    public function getCanDeleteProperty(): bool
+    {
+        return $this->hasPermission('delete');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Component Actions
+    |--------------------------------------------------------------------------
+    */
 
     public function openCreateModal()
     {
+        if (!$this->canCreate) {
+            return;
+        }
+
         $this->resetValidation();
 
         $this->reset([
@@ -40,17 +109,13 @@ class FaqList extends Component
         ]);
 
         $this->status = true;
-
         $this->isOpen = true;
     }
-
 
     public function closeModal()
     {
         $this->isOpen = false;
-
         $this->resetValidation();
-
         $this->reset([
             'question',
             'answer',
@@ -59,9 +124,12 @@ class FaqList extends Component
         ]);
     }
 
-
     public function editFaq($id)
     {
+        if (!$this->canUpdate) {
+            return;
+        }
+
         $this->resetValidation();
 
         $faq = Faq::findOrFail($id);
@@ -74,14 +142,18 @@ class FaqList extends Component
         $this->isOpen = true;
     }
 
-
     public function saveFaq()
     {
+        if ($this->faq_id && !$this->canUpdate) {
+            return;
+        }
+        if (!$this->faq_id && !$this->canCreate) {
+            return;
+        }
+
         $this->validate();
 
-
         if ($this->faq_id) {
-
             $faq = Faq::findOrFail($this->faq_id);
 
             $faq->update([
@@ -91,9 +163,7 @@ class FaqList extends Component
             ]);
 
             $message = 'FAQ successfully updated!';
-
         } else {
-
             Faq::create([
                 'question' => $this->question,
                 'answer' => $this->answer,
@@ -103,33 +173,32 @@ class FaqList extends Component
             $message = 'FAQ successfully created!';
         }
 
-
         $this->closeModal();
-
         session()->flash('message', $message);
     }
-
-
 
     // SweetAlert confirmation
     public function confirmDeleteFaq($id)
     {
+        if (!$this->canDelete) {
+            return;
+        }
+
         $this->dispatch('confirm-delete-faq', id: $id);
     }
-
-
 
     // Delete after confirmation
     public function deleteFaq($id)
     {
-        $faq = Faq::findOrFail($id);
+        if (!$this->canDelete) {
+            return;
+        }
 
+        $faq = Faq::findOrFail($id);
         $faq->delete();
 
         $this->dispatch('faq-deleted');
     }
-
-
 
     public function render()
     {

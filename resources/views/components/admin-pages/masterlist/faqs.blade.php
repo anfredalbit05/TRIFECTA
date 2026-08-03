@@ -6,11 +6,13 @@
             FAQs
         </h2>
 
-        <button
-            wire:click="openCreateModal"
-            class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
-            Add FAQ
-        </button>
+        @if($this->canCreate)
+            <button
+                wire:click="openCreateModal"
+                class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
+                Add FAQ
+            </button>
+        @endif
     </div>
 
     <p class="text-sm text-slate-500 mb-6">
@@ -24,28 +26,23 @@
         </div>
     @endif
 
-
     <!-- TABLE -->
     <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
-
         <table class="w-full text-left border-collapse">
-
             <thead>
                 <tr class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">Question</th>
                     <th class="py-3 px-4">Answer</th>
                     <th class="py-3 px-4">Status</th>
-                    <th class="py-3 px-4 text-center">Action</th>
+                    @if($this->canUpdate || $this->canDelete)
+                        <th class="py-3 px-4 text-center">Action</th>
+                    @endif
                 </tr>
             </thead>
-
             <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
-
                 @forelse($faqs as $index => $faq)
-
                     <tr class="hover:bg-slate-50 transition">
-
                         <td class="py-4 px-4 text-slate-500">
                             {{ $faqs->firstItem() + $index }}
                         </td>
@@ -59,7 +56,6 @@
                         </td>
 
                         <td class="py-4 px-4">
-
                             @if($faq->status)
                                 <span class="px-3 py-1 rounded-md bg-emerald-100 text-emerald-700 text-xs font-semibold">
                                     Active
@@ -69,164 +65,128 @@
                                     Inactive
                                 </span>
                             @endif
-
                         </td>
 
-                        <td class="py-4 px-4 text-center">
+                        @if($this->canUpdate || $this->canDelete)
+                            <td class="py-4 px-4 text-center">
+                                <div class="flex justify-center gap-2">
+                                    @if($this->canUpdate)
+                                        <button
+                                            wire:click="editFaq({{ $faq->FaqID }})"
+                                            title="Edit FAQ"
+                                            class="px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-xs shadow cursor-pointer">
+                                            ✏️
+                                        </button>
+                                    @endif
 
-                            <div class="flex justify-center gap-2">
-
-                                <button
-                                    wire:click="editFaq({{ $faq->FaqID }})"
-                                    class="px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-xs shadow cursor-pointer">
-                                    ✏️
-                                </button>
-
-                                <button
-                                    wire:click="confirmDeleteFaq({{ $faq->FaqID }})"
-                                    class="px-3 py-2 rounded-lg border-amber-400 bg-amber-500 text-white hover:amber-500 text-xs shadow cursor-pointer">
-                                    🗑️
-                                </button>
-
-                            </div>
-
-                        </td>
-
+                                    @if($this->canDelete)
+                                        <button
+                                            wire:click="confirmDeleteFaq({{ $faq->FaqID }})"
+                                            title="Delete FAQ"
+                                            class="px-3 py-2 rounded-lg border-amber-400 bg-amber-500 text-white hover:bg-amber-600 text-xs shadow cursor-pointer">
+                                            🗑️
+                                        </button>
+                                    @endif
+                                </div>
+                            </td>
+                        @endif
                     </tr>
-
                 @empty
-
                     <tr>
                         <td colspan="5" class="text-center py-8 text-slate-500">
                             No FAQs available.
                         </td>
                     </tr>
-
                 @endforelse
-
             </tbody>
-
         </table>
-
 
         @if($faqs->hasPages())
             <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center">
                 {{ $faqs->links('pagination::tailwind') }}
             </div>
         @endif
-
     </div>
-
 
     <!-- MODAL -->
     @if($isOpen)
-
-<div
-    wire:key="faq-modal"
-    class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm">
-
+        <div
+            wire:key="faq-modal"
+            class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm">
             <div class="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden">
-
                 <div class="bg-[#0C2C6B] px-6 py-4 text-white flex justify-between items-center">
-
                     <h3 class="text-lg font-bold">
                         {{ $faq_id ? 'Edit FAQ' : 'Add New FAQ' }}
                     </h3>
-
                     <button
                         wire:click="closeModal"
-                        class="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 cursor-pointer">
+                        class="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 cursor-pointer flex items-center justify-center">
                         ✕
                     </button>
-
                 </div>
 
-
                 <form wire:submit.prevent="saveFaq">
-
                     <div class="p-6 space-y-4">
-
                         <div>
                             <label class="block text-xs font-bold uppercase text-slate-400 mb-1">
                                 Question
                             </label>
-
                             <input
                                 type="text"
                                 wire:model="question"
                                 class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#0C2C6B]">
-
                             @error('question')
-                                <span class="text-xs text-red-500">{{ $message }}</span>
+                                <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
-
 
                         <div>
                             <label class="block text-xs font-bold uppercase text-slate-400 mb-1">
                                 Answer
                             </label>
-
                             <textarea
                                 rows="4"
                                 wire:model="answer"
                                 class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#0C2C6B]"></textarea>
-
                             @error('answer')
-                                <span class="text-xs text-red-500">{{ $message }}</span>
+                                <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
-
 
                         <div>
                             <label class="block text-xs font-bold uppercase text-slate-400 mb-1">
                                 Status
                             </label>
-
                             <select
                                 wire:model="status"
                                 class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white">
-
                                 <option value="1">Active</option>
                                 <option value="0">Inactive</option>
-
                             </select>
                         </div>
-
                     </div>
 
-
                     <div class="flex justify-end gap-2 px-6 py-3 border-t bg-slate-50">
-
                         <button
                             type="button"
                             wire:click="closeModal"
-                            class="px-4 py-2 text-xs font-semibold bg-slate-200 rounded-lg hover:bg-slate-300">
+                            class="px-4 py-2 text-xs font-semibold bg-slate-200 rounded-lg hover:bg-slate-300 cursor-pointer">
                             Cancel
                         </button>
-
                         <button
                             type="submit"
-                            class="px-4 py-2 text-xs font-semibold text-white bg-[#0C2C6B] rounded-lg hover:bg-[#09204f]">
+                            class="px-4 py-2 text-xs font-semibold text-white bg-[#0C2C6B] rounded-lg hover:bg-[#09204f] cursor-pointer shadow">
                             Save FAQ
                         </button>
-
                     </div>
-
                 </form>
-
             </div>
-
         </div>
-
     @endif
-
 
     @script
     <script>
-
         $wire.on('confirm-delete-faq', (event) => {
-
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -236,18 +196,13 @@
                 cancelButtonColor: '#6b7280',
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
-
-                if(result.isConfirmed){
+                if (result.isConfirmed) {
                     $wire.deleteFaq(event.id);
                 }
-
             });
-
         });
 
-
         $wire.on('faq-deleted', () => {
-
             Swal.fire({
                 title: 'Deleted!',
                 text: 'FAQ has been successfully deleted.',
@@ -255,9 +210,7 @@
                 timer: 1500,
                 showConfirmButton: false
             });
-
         });
-
     </script>
     @endscript
 

@@ -1,5 +1,5 @@
 @php
-    $isAdmin = auth()->check() && auth()->user()->RoleID == 1;
+    $isAdmin = auth()->check() && auth()->user()->RoleID != 4;
 @endphp
 
 <div

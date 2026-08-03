@@ -43,7 +43,7 @@ Route::get('/contact', Contact::class)->name('contact');
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', function () {
-        if (Auth::user()->RoleID == 1) {
+        if (Auth::user()->RoleID != 4) {
             return view('pages.admin-pages.dashboard');
         }
 

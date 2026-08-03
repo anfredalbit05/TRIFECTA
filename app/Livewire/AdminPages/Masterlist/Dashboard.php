@@ -12,7 +12,7 @@ class Dashboard extends Component
 {
     public function render()
     {
-        $mapUsers = User::where('RoleID', 5)
+        $mapUsers = User::where('RoleID', 4)
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->get([

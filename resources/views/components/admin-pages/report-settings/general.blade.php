@@ -6,11 +6,13 @@
             General Settings
         </h2>
 
-        <button
-            wire:click="openCreateModal"
-            class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
-            Add Setting
-        </button>
+        @if($this->canCreate)
+            <button
+                wire:click="openCreateModal"
+                class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
+                Add Setting
+            </button>
+        @endif
     </div>
 
     <p class="masterlist-description text-sm text-slate-500 mb-6">
@@ -32,11 +34,13 @@
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">Setting Name</th>
                     <th class="py-3 px-4">Value</th>
-                    <th class="py-3 px-4 text-center">Action</th>
+                    @if($this->canUpdate || $this->canDelete)
+                        <th class="py-3 px-4 text-center">Action</th>
+                    @endif
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
-                @forelse($settings as $index =>$setting)
+                @forelse($settings as $index => $setting)
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="py-4 px-4 font-medium text-slate-500">
                             {{ $index + 1 }}
@@ -51,29 +55,35 @@
                         </td>
 
                         <!-- Actions Column -->
-                        <td class="py-4 px-4 text-center">
-                            <div class="flex gap-2 justify-center">
-                                {{-- EDIT BUTTON --}}
-                                <button
-                                    wire:click="editSetting({{ $setting->SettingsID }})"
-                                    title="Update Setting"
-                                    class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
-                                    ✏️
-                                </button>
+                        @if($this->canUpdate || $this->canDelete)
+                            <td class="py-4 px-4 text-center">
+                                <div class="flex gap-2 justify-center">
+                                    {{-- EDIT BUTTON --}}
+                                    @if($this->canUpdate)
+                                        <button
+                                            wire:click="editSetting({{ $setting->SettingsID }})"
+                                            title="Update Setting"
+                                            class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
+                                            ✏️
+                                        </button>
+                                    @endif
 
-                                {{-- DELETE BUTTON --}}
-                                <button
-                                    wire:click="confirmDeleteSetting({{ $setting->SettingsID }})"
-                                    title="Delete Setting"
-                                    class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition cursor-pointer text-xs font-semibold shadow">
-                                    🗑️
-                                </button>
-                            </div>
-                        </td>
+                                    {{-- DELETE BUTTON --}}
+                                    @if($this->canDelete)
+                                        <button
+                                            wire:click="confirmDeleteSetting({{ $setting->SettingsID }})"
+                                            title="Delete Setting"
+                                            class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition cursor-pointer text-xs font-semibold shadow">
+                                            🗑️
+                                        </button>
+                                    @endif
+                                </div>
+                            </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="text-center py-8 text-slate-500">
+                        <td colspan="{{ ($this->canUpdate || $this->canDelete) ? 4 : 3 }}" class="text-center py-8 text-slate-500">
                             No settings configurations found.
                         </td>
                     </tr>

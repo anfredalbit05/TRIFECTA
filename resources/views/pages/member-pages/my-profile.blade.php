@@ -43,7 +43,7 @@
                 Security
             </a>
 
-              @if(auth()->user()->RoleID != 1)
+              @if(auth()->user()->RoleID == 4)
             <a
                 href="#"
                 @click.prevent="tab = 'activity'"
@@ -92,7 +92,7 @@
             <livewire:member-pages.my-profile.security />
         </div>
 
-         @if(auth()->user()->RoleID != 1)
+         @if(auth()->user()->RoleID == 4)
         <!-- ACTIVITY TAB -->
         <div
             x-show="tab === 'activity'"

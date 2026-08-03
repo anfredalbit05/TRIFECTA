@@ -170,6 +170,7 @@
                         </div>
                     </div>
 
+                    @if(auth()->user()->RoleID != 3)
                     <!-- REPLY FORM SECTION -->
                     <div class="border-t border-slate-200 pt-4 mt-4 space-y-3">
                         <h4 class="text-xs font-bold uppercase tracking-wider text-[#0C2C6B]">Send Email Reply</h4>
@@ -205,6 +206,7 @@
                             </button>
                         </div>
                     </div>
+                    @endif
 
                 </div>
 

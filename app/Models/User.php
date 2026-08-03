@@ -156,6 +156,12 @@ class User extends Authenticatable implements PasskeyUser
     );
 }
 
+public function activations(): HasMany
+{
+    // 'UserID' on the activations table references the member being activated
+    return $this->hasMany(Activation::class, 'UserID', 'UserID');
+}
+
 public function processedActivations()
 {
     return $this->hasMany(
@@ -187,4 +193,9 @@ public function directDownlines(): HasManyThrough
         return $this->hasMany(Activation::class, 'UserID', 'UserID');
     }
 
+
+        public function role()
+    {
+        return $this->belongsTo(Role::class, 'RoleID', 'RoleID');
+    }
 }

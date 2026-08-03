@@ -6,28 +6,30 @@
             Members
         </h2>
 
-        <button
-             onclick="Livewire.dispatch('open-application-modal')"
-            class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
-            Add Member
-        </button>
+        @if($this->canCreate)
+            <button
+                onclick="Livewire.dispatch('open-application-modal')"
+                class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
+                Add Member
+            </button>
+        @endif
     </div>
 
     <p class="masterlist-description text-sm text-slate-500 mb-6">
         Member management content and directory.
     </p>
 
-   <div class="relative max-w-sm">
-    <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
-        🔍
-    </span>
-
-    <input
-        type="text"
-        wire:model.live="search"
-        placeholder="Search members..."
-        class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
-</div>
+    <!-- SEARCH INPUT -->
+    <div class="relative max-w-sm mb-6">
+        <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
+            🔍
+        </span>
+        <input
+            type="text"
+            wire:model.live="search"
+            placeholder="Search members..."
+            class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
+    </div>
 
     <!-- MEMBERS TABLE -->
     <div class="member-table overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
@@ -45,7 +47,7 @@
             </thead>
             <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
                 @forelse($members as $index => $member)
-                    <tr class="hover:bg-slate-50 transition-colors">
+                    <tr wire:key="member-row-{{ $member->UserID }}" class="hover:bg-slate-50 transition-colors">
                         <td class="py-4 px-4 font-medium text-slate-500">
                             {{ $members->firstItem() + $index }}
                         </td>
@@ -76,72 +78,62 @@
                                     Active
                                 </span>
                             @else
-                                <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md  bg-slate-600 text-white text-xs font-semibold shadow-sm">
+                                <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-slate-600 text-white text-xs font-semibold shadow-sm">
                                     Inactive
                                 </span>
                             @endif
                         </td>
 
-                        <!-- Actions Column -->
+                        <!-- ACTIONS COLUMN -->
                         <td class="py-4 px-4 text-center">
                             <div class="flex gap-2 justify-center items-center">
 
-                                <button
-                                    wire:click="viewMember({{ $member->UserID }})"
-                                    class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-slate-600 text-white hover:bg-slate-700">
-
-                                    👁️
-                                </button>
-                                {{-- UPDATE --}}
-                                <button
-                                    wire:click="editMember({{ $member->UserID }})"
-                                    title="Update Member"
-                                    class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
-                                    ✏️
-                                </button>
-
-                                
-                                    {{-- <button
-                                        wire:click="openReview({{ $member->UserID }})"
-                                        title="Review Activation"
-                                        class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow">
-                                        Pending
-                                    </button> --}}
-
-                                {{-- STATUS / ACTIVATION --}}
-                                
+                                <!-- VIEW -->
+                                @if($this->canRead)
                                     <button
-                                        wire:click="openReview({{ $member->UserID }})"
-                                        title="Review Activation"
-                                        class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow">
-                                        Pending
-                                    </button>
-                                @if(strtolower($member->status) === 'active')
-                                    <button
-                                        wire:click="confirmStatus({{ $member->UserID }})"
-                                        title="Deactivate Member"
-                                        class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition cursor-pointer text-xs font-semibold shadow">
-                                        Deactivate
-                                    </button>
-
-                                        {{-- {{ strtolower($member->status) }}
-                                        {{ $member->has_pending_activation == true ? 'true' : 'false' }} --}}
-                                        
-                                @elseif($member->has_pending_activation)
-                                    <button
-                                        wire:click="openReview({{ $member->UserID }})"
-                                        title="Review Activation"
-                                        class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow">
-                                        Pending
-                                    </button>
-                                @else
-                                    <button
-                                        wire:click="openActivation({{ $member->UserID }})"
-                                        title="Activate Member"
-                                        class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
-                                        Activate
+                                        wire:click="viewMember({{ $member->UserID }})"
+                                        title="View Member"
+                                        class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-slate-600 text-white hover:bg-slate-700 transition cursor-pointer text-xs font-semibold shadow">
+                                        👁️
                                     </button>
                                 @endif
+
+                                <!-- EDIT / UPDATE -->
+                                @if($this->canUpdate)
+                                    <button
+                                        wire:click="editMember({{ $member->UserID }})"
+                                        title="Update Member"
+                                        class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
+                                        ✏️
+                                    </button>
+                                @endif
+
+                                <!-- STATUS / ACTIVATION ACTIONS (Requires Update Permission) -->
+                                @if($this->canUpdate)
+                                    @if(strtolower($member->status) === 'active')
+                                        <button
+                                            wire:click="confirmStatus({{ $member->UserID }})"
+                                            title="Deactivate Member"
+                                            class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition cursor-pointer text-xs font-semibold shadow">
+                                            Deactivate
+                                        </button>
+                                    @elseif($member->has_pending_activation)
+                                        <button
+                                            wire:click="openReview({{ $member->UserID }})"
+                                            title="Review Activation"
+                                            class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow">
+                                            Pending
+                                        </button>
+                                    @else
+                                        <button
+                                            wire:click="openActivation({{ $member->UserID }})"
+                                            title="Activate Member"
+                                            class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
+                                            Activate
+                                        </button>
+                                    @endif
+                                @endif
+
                             </div>
                         </td>
                     </tr>
@@ -166,6 +158,7 @@
     <!-- LIVEWIRE MODAL COMPONENT -->
     <livewire:member-pages.my-profile.activation-modal />
 
+    <!-- SWEETALERT SCRIPTS -->
     @script
     <script>
         $wire.on('confirm-status', (data) => {

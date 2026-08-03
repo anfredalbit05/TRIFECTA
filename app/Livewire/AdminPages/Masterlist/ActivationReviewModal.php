@@ -5,6 +5,7 @@ namespace App\Livewire\AdminPages\Masterlist;
 use App\Models\Activation;
 use App\Models\Beneficiary;
 use App\Models\User;
+use App\Models\Wallet;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
@@ -15,24 +16,16 @@ use App\Mail\ActivationRejectedMail;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InviteeApprovedMail;
 
-
 class ActivationReviewModal extends Component
 {
     public bool $open = false;
-
     public ?int $selectedUserID = null;
-
     public ?User $member = null;
-
     public ?Activation $activation = null;
-
     public ?User $referralUser = null;
-
     public array $beneficiaries = [];
-        public string $remarks = '';
-
-        public bool $isRejecting = false;
-
+    public string $remarks = '';
+    public bool $isRejecting = false;
 
     /*
     |--------------------------------------------------------------------------
@@ -43,101 +36,49 @@ class ActivationReviewModal extends Component
     #[On('open-activation-review')]
     public function openModal($UserID): void
     {
-        Log::info(
-            'Opening activation review modal.',
-            [
-                'UserID' => $UserID,
-            ]
-        );
-
+        Log::info('Opening activation review modal.', ['UserID' => $UserID]);
 
         $this->selectedUserID = (int) $UserID;
 
+        $this->member = User::find($this->selectedUserID);
 
         /*
         |--------------------------------------------------------------------------
-        | Load Member
+        | Find Pending Activation by UserID (Fixed from ProcessedBy)
         |--------------------------------------------------------------------------
         */
-
-        $this->member = User::find(
-            $this->selectedUserID
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Find Pending Activation
-        |--------------------------------------------------------------------------
-        |
-        | The member's UserID must match
-        | activations.ProcessedBy.
-        |
-        */
-
-        $this->activation = Activation::where(
-            'ProcessedBy',
-            $this->selectedUserID
-        )
-
-        ->where(
-            'status',
-            'Pending'
-        )
-
-        ->latest(
-            'ActivationID'
-        )
-
-        ->first();
-
+        $this->activation = Activation::where('UserID', $this->selectedUserID)
+            ->where('status', 'Pending')
+            ->latest('ActivationID')
+            ->first();
 
         /*
         |--------------------------------------------------------------------------
         | Load Referral User
         |--------------------------------------------------------------------------
         */
-
         $this->referralUser = null;
 
-
-        if ($this->activation) {
-
-            $this->referralUser = User::find(
-                $this->activation->UserID
-            );
-
+        if ($this->activation && filled($this->activation->upline_code)) {
+            $this->referralUser = User::where(
+                'referralCode',
+                trim($this->activation->upline_code)
+            )->first();
         }
-
 
         /*
         |--------------------------------------------------------------------------
         | Load Member Beneficiaries
         |--------------------------------------------------------------------------
         */
-
-        $this->beneficiaries = Beneficiary::where(
-            'UserID',
-            $this->selectedUserID
-        )
-
-        ->where(
-            'status',
-            true
-        )
-
-        ->orderBy(
-            'BeneficiaryID'
-        )
-
-        ->get()
-
-        ->toArray();
-
+        $this->beneficiaries = Beneficiary::where('UserID', $this->selectedUserID)
+            ->where('status', true)
+            ->orderBy('BeneficiaryID')
+            ->get()
+            ->toArray();
 
         $this->open = true;
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -145,297 +86,194 @@ class ActivationReviewModal extends Component
     |--------------------------------------------------------------------------
     */
 
-   public function approve(): void
-{
-    
-    if (
-        !$this->activation ||
-        !$this->selectedUserID
-    ) {
-        Log::warning('Approval failed: activation or selected user missing.', [
-            'selectedUserID' => $this->selectedUserID,
-            'activation' => $this->activation?->ActivationID,
-        ]);
+    public function approve(): void
+    {
+        if (!$this->activation || !$this->selectedUserID) {
+            Log::warning('Approval failed: activation or selected user missing.');
+            return;
+        }
 
-        return;
+        DB::transaction(function () {
+
+            // 1. Update Activation Status
+            $this->activation->update([
+                'status' => 'Approved',
+            ]);
+
+            // Get CC Admins
+            $adminEmails = User::join('roles', 'users.RoleID', '=', 'roles.RoleID')
+                ->whereIn('roles.rolename', ['Super Administrator', 'Administrator'])
+                ->whereNotNull('users.email')
+                ->pluck('users.email')
+                ->toArray();
+
+            // 2. Activate Member User Account
+            User::where('UserID', $this->selectedUserID)->update([
+                'status' => 'Active',
+            ]);
+
+            $activatedUser = User::find($this->selectedUserID);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Multi-Tier Referral Commission Structure
+            |--------------------------------------------------------------------------
+            | - Level 1 (Direct Upline): 400
+            | - Levels 2 to 5 (Indirect Uplines): 50 each
+            | - Level 6+: 0 (Loop stops completely)
+            */
+            $currentUplineCode = $this->activation->upline_code;
+            $level = 1;
+            $maxLevels = 5;
+
+            while ($currentUplineCode && $level <= $maxLevels) {
+                $uplineUser = User::where('referralCode', $currentUplineCode)->first();
+
+                if (!$uplineUser) {
+                    break;
+                }
+
+                $commissionAmount = ($level === 1) ? 400.00 : 50.00;
+
+                Wallet::create([
+                    'UserID'       => $uplineUser->UserID,
+                    'ActivationID' => $this->activation->ActivationID,
+                    'amount'       => $commissionAmount,
+                    'status'       => 'Active',
+                ]);
+
+                Log::info("Admin Review: Level {$level} commission of {$commissionAmount} awarded to User ID: {$uplineUser->UserID}");
+
+                $currentUplineCode = $uplineUser->upline_code ?? null;
+                $level++;
+            }
+
+            // Send Email to Activated User
+            if ($activatedUser && filled($activatedUser->email)) {
+                try {
+                    Mail::raw(
+                        "Congratulations!\n\nYour account has been approved successfully.\nYou can now log in and access all features.",
+                        function ($message) use ($activatedUser, $adminEmails) {
+                            $message->to($activatedUser->email)
+                                ->cc($adminEmails)
+                                ->subject('Account Approved');
+                        }
+                    );
+                } catch (\Throwable $e) {
+                    Log::error('Failed to send approval email to activated user.', ['error' => $e->getMessage()]);
+                }
+            }
+
+            // Send Email to Upline / Referral User
+            if ($this->referralUser && filled($this->referralUser->email)) {
+                try {
+                    Mail::to($this->referralUser->email)
+                        ->cc($adminEmails)
+                        ->send(new InviteeApprovedMail($this->referralUser, $activatedUser, $this->activation));
+                } catch (\Throwable $e) {
+                    Log::error('Failed to send approval email to upline.', ['error' => $e->getMessage()]);
+                }
+            }
+        });
+
+        $this->dispatch('members-refresh');
+        $this->dispatch('swal:success', title: 'Success!', message: 'Activation approved successfully.');
+        $this->closeModal();
     }
 
-    DB::transaction(function () {
-
-        /*
-        |--------------------------------------------------------------------------
-        | Update Activation
-        |--------------------------------------------------------------------------
-        */
-
-        Activation::where(
-            'ActivationID',
-            $this->activation->ActivationID
-        )->update([
-            'status' => 'Approved',
-        ]);
-
-        /*
-    |--------------------------------------------------------------------------
-    | Get CC recipients (Super Administrator + Administrator roles)
-    |--------------------------------------------------------------------------
-    */
-
-    $adminEmails = User::join('roles', 'users.RoleID', '=', 'roles.RoleID')
-        ->whereIn('roles.rolename', [
-            'Super Administrator',
-            'Administrator',
-        ])
-        ->whereNotNull('users.email')
-        ->pluck('users.email')
-        ->toArray();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Activate Member
-        |--------------------------------------------------------------------------
-        */
-
-        User::where(
-            'UserID',
-            $this->selectedUserID
-        )->update([
-            'status' => 'Active',
-        ]);
-
-        $activatedUser = User::find($this->selectedUserID);
-
-        Log::info('Activated user found.', [
-            'user_id' => $activatedUser?->UserID,
-            'username' => $activatedUser?->username,
-            'email' => $activatedUser?->email,
-        ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Send email to activated user
-        |--------------------------------------------------------------------------
-        */
-
-        if ($activatedUser && filled($activatedUser->email)) {
-
-            try {
-
-                Mail::raw(
-                    "Congratulations!\n\n" .
-                    "Your account has been approved successfully.\n\n" .
-                    "You can now log in and access all features.",
-                    function ($message) use ($activatedUser, $adminEmails) {
-                        $message->to($activatedUser->email)
-                            ->cc($adminEmails)
-                            ->subject('Account Approved');
-                    }
-                );
-
-                Log::info('Approval email sent to activated user.', [
-                    'email' => $activatedUser->email,
-                ]);
-
-            } catch (\Throwable $e) {
-
-                Log::error('Failed to send approval email to activated user.', [
-                    'user_id' => $activatedUser->UserID,
-                    'email' => $activatedUser->email,
-                    'error' => $e->getMessage(),
-                ]);
-            }
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Send email to upline
-        |--------------------------------------------------------------------------
-        */
-
-        $referralUser = User::where(
-            'referralCode',
-            $this->activation->upline_code
-        )->first();
-
-        Log::info('Referral user found.', [
-            'user_id' => $referralUser?->UserID,
-            'email' => $referralUser?->email,
-        ]);
-
-        if ($referralUser && filled($referralUser->email)) {
-
-            try {
-
-                Mail::to($referralUser->email)
-                ->cc($adminEmails)
-                ->send(
-
-                    new InviteeApprovedMail(
-                        $referralUser,
-                        $activatedUser,
-                        $this->activation
-                    )
-
-                );
-
-                Log::info('Approval email sent to upline.', [
-                    'email' => $referralUser->email,
-                ]);
-
-            } catch (\Throwable $e) {
-
-                Log::error('Failed to send approval email to upline.', [
-                    'user_id' => $referralUser->UserID,
-                    'email' => $referralUser->email,
-                    'error' => $e->getMessage(),
-                ]);
-            }
-        }
-    });
-
-    Log::info(
-        'Activation approved.',
-        [
-            'UserID' => $this->selectedUserID,
-            'ActivationID' => $this->activation->ActivationID,
-        ]
-    );
-
-    $this->dispatch('members-refresh');
-
-    $this->dispatch(
-        'swal:success',
-        title: 'Success!',
-        message: 'Activation approved successfully.'
-    );
-
-    $this->closeModal();
-}
-
-
-   /*
+    /*
     |--------------------------------------------------------------------------
     | Reject Activation Request
     |--------------------------------------------------------------------------
     */
 
     public function confirmReject(): void
-{
-    $this->dispatch('swal:reject-confirm', [
-        'title' => 'Reject activation?',
-        'text' => 'Please provide the reason for rejection.',
-    ]);
-}
-
-#[On('submit-rejection')]
-public function submitRejection($remarks): void
-{
-    $this->remarks = $remarks;
-
-    $this->rejectActivation();
-}
-
-    public function rejectActivation(): void
-{
-    if ($this->isRejecting) {
-        return;
+    {
+        $this->dispatch('swal:reject-confirm', [
+            'title' => 'Reject activation?',
+            'text' => 'Please provide the reason for rejection.',
+        ]);
     }
 
-    $this->isRejecting = true;
+    #[On('submit-rejection')]
+    public function submitRejection($remarks): void
+    {
+        $this->remarks = is_array($remarks) ? ($remarks['remarks'] ?? '') : $remarks;
+        $this->rejectActivation();
+    }
 
-    try {
-
-        $this->validate([
-            'remarks' => ['required', 'string', 'max:1000'],
-        ]);
-
-        $activation = Activation::where(
-            'UserID',
-            $this->selectedUserID
-        )->latest()->first();
-
-        if (!$activation) {
+    public function rejectActivation(): void
+    {
+        if ($this->isRejecting) {
             return;
         }
 
-        DB::transaction(function () use ($activation) {
+        $this->isRejecting = true;
 
-            $activation->update([
-                'status' => 'Rejected',
+        try {
+            $this->validate([
+                'remarks' => ['required', 'string', 'max:1000'],
             ]);
 
-            ActivationHistory::create([
-                'ActivationID' => $activation->ActivationID,
-                'AdminID' => Auth::id(),
-                'status' => 'Rejected',
-                'remarks' => $this->remarks,
-            ]);
+            $activation = Activation::where('ActivationID', $this->activation?->ActivationID)
+                ->latest()
+                ->first();
 
-            User::where(
-                'UserID',
-                $this->selectedUserID
-            )->update([
-                'status' => 'Inactive',
-            ]);
+            if (!$activation) {
+                return;
+            }
 
-            $user = User::find($this->selectedUserID);
+            DB::transaction(function () use ($activation) {
+                $activation->update([
+                    'status' => 'Rejected',
+                ]);
 
-            Mail::to($user->email)->send(
-                new ActivationRejectedMail(
-                    $user,
-                    $activation,
-                    $this->beneficiaries,
-                    $this->remarks
-                )
-            );
-        });
+                ActivationHistory::create([
+                    'ActivationID' => $activation->ActivationID,
+                    'AdminID' => Auth::id(),
+                    'status' => 'Rejected',
+                    'remarks' => $this->remarks,
+                ]);
 
-            $this->dispatch(
-            'swal:success',
-            title: 'Rejected!',
-            message: 'Activation rejected successfully.'
-        );
+                User::where('UserID', $this->selectedUserID)->update([
+                    'status' => 'Inactive',
+                ]);
 
-        $this->closeModal();
+                $user = User::find($this->selectedUserID);
 
-    } finally {
+                if ($user && filled($user->email)) {
+                    Mail::to($user->email)->send(
+                        new ActivationRejectedMail(
+                            $user,
+                            $activation,
+                            $this->beneficiaries,
+                            $this->remarks
+                        )
+                    );
+                }
+            });
 
-        $this->isRejecting = false;
+            $this->dispatch('swal:success', title: 'Rejected!', message: 'Activation rejected successfully.');
+            $this->closeModal();
+
+        } finally {
+            $this->isRejecting = false;
+        }
     }
-}
-
-    /*
-    |--------------------------------------------------------------------------
-    | Close Modal
-    |--------------------------------------------------------------------------
-    */
 
     public function closeModal(): void
     {
         $this->open = false;
-
         $this->selectedUserID = null;
-
         $this->member = null;
-
         $this->activation = null;
-
         $this->referralUser = null;
-
         $this->beneficiaries = [];
+        $this->remarks = '';
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Render
-    |--------------------------------------------------------------------------
-    */
 
     public function render()
     {
-        return view(
-            'livewire.admin-pages.masterlist.activation-review-modal'
-        );
+        return view('livewire.admin-pages.masterlist.activation-review-modal');
     }
 }

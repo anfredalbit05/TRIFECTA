@@ -6,11 +6,13 @@
             Benefits
         </h2>
 
-        <button
-            wire:click="openCreateModal"
-            class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
-            Add Benefit
-        </button>
+        @if($this->canCreate)
+            <button
+                wire:click="openCreateModal"
+                class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
+                Add Benefit
+            </button>
+        @endif
     </div>
 
     <p class="masterlist-description text-sm text-slate-500 mb-6">
@@ -34,7 +36,9 @@
                     <th class="py-3 px-4">Details</th>
                     <th class="py-3 px-4">Holder Type</th>
                     <th class="py-3 px-4">Amount</th>
-                    <th class="py-3 px-4 text-center">Action</th>
+                    @if($this->canUpdate || $this->canDelete)
+                        <th class="py-3 px-4 text-center">Action</th>
+                    @endif
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
@@ -63,25 +67,31 @@
                         </td>
 
                         <!-- Actions Column -->
-                        <td class="py-4 px-4 text-center">
-                            <div class="flex gap-2 justify-center">
-                                {{-- EDIT BUTTON --}}
-                                <button
-                                    wire:click="editBenefit({{ $benefit->BentID }})"
-                                    title="Update Benefit"
-                                    class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
-                                    ✏️
-                                </button>
+                        @if($this->canUpdate || $this->canDelete)
+                            <td class="py-4 px-4 text-center">
+                                <div class="flex gap-2 justify-center">
+                                    {{-- EDIT BUTTON --}}
+                                    @if($this->canUpdate)
+                                        <button
+                                            wire:click="editBenefit({{ $benefit->BentID }})"
+                                            title="Update Benefit"
+                                            class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
+                                            ✏️
+                                        </button>
+                                    @endif
 
-                                {{-- DELETE BUTTON --}}
-                                <button
-                                    wire:click="confirmDeleteBenefit({{ $benefit->BentID }})"
-                                    title="Delete Benefit"
-                                    class="inline-flex items-center justify-center px-3 py-2 rounded-lg border-amber-400 bg-amber-500 text-white hover:bg-amber-500 transition cursor-pointer text-xs font-semibold shadow">
-                                    🗑️
-                                </button>
-                            </div>
-                        </td>
+                                    {{-- DELETE BUTTON --}}
+                                    @if($this->canDelete)
+                                        <button
+                                            wire:click="confirmDeleteBenefit({{ $benefit->BentID }})"
+                                            title="Delete Benefit"
+                                            class="inline-flex items-center justify-center px-3 py-2 rounded-lg border-amber-400 bg-amber-500 text-white hover:bg-amber-500 transition cursor-pointer text-xs font-semibold shadow">
+                                            🗑️
+                                        </button>
+                                    @endif
+                                </div>
+                            </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
@@ -93,10 +103,10 @@
             </tbody>
         </table>
         @if($benefits->hasPages())
-    <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center">
-        {{ $benefits->links('pagination::tailwind') }}
-    </div>
-@endif
+            <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center">
+                {{ $benefits->links('pagination::tailwind') }}
+            </div>
+        @endif
     </div>
 
     <!-- ADD/EDIT BENEFIT MODAL -->

@@ -303,9 +303,21 @@ class ApplicationModal extends Component
                 'address' => $this->address,
                 'latitude' => $this->latitude,
                 'longitude' => $this->longitude,
-                'RoleID' => 5,
+                'RoleID' => 4,
                 'status' => 'Inactive',
             ]);
+
+                 Log::info('User created successfully', [
+            'UserID' => $user->UserID,
+                ]);
+
+                Log::info('Saving beneficiaries');
+
+                foreach ($this->beneficiaries as $beneficiary) {
+                    Log::info('Beneficiary data', $beneficiary);
+                }
+
+                Log::info('Sending emails');
 
             foreach ($this->beneficiaries as $beneficiary) {
                 if (
@@ -338,7 +350,7 @@ class ApplicationModal extends Component
             ];
 
            // Get all users with RoleID 1, 2, or 3
-            $admins = User::whereIn('RoleID', [1, 2, 3])
+            $admins = User::whereIn('RoleID', [1])
                 ->whereNotNull('email')
                 ->get();
                 foreach ($admins as $admin) {

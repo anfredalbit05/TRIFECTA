@@ -15,6 +15,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use App\Models\ActivationHistory;
 use Illuminate\Support\Facades\Mail;
+use App\Livewire\Members;
 
 class ActivationModal extends Component
 {
@@ -244,198 +245,205 @@ class ActivationModal extends Component
         $this->open = false;
     }
 
- public function approveActivation($UserID = null): void
-{
-    Log::info('=== APPROVE ACTIVATION STARTED ===', [
-        'received_user_id' => $UserID,
-        'selected_user_id' => $this->selectedUserID,
-    ]);
+    public function approveActivation($UserID = null): void
+    {
+        Log::info('=== APPROVE ACTIVATION STARTED ===', [
+            'received_user_id' => $UserID,
+            'selected_user_id' => $this->selectedUserID,
+        ]);
 
-    // Determine which user to approve
-    $userIdToApprove = $UserID ?? $this->selectedUserID;
+        $userIdToApprove = $UserID ?? $this->selectedUserID;
 
-    Log::info('User ID to approve', [
-        'user_id_to_approve' => $userIdToApprove,
-    ]);
+        Log::info('User ID to approve', [
+            'user_id_to_approve' => $userIdToApprove,
+        ]);
 
-    // Find activation
-    $activation = Activation::where('UserID', $userIdToApprove)
-        ->latest()
-        ->first();
-
-    Log::info('Activation lookup result', [
-        'found' => $activation !== null,
-        'activation_id' => $activation?->ActivationID,
-        'activation_user_id' => $activation?->UserID,
-        'status' => $activation?->status,
-    ]);
-
-    // Fallback
-    if (! $activation && ! $UserID) {
-        Log::warning('No activation found. Looking for latest pending activation.');
-
-        $activation = Activation::where('status', 'Pending')
+        $activation = Activation::where('UserID', $userIdToApprove)
             ->latest()
             ->first();
 
-        Log::info('Fallback activation result', [
+        Log::info('Activation lookup result', [
             'found' => $activation !== null,
             'activation_id' => $activation?->ActivationID,
             'activation_user_id' => $activation?->UserID,
-        ]);
-    }
-
-    if (! $activation) {
-        Log::error('Approval failed: activation not found.');
-
-        return;
-    }
-
-    $targetUserID = $activation->UserID;
-
-    Log::info('Target user determined', [
-        'target_user_id' => $targetUserID,
-    ]);
-
-    DB::transaction(function () use ($activation, $targetUserID) {
-
-        Log::info('Updating activation status', [
-            'activation_id' => $activation->ActivationID,
+            'status' => $activation?->status,
         ]);
 
-        $activation->update([
-            'status' => 'Approved',
+        if (! $activation && ! $UserID) {
+            Log::warning('No activation found. Looking for latest pending activation.');
+
+            $activation = Activation::where('status', 'Pending')
+                ->latest()
+                ->first();
+
+            Log::info('Fallback activation result', [
+                'found' => $activation !== null,
+                'activation_id' => $activation?->ActivationID,
+                'activation_user_id' => $activation?->UserID,
+            ]);
+        }
+
+        if (! $activation) {
+            Log::error('Approval failed: activation not found.');
+            return;
+        }
+
+        $targetUserID = $activation->UserID;
+
+        Log::info('Target user determined', [
+            'target_user_id' => $targetUserID,
         ]);
 
-        Log::info('Updating user status to Active', [
-            'user_id' => $targetUserID,
-        ]);
+        DB::transaction(function () use ($activation, $targetUserID) {
+            // 1. Update activation status
+            $activation->update([
+                'status' => 'Approved',
+            ]);
 
-        User::where('UserID', $targetUserID)->update([
-            'status' => 'Active',
-        ]);
-    });
+            // 2. Update user status to Active
+            User::where('UserID', $targetUserID)->update([
+                'status' => 'Active',
+            ]);
 
-    // Fetch user
-    $user = User::find($targetUserID);
+            /*
+            |--------------------------------------------------------------------------
+            | Multi-Tier Referral Commission Structure
+            |--------------------------------------------------------------------------
+            | - Level 1 (Direct Upline): 400
+            | - Levels 2 to 5 (Indirect Uplines): 50 each
+            | - Level 6+: 0 (Loop stops completely)
+            */
 
-    Log::info('Selected user information', [
-        'user_exists' => $user !== null,
-        'user_id' => $user?->UserID,
-        'username' => $user?->username,
-        'email' => $user?->email,
-    ]);
+            $currentUplineCode = $activation->upline_code;
+            $level = 1;
+            $maxLevels = 5;
 
-    // Fetch upline
-    $upline = User::where(
-        'referralCode',
-        $activation->upline_code
-    )->first();
+            while ($currentUplineCode && $level <= $maxLevels) {
+                $uplineUser = User::where('referralCode', $currentUplineCode)->first();
 
-    Log::info('Upline information', [
-        'upline_exists' => $upline !== null,
-        'upline_id' => $upline?->UserID,
-        'upline_username' => $upline?->username,
-        'upline_email' => $upline?->email,
-        'upline_code' => $activation->upline_code,
-    ]);
-
-    /*
-    |--------------------------------------------------------------------------
-    | Send email to selected user
-    |--------------------------------------------------------------------------
-    */
-
-    if ($user && filled($user->email)) {
-
-        Log::info('Attempting to send approval email to selected user', [
-            'to' => $user->email,
-        ]);
-
-        try {
-
-            Mail::raw(
-                "Congratulations!\n\n" .
-                "Your account has been activated successfully.\n\n" .
-                "You can now log in and access all features.",
-                function ($message) use ($user) {
-                    $message->to($user->email)
-                        ->subject('Account Activated');
+                if (!$uplineUser) {
+                    break;
                 }
-            );
 
-            Log::info('Approval email sent successfully', [
+                $commissionAmount = ($level === 1) ? 400.00 : 50.00;
+
+                Wallet::create([
+                    'UserID'       => $uplineUser->UserID,
+                    'ActivationID' => $activation->ActivationID,
+                    'amount'       => $commissionAmount,
+                    'status'       => 'Active',
+                ]);
+
+                Log::info("Level {$level} commission of {$commissionAmount} awarded to User ID: {$uplineUser->UserID}");
+
+                $currentUplineCode = $uplineUser->upline_code ?? null;
+                $level++;
+            }
+        });
+
+        $user = User::find($targetUserID);
+
+        Log::info('Selected user information', [
+            'user_exists' => $user !== null,
+            'user_id' => $user?->UserID,
+            'username' => $user?->username,
+            'email' => $user?->email,
+        ]);
+
+        $upline = User::where(
+            'referralCode',
+            $activation->upline_code
+        )->first();
+
+        Log::info('Upline information', [
+            'upline_exists' => $upline !== null,
+            'upline_id' => $upline?->UserID,
+            'upline_username' => $upline?->username,
+            'upline_email' => $upline?->email,
+            'upline_code' => $activation->upline_code,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Send email to selected user
+        |--------------------------------------------------------------------------
+        */
+        if ($user && filled($user->email)) {
+            Log::info('Attempting to send approval email to selected user', [
                 'to' => $user->email,
             ]);
 
-        } catch (\Throwable $e) {
+            try {
+                Mail::raw(
+                    "Congratulations!\n\n" .
+                    "Your account has been activated successfully.\n\n" .
+                    "You can now log in and access all features.",
+                    function ($message) use ($user) {
+                        $message->to($user->email)
+                            ->subject('Account Activated');
+                    }
+                );
 
-            Log::error('Failed to send approval email to selected user', [
-                'user_id' => $user->UserID,
-                'email' => $user->email,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                Log::info('Approval email sent successfully', [
+                    'to' => $user->email,
+                ]);
+            } catch (\Throwable $e) {
+                Log::error('Failed to send approval email to selected user', [
+                    'user_id' => $user->UserID,
+                    'email' => $user->email,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
+        } else {
+            Log::warning('Selected user email missing', [
+                'user_exists' => $user !== null,
+                'email' => $user?->email,
             ]);
         }
 
-    } else {
-
-        Log::warning('Selected user email missing', [
-            'user_exists' => $user !== null,
-            'email' => $user?->email,
-        ]);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Send email to upline
-    |--------------------------------------------------------------------------
-    */
-
-    if ($upline && filled($upline->email) && $user) {
-
-        Log::info('Attempting to send email to upline', [
-            'to' => $upline->email,
-        ]);
-
-        try {
-
-            Mail::raw(
-                "Your downline {$user->username} has been approved.",
-                function ($message) use ($upline) {
-                    $message->to($upline->email)
-                        ->subject('Downline Approved');
-                }
-            );
-
-            Log::info('Upline email sent successfully', [
+        /*
+        |--------------------------------------------------------------------------
+        | Send email to upline
+        |--------------------------------------------------------------------------
+        */
+        if ($upline && filled($upline->email) && $user) {
+            Log::info('Attempting to send email to upline', [
                 'to' => $upline->email,
             ]);
 
-        } catch (\Throwable $e) {
+            try {
+                Mail::raw(
+                    "Your downline {$user->username} has been approved.",
+                    function ($message) use ($upline) {
+                        $message->to($upline->email)
+                            ->subject('Downline Approved');
+                    }
+                );
 
-            Log::error('Failed to send approval email to upline', [
-                'upline_id' => $upline->UserID,
-                'email' => $upline->email,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                Log::info('Upline email sent successfully', [
+                    'to' => $upline->email,
+                ]);
+            } catch (\Throwable $e) {
+                Log::error('Failed to send approval email to upline', [
+                    'upline_id' => $upline->UserID,
+                    'email' => $upline->email,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
+        } else {
+            Log::warning('Cannot send email to upline', [
+                'upline_exists' => $upline !== null,
+                'email' => $upline?->email,
             ]);
         }
 
-    } else {
+        Log::info('=== APPROVE ACTIVATION COMPLETED ===');
 
-        Log::warning('Cannot send email to upline', [
-            'upline_exists' => $upline !== null,
-            'email' => $upline?->email,
-        ]);
+        $this->dispatch('activation-approved');
+        $this->closeModal();
     }
-
-    Log::info('=== APPROVE ACTIVATION COMPLETED ===');
-
-    $this->dispatch('activation-approved');
-
-    $this->closeModal();
-}
 
     /*
     |--------------------------------------------------------------------------
@@ -444,7 +452,6 @@ class ActivationModal extends Component
     */
     public function rejectActivation($UserID = null): void
     {
-        // Fallback safely to ensure we always have an ID
         $userIdToReject = $UserID ?? $this->selectedUserID;
 
         $activation = Activation::where('UserID', $userIdToReject)
@@ -466,7 +473,6 @@ class ActivationModal extends Component
             $activation->upline_code
         )->first();
 
-        // Send email to the selected user
         if ($user && filled($user->email)) {
             Mail::raw(
                 "Unfortunately, your activation request has been rejected.",
@@ -477,7 +483,6 @@ class ActivationModal extends Component
             );
         }
 
-        // Send email to the upline
         if ($upline && filled($upline->email) && $user) {
             Mail::raw(
                 "The activation request for your downline {$user->username} has been rejected.",
@@ -491,6 +496,7 @@ class ActivationModal extends Component
         $this->dispatch('activation-rejected');
         $this->closeModal();
     }
+
     /*
     |--------------------------------------------------------------------------
     | Submit Activation Process
@@ -574,7 +580,6 @@ class ActivationModal extends Component
             $isNewActivation = false;
             $adminEmail = config('mail.from.address', 'anfredalbit110525@gmail.com');
 
-            // 1. Save / Update Beneficiaries first so they are fully persisted and captured
             $cleanBeneficiaries = [];
             foreach ($this->beneficiaries as $index => $beneficiary) {
                 $fullname = trim($beneficiary['fullname'] ?? '');
@@ -637,7 +642,6 @@ class ActivationModal extends Component
                 $userSubject = 'Activation Request Resubmitted';
                 $uplineSubject = 'Downline Activation Resubmitted';
                 $adminSubject = 'Activation Request Resubmitted (Admin Notice)';
-
             } else {
                 $activation = Activation::create([
                     'UserID' => $selectedUser->UserID,
@@ -657,7 +661,6 @@ class ActivationModal extends Component
                 $adminSubject = 'New Activation Request Submitted (Admin Notice)';
             }
 
-            // 2. Prepare comprehensive mail payload containing all captured details
             $mailData = [
                 'selectedUser' => $selectedUser,
                 'currentUser' => $currentUser,
@@ -704,15 +707,6 @@ class ActivationModal extends Component
                 });
             }
 
-            if ($isNewActivation) {
-                Wallet::create([
-                    'UserID' => $referralUser->UserID,
-                    'ActivationID' => $activation->ActivationID,
-                    'amount' => $activation->amount - 1899,
-                    'status' => 'Active',
-                ]);
-            }
-
             DB::commit();
 
             $this->dispatch('swal:close');
@@ -723,6 +717,9 @@ class ActivationModal extends Component
                 'title' => 'Success!',
                 'text' => 'Activation request submitted successfully.',
             ]);
+
+            $this->dispatch('members-refresh');
+            $this->dispatch('close-activation-modal');
 
         } catch (ValidationException $e) {
             DB::rollBack();

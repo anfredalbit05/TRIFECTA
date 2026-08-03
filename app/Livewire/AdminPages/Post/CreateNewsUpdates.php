@@ -3,6 +3,8 @@
 namespace App\Livewire\AdminPages\Post;
 
 use App\Models\NewsUpdate;
+use App\Models\Module;
+use App\Models\Privilege;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -17,48 +19,174 @@ class CreateNewsUpdates extends Component
     public $details = '';
     public $category = 'General';
     public $image = null;
+    public $existingImage = null;
 
     public bool $showCreateModal = false;
     public $selectedPost = null;
+    public $postIdBeingEdited = null;
 
-    protected $listeners = ['confirmedDelete' => 'deletePost'];
-
-    public function createPost(): void
+    // Helper to check permissions dynamically
+    protected function hasPermission($action)
     {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        if (!$user || !$user->RoleID) {
+            return false;
+        }
+
+        // Super Admin (RoleID 1) bypasses checks
+        if ((int) $user->RoleID === 1) {
+            return true;
+        }
+
+        $module = Module::where('modulename', 'Post - News & Updates')->first();
+
+        if (!$module) {
+            return false;
+        }
+
+        $privilege = Privilege::where('RoleID', $user->RoleID)
+            ->where('ModuleID', $module->ModuleID)
+            ->first();
+
+        if (!$privilege) {
+            return false;
+        }
+
+        return match ($action) {
+            'create' => (bool) $privilege->can_create,
+            'read'   => (bool) $privilege->can_read,
+            'update' => (bool) $privilege->can_update,
+            'delete' => (bool) $privilege->can_delete,
+            default  => false,
+        };
+    }
+
+    // Computed properties for easy access in Blade views
+    public function getCanCreateProperty()
+    {
+        return $this->hasPermission('create');
+    }
+
+    public function getCanReadProperty()
+    {
+        return $this->hasPermission('read');
+    }
+
+    public function getCanUpdateProperty()
+    {
+        return $this->hasPermission('update');
+    }
+
+    public function getCanDeleteProperty()
+    {
+        return $this->hasPermission('delete');
+    }
+
+    public function openCreateModal(): void
+    {
+        if (!$this->canCreate) {
+            session()->flash('error', 'Unauthorized action.');
+            return;
+        }
+
+        $this->resetValidation();
+        $this->reset(['title', 'details', 'image', 'existingImage', 'postIdBeingEdited']);
+        $this->category = 'General';
+        $this->showCreateModal = true;
+    }
+
+    public function editPost($id): void
+    {
+        if (!$this->canUpdate) {
+            session()->flash('error', 'Unauthorized action.');
+            return;
+        }
+
+        $this->resetValidation();
+        $news = NewsUpdate::findOrFail($id);
+
+        $this->postIdBeingEdited = $news->ID;
+        $this->title = $news->title;
+        $this->details = $news->details;
+        $this->category = $news->category ?? 'General';
+        $this->existingImage = $news->image;
+        $this->image = null;
+
+        $this->showCreateModal = true;
+    }
+
+    public function savePost(): void
+    {
+        // Check permissions based on whether it's an update or create
+        if ($this->postIdBeingEdited && !$this->canUpdate) {
+            $this->addError('title', 'Unauthorized action.');
+            return;
+        }
+
+        if (!$this->postIdBeingEdited && !$this->canCreate) {
+            $this->addError('title', 'Unauthorized action.');
+            return;
+        }
+
         $this->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'details' => ['required', 'string'],
+            'title'    => ['required', 'string', 'max:255'],
+            'details'  => ['required', 'string'],
             'category' => ['required', 'string', 'max:100'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'image'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         /** @var User|null $user */
         $user = Auth::user();
 
-        if (!$user instanceof User) {
-            $this->addError('title', 'You must be logged in to create a post.');
-            return;
+        if ($this->postIdBeingEdited) {
+            $news = NewsUpdate::findOrFail($this->postIdBeingEdited);
+            $imagePath = $news->image;
+
+            if ($this->image) {
+                if ($news->image) {
+                    Storage::disk('public')->delete($news->image);
+                }
+                $imagePath = $this->image->store('news-images', 'public');
+            }
+
+            $news->update([
+                'title'    => $this->title,
+                'details'  => $this->details,
+                'image'    => $imagePath,
+                'category' => $this->category,
+            ]);
+
+            $message = 'News update updated successfully.';
+        } else {
+            $imagePath = null;
+            if ($this->image) {
+                $imagePath = $this->image->store('news-images', 'public');
+            }
+
+            NewsUpdate::create([
+                'title'    => $this->title,
+                'details'  => $this->details,
+                'image'    => $imagePath,
+                'category' => $this->category,
+                'status'   => 'Published',
+                'UserID'   => $user->UserID ?? null,
+            ]);
+
+            $message = 'News update published successfully.';
         }
 
-        $imagePath = null;
-        if ($this->image) {
-            $imagePath = $this->image->store('news-images', 'public');
-        }
-
-        NewsUpdate::create([
-            'title'    => $this->title,
-            'details'  => $this->details,
-            'image'    => $imagePath,
-            'category' => $this->category,
-            'status'   => 'Published',
-            'UserID'   => $user->UserID,
-        ]);
-
-        $this->reset(['title', 'details', 'image']);
+        $this->reset(['title', 'details', 'image', 'existingImage', 'postIdBeingEdited']);
         $this->category = 'General';
         $this->showCreateModal = false;
 
-        session()->flash('success', 'News update published successfully.');
+        session()->flash('success', $message);
+    }
+
+    public function createPost(): void
+    {
+        $this->savePost();
     }
 
     public function openDetails($id): void
@@ -71,15 +199,9 @@ class CreateNewsUpdates extends Component
         $this->selectedPost = null;
     }
 
-    /**
-     * Delete the news update post.
-     */
     public function deletePost($id): void
     {
-        /** @var User|null $user */
-        $user = Auth::user();
-
-        if (!$user || (int) $user->RoleID !== 1) {
+        if (!$this->canDelete) {
             return;
         }
 

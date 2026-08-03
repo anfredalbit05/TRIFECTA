@@ -6,11 +6,13 @@
             Branches
         </h2>
 
-        <button
-            wire:click="openCreateModal"
-            class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
-            Add Branch
-        </button>
+        @if($this->canCreate)
+            <button
+                wire:click="openCreateModal"
+                class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
+                Add Branch
+            </button>
+        @endif
     </div>
 
     <p class="masterlist-description text-sm text-slate-500 mb-6">
@@ -34,7 +36,9 @@
                     <th class="py-3 px-4">Branch Name</th>
                     <th class="py-3 px-4">Type</th>
                     <th class="py-3 px-4">Address</th>
-                    <th class="py-3 px-4 text-center">Action</th>
+                    @if($this->canUpdate || $this->canDelete)
+                        <th class="py-3 px-4 text-center">Action</th>
+                    @endif
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
@@ -63,25 +67,31 @@
                         </td>
 
                         <!-- Actions Column -->
-                        <td class="py-4 px-4 text-center">
-                            <div class="flex gap-2 justify-center">
-                                {{-- EDIT BUTTON --}}
-                                <button
-                                    wire:click="editBranch({{ $branch->BranchID }})"
-                                    title="Update Branch"
-                                    class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
-                                    ✏️
-                                </button>
+                        @if($this->canUpdate || $this->canDelete)
+                            <td class="py-4 px-4 text-center">
+                                <div class="flex gap-2 justify-center">
+                                    {{-- EDIT BUTTON --}}
+                                    @if($this->canUpdate)
+                                        <button
+                                            wire:click="editBranch({{ $branch->BranchID }})"
+                                            title="Update Branch"
+                                            class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
+                                            ✏️
+                                        </button>
+                                    @endif
 
-                                {{-- DELETE BUTTON --}}
-                                <button
-                                    wire:click="confirmDeleteBranch({{ $branch->BranchID }})"
-                                    title="Delete Branch"
-                                    class="inline-flex items-center justify-center px-3 py-2 rounded-lg  border-amber-400 bg-amber-500 text-white hover:bg-amber-500 transition cursor-pointer text-xs font-semibold shadow">
-                                    🗑️
-                                </button>
-                            </div>
-                        </td>
+                                    {{-- DELETE BUTTON --}}
+                                    @if($this->canDelete)
+                                        <button
+                                            wire:click="confirmDeleteBranch({{ $branch->BranchID }})"
+                                            title="Delete Branch"
+                                            class="inline-flex items-center justify-center px-3 py-2 rounded-lg border-amber-400 bg-amber-500 text-white hover:bg-amber-500 transition cursor-pointer text-xs font-semibold shadow">
+                                            🗑️
+                                        </button>
+                                    @endif
+                                </div>
+                            </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
@@ -133,16 +143,16 @@
                             @error('branchname') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
-<!-- Type -->
-<div>
-    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Type</label>
-    <select wire:model="type" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white">
-        <option value="">Select Type</option>
-        <option value="Branch">Branch</option>
-        <option value="Satellite">Satellite</option>
-    </select>
-    @error('type') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-</div>
+                        <!-- Type -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Type</label>
+                            <select wire:model="type" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white">
+                                <option value="">Select Type</option>
+                                <option value="Branch">Branch</option>
+                                <option value="Satellite">Satellite</option>
+                            </select>
+                            @error('type') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                        </div>
 
                         <!-- Address -->
                         <div>

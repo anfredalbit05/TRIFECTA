@@ -3,12 +3,13 @@
 namespace App\Livewire\AdminPages\Masterlist;
 
 use App\Models\Benefit;
+use App\Models\Privilege;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class BenefitsList extends Component
 {
-
     use WithPagination;
 
     protected $paginationTheme = 'tailwind';
@@ -31,8 +32,76 @@ class BenefitsList extends Component
         'status' => 'boolean',
     ];
 
+    /*
+    |--------------------------------------------------------------------------
+    | Permission Checkers (ModuleID 4 assumed for Benefits)
+    |--------------------------------------------------------------------------
+    */
+
+    protected function hasPermission($action): bool
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return false;
+        }
+
+        // Super Admin override (RoleID 1)
+        if ((int) $user->RoleID === 1) {
+            return true;
+        }
+
+        $column = 'can_' . $action;
+
+        if ($user->role && method_exists($user->role, 'permissions')) {
+            $hasPerm = optional($user->role->permissions)
+                ->where('ModuleID', 4)
+                ->where($column, 1)
+                ->isNotEmpty();
+
+            if ($hasPerm) {
+                return true;
+            }
+        }
+
+        return Privilege::where('RoleID', $user->RoleID)
+            ->where('ModuleID', 4)
+            ->where($column, 1)
+            ->exists();
+    }
+
+    public function getCanCreateProperty(): bool
+    {
+        return $this->hasPermission('create');
+    }
+
+    public function getCanReadProperty(): bool
+    {
+        return $this->hasPermission('read');
+    }
+
+    public function getCanUpdateProperty(): bool
+    {
+        return $this->hasPermission('update');
+    }
+
+    public function getCanDeleteProperty(): bool
+    {
+        return $this->hasPermission('delete');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Component Actions
+    |--------------------------------------------------------------------------
+    */
+
     public function openCreateModal()
     {
+        if (!$this->canCreate) {
+            return;
+        }
+
         $this->resetValidation();
 
         $this->reset([
@@ -57,6 +126,10 @@ class BenefitsList extends Component
 
     public function editBenefit($id)
     {
+        if (!$this->canUpdate) {
+            return;
+        }
+
         $this->resetValidation();
         $benefit = Benefit::findOrFail($id);
 
@@ -72,6 +145,13 @@ class BenefitsList extends Component
 
     public function saveBenefit()
     {
+        if ($this->benefit_id && !$this->canUpdate) {
+            return;
+        }
+        if (!$this->benefit_id && !$this->canCreate) {
+            return;
+        }
+
         $this->validate();
 
         if ($this->benefit_id) {
@@ -102,12 +182,20 @@ class BenefitsList extends Component
     // Trigger SweetAlert popup
     public function confirmDeleteBenefit($id)
     {
+        if (!$this->canDelete) {
+            return;
+        }
+
         $this->dispatch('confirm-delete', id: $id);
     }
 
     // Actual deletion executed via JS callback
     public function deleteBenefit($id)
     {
+        if (!$this->canDelete) {
+            return;
+        }
+
         $benefit = Benefit::findOrFail($id);
         $benefit->delete();
 
