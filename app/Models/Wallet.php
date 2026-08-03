@@ -12,6 +12,7 @@ class Wallet extends Model
         'UserID',
         'ActivationID',
         'amount',
+        'source', // <--- ADD THIS LINE HERE
         'status',
     ];
 

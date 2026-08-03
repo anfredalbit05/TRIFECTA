@@ -6,6 +6,7 @@ use App\Models\Activation;
 use App\Models\Beneficiary;
 use App\Models\User;
 use App\Models\Wallet;
+use App\Models\Ledger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
@@ -44,7 +45,7 @@ class ActivationReviewModal extends Component
 
         /*
         |--------------------------------------------------------------------------
-        | Find Pending Activation by UserID (Fixed from ProcessedBy)
+        | Find Pending Activation by UserID
         |--------------------------------------------------------------------------
         */
         $this->activation = Activation::where('UserID', $this->selectedUserID)
@@ -95,6 +96,8 @@ class ActivationReviewModal extends Component
 
         DB::transaction(function () {
 
+            Log::info('Starting approval transaction for ActivationID: ' . $this->activation->ActivationID);
+
             // 1. Update Activation Status
             $this->activation->update([
                 'status' => 'Approved',
@@ -118,13 +121,6 @@ class ActivationReviewModal extends Component
             |--------------------------------------------------------------------------
             | Multi-Tier Referral Commission Structure (6 Levels)
             |--------------------------------------------------------------------------
-            | - Level 1: 400
-            | - Level 2: 50
-            | - Level 3: 40
-            | - Level 4: 30
-            | - Level 5: 20
-            | - Level 6: 10
-            | - Level 7+: 0 (Loop stops completely)
             */
             $currentUplineCode = $this->activation->upline_code;
             $level = 1;
@@ -139,27 +135,45 @@ class ActivationReviewModal extends Component
                 6 => 10.00,
             ];
 
+            Log::info('Initial Upline Code for Commission Loop: ' . ($currentUplineCode ?? 'NONE'));
+
             while ($currentUplineCode && $level <= $maxLevels) {
                 $uplineUser = User::where('referralCode', $currentUplineCode)->first();
 
                 if (!$uplineUser) {
+                    Log::warning("Upline user not found for referral code: {$currentUplineCode} at Level {$level}");
                     break;
                 }
 
                 $commissionAmount = $commissionRates[$level] ?? 0.00;
 
+                Log::info("Processing Level {$level}: Upline UserID {$uplineUser->UserID}, Commission: {$commissionAmount}");
+
                 if ($commissionAmount > 0) {
+                    // Determine source code: 'DC' for Level 1 (Direct Owner), 'O' for Levels 2-6 (Override)
+                    $sourceType = ($level === 1) ? 'DR' : 'OV';
+
+                    // Create Wallet Entry with Source (DC or O)
                     Wallet::create([
                         'UserID'       => $uplineUser->UserID,
                         'ActivationID' => $this->activation->ActivationID,
                         'amount'       => $commissionAmount,
+                        'source'       => $sourceType, // Added DC / O
                         'status'       => 'Active',
                     ]);
 
-                    Log::info("Admin Review: Level {$level} commission of {$commissionAmount} awarded to User ID: {$uplineUser->UserID}");
+                    // Create Ledger Entry
+                    Ledger::create([
+                        'RefID'  => $uplineUser->UserID,
+                        'amount' => $commissionAmount,
+                        'Source' => "Level {$level} Referral Commission [{$sourceType}] (Activation ID: {$this->activation->ActivationID})",
+                        'status' => 'Completed',
+                    ]);
+
+                    Log::info("Ledger & Wallet successfully written for UserID: {$uplineUser->UserID} at Level {$level} as type [{$sourceType}] with amount: {$commissionAmount}");
                 }
 
-                $currentUplineCode = $uplineUser->upline_code ?? null;
+                $currentUplineCode = $uplineUser->uplineCode ?? null;
                 $level++;
             }
 

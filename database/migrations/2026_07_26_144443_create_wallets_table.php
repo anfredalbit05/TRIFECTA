@@ -22,6 +22,9 @@ return new class extends Migration
 
             $table->decimal('amount', 12, 2)->default(0);
 
+           $table->enum('source', ['DR', 'OV'])
+            ->nullable();
+
             $table->foreignId('ActivationID')
                 ->nullable()
                 ->constrained('activations', 'ActivationID')

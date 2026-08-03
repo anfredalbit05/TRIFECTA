@@ -298,9 +298,10 @@ class ActivationModal extends Component
                 'status' => 'Approved',
             ]);
 
-            // 2. Update user status to Active
+            // 2. Update user status to Active (and sync uplineCode from activation if available)
             User::where('UserID', $targetUserID)->update([
                 'status' => 'Active',
+                'uplineCode' => $activation->upline_code,
             ]);
         });
 
@@ -620,6 +621,11 @@ class ActivationModal extends Component
                 $uplineSubject = 'New Downline Activation Request';
                 $adminSubject = 'New Activation Request Submitted (Admin Notice)';
             }
+
+            // Save the upline code directly to the users table's uplineCode column
+            $selectedUser->update([
+                'uplineCode' => $cleanUplineCode,
+            ]);
 
             $mailData = [
                 'selectedUser' => $selectedUser,
