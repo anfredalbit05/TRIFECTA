@@ -46,8 +46,8 @@ use Illuminate\Support\Str;
                             $profilePic = auth()->user()->profilepic;
                         @endphp
 
-                        @if (!$profilePic || $profilePic === 'profiles/default-avatar.png')
-                            <img src="{{ asset('storage/profiles/default-avatar.png') }}" class="profile-image"
+                        @if (!$profilePic || $profilePic === 'images/profiles/default-avatar.png')
+                            <img src="{{ asset('images/profiles/default-avatar.png') }}" class="profile-image"
                                 alt="Default profile picture">
                         @else
                             <img src="{{ Str::startsWith($profilePic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic) }}"
