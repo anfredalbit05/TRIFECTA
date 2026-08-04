@@ -15,15 +15,8 @@ return new class extends Migration
 
             $table->id('TransactionID');
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-            $table->unsignedBigInteger('RefID'); //Membership Fee
-=======
-        $this->member = User::find($this->selectedUserID);
->>>>>>> ef58e6bb3d6f16a88db1d9ed9a9e2e118b00420c
-=======
-            $table->unsignedBigInteger('RefID'); //Membership Fee
->>>>>>> 859c1d2343e4c95b0d797d545229f05478ae7103
+            // Membership Fee Reference
+            $table->string('RefID');
 
             $table->decimal('amount', 12, 2);
 
@@ -37,23 +30,7 @@ return new class extends Migration
             ])->default('OT');
 
             $table->foreignId('ActivationID')
-                ->constrained('activations', 'ActivationID')
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
-=======
-        /*
-        |--------------------------------------------------------------------------
-        | Load Referral User
-        |--------------------------------------------------------------------------
-        */
-        $this->referralUser = null;
->>>>>>> ef58e6bb3d6f16a88db1d9ed9a9e2e118b00420c
-=======
->>>>>>> 859c1d2343e4c95b0d797d545229f05478ae7103
-
-
-
-            $table->foreignId('ActivationID')
+                ->nullable()
                 ->constrained('activations', 'ActivationID')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
