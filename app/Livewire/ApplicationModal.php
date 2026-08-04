@@ -46,7 +46,7 @@ class ApplicationModal extends Component
 
     /*
     |--------------------------------------------------------------------------
-    | Beneficiary Informations
+    | Beneficiary Information
     |--------------------------------------------------------------------------
     */
 
