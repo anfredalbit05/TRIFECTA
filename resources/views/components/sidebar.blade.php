@@ -1,19 +1,21 @@
 @php
+use Illuminate\Support\Str;
     $isAdmin = auth()->check() && auth()->user()->RoleID != 4;
 @endphp
 
-<div
-    x-data="{ open: false }"
-    x-on:profile-updated.window="window.location.reload()"
-    class="sidebar-wrapper">
+
+
+<div x-data="{ open: false }" x-on:profile-updated.window="window.location.reload()" class="sidebar-wrapper">
 
     <!-- Mobile Header -->
     <header class="mobile-header">
         <button @click="open = !open" class="menu-button" aria-label="Toggle Menu">
-            <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="menu-icon" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
-            <svg x-show="open" x-cloak xmlns="http://www.w3.org/2000/svg" class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg x-show="open" x-cloak xmlns="http://www.w3.org/2000/svg" class="menu-icon" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
@@ -22,12 +24,7 @@
     </header>
 
     <!-- Overlay (Mobile Only) -->
-    <div
-        x-show="open"
-        x-transition.opacity
-        x-cloak
-        @click="open = false"
-        class="sidebar-overlay">
+    <div x-show="open" x-transition.opacity x-cloak @click="open = false" class="sidebar-overlay">
     </div>
 
     <!-- Sidebar -->
@@ -46,14 +43,15 @@
                 <div class="profile-section">
                     <div class="profile-image-box">
                         @php
-                            $profilePic = auth()->user()->profilepic ?? null;
-                            $defaultAvatar = 'profiles/default-avatar.png';
+                            $profilePic = auth()->user()->profilepic;
                         @endphp
 
-                        @if(empty($profilePic) || $profilePic === $defaultAvatar)
-                            <img src="{{ asset('storage/profiles/default-avatar.png') }}" class="profile-image" alt="Default profile picture">
+                        @if (!$profilePic || $profilePic === 'profiles/default-avatar.png')
+                            <img src="{{ asset('storage/profiles/default-avatar.png') }}" class="profile-image"
+                                alt="Default profile picture">
                         @else
-                            <img src="{{ asset('storage/' . $profilePic) }}" class="profile-image" alt="Profile picture">
+                            <img src="{{ Str::startsWith($profilePic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic) }}"
+                                class="profile-image" alt="Profile picture">
                         @endif
                     </div>
 
@@ -69,29 +67,35 @@
 
                 <!-- Menu -->
                 <div class="menu-list">
-                    <a href="{{ route('dashboard') }}" class="menu-item {{ request()->routeIs('dashboard') ? 'active-menu' : '' }}">
+                    <a href="{{ route('dashboard') }}"
+                        class="menu-item {{ request()->routeIs('dashboard') ? 'active-menu' : '' }}">
                         Dashboard
                     </a>
 
-                    <a href="{{ route('genealogy-tree') }}" class="menu-item {{ request()->routeIs('genealogy-tree') ? 'active-menu' : '' }}">
+                    <a href="{{ route('genealogy-tree') }}"
+                        class="menu-item {{ request()->routeIs('genealogy-tree') ? 'active-menu' : '' }}">
                         Genealogy
                     </a>
 
-                    @if($isAdmin)
-                        <a href="{{ route('masterlist') }}" class="menu-item {{ request()->routeIs('masterlist') ? 'active-menu' : '' }}">
+                    @if ($isAdmin)
+                        <a href="{{ route('masterlist') }}"
+                            class="menu-item {{ request()->routeIs('masterlist') ? 'active-menu' : '' }}">
                             Masterlist
                         </a>
 
-                        <a href="{{ route('post') }}" class="menu-item {{ request()->routeIs('post') ? 'active-menu' : '' }}">
+                        <a href="{{ route('post') }}"
+                            class="menu-item {{ request()->routeIs('post') ? 'active-menu' : '' }}">
                             Post
                         </a>
 
-                        <a href="{{ route('report-settings') }}" class="menu-item {{ request()->routeIs('report-settings') ? 'active-menu' : '' }}">
+                        <a href="{{ route('report-settings') }}"
+                            class="menu-item {{ request()->routeIs('report-settings') ? 'active-menu' : '' }}">
                             Report & Settings
                         </a>
                     @endif
 
-                    <a href="{{ route('my-profile') }}" class="menu-item {{ request()->routeIs('my-profile') ? 'active-menu' : '' }}">
+                    <a href="{{ route('my-profile') }}"
+                        class="menu-item {{ request()->routeIs('my-profile') ? 'active-menu' : '' }}">
                         My Profile
                     </a>
                 </div>
