@@ -122,26 +122,17 @@ class SettingsSeeder extends Seeder
             // ===========================
             [
                 'name' => 'default_profile_picture',
-                'value' => 'images/profiles/default-avatar.png',
+                'value' => 'storage/profiles/default-avatar.png',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'name' => 'default_news_updates_logo',
-                'value' => 'news/default-news.png',
+                'name' => 'default_news_updates_picture',
+                'value' => 'storage/news-images/default-news.png',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
 
-            // ===========================
-            // REFERRAL
-            // ===========================
-            [
-                'name' => 'referral_prefix',
-                'value' => 'DAY',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
 
         ]);
     }

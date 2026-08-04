@@ -47,11 +47,11 @@
                     <div class="profile-image-box">
                         @php
                             $profilePic = auth()->user()->profilepic ?? null;
-                            $defaultAvatar = 'images/profiles/default-avatar.png';
+                            $defaultAvatar = 'profiles/default-avatar.png';
                         @endphp
 
-                        @if(empty($profilePic) || $profilePic === $defaultAvatar || $profilePic === 'images/profiles/default-avatar.png')
-                            <img src="{{ asset('images/profiles/default-avatar.png') }}" class="profile-image" alt="Default profile picture">
+                        @if(empty($profilePic) || $profilePic === $defaultAvatar)
+                            <img src="{{ asset('storage/profiles/default-avatar.png') }}" class="profile-image" alt="Default profile picture">
                         @else
                             <img src="{{ asset('storage/' . $profilePic) }}" class="profile-image" alt="Profile picture">
                         @endif
