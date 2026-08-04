@@ -40,7 +40,7 @@
             x-show="tab === 'overview'"
                   x-cloak>
 
-            <livewire:member-pages.dashboard.newsupdates />
+            <livewire:member-pages.dashboard.news-updates />
 
         </div>
 
