@@ -51,7 +51,7 @@
             <div class="h-28 w-28 shrink-0 overflow-hidden rounded-full border-4 border-slate-100 bg-slate-100 shadow-sm mx-auto sm:mx-0">
                 @php
                     $profilePath = auth()->user()->profilepic;
-                    $defaultAvatar = 'images/profiles/default-avatar.png';
+                    $defaultAvatar = 'profiles/default-avatar.png';
                 @endphp
 
                 @if ($profilepic)
@@ -59,7 +59,7 @@
                 @elseif ($profilePath && $profilePath !== $defaultAvatar)
                     <img src="{{ asset('storage/' . $profilePath) }}" class="h-full w-full object-cover" alt="Profile picture">
                 @else
-                    <img src="{{ asset('images/profiles/default-avatar.png') }}" class="h-full w-full object-cover" alt="Default profile picture">
+                    <img src="{{ asset('profiles/default-avatar.png') }}" class="h-full w-full object-cover" alt="Default profile picture">
                 @endif
             </div>
 

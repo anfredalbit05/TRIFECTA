@@ -1,12 +1,7 @@
 <div class="dashboard-grid">
 
-
-
     <!-- LEFT FEED COLUMN (Contains Create Post + Feed Items) -->
     <div class="feed-column">
-
-
-
         <!-- NEWS / FEED ITEMS -->
         @forelse($newsUpdates as $news)
 

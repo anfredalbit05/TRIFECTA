@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             MembershipFeeSeeder::class,
             ModuleSeeder::class,
             TestimonialsSeeder::class,
+            SettingsSeeder::class,
         ]);
     }
 }

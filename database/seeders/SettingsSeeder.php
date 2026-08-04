@@ -46,24 +46,11 @@ class SettingsSeeder extends Seeder
             // MEMBERSHIP
             // ===========================
             [
-                'name' => 'membership_fee',
-                'value' => '1999',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
                 'name' => 'membership_validity_months',
                 'value' => '12',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            [
-                'name' => 'maximum_beneficiaries',
-                'value' => '3',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-
             // ===========================
             // AGE LIMITS
             // ===========================
@@ -135,7 +122,7 @@ class SettingsSeeder extends Seeder
             // ===========================
             [
                 'name' => 'default_profile_picture',
-                'value' => 'profiles/default-avatar.png',
+                'value' => 'images/profiles/default-avatar.png',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
