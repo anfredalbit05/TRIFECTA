@@ -45,7 +45,7 @@ class UsersSeeder extends Seeder
                 'email' => 'dtechmsolution@gmail.com',
                 'email_verified_at' => now(),
 
-                'profilepic' => 'profiles/default-avatar.png',
+                'profilepic' => 'images/profiles/default-avatar.png',
 
                 'referralCode' => strtoupper(Str::random(8)),
                 'uplineCode' => null,
@@ -77,7 +77,7 @@ class UsersSeeder extends Seeder
                 'email' => 'anfredalbit110525@gmail.com',
                 'email_verified_at' => now(),
 
-                'profilepic' => 'profiles/default-avatar.png',
+                'profilepic' => 'images/profiles/default-avatar.png',
 
                 'referralCode' => strtoupper(Str::random(8)),
                 'uplineCode' => null,
@@ -111,7 +111,7 @@ class UsersSeeder extends Seeder
                 'email' => 'selboretnan@gmail.com',
                 'email_verified_at' => now(),
 
-                'profilepic' => 'profiles/default-avatar.png',
+                'profilepic' => 'images/profiles/default-avatar.png',
 
                 'referralCode' => strtoupper(Str::random(8)),
                 'uplineCode' => null,
@@ -146,7 +146,7 @@ class UsersSeeder extends Seeder
                 'email' => 'theroyalicon2026@gmail.com',
                 'email_verified_at' => now(),
 
-                'profilepic' => 'profiles/default-avatar.png',
+                'profilepic' => 'images/profiles/default-avatar.png',
 
                 'referralCode' => strtoupper(Str::random(8)),
                 'uplineCode' => null,
@@ -181,7 +181,7 @@ class UsersSeeder extends Seeder
                 'email' => 'manliguezprinces00@gmail.com',
                 'email_verified_at' => now(),
 
-                'profilepic' => 'profiles/default-avatar.png',
+                'profilepic' => 'images/profiles/default-avatar.png',
 
                 'referralCode' => strtoupper(Str::random(8)),
                 'uplineCode' => null,
@@ -216,7 +216,7 @@ class UsersSeeder extends Seeder
                 'email' => 'ccnierras1977@gmail.com',
                 'email_verified_at' => now(),
 
-                'profilepic' => 'profiles/default-avatar.png',
+                'profilepic' => 'images/profiles/default-avatar.png',
 
                 'referralCode' => strtoupper(Str::random(8)),
                 'uplineCode' => null,
@@ -251,7 +251,7 @@ class UsersSeeder extends Seeder
                 'email' => 'mariacdrobles@gmail.com',
                 'email_verified_at' => now(),
 
-                'profilepic' => 'profiles/default-avatar.png',
+                'profilepic' => 'images/profiles/default-avatar.png',
 
                 'referralCode' => strtoupper(Str::random(8)),
                 'uplineCode' => null,
@@ -287,7 +287,7 @@ class UsersSeeder extends Seeder
                 'email' => 'alfeduron09@gmail.com',
                 'email_verified_at' => now(),
 
-                'profilepic' => 'profiles/default-avatar.png',
+                'profilepic' => 'images/profiles/default-avatar.png',
 
                 'referralCode' => strtoupper(Str::random(8)),
                 'uplineCode' => null,
