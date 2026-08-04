@@ -9,6 +9,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+
 class Members extends Component
 {
     use WithPagination;
@@ -266,4 +267,14 @@ class Members extends Component
 
         $this->dispatch('open-view-member', UserID: $member->UserID);
     }
+
+        public function handleActivationBroadcast($event): void
+    {
+        // This method will automatically trigger in real-time
+        // whenever an activation event is broadcasted on the channel.
+
+        // You can optionally target or just refresh the component:
+        $this->skipRender = false;
+    }
+
 }

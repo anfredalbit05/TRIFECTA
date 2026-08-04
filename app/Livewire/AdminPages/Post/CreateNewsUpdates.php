@@ -10,10 +10,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class CreateNewsUpdates extends Component
 {
     use WithFileUploads;
+    use WithPagination;
 
     public $title = '';
     public $details = '';
@@ -224,12 +226,12 @@ class CreateNewsUpdates extends Component
         session()->flash('success', 'News update deleted successfully.');
     }
 
-    public function render()
+public function render()
     {
         $newsUpdates = NewsUpdate::with('user')
             ->where('status', 'Published')
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return view('components.admin-pages.post.news-updates', [
             'newsUpdates' => $newsUpdates,

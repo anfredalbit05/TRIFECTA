@@ -7,6 +7,7 @@ use App\Models\Beneficiary;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Ledger;
+use App\Models\MembershipFee;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
@@ -119,15 +120,37 @@ class ActivationReviewModal extends Component
 
             /*
             |--------------------------------------------------------------------------
-            | Multi-Tier Referral Commission Structure (6 Levels)
+            | Record Membership Fees (MF) breakdown into Ledger for the Activated User
+            |--------------------------------------------------------------------------
+            */
+            $membershipFees = MembershipFee::all();
+
+            foreach ($membershipFees as $fee) {
+                Ledger::create([
+                    'RefID'        => $fee->FeeID,
+                    'amount'       => $fee->Cost,
+                    'Source'       => 'MF', // Membership Fee
+                    'ActivationID' => $this->activation->ActivationID,
+                    'status'       => 'Completed',
+                ]);
+
+                Log::info("Membership Fee ledger entry [{$fee->FeeName}] written with RefID: {$fee->FeeID} and amount: {$fee->Cost}");
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Multi-Tier Referral Commission Structure with Dynamic Sponsoring Count
             |--------------------------------------------------------------------------
             */
             $currentUplineCode = $this->activation->upline_code;
             $level = 1;
             $maxLevels = 6;
 
+            $drFee = MembershipFee::where('FeeName', 'Direct Referral')->value('Cost') ?? 400.00;
+
+            // Standard hierarchy level rates (fallback if needed)
             $commissionRates = [
-                1 => 400.00,
+                1 => (float) $drFee,
                 2 => 50.00,
                 3 => 40.00,
                 4 => 30.00,
@@ -145,32 +168,59 @@ class ActivationReviewModal extends Component
                     break;
                 }
 
-                $commissionAmount = $commissionRates[$level] ?? 0.00;
+                $commissionAmount = 0.00;
+                $sourceType = ($level === 1) ? 'DR' : 'OV';
+
+                if ($level === 1) {
+                    // Level 1 always gets the Direct Referral amount
+                    $commissionAmount = $commissionRates[1];
+                } else {
+                    // For higher levels (e.g., Level 2 like User 1), check how many direct invitees
+                    // the immediate sponsor (e.g., User 2) has successfully registered up to now.
+                    $sponsorUserID = User::where('referralCode', $this->activation->upline_code)->value('UserID');
+
+                    // Count how many approved activations belong to this sponsor's direct referral code
+                    $directInviteCount = Activation::where('status', 'Approved')
+                        ->where('upline_code', $this->activation->upline_code)
+                        ->count();
+
+                    // Map direct invite sequence count to decreasing commission rates:
+                    // 1st invite = 50, 2nd = 40, 3rd = 30, 4th = 20, 5th = 10, 6th+ = 0
+                    $dynamicOverrideRates = [
+                        1 => 50.00,
+                        2 => 40.00,
+                        3 => 30.00,
+                        4 => 20.00,
+                        5 => 10.00,
+                    ];
+
+                    $commissionAmount = $dynamicOverrideRates[$directInviteCount] ?? 0.00;
+                }
 
                 Log::info("Processing Level {$level}: Upline UserID {$uplineUser->UserID}, Commission: {$commissionAmount}");
 
                 if ($commissionAmount > 0) {
-                    // Determine source code: 'DC' for Level 1 (Direct Owner), 'O' for Levels 2-6 (Override)
-                    $sourceType = ($level === 1) ? 'DR' : 'OV';
-
-                    // Create Wallet Entry with Source (DC or O)
+                    // Create Wallet Entry for Upline
                     Wallet::create([
                         'UserID'       => $uplineUser->UserID,
                         'ActivationID' => $this->activation->ActivationID,
                         'amount'       => $commissionAmount,
-                        'source'       => $sourceType, // Added DC / O
+                        'source'       => $sourceType,
                         'status'       => 'Active',
                     ]);
 
-                    // Create Ledger Entry
+                    // Create Ledger Entry for Upline Commission/Override
                     Ledger::create([
-                        'RefID'  => $uplineUser->UserID,
-                        'amount' => $commissionAmount,
-                        'Source' => "Level {$level} Referral Commission [{$sourceType}] (Activation ID: {$this->activation->ActivationID})",
-                        'status' => 'Completed',
+                        'RefID'        => $uplineUser->UserID,
+                        'amount'       => $commissionAmount,
+                        'Source'       => $sourceType,
+                        'ActivationID' => $this->activation->ActivationID,
+                        'status'       => 'Completed',
                     ]);
 
                     Log::info("Ledger & Wallet successfully written for UserID: {$uplineUser->UserID} at Level {$level} as type [{$sourceType}] with amount: {$commissionAmount}");
+                } else {
+                    Log::info("No commission generated for UserID: {$uplineUser->UserID} at Level {$level} due to invite threshold limit.");
                 }
 
                 $currentUplineCode = $uplineUser->uplineCode ?? null;

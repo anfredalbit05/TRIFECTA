@@ -28,6 +28,9 @@ class DatabaseSeeder extends Seeder
             UsersSeeder::class,
             ContextsSeeder::class,
             BenefitsSeeder::class,
+            MembershipFeeSeeder::class,
+            ModuleSeeder::class,
+            TestimonialsSeeder::class,
         ]);
     }
 }

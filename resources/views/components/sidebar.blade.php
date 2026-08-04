@@ -57,12 +57,12 @@
                         @endif
                     </div>
 
-                    <h2 class="profile-name">
-                        {{ Auth::user()->firstname ?? 'Member' }}
-                        {{ Auth::user()->lastname ?? '' }}
+                    <h2 class="profile-name text-center">
+                        <div>{{ Auth::user()->firstname ?? 'Member' }}</div>
+                        <div>{{ Auth::user()->lastname ?? '' }}</div>
                     </h2>
 
-                    <p class="profile-status">
+                    <p class="profile-status text-center">
                         {{ Auth::user()->status ?? 'Inactive' }} Member
                     </p>
                 </div>

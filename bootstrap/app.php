@@ -42,7 +42,13 @@ return Application::configure(basePath: dirname(__DIR__))
                 | Request::HEADER_X_FORWARDED_PORT
                 | Request::HEADER_X_FORWARDED_PROTO
         );
+
+
+         $middleware->alias([
+            'inactive' => \App\Http\Middleware\CheckInactiveAccount::class,
+        ]);
     })
+
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),

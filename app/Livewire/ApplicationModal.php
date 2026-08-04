@@ -41,10 +41,12 @@ class ApplicationModal extends Component
     public ?int $userId = null;
 
 
+    public $upline = '';
+
 
     /*
     |--------------------------------------------------------------------------
-    | Beneficiary Information
+    | Beneficiary Informations
     |--------------------------------------------------------------------------
     */
 
@@ -148,13 +150,18 @@ class ApplicationModal extends Component
     |--------------------------------------------------------------------------
     */
 
-    #[On('open-application-modal')]
-    public function open()
-    {
-        $this->resetErrorBag();
-        $this->resetValidation();
-        $this->open = true;
+  #[On('open-application-modal')]
+public function open($upline = null)
+{
+    $this->resetErrorBag();
+    $this->resetValidation();
+
+    $this->open = true;
+
+    if ($upline) {
+        $this->upline = $upline;
     }
+}
 
 
 
@@ -292,6 +299,7 @@ class ApplicationModal extends Component
                 'username' => $this->username,
                 'password' => bcrypt($this->password),
                 'referralCode' => $referralCode,
+                'uplineCode' => $this->upline, // ✅ Correct
                 'lastname' => $this->surname,
                 'firstname' => $this->first_name,
                 'middlename' => $this->middle_name,
@@ -378,12 +386,12 @@ class ApplicationModal extends Component
                             ->subject('Your Application Details & Credentials');
 
                     // Attach the benefits image from the public folder
-                    $photoPath = public_path('images/benefits.jpg');
+                    $photoPath = public_path('images/benefits.png');
 
                     if (file_exists($photoPath)) {
                         $message->attach($photoPath, [
-                            'as' => 'benefits.jpg',
-                            'mime' => 'image/jpeg',
+                            'as' => 'benefits.png',
+                            'mime' => 'image/png',
                         ]);
                     }
                 });

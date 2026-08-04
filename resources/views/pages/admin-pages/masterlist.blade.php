@@ -66,7 +66,7 @@
 
     </div>
 
-    <div class="dashboard-layout px-10 pt-4">
+    <div class="dashboard-layout px-12 pt-4">
 
         <!-- OVERVIEW -->
         <div

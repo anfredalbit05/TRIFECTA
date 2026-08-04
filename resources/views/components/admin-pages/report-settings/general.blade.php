@@ -43,7 +43,7 @@
                 @forelse($settings as $index => $setting)
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="py-4 px-4 font-medium text-slate-500">
-                            {{ $index + 1 }}
+                           {{ $settings->firstItem() + $index }}
                         </td>
 
                         <td class="py-4 px-4 font-semibold text-slate-900">
@@ -73,7 +73,7 @@
                                         <button
                                             wire:click="confirmDeleteSetting({{ $setting->SettingsID }})"
                                             title="Delete Setting"
-                                            class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition cursor-pointer text-xs font-semibold shadow">
+                                            class="inline-flex items-center justify-center px-3 py-2 rounded-lg border-amber-400 bg-amber-500 text-white hover:bg-amber-500 transition cursor-pointer text-xs font-semibold shadow">
                                             🗑️
                                         </button>
                                     @endif
@@ -90,6 +90,53 @@
                 @endforelse
             </tbody>
         </table>
+
+        <!-- PAGINATION -->
+        @if($settings->hasPages())
+            <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
+
+                {{-- Previous Page Link --}}
+                @if ($settings->onFirstPage())
+                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                        Previous
+                    </span>
+                @else
+                    <button
+                        wire:click="previousPage"
+                        wire:loading.attr="disabled"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer"
+                        style="background-color: #D79B10;"
+                        onmouseover="this.style.backgroundColor='#c58d0f'"
+                        onmouseout="this.style.backgroundColor='#D79B10'"
+                    >
+                        Previous
+                    </button>
+                @endif
+
+                <span class="text-sm text-gray-600">
+                    Page {{ $settings->currentPage() }} of {{ $settings->lastPage() }}
+                </span>
+
+                {{-- Next Page Link --}}
+                @if ($settings->hasMorePages())
+                    <button
+                        wire:click="nextPage"
+                        wire:loading.attr="disabled"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer"
+                        style="background-color: #0C2C6B;"
+                        onmouseover="this.style.backgroundColor='#0a2559'"
+                        onmouseout="this.style.backgroundColor='#0C2C6B'"
+                    >
+                        Next
+                    </button>
+                @else
+                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                        Next
+                    </span>
+                @endif
+
+            </div>
+        @endif
     </div>
 
     <!-- ADD/EDIT SETTING MODAL -->
@@ -144,7 +191,7 @@
                         <button
                             type="submit"
                             class="px-4 py-2 text-xs font-semibold text-white bg-[#0C2C6B] rounded-lg hover:bg-[#09204f] transition cursor-pointer shadow">
-                            Save Setting
+                            {{ $setting_id ? 'Update Setting' : 'Save Setting' }}
                         </button>
                     </div>
                 </form>
@@ -153,36 +200,77 @@
         </div>
     @endif
 
-    @script
-    <script>
-        $wire.on('confirm-delete', (event) => {
-            const settingId = event.id || event[0]?.id;
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $wire.deleteSetting(settingId);
-                }
-            });
+@script
+<script>
+    // Listen for custom success alerts
+    $wire.on('swal:success', (event) => {
+        const data = event[0] || event;
+        Swal.fire({
+            title: data.title,
+            text: data.text,
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
         });
+    });
 
-        $wire.on('setting-deleted', () => {
-            Swal.fire({
-                title: 'Deleted!',
-                text: 'Setting has been successfully deleted.',
-                icon: 'success',
-                timer: 1500,
-                showConfirmButton: false
-            });
+    // Listen for custom error alerts (like duplicates)
+    $wire.on('swal:error', (event) => {
+        const data = event[0] || event;
+        Swal.fire({
+            title: data.title,
+            html: data.text, // This line enables the HTML formatting
+            icon: 'error',
+            confirmButtonColor: '#0C2C6B'
         });
-    </script>
-    @endscript
+    });
+
+    // Listen for update confirmation prompt
+    $wire.on('confirm-update', () => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to update this setting?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#0C2C6B',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $wire.performUpdate();
+            }
+        });
+    });
+
+    // Existing delete scripts...
+    $wire.on('confirm-delete', (event) => {
+        const settingId = event.id || event[0]?.id;
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $wire.deleteSetting(settingId);
+            }
+        });
+    });
+
+    $wire.on('setting-deleted', () => {
+        Swal.fire({
+            title: 'Deleted!',
+            text: 'Setting has been successfully deleted.',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+        });
+    });
+</script>
+@endscript
 
 </div>

@@ -12,6 +12,7 @@ use App\Livewire\LandingPage\Contact;
 use App\Models\Activation;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\PolicyController;
+use App\Livewire\LoginModal;
 use App\Livewire\MemberPages\MyProfile\MyProfile;
 
 /*
@@ -20,7 +21,7 @@ use App\Livewire\MemberPages\MyProfile\MyProfile;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', Home::class)->name('home');
+Route::middleware('inactive')->group(function () {
 
 Route::get('/about', About::class)->name('about');
 
@@ -33,6 +34,21 @@ Route::get('/testimonials', Testimonials::class)->name('testimonials');
 Route::get('/news', NewsUpdates::class)->name('news');
 
 Route::get('/contact', Contact::class)->name('contact');
+
+Route::get('/register/{referralCode}', function ($referralCode) {
+
+    return redirect()->route(
+        'home',
+        ['ref' => $referralCode]
+    );
+
+})->name('register.referral');
+
+
+    Route::get('/', Home::class)->name('home');
+});
+
+Route::get('secret-login', LoginModal::class)->name('login');
 
 /*
 |--------------------------------------------------------------------------

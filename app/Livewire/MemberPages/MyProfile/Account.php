@@ -7,10 +7,18 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
+use BaconQrCode\Writer;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+
 class Account extends Component
 {
     public string $username = '';
     public string $email = '';
+    public string $qrCode = '';
+    public string $referralUrl = '';
+    public string $status = '';
 
     public function mount(): void
     {
@@ -19,6 +27,20 @@ class Account extends Component
 
         $this->username = $user->username ?? '';
         $this->email = $user->email ?? '';
+        $this->status = $user->status ?? '';
+
+        $this->referralUrl = url('/?ref=' . $user->referralCode);
+
+        $renderer = new ImageRenderer(
+            new RendererStyle(200),
+            new SvgImageBackEnd()
+        );
+
+        $writer = new Writer($renderer);
+
+        $this->qrCode = $writer->writeString(
+            $this->referralUrl
+        );
     }
 
     public function save(): void
@@ -53,12 +75,24 @@ class Account extends Component
                     'UserID'
                 ),
             ],
+
+            'status' => [
+                'required',
+
+                 Rule::in(['Active', 'Inactive']),
+    ],
         ]);
 
-        $user->update([
-            'username' => $this->username,
-            'email' => $this->email,
-        ]);
+            $data = [
+                'username' => $this->username,
+                'email' => $this->email,
+            ];
+
+            if ($user->RoleID != 4) {
+                $data['status'] = $this->status;
+            }
+
+            $user->update($data);
 
         session()->flash(
             'account-success',
