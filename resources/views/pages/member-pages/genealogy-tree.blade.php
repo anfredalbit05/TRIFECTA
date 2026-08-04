@@ -29,7 +29,7 @@
     </div>
 
     <!-- CONTENT WRAPPER -->
-    <div class="genealogy-layout px-10 pt-4">
+    <div class="genealogy-layout px-12 pt-4">
 
         <!-- INVITEE TAB -->
         <div x-show="tab === 'invitee'" x-cloak class="tab-card">

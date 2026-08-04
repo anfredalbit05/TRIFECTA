@@ -7,9 +7,15 @@ use App\Models\Privilege;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class BranchesList extends Component
 {
+
+    use WithPagination;
+
+    protected $paginationTheme = 'tailwind';
+
     public $isOpen = false;
     public $branch_id;
 
@@ -194,7 +200,7 @@ class BranchesList extends Component
         return view('components.admin-pages.masterlist.branches', [
             'branches' => Branch::where('status', true)
                 ->latest('BranchID')
-                ->get()
+                ->paginate(10)
         ]);
     }
 }

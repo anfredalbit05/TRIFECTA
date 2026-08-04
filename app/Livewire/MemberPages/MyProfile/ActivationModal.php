@@ -85,7 +85,7 @@ class ActivationModal extends Component
 
         $this->payment_method = '';
         $this->amount = $this->getMembershipFee();
-        $this->upline_code = '';
+        $this->upline_code = $this->selectedUserRecord?->uplineCode ?? '';
         $this->reference_code = '';
 
         $this->loadBeneficiaries();

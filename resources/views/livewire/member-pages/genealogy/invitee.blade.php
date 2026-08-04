@@ -1,6 +1,6 @@
-<div class="w-full bg-slate-50 min-h-[500px] p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+<div class="w-full bg-slate-50 min-h-[500px] p-4 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm">
     {{-- Top Action Bar --}}
-    <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-200">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
         <div>
             <h2 class="text-lg font-bold text-slate-800">Genealogy Tree</h2>
             <p class="text-xs text-slate-500">Visualizing direct referrals and downlines</p>
@@ -9,7 +9,7 @@
         @if(isset($tree['id']) && $tree['id'] !== auth()->id())
             <button
                 wire:click="focusUser({{ auth()->id() }})"
-                class="px-3 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
+                class="px-3 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200 self-start sm:self-auto"
             >
                 ↺ Reset to My Node
             </button>
@@ -19,7 +19,8 @@
     {{-- Tree Viewport --}}
     <div class="w-full overflow-x-auto py-6">
         @if(!empty($tree))
-            <div class="inline-flex min-w-full justify-center">
+            {{-- Centers the tree content nicely and enables horizontal scrolling on mobile/overflow --}}
+            <div class="flex justify-center min-w-max mx-auto px-4">
                 {{-- Corrected path to match genealogy partials directory --}}
                 @include('livewire.member-pages.genealogy.partials.tree-node', [
                     'node' => $tree,

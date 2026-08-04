@@ -40,7 +40,7 @@
     </div>
 
     <!-- CONTENT AREA -->
-    <div class="dashboard-layout px-10 pt-4">
+    <div class="dashboard-layout px-12 pt-4">
 
         <!-- OVERVIEW -->
         <div
@@ -60,13 +60,16 @@
         </div>
 
         <!-- TESTIMONIALS -->
-        <div
-            x-show="tab === 'testimonials'"
-            x-cloak
-            class="dashboard-main-card full-width-card"
-        >
-            <x-admin-pages.post.testimonials />
-        </div>
+        <!-- TESTIMONIALS -->
+                <div
+                    x-show="tab === 'testimonials'"
+                    x-cloak
+                    class="dashboard-main-card full-width-card"
+                >
+                    {{-- CHANGE THIS FROM: <x-admin-pages.post.testimonials /> --}}
+                    {{-- TO THIS: --}}
+                    <livewire:admin-pages.post.manage-testimonials />
+                </div>
 
     </div>
 

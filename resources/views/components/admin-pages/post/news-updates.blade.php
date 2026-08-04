@@ -189,6 +189,9 @@
         </div>
     @endif
 
+    <!-- TABLE VIEW WRAPPED IN CARD CONTAINER -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+
         <!-- Desktop / Tablet Table View -->
         <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left border-collapse min-w-[650px]">
@@ -196,6 +199,7 @@
                     <tr class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
                         <th class="py-3 px-4 w-12">#</th>
                         <th class="py-3 px-4">Title & Summary</th>
+                        <th class="py-3 px-4">Details</th>
                         <th class="py-3 px-4 w-36">Category</th>
                         <th class="py-3 px-4 w-36">Date Posted</th>
                         @if($this->canRead || $this->canUpdate || $this->canDelete)
@@ -211,8 +215,13 @@
                             </td>
                             <td class="py-4 px-4 align-middle max-w-xs lg:max-w-md">
                                 <div class="font-semibold text-slate-900 line-clamp-1">{{ $news->title }}</div>
+                            </td>
+
+                            <td class="py-4 px-4 align-middle max-w-xs lg:max-w-md">
                                 <div class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ Str::limit($news->details, 60) }}</div>
                             </td>
+
+
                             <td class="py-4 px-4 whitespace-nowrap align-middle">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
                                     {{ $news->category ?? 'General' }}
@@ -340,10 +349,50 @@
             @endforelse
         </div>
 
-        <!-- PAGINATION -->
+<!-- PAGINATION -->
         @if(method_exists($newsUpdates, 'hasPages') && $newsUpdates->hasPages())
-            <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center">
-                {{ $newsUpdates->links('pagination::tailwind') }}
+            <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
+
+                {{-- Previous Page Link --}}
+                @if ($newsUpdates->onFirstPage())
+                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                        Previous
+                    </span>
+                @else
+                    <button
+                        wire:click="previousPage"
+                        wire:loading.attr="disabled"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer"
+                        style="background-color: #D79B10;"
+                        onmouseover="this.style.backgroundColor='#c58d0f'"
+                        onmouseout="this.style.backgroundColor='#D79B10'"
+                    >
+                        Previous
+                    </button>
+                @endif
+
+                <span class="text-sm text-gray-600">
+                    Page {{ $newsUpdates->currentPage() }} of {{ $newsUpdates->lastPage() }}
+                </span>
+
+                {{-- Next Page Link --}}
+                @if ($newsUpdates->hasMorePages())
+                    <button
+                        wire:click="nextPage"
+                        wire:loading.attr="disabled"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer"
+                        style="background-color: #0C2C6B;"
+                        onmouseover="this.style.backgroundColor='#0a2559'"
+                        onmouseout="this.style.backgroundColor='#0C2C6B'"
+                    >
+                        Next
+                    </button>
+                @else
+                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                        Next
+                    </span>
+                @endif
+
             </div>
         @endif
     </div>

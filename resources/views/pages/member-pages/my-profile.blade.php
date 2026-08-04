@@ -19,9 +19,10 @@
     </nav>
 
     <!-- PROFILE NAVIGATION MENU WITH ACTIVATE BUTTON ON FAR RIGHT -->
-    <div class="dashboard-nav-menu flex flex-wrap items-center justify-between">
+    <div class="dashboard-nav-menu flex flex-col md:flex-row md:items-center justify-between gap-4">
 
-        <div class="flex items-center space-x-2">
+        <!-- WRAPPED LINKS CONTAINER (Removed space-x-2, added flex-wrap and gap-2) -->
+        <div class="flex flex-wrap items-center gap-2">
             <a
                 href="#"
                 @click.prevent="tab = 'profile'"
@@ -43,16 +44,15 @@
                 Security
             </a>
 
-              @if(auth()->user()->RoleID == 4)
-            <a
-                href="#"
-                @click.prevent="tab = 'activity'"
-                :class="tab === 'activity' ? 'active' : ''">
-                Activity
-            </a>
+            @if(auth()->user()->RoleID == 4)
+                <a
+                    href="#"
+                    @click.prevent="tab = 'activity'"
+                    :class="tab === 'activity' ? 'active' : ''">
+                    Activity
+                </a>
 
-
-            <a
+                <a
                     href="#"
                     @click.prevent="tab = 'certificate'"
                     :class="tab === 'certificate' ? 'active' : ''">
@@ -61,13 +61,15 @@
             @endif
         </div>
 
-            <!-- Replace your old button block with this: -->
-        <livewire:member-pages.my-profile.activation-button />
+        <!-- ACTIVATION BUTTON CONTAINER -->
+        <div class="flex items-center shrink-0">
+            <livewire:member-pages.my-profile.activation-button />
+        </div>
 
     </div>
 
     <!-- PAGE CONTENT -->
-    <div class="dashboard-layout px-10 pt-4">
+    <div class="dashboard-layout px-12 pt-4">
 
         <!-- PROFILE TAB -->
         <div
@@ -92,14 +94,14 @@
             <livewire:member-pages.my-profile.security />
         </div>
 
-         @if(auth()->user()->RoleID == 4)
-        <!-- ACTIVITY TAB -->
-        <div
-            x-show="tab === 'activity'"
-            x-cloak
-            class="dashboard-main-card full-width-card">
-            <livewire:member-pages.my-profile.activity />
-        </div>
+        @if(auth()->user()->RoleID == 4)
+            <!-- ACTIVITY TAB -->
+            <div
+                x-show="tab === 'activity'"
+                x-cloak
+                class="dashboard-main-card full-width-card">
+                <livewire:member-pages.my-profile.activity />
+            </div>
 
             <!-- CERTIFICATE TAB -->
             <div
@@ -111,10 +113,9 @@
         @endif
 
     </div>
-<!-- ACTIVATION MODAL -->
-<livewire:member-pages.my-profile.activation-modal />
+
+    <!-- ACTIVATION MODAL -->
+    <livewire:member-pages.my-profile.activation-modal />
 </div>
-
-
 
 @endsection

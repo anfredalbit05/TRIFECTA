@@ -91,54 +91,79 @@
     <div class="testimonials-container">
         <div class="testimonials-grid">
 
-            <!-- Testimonial 1 -->
-            <div class="testimonial-card">
-                <div class="testimonial-quote">❝</div>
+            @forelse($testimonials as $testimonial)
+                <div class="testimonial-card">
+                    <div class="testimonial-quote">❝</div>
 
-                <p class="testimonial-body">
-                    DAYONGAN helped our family during a difficult time.
-                    Their support gave us peace of mind and financial relief.
-                </p>
+                    <!-- Rating Stars Output -->
+                    <div class="testimonial-rating mb-2" style="color: #f59e0b; font-size: 0.9rem;">
+                        @for($i = 1; $i <= 5; $i++)
+                            <span>{{ $i <= $testimonial->rate ? '★' : '☆' }}</span>
+                        @endfor
+                    </div>
 
-                <div class="testimonial-footer">
-                    <h4 class="testimonial-name">Maria Santos</h4>
-                    <p class="testimonial-role">Member</p>
+                    <p class="testimonial-body">
+                        "{{ $testimonial->testimony }}"
+                    </p>
+
+                    <div class="testimonial-footer">
+                        <h4 class="testimonial-name">{{ $testimonial->fullname }}</h4>
+                        <p class="testimonial-role">{{ $testimonial->designation ?? 'Member' }}</p>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Testimonial 2 -->
-            <div class="testimonial-card">
-                <div class="testimonial-quote">❝</div>
-
-                <p class="testimonial-body">
-                    I appreciate the kindness and professionalism of the
-                    DAYONGAN team. They truly care about every member.
-                </p>
-
-                <div class="testimonial-footer">
-                    <h4 class="testimonial-name">Juan Dela Cruz</h4>
-                    <p class="testimonial-role">Member</p>
+            @empty
+                <div class="col-span-full text-center py-8 text-gray-500">
+                    <p>No testimonials available at the moment.</p>
                 </div>
-            </div>
-
-            <!-- Testimonial 3 -->
-            <div class="testimonial-card">
-                <div class="testimonial-quote">❝</div>
-
-                <p class="testimonial-body">
-                    Affordable protection and genuine concern for the community.
-                    I highly recommend DAYONGAN to every Filipino family.
-                </p>
-
-                <div class="testimonial-footer">
-                    <h4 class="testimonial-name">Ana Rodriguez</h4>
-                    <p class="testimonial-role">Member</p>
-                </div>
-            </div>
+            @endforelse
 
         </div>
-    </div>
-</section>
+
+
+<!-- Custom Pagination Controls -->
+<div class="mt-8 flex justify-center items-center space-x-4">
+
+    {{-- Previous Page Link --}}
+    @if ($testimonials->onFirstPage())
+        <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+            Previous
+        </span>
+    @else
+        <button
+            wire:click="previousPage"
+            wire:loading.attr="disabled"
+            class="px-4 py-2 text-white rounded transition cursor-pointer"
+            style="background-color: #D79B10;"
+            onmouseover="this.style.backgroundColor='#c58d0f'"
+            onmouseout="this.style.backgroundColor='#D79B10'"
+        >
+            Previous
+        </button>
+    @endif
+
+    <span class="text-sm text-gray-600">
+        Page {{ $testimonials->currentPage() }} of {{ $testimonials->lastPage() }}
+    </span>
+
+    {{-- Next Page Link --}}
+    @if ($testimonials->hasMorePages())
+        <button
+            wire:click="nextPage"
+            wire:loading.attr="disabled"
+            class="px-4 py-2 text-white rounded transition cursor-pointer"
+            style="background-color: #0C2C6B;"
+            onmouseover="this.style.backgroundColor='#0a2559'"
+            onmouseout="this.style.backgroundColor='#0C2C6B'"
+        >
+            Next
+        </button>
+    @else
+        <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+            Next
+        </span>
+    @endif
+
+</div>
 
 <!-- =========================
      HIGHLIGHTS

@@ -26,8 +26,7 @@ return new class extends Migration
                 'OV', // Overrides
             ])->nullable();
 
-           $table->enum('source', ['DR', 'OV'])
-            ->nullable();
+
 
             $table->foreignId('ActivationID')
                 ->nullable()

@@ -18,6 +18,7 @@ class Ledger extends Model
         'RefID',
         'amount',
         'Source',
+        'ActivationID', // <--- Add this line
         'status',
     ];
 

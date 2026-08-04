@@ -6,10 +6,10 @@
         <div class="w-0.5 h-6 bg-slate-300"></div>
     @endif
 
-    {{-- User Card Node (Non-clickable) --}}
+    {{-- User Card Node --}}
     <div
         @class([
-            'group relative flex flex-col items-center p-4 min-w-[160px] bg-white rounded-xl border-2 shadow-sm transition-all duration-200 z-10',
+            'group relative flex flex-col items-center p-4 min-w-[150px] sm:min-w-[160px] bg-white rounded-xl border-2 shadow-sm transition-all duration-200 z-10',
             'border-emerald-500 ring-2 ring-emerald-500/10' => ($node['status'] ?? '') === 'Active',
             'border-slate-200' => ($node['status'] ?? '') !== 'Active',
         ])
@@ -20,15 +20,13 @@
         </div>
 
         {{-- User Details --}}
-        <span class="font-semibold text-xs text-slate-800 text-center line-clamp-1 max-w-[140px] mb-1">
+        <span class="font-semibold text-xs text-slate-800 text-center line-clamp-1 max-w-[130px] sm:max-w-[140px] mb-1">
             {{ $node['name'] }}
         </span>
 
         <span class="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/60">
             Ref: {{ $node['referral_code'] ?? 'N/A' }}
         </span>
-
-
     </div>
 
     {{-- Downlines (Children) Section --}}
@@ -38,19 +36,23 @@
         {{-- Vertical Stem dropping down from the parent card --}}
         <div class="w-0.5 h-6 bg-slate-300"></div>
 
-        {{-- Dynamic Connector layout matching exact reference design --}}
-        <div class="relative flex items-start justify-center">
+        {{-- Dynamic Connector layout optimized for responsiveness: stacked vertically on mobile, horizontal tree layout on desktop --}}
+        <div class="relative flex flex-col sm:flex-row items-center sm:items-start justify-center gap-6 sm:gap-0">
 
-            {{-- Horizontal Spanning Bar for 2 or more children --}}
+            {{-- Horizontal Spanning Bar for desktop view when 2 or more children exist --}}
             @if($childCount == 2)
-                <div class="absolute top-0 left-[25%] right-[25%] h-0.5 bg-slate-300"></div>
+                <div class="hidden sm:block absolute top-0 left-[25%] right-[25%] h-0.5 bg-slate-300"></div>
             @elseif($childCount >= 3)
-                <div class="absolute top-0 left-[15%] right-[15%] h-0.5 bg-slate-300"></div>
+                <div class="hidden sm:block absolute top-0 left-[15%] right-[15%] h-0.5 bg-slate-300"></div>
             @endif
 
-            {{-- Render each child node cleanly side-by-side with balanced spacing --}}
+            {{-- Render each child node cleanly --}}
             @foreach($node['downlines'] as $child)
-                <div class="flex flex-col items-center px-4 relative">
+                <div class="flex flex-col items-center sm:px-4 relative">
+                    {{-- Vertical connecting line for subsequent items in mobile stack view --}}
+                    @if(!$loop->first)
+                        <div class="sm:hidden w-0.5 h-6 bg-slate-300"></div>
+                    @endif
                     @include('livewire.member-pages.genealogy.partials.tree-node', ['node' => $child, 'isRoot' => false])
                 </div>
             @endforeach
