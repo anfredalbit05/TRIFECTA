@@ -18,59 +18,60 @@
         </div>
     </nav>
 
-    <!-- PROFILE NAVIGATION MENU WITH ACTIVATE BUTTON ON FAR RIGHT -->
-    <div class="dashboard-nav-menu flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <!-- CONTENT WRAPPER (Includes both Nav Menu and Cards to keep identical layout width) -->
+    <div class="dashboard-layout px-12 pt-4 flex flex-col gap-4">
 
-        <!-- WRAPPED LINKS CONTAINER (Removed space-x-2, added flex-wrap and gap-2) -->
-        <div class="flex flex-wrap items-center gap-2">
-            <a
-                href="#"
-                @click.prevent="tab = 'profile'"
-                :class="tab === 'profile' ? 'active' : ''">
-                Profile
-            </a>
+        <!-- PROFILE NAVIGATION MENU WITH ACTIVATE BUTTON ON FAR RIGHT -->
+        <div class="dashboard-nav-menu flex flex-col md:flex-row md:items-center justify-between gap-4">
 
-            <a
-                href="#"
-                @click.prevent="tab = 'account'"
-                :class="tab === 'account' ? 'active' : ''">
-                Account
-            </a>
-
-            <a
-                href="#"
-                @click.prevent="tab = 'security'"
-                :class="tab === 'security' ? 'active' : ''">
-                Security
-            </a>
-
-            {{-- @if(auth()->user()->RoleID == 4) --}}
+            <!-- WRAPPED LINKS CONTAINER -->
+            <div class="flex flex-wrap items-center gap-2">
                 <a
                     href="#"
-                    @click.prevent="tab = 'activity'"
-                    :class="tab === 'activity' ? 'active' : ''">
-                    Activity
+                    @click.prevent="tab = 'profile'"
+                    :class="tab === 'profile' ? 'active' : ''">
+                    Profile
                 </a>
 
                 <a
                     href="#"
-                    @click.prevent="tab = 'certificate'"
-                    :class="tab === 'certificate' ? 'active' : ''">
-                    Certificate
+                    @click.prevent="tab = 'account'"
+                    :class="tab === 'account' ? 'active' : ''">
+                    Account
                 </a>
-            {{-- @endif --}}
+
+                <a
+                    href="#"
+                    @click.prevent="tab = 'security'"
+                    :class="tab === 'security' ? 'active' : ''">
+                    Security
+                </a>
+
+                {{-- @if(auth()->user()->RoleID == 4) --}}
+                    <a
+                        href="#"
+                        @click.prevent="tab = 'activity'"
+                        :class="tab === 'activity' ? 'active' : ''">
+                        Activity
+                    </a>
+
+                    <a
+                        href="#"
+                        @click.prevent="tab = 'certificate'"
+                        :class="tab === 'certificate' ? 'active' : ''">
+                        Certificate
+                    </a>
+                {{-- @endif --}}
+            </div>
+
+            <!-- ACTIVATION BUTTON CONTAINER -->
+            <div class="flex items-center shrink-0">
+                <livewire:member-pages.my-profile.activation-button />
+            </div>
+
         </div>
 
-        <!-- ACTIVATION BUTTON CONTAINER -->
-        <div class="flex items-center shrink-0">
-            <livewire:member-pages.my-profile.activation-button />
-        </div>
-
-    </div>
-
-    <!-- PAGE CONTENT -->
-    <div class="dashboard-layout px-12 pt-4">
-
+        <!-- PAGE CONTENT -->
         <!-- PROFILE TAB -->
         <div
             x-show="tab === 'profile'"

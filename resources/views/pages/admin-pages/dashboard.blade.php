@@ -4,26 +4,21 @@
 
 @section('content')
 
-<div class="dashboard-container"  p-6 x-data="{ tab: 'overview' }">
-
+<div class="dashboard-container" x-data="{ tab: 'overview' }">
 
     <!-- DASHBOARD TOP NAVIGATION -->
     <nav class="dashboard-nav">
-
-
         <div class="dashboard-nav-title">
-
             <h1>
                 Dashboard
             </h1>
-
         </div>
-
     </nav>
 
-     <div class="dashboard-nav-menu">
+    <!-- CONTENT WRAPPER (Includes both Nav Menu and Cards to keep identical layout width) -->
+    <div class="dashboard-layout px-12 pt-4 flex flex-col gap-4">
 
-
+        <div class="dashboard-nav-menu">
             <a href="#"
                @click.prevent="tab='overview'"
                :class="tab === 'overview' ? 'active' : ''">
@@ -36,51 +31,41 @@
                 My Dashboard
             </a>
 
-              @if(auth()->user()->RoleID == 1)
+            @if(auth()->user()->RoleID == 1)
             <a href="#"
                @click.prevent="tab='all-users'"
                :class="tab === 'all-users' ? 'active' : ''">
                 All Users
             </a>
-              @endif
-
+            @endif
         </div>
 
-    <!-- DASHBOARD CONTENT -->
-    <div class="dashboard-layout px-12 pt-4">
-
+        <!-- DASHBOARD CONTENT -->
         <!-- OVERVIEW -->
         <div
             x-show="tab === 'overview'"
-                x-cloak
-                class="dashboard-main-card full-width-card">
-
-           <livewire:admin-pages.dashboard.overview-analytics />
-
+            x-cloak
+            class="dashboard-main-card full-width-card">
+            <livewire:admin-pages.dashboard.overview-analytics />
         </div>
 
-        <!-- MEMBERS -->
+        <!-- MY DASHBOARD -->
         <div
             x-show="tab === 'my-dashboard'"
             x-cloak
             class="dashboard-main-card full-width-card">
-
-             <livewire:member-pages.dashboard.news-updates />
-
+            <livewire:member-pages.dashboard.news-updates />
         </div>
 
-          <!-- MEMBERS -->
+        <!-- ALL USERS -->
         <div
             x-show="tab === 'all-users'"
             x-cloak
             class="dashboard-main-card full-width-card">
-
-             <livewire:admin-pages.dashboard.all-users />
-
+            <livewire:admin-pages.dashboard.all-users />
         </div>
 
     </div>
-
 
 </div>
 

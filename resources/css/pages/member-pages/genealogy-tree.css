@@ -3,92 +3,97 @@
 ========================= */
 
 .genealogy-container {
-    @apply w-full min-h-screen;
+    @apply w-full min-h-screen flex flex-col;
 }
-
 
 /* =========================
    GENEALOGY LAYOUT
 ========================= */
 
 .genealogy-layout {
-    @apply w-full;
+    @apply w-full
+    px-2
+    sm:px-4
+    md:px-6
+    lg:px-8
+    xl:px-10
+    flex
+    flex-col
+    gap-4
+    flex-grow;
 }
 
-
 /* =========================
-   MAIN CARD / TAB CARD
+   MAIN CARD
 ========================= */
 
 .genealogy-main-card,
 .tab-card {
-    @apply w-full min-h-full rounded-xl bg-white p-5 shadow;
+    @apply w-full
+    rounded-xl
+    bg-white
+    shadow
+    p-3
+    sm:p-4
+    lg:p-5;
 }
 
 .full-width-card {
-    @apply w-full min-h-[500px];
+    @apply w-full overflow-x-auto;
 }
 
+/* =========================
+   TREE WRAPPER
+========================= */
+
+.tree-wrapper {
+    @apply w-max min-w-full py-6 px-4 sm:px-6 lg:px-10;
+}
 
 /* =========================
-   GENEALOGY NAVIGATION
+   NAVIGATION
 ========================= */
 
 .genealogy-nav {
-    @apply sticky top-0 z-30
-    w-full
-    mt-0 mb-2
-    overflow-hidden;
+    @apply sticky top-0 z-30 w-full;
 }
 
 .genealogy-nav-title {
-    @apply flex items-center justify-center bg-[#0C2C6B] py-3;
+    @apply flex items-center justify-center bg-[#0C2C6B] py-3 px-4;
 }
 
 .genealogy-nav-title h1 {
-    @apply text-xl font-bold text-white;
+    @apply text-lg sm:text-xl font-bold text-white;
 }
 
 .genealogy-nav-menu {
-    /* Lower z-index so the mobile sidebar slides cleanly over it, aligned left for items */
-   @apply sticky top-[78px] md:top-[65px] z-20
-    flex flex-wrap items-center justify-start
-    gap-3
+    @apply w-full
+    flex
+    flex-wrap
+    items-center
+    gap-2
+    sm:gap-3
     bg-white
     rounded-xl
     shadow-md
-    mt-4
-    md:mt-0
-    px-4 md:px-6 py-3
-    mx-auto;
-
-    width: 92%;
-    max-width: 1300px;
+    p-3
+    sm:p-4;
 }
 
 .genealogy-nav-menu a {
-    @apply rounded-lg
-    px-4 py-2
-    text-sm
-    font-semibold
-    text-gray-500
-    transition;
+    @apply px-4 py-2 rounded-lg text-sm font-semibold text-gray-500 transition;
 }
 
 .genealogy-nav-menu a:hover {
     @apply bg-gray-100 text-[#0C2C6B];
 }
 
-.genealogy-nav-menu a.active,
-.genealogy-nav-menu .active,
-.genealogy-nav-menu a:active,
-.genealogy-nav-menu a:focus {
-    background-color: #0C2C6B !important;
-    color: #ffffff !important;
+.genealogy-nav-menu a.active {
+    @apply bg-[#0C2C6B] text-white;
 }
 
 /* =========================
-   TAB CONTENT & HELPERS
+   HELPERS
 ========================= */
 
 [x-cloak] {
@@ -96,9 +101,9 @@
 }
 
 .tab-title {
-    @apply text-xl font-bold text-[#0C2C6B];
+    @apply text-lg sm:text-xl font-bold text-[#0C2C6B];
 }
 
 .tab-description {
-    @apply mt-2 text-sm text-gray-500;
+    @apply mt-1 text-sm text-gray-500;
 }

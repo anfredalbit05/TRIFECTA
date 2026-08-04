@@ -14,59 +14,59 @@
         </div>
     </nav>
 
-    <div class="dashboard-nav-menu">
-        <a
-            href="#"
-            @click.prevent="tab = 'overview'"
-            :class="tab === 'overview' ? 'active' : ''"
-        >
-            Overview
-        </a>
+    <!-- CONTENT WRAPPER (Includes both Nav Menu and Cards to keep identical layout width) -->
+    <div class="dashboard-layout px-12 pt-4 flex flex-col gap-4">
 
-        <a
-            href="#"
-            @click.prevent="tab = 'members'"
-            :class="tab === 'members' ? 'active' : ''"
-        >
-            Members
-        </a>
+        <!-- MASTERLIST NAVIGATION MENU -->
+        <div class="dashboard-nav-menu">
+            <a
+                href="#"
+                @click.prevent="tab = 'overview'"
+                :class="tab === 'overview' ? 'active' : ''"
+            >
+                Overview
+            </a>
 
-        <a
-            href="#"
-            @click.prevent="tab = 'branches'"
-            :class="tab === 'branches' ? 'active' : ''"
-        >
-            Branches
-        </a>
+            <a
+                href="#"
+                @click.prevent="tab = 'members'"
+                :class="tab === 'members' ? 'active' : ''"
+            >
+                Members
+            </a>
 
-        <a
-            href="#"
-            @click.prevent="tab = 'benefits'"
-            :class="tab === 'benefits' ? 'active' : ''"
-        >
-            Benefits
-        </a>
+            <a
+                href="#"
+                @click.prevent="tab = 'branches'"
+                :class="tab === 'branches' ? 'active' : ''"
+            >
+                Branches
+            </a>
 
-        <a
-            href="#"
-            @click.prevent="tab = 'inquiries'"
-            :class="tab === 'inquiries' ? 'active' : ''"
-        >
-            Inquiries
-        </a>
+            <a
+                href="#"
+                @click.prevent="tab = 'benefits'"
+                :class="tab === 'benefits' ? 'active' : ''"
+            >
+                Benefits
+            </a>
 
+            <a
+                href="#"
+                @click.prevent="tab = 'inquiries'"
+                :class="tab === 'inquiries' ? 'active' : ''"
+            >
+                Inquiries
+            </a>
 
-        <a
-            href="#"
-            @click.prevent="tab = 'faqs'"
-            :class="tab === 'faqs' ? 'active' : ''"
-        >
-            FAQs
-        </a>
-
-    </div>
-
-    <div class="dashboard-layout px-12 pt-4">
+            <a
+                href="#"
+                @click.prevent="tab = 'faqs'"
+                :class="tab === 'faqs' ? 'active' : ''"
+            >
+                FAQs
+            </a>
+        </div>
 
         <!-- OVERVIEW -->
         <div
@@ -120,7 +120,6 @@
         >
              <livewire:admin-pages.masterlist.faq-list />
         </div>
-
 
     </div>
 

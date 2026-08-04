@@ -13,34 +13,35 @@
         </div>
     </nav>
 
-    <div class="dashboard-nav-menu">
-        <a
-            href="#"
-            @click.prevent="tab = 'overview'"
-            :class="tab === 'overview' ? 'active' : ''"
-        >
-            Overview
-        </a>
+    <!-- CONTENT WRAPPER (Includes both Nav Menu and Cards to keep identical layout width) -->
+    <div class="dashboard-layout px-12 pt-4 flex flex-col gap-4">
 
-        <a
-            href="#"
-            @click.prevent="tab = 'news'"
-            :class="tab === 'news' ? 'active' : ''"
-        >
-            News & Update
-        </a>
+        <!-- NAVIGATION MENU -->
+        <div class="dashboard-nav-menu">
+            <a
+                href="#"
+                @click.prevent="tab = 'overview'"
+                :class="tab === 'overview' ? 'active' : ''"
+            >
+                Overview
+            </a>
 
-        <a
-            href="#"
-            @click.prevent="tab = 'testimonials'"
-            :class="tab === 'testimonials' ? 'active' : ''"
-        >
-            Testimonials
-        </a>
-    </div>
+            <a
+                href="#"
+                @click.prevent="tab = 'news'"
+                :class="tab === 'news' ? 'active' : ''"
+            >
+                News & Update
+            </a>
 
-    <!-- CONTENT AREA -->
-    <div class="dashboard-layout px-12 pt-4">
+            <a
+                href="#"
+                @click.prevent="tab = 'testimonials'"
+                :class="tab === 'testimonials' ? 'active' : ''"
+            >
+                Testimonials
+            </a>
+        </div>
 
         <!-- OVERVIEW -->
         <div
@@ -60,16 +61,13 @@
         </div>
 
         <!-- TESTIMONIALS -->
-        <!-- TESTIMONIALS -->
-                <div
-                    x-show="tab === 'testimonials'"
-                    x-cloak
-                    class="dashboard-main-card full-width-card"
-                >
-                    {{-- CHANGE THIS FROM: <x-admin-pages.post.testimonials /> --}}
-                    {{-- TO THIS: --}}
-                    <livewire:admin-pages.post.manage-testimonials />
-                </div>
+        <div
+            x-show="tab === 'testimonials'"
+            x-cloak
+            class="dashboard-main-card full-width-card"
+        >
+            <livewire:admin-pages.post.manage-testimonials />
+        </div>
 
     </div>
 
