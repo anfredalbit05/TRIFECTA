@@ -21,13 +21,11 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->decimal('amount', 12, 2)->default(0);
+            
             $table->enum('source', [
                 'DR', // Direct Referral
                 'OV', // Overrides
             ])->nullable();
-
-           $table->enum('source', ['DR', 'OV'])
-            ->nullable();
 
             $table->foreignId('ActivationID')
                 ->nullable()
