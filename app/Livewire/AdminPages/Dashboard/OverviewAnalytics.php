@@ -123,9 +123,9 @@ class OverviewAnalytics extends Component
 
         $this->topReferrers = User::query()
             ->join('activations', 'users.referralCode', '=', 'activations.upline_code')
-            ->select('users.firstname', 'users.lastname', 'users.referralCode', 'users.profilepic', DB::raw('count(activations.ActivationID) as total_invites'))
+            ->select('users.firstname', 'users.lastname', 'users.referralCode', 'users.profilepic', 'users.address', DB::raw('count(activations.ActivationID) as total_invites'))
             ->where('activations.status', 'Approved')
-            ->groupBy('users.UserID', 'users.firstname', 'users.lastname', 'users.referralCode', 'users.profilepic')
+            ->groupBy('users.UserID', 'users.firstname', 'users.lastname', 'users.referralCode', 'users.profilepic', 'users.address')
             ->orderByDesc('total_invites')
             ->limit(5)
             ->get();

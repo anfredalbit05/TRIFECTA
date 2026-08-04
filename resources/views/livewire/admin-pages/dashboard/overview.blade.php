@@ -138,7 +138,7 @@
         </div>
 
 
-<div class="bg-white shadow-sm border border-gray-100 rounded-2xl p-6" x-data="{ modalOpen: false, activeImage: '', activeName: '' }">
+<div class="bg-white shadow-sm border border-gray-100 rounded-2xl p-6" x-data="{ modalOpen: false, activeImage: '', activeName: '', activeAddress: '' }">
     <div class="flex items-center justify-between mb-4">
         <h3 class="font-bold text-[#0C2C6B] text-lg">
             Top Members (Most Referrals)
@@ -173,9 +173,9 @@
                     <div class="w-12 h-12 rounded-full overflow-hidden bg-[#0C2C6B]/10 flex items-center justify-center shrink-0 border border-gray-200">
                         @if(!empty($referrer->profilepic))
                             <img src="{{ asset('storage/' . $referrer->profilepic) }}"
-                                 alt="{{ $referrer->firstname }}"
-                                 class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                                 @click="modalOpen = true; activeImage = '{{ asset('storage/' . $referrer->profilepic) }}'; activeName = '{{ $referrer->firstname }} {{ $referrer->lastname }}'">
+     alt="{{ $referrer->firstname }}"
+     class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+     @click="modalOpen = true; activeImage = '{{ asset('storage/' . $referrer->profilepic) }}'; activeName = '{{ $referrer->firstname }} {{ $referrer->lastname }}'; activeAddress = '{{ $referrer->address }}'">
                         @else
                             <span class="text-[#0C2C6B] font-bold text-sm tracking-wide">
                                 {{ strtoupper(substr($referrer->firstname, 0, 1)) }}{{ strtoupper(substr($referrer->lastname, 0, 1)) }}
@@ -233,6 +233,13 @@
             <div class="w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-gray-100 shadow-inner mb-4">
                 <img :src="activeImage" alt="Profile View" class="w-full h-full object-cover">
             </div>
+
+
+            <!-- Address Displayed Here -->
+        <p class="text-xs text-gray-500 mb-4 flex items-center justify-center gap-1">
+            📍 <span x-text="activeAddress"></span>
+        </p>
+
 
             <button @click="modalOpen = false" class="w-full bg-[#0C2C6B] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#081f4f] transition-colors cursor-pointer">
                 Close

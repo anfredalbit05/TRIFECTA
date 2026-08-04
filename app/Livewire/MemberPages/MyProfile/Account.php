@@ -20,14 +20,20 @@ class Account extends Component
     public string $referralUrl = '';
     public string $status = '';
 
+    // Added property to hold read-only beneficiaries
+    public $beneficiaries = [];
+
     public function mount(): void
     {
-        /** @var User $user */
-        $user = Auth::user();
+        $userId = Auth::id();
+
+        // Fetch user with beneficiaries loaded properly using Eloquent query
+        $user = User::with('beneficiaries')->findOrFail($userId);
 
         $this->username = $user->username ?? '';
         $this->email = $user->email ?? '';
         $this->status = $user->status ?? '';
+        $this->beneficiaries = $user->beneficiaries;
 
         $this->referralUrl = url('/?ref=' . $user->referralCode);
 
@@ -53,46 +59,29 @@ class Account extends Component
                 'required',
                 'string',
                 'max:50',
-
-                Rule::unique(
-                    'users',
-                    'username'
-                )->ignore(
-                    $user->UserID,
-                    'UserID'
-                ),
+                Rule::unique('users', 'username')->ignore($user->UserID, 'UserID'),
             ],
-
             'email' => [
                 'required',
                 'email',
-
-                Rule::unique(
-                    'users',
-                    'email'
-                )->ignore(
-                    $user->UserID,
-                    'UserID'
-                ),
+                Rule::unique('users', 'email')->ignore($user->UserID, 'UserID'),
             ],
-
             'status' => [
                 'required',
-
-                 Rule::in(['Active', 'Inactive']),
-    ],
+                Rule::in(['Active', 'Inactive']),
+            ],
         ]);
 
-            $data = [
-                'username' => $this->username,
-                'email' => $this->email,
-            ];
+        $data = [
+            'username' => $this->username,
+            'email' => $this->email,
+        ];
 
-            if ($user->RoleID != 4) {
-                $data['status'] = $this->status;
-            }
+        if ($user->RoleID != 4) {
+            $data['status'] = $this->status;
+        }
 
-            $user->update($data);
+        $user->update($data);
 
         session()->flash(
             'account-success',

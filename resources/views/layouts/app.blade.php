@@ -8,6 +8,8 @@
         @yield('title', 'Dayongan')
     </title>
 
+
+
     @vite([
         'resources/css/app.css',
         'resources/js/app.js'

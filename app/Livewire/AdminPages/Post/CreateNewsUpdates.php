@@ -201,27 +201,35 @@ class CreateNewsUpdates extends Component
         $this->selectedPost = null;
     }
 
-    public function deletePost($id): void
+  public function deletePost($id): void
     {
         if (!$this->canDelete) {
             return;
         }
 
-        $news = NewsUpdate::find($id);
+        $news = NewsUpdate::where('ID', $id)->first();
 
         if (!$news) {
             return;
         }
 
         if ($news->image) {
-            Storage::disk('public')->delete($news->image);
+            // Note: based on your folder path public/storage/news-images/
+            // $news->image usually returns 'news-images/filename.jpg'
+            $publicPath = public_path('storage/' . $news->image);
+
+            if (file_exists($publicPath)) {
+                @unlink($publicPath);
+            }
         }
 
-        $news->delete();
+        NewsUpdate::where('ID', $id)->delete();
 
         if ($this->selectedPost && $this->selectedPost->ID == $id) {
             $this->selectedPost = null;
         }
+
+        $this->resetPage();
 
         session()->flash('success', 'News update deleted successfully.');
     }

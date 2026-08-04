@@ -11,6 +11,10 @@ class NewsUpdate extends Model
 
     protected $primaryKey = 'ID';
 
+    // --- ADD THESE TWO LINES ---
+    public $incrementing = true;
+    protected $keyType = 'int';
+
 
     protected $fillable = [
         'title',

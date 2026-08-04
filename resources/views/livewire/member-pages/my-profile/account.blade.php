@@ -73,19 +73,18 @@
             </div>
 
             <div class="flex justify-end border-t border-slate-200 bg-slate-50 px-6 py-5">
-                <button
-                    type="submit"
-                    wire:loading.attr="disabled"
-                    wire:target="save"
-                    class="rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60">
-
-                    <span wire:loading.remove wire:target="save">
-                        Save Account Information
-                    </span>
-                    <span wire:loading wire:target="save">
-                        Saving...
-                    </span>
-                </button>
+<button
+    type="submit"
+    wire:loading.attr="disabled"
+    wire:target="save"
+    class="rounded-xl bg-[#0C2C6B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#071a42] disabled:opacity-60">
+    <span wire:loading.remove wire:target="save">
+        Save Account Information
+    </span>
+    <span wire:loading wire:target="save">
+        Saving...
+    </span>
+</button>
             </div>
         </form>
     </div>
@@ -156,14 +155,50 @@
                         {{ $referralUrl }}
                     </p>
                 </div>
-
-                <button
-                    type="button"
-                    onclick="navigator.clipboard.writeText('{{ $referralUrl }}')"
-                    class="mt-4 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800">
-                    Copy Referral Link
-                </button>
+<button
+    type="button"
+    onclick="navigator.clipboard.writeText('{{ $referralUrl }}')"
+    class="mt-4 rounded-xl bg-[#0C2C6B] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#071a42]">
+    Copy Referral Link
+</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Read-Only Beneficiaries Card -->
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-200 bg-slate-50 px-6 py-5">
+            <h3 class="font-semibold text-slate-900">
+                Registered Beneficiaries
+            </h3>
+
+        </div>
+
+        <div class="p-6">
+            @if(count($beneficiaries) > 0)
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
+                                <th class="pb-3 px-3">Full Name</th>
+                                <th class="pb-3 px-3">Birthdate</th>
+                                <th class="pb-3 px-3">Relationship</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-sm text-slate-700">
+                            @foreach($beneficiaries as $beneficiary)
+                                <tr>
+                                    <td class="py-3 px-3 font-medium text-slate-900">{{ $beneficiary->fullname ?? 'N/A' }}</td>
+                                    <td class="py-3 px-3">{{ $beneficiary->birthdate ? \Carbon\Carbon::parse($beneficiary->birthdate)->format('M d, Y') : 'N/A' }}</td>
+                                    <td class="py-3 px-3">{{ $beneficiary->relationship ?? 'N/A' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <p class="text-sm text-slate-500 text-center py-4">No beneficiaries registered.</p>
+            @endif
         </div>
     </div>
 

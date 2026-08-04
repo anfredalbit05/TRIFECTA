@@ -65,12 +65,12 @@
 
             <!-- Upload Controls -->
             <div class="flex-1 w-full flex flex-col items-center sm:items-start">
-                <label for="profilepic" class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 w-full sm:w-auto">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 12v6m0-6l-3 3m3-3l3 3M12 4v8" />
-                    </svg>
-                    Choose New Picture
-                </label>
+               <label for="profilepic" class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white transition w-full sm:w-auto" style="background-color: #0C2C6B;" onmouseover="this.style.backgroundColor='#071a42'" onmouseout="this.style.backgroundColor='#0C2C6B'">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 12v6m0-6l-3 3m3-3l3 3M12 4v8" />
+    </svg>
+    Choose New Picture
+</label>
 
                 <input id="profilepic" type="file" wire:model="profilepic" accept="image/*" class="hidden">
 
@@ -195,14 +195,14 @@
             </div>
 
             <div class="flex justify-center sm:justify-end border-t border-slate-200 bg-slate-50 px-6 py-5">
-                <button type="submit" wire:loading.attr="disabled" wire:target="saveProfile" class="rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60 w-full sm:w-auto">
-                    <span wire:loading.remove wire:target="saveProfile">
-                        Save Personal Information
-                    </span>
-                    <span wire:loading wire:target="saveProfile">
-                        Saving...
-                    </span>
-                </button>
+              <button type="submit" wire:loading.attr="disabled" wire:target="saveProfile" class="rounded-xl bg-[#0C2C6B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#071a42] disabled:opacity-60 w-full sm:w-auto">
+    <span wire:loading.remove wire:target="saveProfile">
+        Save Personal Information
+    </span>
+    <span wire:loading wire:target="saveProfile">
+        Saving...
+    </span>
+</button>
             </div>
         </form>
     </div>

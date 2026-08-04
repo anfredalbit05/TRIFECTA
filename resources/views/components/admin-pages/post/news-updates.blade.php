@@ -258,17 +258,17 @@
                                             </button>
                                         @endif
 
-                                        <!-- Delete Button -->
-                                        @if($this->canDelete)
-                                            <button
-                                                type="button"
-                                                onclick="confirmDelete({{ $news->ID }})"
-                                                class="inline-flex items-center justify-center p-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow"
-                                                title="Delete Post"
-                                            >
-                                                🗑️
-                                            </button>
-                                        @endif
+                                    @if($this->canDelete)
+                                        <button
+                                            type="button"
+                                            wire:click="deletePost({{ $news->ID }})"
+                                            wire:confirm="Are you sure you want to delete this news update?"
+                                            class="inline-flex items-center justify-center p-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow"
+                                            title="Delete Post"
+                                        >
+                                            🗑️
+                                        </button>
+                                    @endif
                                     </div>
                                 </td>
                             @endif
@@ -332,7 +332,8 @@
                             @if($this->canDelete)
                                 <button
                                     type="button"
-                                    onclick="confirmDelete({{ $news->ID }})"
+                                    wire:click="deletePost({{ $news->ID }})"
+                                    wire:confirm="Are you sure you want to delete this news update?"
                                     class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow"
                                     title="Delete Post"
                                 >

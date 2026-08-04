@@ -248,29 +248,13 @@
                     type="submit"
                     wire:loading.attr="disabled"
                     wire:target="changePassword"
-                    class="rounded-xl
-                    bg-slate-900 px-6 py-3
-                    text-sm font-semibold
-                    text-white transition
-                    hover:bg-slate-800
-                    disabled:opacity-60">
-
-                    <span
-                        wire:loading.remove
-                        wire:target="changePassword">
-
+                    class="rounded-xl bg-[#0C2C6B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#071a42] disabled:opacity-60">
+                    <span wire:loading.remove wire:target="changePassword">
                         Change Password
-
                     </span>
-
-                    <span
-                        wire:loading
-                        wire:target="changePassword">
-
+                    <span wire:loading wire:target="changePassword">
                         Updating...
-
                     </span>
-
                 </button>
 
             </div>
