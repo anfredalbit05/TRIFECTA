@@ -54,12 +54,10 @@
                     $defaultAvatar = 'profiles/default-avatar.png';
                 @endphp
 
-                @if ($profilepic)
-                    <img src="{{ $profilepic->temporaryUrl() }}" class="h-full w-full object-cover" alt="New profile picture">
-                @elseif ($profilePath && $profilePath !== $defaultAvatar)
-                    <img src="{{ asset('storage/' . $profilePath) }}" class="h-full w-full object-cover" alt="Profile picture">
+                @if ($profilePath && $profilePath !== $defaultAvatar)
+                    <img src="{{ asset($profilePath) }}" class="h-full w-full object-cover" alt="Profile picture">
                 @else
-                    <img src="{{ asset('profiles/default-avatar.png') }}" class="h-full w-full object-cover" alt="Default profile picture">
+                    <img src="{{ asset($defaultAvatar) }}" class="h-full w-full object-cover" alt="Default profile picture">
                 @endif
             </div>
 
