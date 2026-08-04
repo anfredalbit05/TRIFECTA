@@ -105,15 +105,19 @@
                                 {{ $featuredPost->title }}
                             </h2>
 
+                             <span class="news-featured-author">
+                                Post by: {{ $featuredPost->user ? $featuredPost->user->firstname . ' ' . $featuredPost->user->lastname : 'Dayongan Media Team' }}
+                            </span>
+
                             <p class="news-featured-text">
                                 {{ Str::limit(strip_tags($featuredPost->details), 180) }}
                             </p>
+
+
                         </div>
 
                         <div class="news-featured-footer">
-                            <span class="news-featured-author">
-                                By {{ $featuredPost->user ? $featuredPost->user->firstname . ' ' . $featuredPost->user->lastname : 'Dayongan Media Team' }}
-                            </span>
+
 
                             <a href="#news-{{ $featuredPost->ID }}" class="news-featured-link">
                                 Read Full Story →

@@ -53,6 +53,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
     'latitude',
     'longitude',
     'email',
+    'policy_number',
 
     // Profile Picture
     'profilepic',

@@ -5,7 +5,6 @@ namespace App\Livewire\MemberPages\Genealogy;
 use App\Models\User;
 use App\Models\Activation;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class GenealogyTree extends Component
@@ -23,56 +22,59 @@ class GenealogyTree extends Component
         $this->activeTab = $tab;
     }
 
-   public function buildTree($userId, $depth = 1, $maxDepth = 2, $ancestors = [])
-{
-    if ($depth > $maxDepth || in_array($userId, $ancestors)) {
-        return null;
-    }
-
-    $user = User::find($userId);
-
-    if (!$user) {
-        return null;
-    }
-
-    $ancestors[] = $user->UserID;
-
-    $children = [];
-
-    $downlines = Activation::query()
-        ->where('upline_code', $user->referralCode)
-        ->whereIn('status', ['Approved', 'Pending'])
-        ->with('user')
-        ->get();
-
-    foreach ($downlines as $activation) {
-
-        $child = $activation->user;
-
-        if (!$child) {
-            continue;
+    public function buildTree($userId, int $depth = 1, int $maxDepth = 3, array $ancestors = []): ?array
+    {
+        // Prevent infinite loops and exceeding max depth
+        if ($depth > $maxDepth || in_array($userId, $ancestors)) {
+            return null;
         }
 
-        if (in_array($child->UserID, $ancestors)) {
-            continue;
+        $user = User::find($userId);
+
+        if (!$user || empty($user->referralCode)) {
+            return null;
         }
 
-        $children[] = $this->buildTree(
-            $child->UserID,
-            $depth + 1,
-            $maxDepth,
-            $ancestors
-        );
-    }
+        // Add current user to tracking array to prevent circular references
+        $ancestors[] = $user->UserID;
 
-    return [
-        'id' => $user->UserID,
-        'name' => trim($user->firstname . ' ' . $user->lastname),
-        'referral_code' => $user->referralCode,
-        'status' => $user->status,
-        'downlines' => array_filter($children),
-    ];
-}
+        $children = [];
+
+        // Fetch all downlines whose upline_code matches this user's referral code
+        $downlines = Activation::query()
+            ->where('upline_code', $user->referralCode)
+            ->whereIn('status', ['Approved', 'Pending'])
+            ->with('user')
+            ->get();
+
+        foreach ($downlines as $activation) {
+            $childUser = $activation->user;
+
+            if (!$childUser || in_array($childUser->UserID, $ancestors)) {
+                continue;
+            }
+
+            // Recursively build the subtree for each downline user
+            $subTree = $this->buildTree(
+                $childUser->UserID,
+                $depth + 1,
+                $maxDepth,
+                $ancestors
+            );
+
+            if ($subTree) {
+                $children[] = $subTree;
+            }
+        }
+
+        return [
+            'id' => $user->UserID,
+            'name' => trim($user->firstname . ' ' . $user->lastname),
+            'referral_code' => $user->referralCode,
+            'status' => $user->status,
+            'downlines' => $children,
+        ];
+    }
 
     public function focusUser($userId)
     {
@@ -81,7 +83,8 @@ class GenealogyTree extends Component
 
     public function render()
     {
-        $treeData = $this->buildTree($this->rootUserId);
+        // You can adjust maxDepth here (e.g., 3 or 5 levels deep)
+        $treeData = $this->buildTree($this->rootUserId, 1, 3);
 
         if ($this->activeTab === 'board-member') {
             return view('livewire.member-pages.genealogy.board-members');

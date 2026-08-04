@@ -19,18 +19,14 @@ class PolicyController extends Controller
             $user->UserID
         )->get();
 
+
         return Pdf::loadView('policy.template', [
 
             'user' => $user,
 
             'beneficiaries' => $beneficiaries,
 
-            'policyNumber' => 'POL-'.date('Y').'-'.str_pad(
-                $user->UserID,
-                5,
-                '0',
-                STR_PAD_LEFT
-            ),
+            'policyNumber' => $user->policy_number,
 
             'effectiveDate' => now(),
 

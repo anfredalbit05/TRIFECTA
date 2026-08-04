@@ -1,3 +1,8 @@
+@php
+    use Illuminate\Support\Str;
+
+@endphp
+
 <div class="w-full space-y-8">
 
     <!-- Header -->
@@ -57,15 +62,15 @@
                 class="h-28 w-28 shrink-0 overflow-hidden rounded-full border-4 border-slate-100 bg-slate-100 shadow-sm mx-auto sm:mx-0">
 
                 @php
-                    $profilePic = auth()->user()->profilepic ?? null;
-                    $defaultAvatar = 'profiles/default-avatar.png';
+                    $profilePic = auth()->user()->profilepic;
                 @endphp
 
-                @if (empty($profilePic) || $profilePic === $defaultAvatar)
-                    <img src="{{ asset('storage/profiles/default-avatar.png') }}" class="profile-image"
+                @if (!$profilePic || $profilePic === 'images/profiles/default-avatar.png')
+                    <img src="{{ asset('images/profiles/default-avatar.png') }}" class="profile-image"
                         alt="Default profile picture">
                 @else
-                    <img src="{{ asset('storage/' . $profilePic) }}" class="profile-image" alt="Profile picture">
+                    <img src="{{ Str::startsWith($profilePic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic) }}"
+                        class="profile-image" alt="Profile picture">
                 @endif
             </div>
 

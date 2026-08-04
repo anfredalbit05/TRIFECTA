@@ -202,7 +202,7 @@
                         class="inline-block"
                     />
                 </p>
-                <a href="{{ $contexts['contact_fb_url'] ?? 'https://facebook.com' }}" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">
+                <a href="{{ $contexts['contact_fb_url'] ?? 'https://www.facebook.com/dayongansolidaritas#' }}" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">
                     <x-editable-text
                         key="contact_fb_btn_text"
                         :value="$contexts['contact_fb_btn_text'] ?? ''"

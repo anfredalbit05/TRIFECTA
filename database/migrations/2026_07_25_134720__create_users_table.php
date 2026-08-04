@@ -56,6 +56,8 @@ return new class extends Migration
                 'Suspended',
             ])->default('Inactive');
 
+            $table->string('policy_number', 50)->nullable();
+
             $table->rememberToken();
 
             $table->timestamps();

@@ -1,4 +1,4 @@
-<div class="w-full space-y-8">
+<div class="w-full space-y-8" x-data="{ copied: false }">
 
     <!-- Header -->
     <div>
@@ -73,18 +73,18 @@
             </div>
 
             <div class="flex justify-end border-t border-slate-200 bg-slate-50 px-6 py-5">
-<button
-    type="submit"
-    wire:loading.attr="disabled"
-    wire:target="save"
-    class="rounded-xl bg-[#0C2C6B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#071a42] disabled:opacity-60">
-    <span wire:loading.remove wire:target="save">
-        Save Account Information
-    </span>
-    <span wire:loading wire:target="save">
-        Saving...
-    </span>
-</button>
+                <button
+                    type="submit"
+                    wire:loading.attr="disabled"
+                    wire:target="save"
+                    class="rounded-xl bg-[#0C2C6B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#071a42] disabled:opacity-60">
+                    <span wire:loading.remove wire:target="save">
+                        Save Account Information
+                    </span>
+                    <span wire:loading wire:target="save">
+                        Saving...
+                    </span>
+                </button>
             </div>
         </form>
     </div>
@@ -155,12 +155,17 @@
                         {{ $referralUrl }}
                     </p>
                 </div>
-<button
-    type="button"
-    onclick="navigator.clipboard.writeText('{{ $referralUrl }}')"
-    class="mt-4 rounded-xl bg-[#0C2C6B] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#071a42]">
-    Copy Referral Link
-</button>
+
+                <button
+                    type="button"
+                    @click="
+                        navigator.clipboard.writeText('{{ $referralUrl }}');
+                        copied = true;
+                        setTimeout(() => copied = false, 3000);
+                    "
+                    class="mt-4 rounded-xl bg-[#0C2C6B] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#071a42] cursor-pointer">
+                    Copy Referral Link
+                </button>
             </div>
         </div>
     </div>
@@ -171,7 +176,6 @@
             <h3 class="font-semibold text-slate-900">
                 Registered Beneficiaries
             </h3>
-
         </div>
 
         <div class="p-6">
@@ -200,6 +204,25 @@
                 <p class="text-sm text-slate-500 text-center py-4">No beneficiaries registered.</p>
             @endif
         </div>
+    </div>
+
+    <!-- Toast Notification Component -->
+<div
+        x-show="copied"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 -translate-y-4"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 -translate-y-4"
+        style="display: none;"
+        class="fixed top-5 right-5 z-50 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-800 shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <p class="text-sm font-medium">
+            Referral link copied to clipboard!
+        </p>
     </div>
 
 </div>

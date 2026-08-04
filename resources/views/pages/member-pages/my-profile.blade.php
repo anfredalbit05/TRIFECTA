@@ -44,7 +44,7 @@
                 Security
             </a>
 
-            @if(auth()->user()->RoleID == 4)
+            {{-- @if(auth()->user()->RoleID == 4) --}}
                 <a
                     href="#"
                     @click.prevent="tab = 'activity'"
@@ -58,7 +58,7 @@
                     :class="tab === 'certificate' ? 'active' : ''">
                     Certificate
                 </a>
-            @endif
+            {{-- @endif --}}
         </div>
 
         <!-- ACTIVATION BUTTON CONTAINER -->
@@ -94,7 +94,7 @@
             <livewire:member-pages.my-profile.security />
         </div>
 
-        @if(auth()->user()->RoleID == 4)
+        {{-- @if(auth()->user()->RoleID == 4) --}}
             <!-- ACTIVITY TAB -->
             <div
                 x-show="tab === 'activity'"
@@ -110,7 +110,7 @@
                 class="dashboard-main-card full-width-card">
                 <livewire:member-pages.my-profile.certificate />
             </div>
-        @endif
+        {{-- @endif --}}
 
     </div>
 

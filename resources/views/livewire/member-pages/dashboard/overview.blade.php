@@ -111,9 +111,9 @@
             </div>
         </div>
 
-        <div class="membership-card">
+        {{-- <div class="membership-card">
             🏅 Standard Membership
-        </div>
+        </div> --}}
 
         <div class="distribution-card">
             <div class="distribution-icon">📊</div>
@@ -123,10 +123,10 @@
             </div>
         </div>
 
-        <div class="wallet-footer">
+        {{-- <div class="wallet-footer">
             <span>✔ UNILEVEL L1</span>
             <strong>₱360.00</strong>
-        </div>
+        </div> --}}
 
     </aside>
 

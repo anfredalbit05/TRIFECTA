@@ -1,7 +1,7 @@
 @props(['node', 'isRoot' => false])
 
 <div class="flex flex-col items-center relative">
-    {{-- Top Vertical Line (for non-root nodes connecting from above) --}}
+    {{-- Top Vertical Line connecting from parent above --}}
     @if(!$isRoot)
         <div class="w-0.5 h-6 bg-slate-300"></div>
     @endif
@@ -10,7 +10,7 @@
     <div
         @class([
             'group relative flex flex-col items-center p-4 min-w-[150px] sm:min-w-[160px] bg-white rounded-xl border-2 shadow-sm transition-all duration-200 z-10',
-            'border-emerald-500 ring-2 ring-emerald-500/10' => ($node['status'] ?? '') === 'Active',
+            'border-blue-700 ring-2 ring-blue-700/10' => ($node['status'] ?? '') === 'Active',
             'border-slate-200' => ($node['status'] ?? '') !== 'Active',
         ])
     >
@@ -31,28 +31,36 @@
 
     {{-- Downlines (Children) Section --}}
     @if(!empty($node['downlines']))
-        @php $childCount = count($node['downlines']); @endphp
-
-        {{-- Vertical Stem dropping down from the parent card --}}
+        {{-- Vertical Stem dropping down from parent card --}}
         <div class="w-0.5 h-6 bg-slate-300"></div>
 
-        {{-- Dynamic Connector layout optimized for responsiveness: stacked vertically on mobile, horizontal tree layout on desktop --}}
-        <div class="relative flex flex-col sm:flex-row items-center sm:items-start justify-center gap-6 sm:gap-0">
-
-            {{-- Horizontal Spanning Bar for desktop view when 2 or more children exist --}}
-            @if($childCount == 2)
-                <div class="hidden sm:block absolute top-0 left-[25%] right-[25%] h-0.5 bg-slate-300"></div>
-            @elseif($childCount >= 3)
-                <div class="hidden sm:block absolute top-0 left-[15%] right-[15%] h-0.5 bg-slate-300"></div>
-            @endif
-
-            {{-- Render each child node cleanly --}}
+        {{-- Children Container --}}
+        <div class="flex flex-col sm:flex-row items-center sm:items-start justify-center gap-6 sm:gap-4 relative">
             @foreach($node['downlines'] as $child)
-                <div class="flex flex-col items-center sm:px-4 relative">
-                    {{-- Vertical connecting line for subsequent items in mobile stack view --}}
+                <div class="flex flex-col items-center relative sm:px-2">
+
+                    {{-- Mobile Vertical Line --}}
                     @if(!$loop->first)
                         <div class="sm:hidden w-0.5 h-6 bg-slate-300"></div>
                     @endif
+
+                    {{-- Desktop Branch Connector Structure --}}
+                    @if(count($node['downlines']) > 1)
+                        <div class="hidden sm:block absolute -top-6 left-0 right-0 h-6">
+                            {{-- Horizontal connector spanning across children via top-border --}}
+                            <div class="absolute top-0 h-3 border-t-2 border-slate-300
+                                @if($loop->first) left-1/2 right-0
+                                @elseif($loop->last) left-0 right-1/2
+                                @else left-0 right-0 @endif">
+                            </div>
+                            {{-- Center vertical tick connecting down to the child card --}}
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-0.5 h-6 bg-slate-300"></div>
+                        </div>
+                    @else
+                        {{-- Single Child Straight Vertical Line --}}
+                        <div class="hidden sm:block w-0.5 h-6 bg-slate-300 -mt-6 mb-0"></div>
+                    @endif
+
                     @include('livewire.member-pages.genealogy.partials.tree-node', ['node' => $child, 'isRoot' => false])
                 </div>
             @endforeach
