@@ -18,6 +18,7 @@ class Account extends Component
     public string $email = '';
     public string $qrCode = '';
     public string $referralUrl = '';
+    public string $status = '';
 
     public function mount(): void
     {
@@ -26,6 +27,7 @@ class Account extends Component
 
         $this->username = $user->username ?? '';
         $this->email = $user->email ?? '';
+        $this->status = $user->status ?? '';
 
         $this->referralUrl = url('/?ref=' . $user->referralCode);
 
@@ -73,12 +75,24 @@ class Account extends Component
                     'UserID'
                 ),
             ],
+
+            'status' => [
+                'required',
+
+                 Rule::in(['Active', 'Inactive']),
+    ],
         ]);
 
-        $user->update([
-            'username' => $this->username,
-            'email' => $this->email,
-        ]);
+            $data = [
+                'username' => $this->username,
+                'email' => $this->email,
+            ];
+
+            if ($user->RoleID != 4) {
+                $data['status'] = $this->status;
+            }
+
+            $user->update($data);
 
         session()->flash(
             'account-success',

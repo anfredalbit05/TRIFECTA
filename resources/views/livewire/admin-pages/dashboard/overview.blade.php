@@ -113,39 +113,6 @@
 
     </div>
 
-    <!-- BRANCH TABLE -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden">
-        <h3 class="font-bold text-[#0C2C6B] text-lg mb-4">
-            Branch Performance
-        </h3>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="border-b border-gray-100 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        <th class="pb-3 pl-2">Branch Name</th>
-                        <th class="pb-3 pr-2 text-right">Total Users</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50 text-sm">
-                    @forelse($branchStats as $branch)
-                        <tr class="hover:bg-gray-50/50 transition-colors">
-                            <td class="py-3.5 pl-2 font-medium text-gray-800">
-                                {{ $branch->branchname }}
-                            </td>
-                            <td class="py-3.5 pr-2 text-right font-semibold text-[#0C2C6B]">
-                                {{ $branch->user_count }}
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="2" class="text-center py-4 text-gray-400 text-sm">No branch data available.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-
     <!-- NEWS & DEMOGRAPHICS -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -170,31 +137,116 @@
             </div>
         </div>
 
-        <!-- GENDER DEMOGRAPHICS -->
-        <div class="bg-white shadow-sm border border-gray-100 rounded-2xl p-6">
-            <h3 class="font-bold text-[#0C2C6B] text-lg mb-4">
-                Member Demographics
-            </h3>
-            <div class="space-y-3">
-                @forelse($genderStats as $gender)
-                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-                        <span class="text-sm font-medium text-gray-700">
-                            {{ $gender->gender }}
-                        </span>
-                        <span class="font-bold text-[#0C2C6B] bg-white px-3 py-1 rounded-lg shadow-2xs text-sm">
-                            {{ $gender->total }}
-                        </span>
+
+<div class="bg-white shadow-sm border border-gray-100 rounded-2xl p-6" x-data="{ modalOpen: false, activeImage: '', activeName: '' }">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold text-[#0C2C6B] text-lg">
+            Top Members (Most Referrals)
+        </h3>
+        <span class="text-xs font-semibold bg-blue-50 text-[#0C2C6B] px-2.5 py-1 rounded-lg">
+            Leaderboard
+        </span>
+    </div>
+
+    <!-- Scrollable container -->
+    <div class="space-y-3 max-h-[380px] overflow-y-auto pr-1">
+        @forelse($topReferrers as $index => $referrer)
+            @php
+                $rankColors = [
+                    0 => 'bg-amber-100 text-amber-700 border-amber-200',
+                    1 => 'bg-slate-100 text-slate-700 border-slate-200',
+                    2 => 'bg-orange-100 text-orange-700 border-orange-200'
+                ];
+                $badgeStyle = $rankColors[$index] ?? 'bg-gray-50 text-gray-500 border-gray-100';
+            @endphp
+
+            <div class="flex items-center justify-between p-3.5 bg-gray-50/70 hover:bg-gray-50 border border-gray-100/80 rounded-xl transition-all">
+
+                <!-- Left Side: Rank, Profile Image/Avatar, and Info -->
+                <div class="flex items-center gap-3.5">
+                    <!-- Rank Badge -->
+                    <div class="w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold border {{ $badgeStyle }}">
+                        #{{ $index + 1 }}
                     </div>
-                @empty
-                    <p class="text-sm text-gray-400 py-4 text-center">No demographic data available.</p>
-                @endforelse
+
+                    <!-- Profile Picture / Avatar -->
+                    <div class="w-12 h-12 rounded-full overflow-hidden bg-[#0C2C6B]/10 flex items-center justify-center shrink-0 border border-gray-200">
+                        @if(!empty($referrer->profilepic))
+                            <img src="{{ asset('storage/' . $referrer->profilepic) }}"
+                                 alt="{{ $referrer->firstname }}"
+                                 class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                                 @click="modalOpen = true; activeImage = '{{ asset('storage/' . $referrer->profilepic) }}'; activeName = '{{ $referrer->firstname }} {{ $referrer->lastname }}'">
+                        @else
+                            <span class="text-[#0C2C6B] font-bold text-sm tracking-wide">
+                                {{ strtoupper(substr($referrer->firstname, 0, 1)) }}{{ strtoupper(substr($referrer->lastname, 0, 1)) }}
+                            </span>
+                        @endif
+                    </div>
+
+                    <!-- Name & Referral Code -->
+                    <div>
+                        <p class="text-sm font-bold text-gray-800 leading-tight">
+                            {{ $referrer->firstname }} {{ $referrer->lastname }}
+                        </p>
+                        <p class="text-xs text-gray-400 font-mono mt-1 flex items-center gap-1">
+                            <span>Code:</span>
+                            <span class="text-[#0C2C6B] font-semibold bg-white px-1.5 py-0.5 rounded border border-gray-200">
+                                {{ $referrer->referralCode }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Side: Total Invites -->
+                <div class="text-right">
+                    <span class="inline-flex items-center gap-1 font-extrabold text-[#0C2C6B] bg-blue-50/80 border border-blue-100 px-3 py-1.5 rounded-xl text-sm shadow-sm">
+                        {{ $referrer->total_invites }}
+                        <span class="text-xs font-medium text-blue-600/70">Invites</span>
+                    </span>
+                </div>
+
             </div>
+        @empty
+            <div class="text-center py-6">
+                <p class="text-3xl mb-2">🏆</p>
+                <p class="text-sm text-gray-400">No referral records found yet.</p>
+            </div>
+        @endforelse
+    </div>
+
+    <!-- IMAGE PREVIEW MODAL -->
+    <div x-show="modalOpen"
+         x-transition.opacity
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+         style="display: none;"
+         @click.self="modalOpen = false">
+
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center relative shadow-2xl" @click.stop>
+            <!-- Close Button -->
+            <button @click="modalOpen = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-bold text-lg cursor-pointer">
+                &times;
+            </button>
+
+            <h4 class="font-bold text-[#0C2C6B] text-base mb-4" x-text="activeName"></h4>
+
+            <!-- Full Image Preview -->
+            <div class="w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-gray-100 shadow-inner mb-4">
+                <img :src="activeImage" alt="Profile View" class="w-full h-full object-cover">
+            </div>
+
+            <button @click="modalOpen = false" class="w-full bg-[#0C2C6B] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#081f4f] transition-colors cursor-pointer">
+                Close
+            </button>
         </div>
+    </div>
+</div>
+
+
 
     </div>
 
-    <!-- CHARTS SECTION -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- CHARTS SECTION (Only Monthly Registrations left, Gender Chart completely removed) -->
+    <div class="grid grid-cols-1 gap-6">
 
         <!-- MONTHLY REGISTRATIONS -->
         <div class="bg-white shadow-sm border border-gray-100 rounded-2xl p-6">
@@ -206,18 +258,7 @@
             </div>
         </div>
 
-        <!-- GENDER CHART -->
-        <div class="bg-white shadow-sm border border-gray-100 rounded-2xl p-6">
-            <h3 class="font-bold text-[#0C2C6B] text-lg mb-4">
-                Gender Distribution (Male, Female, Other)
-            </h3>
-            <div class="relative h-64 sm:h-80 w-full">
-                <canvas id="genderChart"></canvas>
-            </div>
-        </div>
-
     </div>
-
 
 </div>
 
@@ -225,7 +266,7 @@
 <script>
     document.addEventListener('livewire:initialized', () => {
 
-        // 1. Monthly Registrations Bar Chart (Steps of 1, 2, 3...)
+        // Monthly Registrations Bar Chart
         const monthlyLabels = @json($monthlyUsers->pluck('month'));
         const monthlyData = @json($monthlyUsers->pluck('total'));
 
@@ -238,61 +279,6 @@
                     data: monthlyData,
                     backgroundColor: '#0C2C6B',
                     borderRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1,
-                            precision: 0
-                        }
-                    }
-                }
-            }
-        });
-
-        // 2. Gender Distribution Doughnut Chart (Male, Female, Other)
-        const genderLabels = @json($genderStats->pluck('gender'));
-        const genderData = @json($genderStats->pluck('total'));
-
-        new Chart(document.getElementById('genderChart'), {
-            type: 'doughnut',
-            data: {
-                labels: genderLabels,
-                datasets: [{
-                    data: genderData,
-                    backgroundColor: [
-                        '#0C2C6B', // Male (Blue)
-                        '#D79B10', // Female (Pink)
-                        '#475569'  // Other (Green)
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-
-        // 3. Branch Performance Line Chart
-        const branchLabels = @json($branchStats->pluck('branchname'));
-        const branchData = @json($branchStats->pluck('user_count'));
-
-        new Chart(document.getElementById('branchChart'), {
-            type: 'line',
-            data: {
-                labels: branchLabels,
-                datasets: [{
-                    label: 'Users',
-                    data: branchData,
-                    borderColor: '#7c3aed',
-                    backgroundColor: '#7c3aed33',
-                    tension: 0.4,
-                    fill: true
                 }]
             },
             options: {

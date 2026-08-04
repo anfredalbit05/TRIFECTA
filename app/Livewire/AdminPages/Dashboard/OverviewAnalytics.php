@@ -10,6 +10,7 @@ use App\Models\Beneficiary;
 use App\Models\Inquiry;
 use App\Models\NewsUpdate;
 use App\Models\Faq;
+use App\Models\Activation;
 use Illuminate\Support\Facades\DB;
 
 class OverviewAnalytics extends Component
@@ -34,9 +35,9 @@ class OverviewAnalytics extends Component
     public $recentNews;
 
     public $branchStats;
-    public $genderStats;
     public $benefitStats;
     public $monthlyUsers;
+    public $topReferrers;
 
     public function mount()
     {
@@ -91,19 +92,6 @@ class OverviewAnalytics extends Component
 
         /*
         |--------------------------------------------------------------------------
-        | GENDER ANALYTICS
-        |--------------------------------------------------------------------------
-        */
-
-        $this->genderStats = User::select(
-                'gender',
-                DB::raw('count(*) as total')
-            )
-            ->groupBy('gender')
-            ->get();
-
-        /*
-        |--------------------------------------------------------------------------
         | BENEFIT ANALYTICS (Safely handled if relationship is missing)
         |--------------------------------------------------------------------------
         */
@@ -125,6 +113,21 @@ class OverviewAnalytics extends Component
                 DB::raw("COUNT(*) as total")
             )
             ->groupBy('month')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOP REFERRERS LEADERBOARD
+        |--------------------------------------------------------------------------
+        */
+
+        $this->topReferrers = User::query()
+            ->join('activations', 'users.referralCode', '=', 'activations.upline_code')
+            ->select('users.firstname', 'users.lastname', 'users.referralCode', 'users.profilepic', DB::raw('count(activations.ActivationID) as total_invites'))
+            ->where('activations.status', 'Approved')
+            ->groupBy('users.UserID', 'users.firstname', 'users.lastname', 'users.referralCode', 'users.profilepic')
+            ->orderByDesc('total_invites')
+            ->limit(5)
             ->get();
     }
 

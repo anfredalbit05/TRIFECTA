@@ -108,14 +108,24 @@
                     Account Status
                 </p>
                 <div class="mt-3">
-                    <span @class([
-                        'inline-flex rounded-full px-3 py-1 text-xs font-semibold',
-                        'bg-emerald-100 text-emerald-700' => auth()->user()->status === 'Active',
-                        'bg-amber-100 text-amber-700' => auth()->user()->status === 'Inactive',
-                        'bg-red-100 text-red-700' => auth()->user()->status === 'Suspended',
-                    ])>
-                        {{ auth()->user()->status }}
-                    </span>
+                    @if (auth()->user()->RoleID != 4)
+                        <select
+                            wire:model="status"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm">
+
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    @else
+                        <span @class([
+                            'inline-flex rounded-full px-3 py-1 text-xs font-semibold',
+                            'bg-emerald-100 text-emerald-700' => auth()->user()->status === 'Active',
+                            'bg-amber-100 text-amber-700' => auth()->user()->status === 'Inactive',
+                            'bg-red-100 text-red-700' => auth()->user()->status === 'Suspended',
+                        ])>
+                            {{ auth()->user()->status }}
+                        </span>
+                    @endif
                 </div>
             </div>
 
