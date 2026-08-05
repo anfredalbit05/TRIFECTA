@@ -47,14 +47,13 @@
 
 
     <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-   <script>
+<script>
     document.addEventListener('livewire:init', () => {
 
         // TOAST NOTIFICATIONS
         Livewire.on('toast', (event) => {
-
             const data = Array.isArray(event) ? event[0] : event;
 
             Swal.fire({
@@ -66,12 +65,10 @@
                 timer: 3000,
                 timerProgressBar: true,
             });
-
         });
 
         // GENERAL CONFIRMATION
         Livewire.on('swal:confirm', (event) => {
-
             const data = Array.isArray(event) ? event[0] : event;
 
             Swal.fire({
@@ -84,9 +81,7 @@
                 cancelButtonColor: '#D79B10',
                 allowOutsideClick: false
             }).then((result) => {
-
                 if (result.isConfirmed) {
-
                     Swal.fire({
                         title: 'Processing...',
                         text: 'Please wait...',
@@ -99,14 +94,11 @@
 
                     Livewire.dispatch(data.method || data.nextMethod);
                 }
-
             });
-
         });
 
         // APPLICATION SUBMISSION
         Livewire.on('swal-confirm-submission', () => {
-
             Swal.fire({
                 title: 'Save Application?',
                 text: 'Are you sure you want to submit this application?',
@@ -116,9 +108,7 @@
                 confirmButtonColor: '#0B2A5B',
                 cancelButtonColor: '#d33'
             }).then((result) => {
-
                 if (result.isConfirmed) {
-
                     Swal.fire({
                         title: 'Submitting...',
                         text: 'Please wait.',
@@ -131,9 +121,7 @@
 
                     Livewire.dispatch('confirmed-save-application');
                 }
-
             });
-
         });
 
         // CLOSE LOADING
@@ -143,7 +131,6 @@
 
         // SUCCESS ALERT WITH OK BUTTON
         Livewire.on('swal:success', (event) => {
-
             const data = Array.isArray(event) ? event[0] : event;
 
             Swal.close();
@@ -157,75 +144,70 @@
                 showConfirmButton: true,
                 allowOutsideClick: false
             });
-
         });
+
+
 
     });
 </script>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<script>
+    let mapInstance = null;
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    function initMapIfVisible() {
+        const mapElement = document.getElementById('map');
 
+        // Your default coordinates
+        const defaultLat = 7.446819564242066;
+        const defaultLng = 125.80932758793946;
 
-    <script>
-        let mapInstance = null;
+        if (mapElement) {
+            // Fix: Clean up old map instance if it exists to prevent "already initialized" crash
+            if (mapInstance) {
+                mapInstance.remove();
+                mapInstance = null;
+            }
 
+            mapInstance = L.map('map').setView([defaultLat, defaultLng], 15);
 
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(mapInstance);
 
-        function initMapIfVisible() {
-            const mapElement = document.getElementById('map');
+            // Add a draggable marker initialized at your default coordinates
+            let marker = L.marker([defaultLat, defaultLng], {
+                draggable: true
+            }).addTo(mapInstance);
 
-            // Your default coordinates
-            const defaultLat = 7.446819564242066;
-            const defaultLng = 125.80932758793946;
+            marker.on('dragend', function(e) {
+                const latlng = marker.getLatLng();
+                Livewire.dispatch('set-coordinates', {
+                    lat: latlng.lat,
+                    lng: latlng.lng
+                });
+            });
 
-            if (mapElement) {
-                if (!mapInstance) {
-                    mapInstance = L.map('map').setView([defaultLat, defaultLng], 15);
-
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap'
-                    }).addTo(mapInstance);
-
-                    // Add a draggable marker initialized at your default coordinates
-                    let marker = L.marker([defaultLat, defaultLng], {
-                        draggable: true
-                    }).addTo(mapInstance);
-
-                    marker.on('dragend', function(e) {
-                        const latlng = marker.getLatLng();
-                        Livewire.dispatch('set-coordinates', {
-                            lat: latlng.lat,
-                            lng: latlng.lng
-                        });
-                    });
-
-                    mapInstance.on('click', function(e) {
-                        marker.setLatLng(e.latlng);
-                        Livewire.dispatch('set-coordinates', {
-                            lat: e.latlng.lat,
-                            lng: e.latlng.lng
-                        });
-                    });
-                } else {
-                    setTimeout(() => {
-                        mapInstance.invalidateSize();
-                    }, 200);
-                }
-            } else {
-                if (mapInstance) {
-                    mapInstance.remove();
-                    mapInstance = null;
-                }
+            mapInstance.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                Livewire.dispatch('set-coordinates', {
+                    lat: e.latlng.lat,
+                    lng: e.latlng.lng
+                });
+            });
+        } else {
+            if (mapInstance) {
+                mapInstance.remove();
+                mapInstance = null;
             }
         }
+    }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            initMapIfVisible();
-        });
-    </script>
-
+    document.addEventListener('DOMContentLoaded', function() {
+        initMapIfVisible();
+    });
+</script>
 
 </body>
 

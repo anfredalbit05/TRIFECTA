@@ -735,76 +735,21 @@ x-data="{
 
 
   <script>
-    let map = null;
-    let marker = null;
+    document.addEventListener('livewire:init', () => {
 
-    document.addEventListener('livewire:initialized', () => {
+        // VALIDATION ERROR ALERT
+        Livewire.on('validation-error', (event) => {
+            // Extract the payload correctly from Livewire 3 event structure
+            const data = event.detail ? event.detail : (Array.isArray(event) ? event[0] : event);
 
-        Livewire.on('destroy-map', () => {
-
-            if (map) {
-                map.remove();
-                map = null;
-                marker = null;
-            }
-
-        });
-
-        Livewire.on('map-opened', (data) => {
-
-            setTimeout(() => {
-
-                const defaultLat = 7.442294461028405;
-                const defaultLng = 125.81370503321095;
-
-                const lat = data.latitude ?? defaultLat;
-                const lng = data.longitude ?? defaultLng;
-
-                if (map) {
-                    map.remove();
-                    map = null;
-                    marker = null;
-                }
-
-                map = L.map('map').setView([lat, lng], 15);
-
-                L.tileLayer(
-                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    {
-                        attribution: '&copy; OpenStreetMap'
-                    }
-                ).addTo(map);
-
-                if (
-                    data.latitude !== null &&
-                    data.longitude !== null
-                ) {
-                    marker = L.marker([lat, lng]).addTo(map);
-
-                    map.setView([lat, lng], 16);
-                }
-
-                map.on('click', function (e) {
-
-                    if (marker) {
-                        marker.setLatLng(e.latlng);
-                    } else {
-                        marker = L.marker(e.latlng).addTo(map);
-                    }
-
-                    Livewire.dispatch('set-coordinates', {
-                        lat: e.latlng.lat,
-                        lng: e.latlng.lng
-                    });
-
-                });
-
-                setTimeout(() => {
-                    map.invalidateSize();
-                }, 100);
-
-            }, 300);
-
+            Swal.fire({
+                icon: 'error',
+                title: data.title || 'Error',
+                html: data.html || data.text || 'Please check the required fields.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#0B2A5B',
+                allowOutsideClick: false
+            });
         });
 
     });
