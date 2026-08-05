@@ -41,6 +41,27 @@ class RolesSeeder extends Seeder
                 'created_at'  => now(),
                 'updated_at'  => now(),
             ],
+            [
+                'rolename'   => 'Executive Management',
+                'description'=> 'Executive management with limited privileges',
+                'status'      => true,
+                'created_at'  => now(),
+                'updated_at'  => now(),
+            ],
+            [
+                'rolename'   => 'Agency',
+                'description'=> 'Agency with limited privileges',
+                'status'      => true,
+                'created_at'  => now(),
+                'updated_at'  => now(),
+            ],
+            [
+                'rolename'   => 'Human Resource',
+                'description'=> 'Human Resource with limited privileges',
+                'status'      => true,
+                'created_at'  => now(),
+                'updated_at'  => now(),
+            ],
         ]);
     }
 }
