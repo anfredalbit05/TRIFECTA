@@ -99,7 +99,7 @@ class Profile extends Component
 
     $this->signature = $filename;
 
-    session()->flash('profile-success', 'Signature saved successfully.');
+    $this->dispatch('signature-saved');
 }
 
 public function removeSignature(): void

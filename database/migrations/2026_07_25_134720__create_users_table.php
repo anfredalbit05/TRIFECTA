@@ -57,7 +57,7 @@ return new class extends Migration
             ])->default('Inactive');
 
 
-            $table->text('signature')->nullable();
+           $table->string('signature', 255)->nullable();
 
             $table->string('policy_number', 50)->nullable();
 

@@ -67,7 +67,7 @@ document.addEventListener('livewire:init', () => {
             showCancelButton: true,
             confirmButtonText: 'Yes, submit it!',
             confirmButtonColor: '#0B2A5B',
-            cancelButtonColor: '#d33'
+            cancelButtonColor: '#D79B10'
         }).then((result) => {
 
             if (result.isConfirmed) {
@@ -99,7 +99,7 @@ document.addEventListener('livewire:init', () => {
             showCancelButton: true,
             confirmButtonText: 'Yes, update it!',
             confirmButtonColor: '#0B2A5B',
-            cancelButtonColor: '#d33'
+            cancelButtonColor: '#D79B10'
         }).then((result) => {
 
             if (result.isConfirmed) {
@@ -133,10 +133,9 @@ Livewire.on('swal:confirm', (event) => {
         showCancelButton: true,
         confirmButtonText: 'Yes, proceed!',
         confirmButtonColor: '#0B2A5B',
-        cancelButtonColor: '#d33',
+        cancelButtonColor: '#D79B10',
         allowOutsideClick: false
     }).then((result) => {
-
         if (result.isConfirmed) {
 
             Swal.fire({

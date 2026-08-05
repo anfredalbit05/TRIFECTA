@@ -449,43 +449,110 @@
         if (target === 'front') {
             frontEl.classList.remove('hidden');
             backEl.classList.add('hidden');
+
             btnFront.className =
                 "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-[#0C2C6B] text-white";
+
             btnBack.className =
                 "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-slate-200 text-slate-700";
+
         } else {
             backEl.classList.remove('hidden');
             frontEl.classList.add('hidden');
-            btnBack.className = "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-[#0C2C6B] text-white";
+
+            btnBack.className =
+                "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-[#0C2C6B] text-white";
+
             btnFront.className =
                 "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-slate-200 text-slate-700";
         }
     }
 
+
     function signaturePadSetup() {
         return {
             pad: null,
+
             initPad() {
                 const canvas = this.$refs.signatureCanvas;
+
                 canvas.width = canvas.offsetWidth;
                 canvas.height = canvas.offsetHeight;
+
                 this.pad = new SignaturePad(canvas);
+
                 @if ($signature)
                     this.pad.fromDataURL("{{ asset('storage/' . $signature) }}");
                 @endif
             },
+
+
             clearPad() {
                 this.pad.clear();
                 @this.call('removeSignature');
             },
+
+
             savePad() {
+
                 if (this.pad.isEmpty()) {
-                    alert("Please provide a signature first.");
+
+                    Swal.fire({
+                        title: 'No Signature',
+                        text: 'Please provide a signature first.',
+                        icon: 'warning',
+                        confirmButtonColor: '#0C2C6B'
+                    });
+
                     return;
                 }
+
+
                 const dataUrl = this.pad.toDataURL();
-                @this.call('saveSignature', dataUrl);
+
+
+                Swal.fire({
+                    title: 'Save Signature?',
+                    text: 'Your signature will be saved to your profile.',
+                    icon: 'question',
+
+                    showCancelButton: true,
+
+                    confirmButtonColor: '#0B2A5B',
+                    cancelButtonColor: '#D79B10',
+
+                    confirmButtonText: 'Yes, Save it',
+                    cancelButtonText: 'Cancel'
+
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        @this.call('saveSignature', dataUrl);
+
+                    }
+
+                });
+
             }
         }
     }
+
+
+
+    document.addEventListener('livewire:init', () => {
+
+        Livewire.on('signature-saved', () => {
+
+            Swal.fire({
+                title: 'Saved!',
+                text: 'Your signature has been saved successfully.',
+                icon: 'success',
+                confirmButtonColor: '#0C2C6B'
+            });
+
+        });
+
+    });
+
 </script>
