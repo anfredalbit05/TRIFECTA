@@ -67,38 +67,38 @@
                     </div>
 
 
-<div class="flex-1 w-full flex flex-col items-center sm:items-start">
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-        <!-- Choose New Picture Button -->
-        <label for="profilepic"
-            class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-white transition w-full sm:w-auto bg-[#0C2C6B] hover:bg-[#071a42] text-center whitespace-nowrap">
-            Choose New Picture
-        </label>
-        <input id="profilepic" type="file" wire:model="profilepic" accept="image/*" class="hidden">
+                    <div class="flex-1 w-full flex flex-col items-center sm:items-start">
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                            <!-- Choose New Picture Button -->
+                            <label for="profilepic"
+                                class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-white transition w-full sm:w-auto bg-[#0C2C6B] hover:bg-[#071a42] text-center whitespace-nowrap">
+                                Choose New Picture
+                            </label>
+                            <input id="profilepic" type="file" wire:model="profilepic" accept="image/*"
+                                class="hidden">
 
-        <!-- Remove Picture Button: Shows ONLY if user has a custom picture and hasn't picked a new file yet -->
-        @if (!$profilepic && auth()->user()->profilepic && auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
-            <button type="button"
-                wire:click="removeProfilePicture"
-                wire:confirm="Are you sure you want to remove your profile picture?"
-                class="inline-flex items-center justify-center gap-2 rounded-xl px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 transition w-full sm:w-auto text-center whitespace-nowrap">
-                Remove Picture
-            </button>
-        @endif
-    </div>
+                            <!-- Remove Picture Button: Shows ONLY if user has a custom picture and hasn't picked a new file yet -->
+                            @if (!$profilepic && auth()->user()->profilepic && auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
+                                <button type="button" wire:click="removeProfilePicture"
+                                    wire:confirm="Are you sure you want to remove your profile picture?"
+                                    class="inline-flex items-center justify-center gap-2 rounded-xl px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 transition w-full sm:w-auto text-center whitespace-nowrap">
+                                    Remove Picture
+                                </button>
+                            @endif
+                        </div>
 
-    @error('profilepic')
-        <p class="mt-2 text-xs sm:text-sm text-red-600">{{ $message }}</p>
-    @enderror
+                        @error('profilepic')
+                            <p class="mt-2 text-xs sm:text-sm text-red-600">{{ $message }}</p>
+                        @enderror
 
-    <!-- Save Button: Shows ONLY when a new file is selected -->
-    @if ($profilepic)
-        <button type="button" wire:click="updateProfilePicture"
-            class="mt-3 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-emerald-700 w-full sm:w-auto text-center whitespace-nowrap">
-            Save Profile Picture
-        </button>
-    @endif
-</div>
+                        <!-- Save Button: Shows ONLY when a new file is selected -->
+                        @if ($profilepic)
+                            <button type="button" wire:click="updateProfilePicture"
+                                class="mt-3 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-emerald-700 w-full sm:w-auto text-center whitespace-nowrap">
+                                Save Profile Picture
+                            </button>
+                        @endif
+                    </div>
                 </div>
             </div>
 
@@ -318,7 +318,8 @@
                                     {{ strtoupper(trim("$firstname $middlename $lastname") ?: 'NAME HERE') }}</p>
                                 <p><strong>ADDRESS:</strong> {{ strtoupper($address ?: 'N/A') }}</p>
                                 <p><strong>SEX:</strong> {{ strtoupper($sex) }} &nbsp;&nbsp;&nbsp;
-                                    <strong>STATUS:</strong> {{ strtoupper($civilStatus) }}</p>
+                                    <strong>STATUS:</strong> {{ strtoupper($civilStatus) }}
+                                </p>
                                 <p><strong>BIRTH DATE:</strong>
                                     {{ $birthdate ? \Carbon\Carbon::parse($birthdate)->format('F d, Y') : 'N/A' }}</p>
                                 <p><strong>DATE JOINED:</strong>
@@ -344,7 +345,8 @@
                                 <div
                                     class="w-20 sm:w-24 h-7 sm:h-8 flex items-center justify-center border-b border-slate-400">
                                     @if ($signature)
-                                        <img src="{{ $signature }}" class="max-h-6 sm:max-h-7 object-contain">
+                                        <img src="{{ asset('storage/' . $signature) }}"
+                                            class="max-h-6 sm:max-h-7 object-contain">
                                     @else
                                         <span class="text-[7px] text-slate-400 italic">No Signature</span>
                                     @endif
@@ -448,7 +450,7 @@
             frontEl.classList.remove('hidden');
             backEl.classList.add('hidden');
             btnFront.className =
-            "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-[#0C2C6B] text-white";
+                "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-[#0C2C6B] text-white";
             btnBack.className =
                 "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-slate-200 text-slate-700";
         } else {
@@ -469,12 +471,12 @@
                 canvas.height = canvas.offsetHeight;
                 this.pad = new SignaturePad(canvas);
                 @if ($signature)
-                    this.pad.fromDataURL("{{ $signature }}");
+                    this.pad.fromDataURL("{{ asset('storage/' . $signature) }}");
                 @endif
             },
             clearPad() {
                 this.pad.clear();
-                @this.set('signature', null);
+                @this.call('removeSignature');
             },
             savePad() {
                 if (this.pad.isEmpty()) {

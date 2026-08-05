@@ -74,16 +74,50 @@ class Profile extends Component
     }
 
     // Save signature coming from canvas dataURL
-    public function saveSignature($dataUrl): void
-    {
-        $this->signature = $dataUrl;
+   public function saveSignature($dataUrl): void
+{
+    $user = User::findOrFail(Auth::id());
 
-        /** @var User $user */
-        $user = User::findOrFail(Auth::id());
-        $user->update(['signature' => $dataUrl]);
+    // Remove "data:image/png;base64,"
+    $image = str_replace('data:image/png;base64,', '', $dataUrl);
+    $image = str_replace(' ', '+', $image);
 
-        session()->flash('profile-success', 'Signature saved successfully.');
+    $imageData = base64_decode($image);
+
+    $filename = 'signatures/signature_' . $user->UserID . '_' . time() . '.png';
+
+    // Delete old signature if exists
+    if ($user->signature && Storage::disk('public')->exists($user->signature)) {
+        Storage::disk('public')->delete($user->signature);
     }
+
+    Storage::disk('public')->put($filename, $imageData);
+
+    $user->update([
+        'signature' => $filename
+    ]);
+
+    $this->signature = $filename;
+
+    session()->flash('profile-success', 'Signature saved successfully.');
+}
+
+public function removeSignature(): void
+{
+    $user = User::findOrFail(Auth::id());
+
+    if ($user->signature && Storage::disk('public')->exists($user->signature)) {
+        Storage::disk('public')->delete($user->signature);
+    }
+
+    $user->update([
+        'signature' => null,
+    ]);
+
+    $this->signature = null;
+
+    session()->flash('profile-success', 'Signature removed successfully.');
+}
 
     public function updatedProfilepic(): void
     {
