@@ -735,7 +735,81 @@ x-data="{
 
 
   <script>
-    document.addEventListener('livewire:init', () => {
+    let map = null;
+    let marker = null;
+
+    document.addEventListener('livewire:initialized', () => {
+
+        Livewire.on('destroy-map', () => {
+
+            if (map) {
+                map.remove();
+                map = null;
+                marker = null;
+            }
+
+        });
+
+        Livewire.on('map-opened', (data) => {
+
+            setTimeout(() => {
+
+                const defaultLat = 7.442294461028405;
+                const defaultLng = 125.81370503321095;
+
+                const lat = data.latitude ?? defaultLat;
+                const lng = data.longitude ?? defaultLng;
+
+                if (map) {
+                    map.remove();
+                    map = null;
+                    marker = null;
+                }
+
+                map = L.map('map').setView([lat, lng], 15);
+
+                L.tileLayer(
+                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    {
+                        attribution: '&copy; OpenStreetMap'
+                    }
+                ).addTo(map);
+
+                if (
+                    data.latitude !== null &&
+                    data.longitude !== null
+                ) {
+                    marker = L.marker([lat, lng]).addTo(map);
+
+                    map.setView([lat, lng], 16);
+                }
+
+                map.on('click', function (e) {
+
+                    if (marker) {
+                        marker.setLatLng(e.latlng);
+                    } else {
+                        marker = L.marker(e.latlng).addTo(map);
+                    }
+
+                    Livewire.dispatch('set-coordinates', {
+                        lat: e.latlng.lat,
+                        lng: e.latlng.lng
+                    });
+
+                });
+
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 100);
+
+            }, 300);
+
+        });
+
+    });
+
+      document.addEventListener('livewire:init', () => {
 
         // VALIDATION ERROR ALERT
         Livewire.on('validation-error', (event) => {
@@ -753,5 +827,6 @@ x-data="{
         });
 
     });
+
 </script>
 </div>

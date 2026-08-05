@@ -622,10 +622,6 @@ class ActivationModal extends Component
                 $adminSubject = 'New Activation Request Submitted (Admin Notice)';
             }
 
-            // Save the upline code directly to the users table's uplineCode column
-            $selectedUser->update([
-                'uplineCode' => $cleanUplineCode,
-            ]);
 
             $mailData = [
                 'selectedUser' => $selectedUser,

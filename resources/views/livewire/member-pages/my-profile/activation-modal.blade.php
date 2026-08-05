@@ -199,11 +199,15 @@
                                     Upline Code *
                                 </label>
                                 <input
-                                        wire:model="upline_code"
-                                        type="text"
-                                        placeholder="Enter upline code"
-                                        {{ !empty($upline_code) ? 'readonly' : '' }}
-                                        class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none {{ !empty($upline_code) ? 'bg-slate-100 text-slate-600 cursor-not-allowed' : 'bg-white' }}">
+    wire:model="upline_code"
+    type="text"
+    placeholder="Enter upline code"
+    @readonly($selectedUserRecord?->status === 'Active')
+    class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm
+        focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none
+        {{ $selectedUserRecord?->status === 'Active'
+            ? 'bg-slate-100 text-slate-600 cursor-not-allowed'
+            : 'bg-white' }}">
                                 @error('upline_code')
                                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                 @enderror

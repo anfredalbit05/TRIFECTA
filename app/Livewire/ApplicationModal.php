@@ -204,8 +204,6 @@ public function open($upline = null)
     $this->open = false;
 }
 
-
-
     /*
     |--------------------------------------------------------------------------
     | Validate and Prompt Confirmation
