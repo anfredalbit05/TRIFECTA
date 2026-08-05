@@ -15,10 +15,8 @@ return new class extends Migration
 
             $table->id('BranchID');
 
-            // Branch Information
-            $table->string('branchCode', 20)->unique();
             $table->string('branchname', 150);
-            $table->string('type', 50);
+            // $table->string('type', 50);
             $table->text('address');
 
             // Status

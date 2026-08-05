@@ -19,8 +19,25 @@
         @endif
     </div>
 
-    <p class="text-sm text-slate-500 mb-6">Displaying verified feedback from community members.</p>
+    <!-- SEARCH INPUT & REFRESH BUTTON CONTAINER -->
+    <div class="flex items-center justify-between gap-4 mb-6">
+        <!-- SEARCH INPUT -->
+        <div class="relative max-w-sm w-full">
+            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
+                🔍
+            </span>
+            <input type="text" wire:model.live="search" placeholder="Search testimonials..."
+                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
+        </div>
 
+        <!-- REFRESH BUTTON -->
+        <button wire:click="resetTable" wire:loading.attr="disabled" title="Refresh Table"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
+            <span wire:loading.remove wire:target="resetTable">🔄</span>
+            <span wire:loading wire:target="resetTable" class="animate-spin">⏳</span>
+            <span class="hidden sm:inline">Refresh</span>
+        </button>
+    </div>
     <!-- CREATE / EDIT MODAL -->
     @if($showCreateModal)
         <div

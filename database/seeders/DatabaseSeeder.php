@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             ModuleSeeder::class,
             TestimonialsSeeder::class,
             SettingsSeeder::class,
+            BranchesSeeder::class,
         ]);
     }
 }

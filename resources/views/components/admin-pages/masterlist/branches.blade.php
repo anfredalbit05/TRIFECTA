@@ -6,9 +6,8 @@
             Branches
         </h2>
 
-        @if($this->canCreate)
-            <button
-                wire:click="openCreateModal"
+        @if ($this->canCreate)
+            <button wire:click="openCreateModal"
                 class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
                 Add Branch
             </button>
@@ -26,17 +25,36 @@
         </div>
     @endif
 
+    <!-- SEARCH INPUT & REFRESH BUTTON CONTAINER -->
+    <div class="flex items-center justify-between gap-4 mb-6">
+        <!-- SEARCH INPUT -->
+        <div class="relative max-w-sm w-full">
+            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
+                🔍
+            </span>
+            <input type="text" wire:model.live="search" placeholder="Search branches..."
+                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
+        </div>
+
+        <!-- REFRESH BUTTON -->
+        <button wire:click="resetTable" wire:loading.attr="disabled" title="Refresh Table"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
+            <span wire:loading.remove wire:target="resetTable">🔄</span>
+            <span wire:loading wire:target="resetTable" class="animate-spin">⏳</span>
+            <span class="hidden sm:inline">Refresh</span>
+        </button>
+    </div>
+
     <!-- BRANCHES TABLE -->
     <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
+                <tr
+                    class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
                     <th class="py-3 px-4">#</th>
-                    <th class="py-3 px-4">Branch Code</th>
                     <th class="py-3 px-4">Branch Name</th>
-                    <th class="py-3 px-4">Type</th>
                     <th class="py-3 px-4">Address</th>
-                    @if($this->canUpdate || $this->canDelete)
+                    @if ($this->canUpdate || $this->canDelete)
                         <th class="py-3 px-4 text-center">Action</th>
                     @endif
                 </tr>
@@ -49,17 +67,7 @@
                         </td>
 
                         <td class="py-4 px-4 font-semibold text-slate-900">
-                            {{ $branch->branchCode }}
-                        </td>
-
-                        <td class="py-4 px-4 font-semibold text-slate-900">
                             {{ $branch->branchname }}
-                        </td>
-
-                        <td class="py-4 px-4">
-                            <span class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
-                                {{ $branch->type }}
-                            </span>
                         </td>
 
                         <td class="py-4 px-4 text-slate-500 max-w-xs truncate">
@@ -67,23 +75,20 @@
                         </td>
 
                         <!-- Actions Column -->
-                        @if($this->canUpdate || $this->canDelete)
+                        @if ($this->canUpdate || $this->canDelete)
                             <td class="py-4 px-4 text-center">
                                 <div class="flex gap-2 justify-center">
                                     {{-- EDIT BUTTON --}}
-                                    @if($this->canUpdate)
-                                        <button
-                                            wire:click="editBranch({{ $branch->BranchID }})"
-                                            title="Update Branch"
+                                    @if ($this->canUpdate)
+                                        <button wire:click="editBranch({{ $branch->BranchID }})" title="Update Branch"
                                             class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
                                             ✏️
                                         </button>
                                     @endif
 
                                     {{-- DELETE BUTTON --}}
-                                    @if($this->canDelete)
-                                        <button
-                                            wire:click="confirmDeleteBranch({{ $branch->BranchID }})"
+                                    @if ($this->canDelete)
+                                        <button wire:click="confirmDeleteBranch({{ $branch->BranchID }})"
                                             title="Delete Branch"
                                             class="inline-flex items-center justify-center px-3 py-2 rounded-lg border-amber-400 bg-amber-500 text-white hover:bg-amber-500 transition cursor-pointer text-xs font-semibold shadow">
                                             🗑️
@@ -103,57 +108,50 @@
             </tbody>
         </table>
 
-   <!-- PAGINATION -->
-    @if($branches->hasPages())
-        <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
+        <!-- PAGINATION -->
+        @if ($branches->hasPages())
+            <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
 
-            {{-- Previous Page Link --}}
-            @if ($branches->onFirstPage())
-                <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
-                    Previous
+                {{-- Previous Page Link --}}
+                @if ($branches->onFirstPage())
+                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                        Previous
+                    </span>
+                @else
+                    <button wire:click="previousPage" wire:loading.attr="disabled"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer"
+                        style="background-color: #D79B10;" onmouseover="this.style.backgroundColor='#c58d0f'"
+                        onmouseout="this.style.backgroundColor='#D79B10'">
+                        Previous
+                    </button>
+                @endif
+
+                <span class="text-sm text-gray-600">
+                    Page {{ $branches->currentPage() }} of {{ $branches->lastPage() }}
                 </span>
-            @else
-                <button
-                    wire:click="previousPage"
-                    wire:loading.attr="disabled"
-                    class="px-4 py-2 text-white rounded transition cursor-pointer"
-                    style="background-color: #D79B10;"
-                    onmouseover="this.style.backgroundColor='#c58d0f'"
-                    onmouseout="this.style.backgroundColor='#D79B10'"
-                >
-                    Previous
-                </button>
-            @endif
 
-            <span class="text-sm text-gray-600">
-                Page {{ $branches->currentPage() }} of {{ $branches->lastPage() }}
-            </span>
+                {{-- Next Page Link --}}
+                @if ($branches->hasMorePages())
+                    <button wire:click="nextPage" wire:loading.attr="disabled"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer"
+                        style="background-color: #0C2C6B;" onmouseover="this.style.backgroundColor='#0a2559'"
+                        onmouseout="this.style.backgroundColor='#0C2C6B'">
+                        Next
+                    </button>
+                @else
+                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                        Next
+                    </span>
+                @endif
 
-            {{-- Next Page Link --}}
-            @if ($branches->hasMorePages())
-                <button
-                    wire:click="nextPage"
-                    wire:loading.attr="disabled"
-                    class="px-4 py-2 text-white rounded transition cursor-pointer"
-                    style="background-color: #0C2C6B;"
-                    onmouseover="this.style.backgroundColor='#0a2559'"
-                    onmouseout="this.style.backgroundColor='#0C2C6B'"
-                >
-                    Next
-                </button>
-            @else
-                <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
-                    Next
-                </span>
-            @endif
-
-        </div>
-    @endif
+            </div>
+        @endif
     </div>
 
     <!-- ADD/EDIT BRANCH MODAL -->
-    @if($isOpen)
-        <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm overflow-y-auto">
+    @if ($isOpen)
+        <div
+            class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm overflow-y-auto">
             <div class="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl my-8">
 
                 <!-- MODAL HEADER -->
@@ -164,10 +162,8 @@
                         </h3>
                         <p class="text-xs text-blue-100">Fill in the branch details below.</p>
                     </div>
-                    <button
-                        wire:click="closeModal"
-                        class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition hover:bg-white/30 text-white font-bold cursor-pointer"
-                    >
+                    <button wire:click="closeModal"
+                        class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition hover:bg-white/30 text-white font-bold cursor-pointer">
                         ✕
                     </button>
                 </div>
@@ -176,50 +172,38 @@
                     <!-- MODAL BODY -->
                     <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
 
-                        <!-- Branch Code -->
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Branch Code</label>
-                            <input type="text" wire:model="branchCode" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]">
-                            @error('branchCode') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                        </div>
-
                         <!-- Branch Name -->
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Branch Name</label>
-                            <input type="text" wire:model="branchname" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]">
-                            @error('branchname') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- Type -->
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Type</label>
-                            <select wire:model="type" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white">
-                                <option value="">Select Type</option>
-                                <option value="Branch">Branch</option>
-                                <option value="Satellite">Satellite</option>
-                            </select>
-                            @error('type') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Branch
+                                Name</label>
+                            <input type="text" wire:model="branchname"
+                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]">
+                            @error('branchname')
+                                <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <!-- Address -->
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Address</label>
-                            <textarea wire:model="address" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]" rows="3"></textarea>
-                            @error('address') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            <label
+                                class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Address</label>
+                            <textarea wire:model="address"
+                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                                rows="3"></textarea>
+                            @error('address')
+                                <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span>
+                            @enderror
                         </div>
 
                     </div>
 
                     <!-- MODAL FOOTER -->
                     <div class="flex justify-end gap-2 border-t border-slate-200 px-6 py-3 bg-slate-50">
-                        <button
-                            type="button"
-                            wire:click="closeModal"
+                        <button type="button" wire:click="closeModal"
                             class="px-4 py-2 text-xs font-semibold text-slate-700 bg-slate-200 rounded-lg hover:bg-slate-300 transition cursor-pointer">
                             Cancel
                         </button>
-                        <button
-                            type="submit"
+                        <button type="submit"
                             class="px-4 py-2 text-xs font-semibold text-white bg-[#0C2C6B] rounded-lg hover:bg-[#09204f] transition cursor-pointer shadow">
                             Save Branch
                         </button>
@@ -231,33 +215,33 @@
     @endif
 
     @script
-    <script>
-        $wire.on('confirm-delete', (event) => {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#E5B83B',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $wire.deleteBranch(event.id);
-                }
+        <script>
+            $wire.on('confirm-delete', (event) => {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#E5B83B',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $wire.deleteBranch(event.id);
+                    }
+                });
             });
-        });
 
-        $wire.on('branch-deleted', () => {
-            Swal.fire({
-                title: 'Deleted!',
-                text: 'Branch has been successfully deleted.',
-                icon: 'success',
-                timer: 1500,
-                showConfirmButton: false
+            $wire.on('branch-deleted', () => {
+                Swal.fire({
+                    title: 'Deleted!',
+                    text: 'Branch has been successfully deleted.',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
             });
-        });
-    </script>
+        </script>
     @endscript
 
 </div>

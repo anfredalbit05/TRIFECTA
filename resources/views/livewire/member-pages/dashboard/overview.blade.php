@@ -1,7 +1,69 @@
-<div class="dashboard-grid">
+<div class="dashboard-grid flex flex-col lg:flex-row">
 
-    <!-- LEFT FEED COLUMN (Contains Create Post + Feed Items) -->
-    <div class="feed-column">
+    <!-- RIGHT COLUMN (REFRESH HEADER + STICKY WALLET) -->
+    <!-- order-1 makes this appear FIRST (at the top) on mobile -->
+    <!-- lg:order-2 moves it back to the RIGHT side on large screens -->
+    <div class="flex flex-col gap-4 w-full lg:w-80 shrink-0 order-1 lg:order-2">
+
+        <!-- REFRESH BUTTON HEADER -->
+        <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div>
+                <h3 class="font-bold text-gray-800 text-base">Dashboard Actions</h3>
+                <p class="text-xs text-gray-500">Sync latest data feeds.</p>
+            </div>
+            <button wire:click="refreshDashboard" wire:loading.attr="disabled" title="Refresh Dashboard"
+                class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold rounded-lg shadow-sm transition cursor-pointer">
+                <span wire:loading.remove wire:target="refreshDashboard">🔄</span>
+                <span wire:loading wire:target="refreshDashboard" class="animate-spin">⏳</span>
+                <span>Refresh</span>
+            </button>
+        </div>
+
+        <!-- STICKY WALLET CARD -->
+        <aside class="wallet-card">
+
+            <div class="wallet-block">
+                <span class="wallet-label">Cash Wallet</span>
+                <h2 class="wallet-value">₱{{ number_format($totalAmount, 2) }}</h2>
+            </div>
+
+            <hr>
+
+            <div class="wallet-block">
+                <span class="wallet-label">Fidelity Wallet</span>
+                <h2 class="wallet-value">₱100.00</h2>
+            </div>
+
+            <hr>
+
+            <div class="wallet-summary">
+                <div>
+                    <span>Total Earnings</span>
+                    ₱{{ number_format($totalAmount, 2) }}
+                </div>
+                <div>
+                    <span>Total Withdrawals</span>
+                    <strong>₱0.00</strong>
+                </div>
+            </div>
+
+            <div class="distribution-card">
+                <div class="distribution-icon">📊</div>
+                <div>
+                    <h4>Earnings Distribution</h4>
+                    <p>Categorized income based on transaction source.</p>
+                </div>
+            </div>
+
+        </aside>
+
+    </div>
+
+    <!-- LEFT FEED COLUMN (Contains Feed Items Only) -->
+    <!-- order-2 makes this appear BELOW the wallet on mobile -->
+    <!-- lg:order-1 moves it to the LEFT side on large screens -->
+    <div class="feed-column flex-1 order-2 lg:order-1">
+
         <!-- NEWS / FEED ITEMS -->
         @forelse($newsUpdates as $news)
 
@@ -80,54 +142,5 @@
         @endforelse
 
     </div>
-
-    <!-- ==========================================
-        RIGHT CARD (STICKY WALLET)
-    =========================================== -->
-    <aside class="wallet-card">
-
-        <div class="wallet-block">
-            <span class="wallet-label">Cash Wallet</span>
-            <h2 class="wallet-value">₱{{ number_format($totalAmount, 2) }}</h2>
-        </div>
-
-        <hr>
-
-        <div class="wallet-block">
-            <span class="wallet-label">Fidelity Wallet</span>
-            <h2 class="wallet-value">₱100.00</h2>
-        </div>
-
-        <hr>
-
-        <div class="wallet-summary">
-            <div>
-                <span>Total Earnings</span>
-                ₱{{ number_format($totalAmount, 2) }}
-            </div>
-            <div>
-                <span>Total Withdrawals</span>
-                <strong>₱0.00</strong>
-            </div>
-        </div>
-
-        {{-- <div class="membership-card">
-            🏅 Standard Membership
-        </div> --}}
-
-        <div class="distribution-card">
-            <div class="distribution-icon">📊</div>
-            <div>
-                <h4>Earnings Distribution</h4>
-                <p>Categorized income based on transaction source.</p>
-            </div>
-        </div>
-
-        {{-- <div class="wallet-footer">
-            <span>✔ UNILEVEL L1</span>
-            <strong>₱360.00</strong>
-        </div> --}}
-
-    </aside>
 
 </div>

@@ -1,16 +1,15 @@
 <div class="faqs-container w-full px-4 sm:px-6 lg:px-8 py-6">
 
     <!-- HEADER -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
-        <h2 class="text-2xl font-bold text-slate-800">
+    <div class="members-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
+        <h2 class="masterlist-title text-2xl font-bold text-slate-800">
             FAQs
         </h2>
 
-        @if($this->canCreate)
-            <button
-                wire:click="openCreateModal"
-                class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
-                Add FAQ
+        @if ($this->canCreate)
+            <button wire:click="openCreateModal"
+                class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
+                Add FAQs
             </button>
         @endif
     </div>
@@ -20,22 +19,43 @@
     </p>
 
     <!-- MESSAGE -->
-    @if(session()->has('message'))
+    @if (session()->has('message'))
         <div class="p-4 mb-4 text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl text-sm font-medium">
             {{ session('message') }}
         </div>
     @endif
 
+    <!-- SEARCH INPUT & REFRESH BUTTON CONTAINER -->
+    <div class="flex items-center justify-between gap-4 mb-6">
+        <!-- SEARCH INPUT -->
+        <div class="relative max-w-sm w-full">
+            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
+                🔍
+            </span>
+            <input type="text" wire:model.live="search" placeholder="Search FAQs..."
+                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
+        </div>
+
+        <!-- REFRESH BUTTON -->
+        <button wire:click="resetTable" wire:loading.attr="disabled" title="Refresh Table"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
+            <span wire:loading.remove wire:target="resetTable">🔄</span>
+            <span wire:loading wire:target="resetTable" class="animate-spin">⏳</span>
+            <span class="hidden sm:inline">Refresh</span>
+        </button>
+    </div>
+
     <!-- TABLE -->
     <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
+                <tr
+                    class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">Question</th>
                     <th class="py-3 px-4">Answer</th>
                     <th class="py-3 px-4">Status</th>
-                    @if($this->canUpdate || $this->canDelete)
+                    @if ($this->canUpdate || $this->canDelete)
                         <th class="py-3 px-4 text-center">Action</th>
                     @endif
                 </tr>
@@ -56,8 +76,9 @@
                         </td>
 
                         <td class="py-4 px-4">
-                            @if($faq->status)
-                                <span class="px-3 py-1 rounded-md bg-emerald-100 text-emerald-700 text-xs font-semibold">
+                            @if ($faq->status)
+                                <span
+                                    class="px-3 py-1 rounded-md bg-emerald-100 text-emerald-700 text-xs font-semibold">
                                     Active
                                 </span>
                             @else
@@ -67,22 +88,18 @@
                             @endif
                         </td>
 
-                        @if($this->canUpdate || $this->canDelete)
+                        @if ($this->canUpdate || $this->canDelete)
                             <td class="py-4 px-4 text-center">
                                 <div class="flex justify-center gap-2">
-                                    @if($this->canUpdate)
-                                        <button
-                                            wire:click="editFaq({{ $faq->FaqID }})"
-                                            title="Edit FAQ"
+                                    @if ($this->canUpdate)
+                                        <button wire:click="editFaq({{ $faq->FaqID }})" title="Edit FAQ"
                                             class="px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-xs shadow cursor-pointer">
                                             ✏️
                                         </button>
                                     @endif
 
-                                    @if($this->canDelete)
-                                        <button
-                                            wire:click="confirmDeleteFaq({{ $faq->FaqID }})"
-                                            title="Delete FAQ"
+                                    @if ($this->canDelete)
+                                        <button wire:click="confirmDeleteFaq({{ $faq->FaqID }})" title="Delete FAQ"
                                             class="px-3 py-2 rounded-lg border-amber-400 bg-amber-500 text-white hover:bg-amber-600 text-xs shadow cursor-pointer">
                                             🗑️
                                         </button>
@@ -101,66 +118,56 @@
             </tbody>
         </table>
 
-  <!-- PAGINATION -->
-    @if($faqs->hasPages())
-        <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
+        <!-- PAGINATION -->
+        @if ($faqs->hasPages())
+            <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
 
-            {{-- Previous Page Link --}}
-            @if ($faqs->onFirstPage())
-                <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
-                    Previous
+                {{-- Previous Page Link --}}
+                @if ($faqs->onFirstPage())
+                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                        Previous
+                    </span>
+                @else
+                    <button wire:click="previousPage" wire:loading.attr="disabled"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer"
+                        style="background-color: #D79B10;" onmouseover="this.style.backgroundColor='#c58d0f'"
+                        onmouseout="this.style.backgroundColor='#D79B10'">
+                        Previous
+                    </button>
+                @endif
+
+                <span class="text-sm text-gray-600">
+                    Page {{ $faqs->currentPage() }} of {{ $faqs->lastPage() }}
                 </span>
-            @else
-                <button
-                    wire:click="previousPage"
-                    wire:loading.attr="disabled"
-                    class="px-4 py-2 text-white rounded transition cursor-pointer"
-                    style="background-color: #D79B10;"
-                    onmouseover="this.style.backgroundColor='#c58d0f'"
-                    onmouseout="this.style.backgroundColor='#D79B10'"
-                >
-                    Previous
-                </button>
-            @endif
 
-            <span class="text-sm text-gray-600">
-                Page {{ $faqs->currentPage() }} of {{ $faqs->lastPage() }}
-            </span>
+                {{-- Next Page Link --}}
+                @if ($faqs->hasMorePages())
+                    <button wire:click="nextPage" wire:loading.attr="disabled"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer"
+                        style="background-color: #0C2C6B;" onmouseover="this.style.backgroundColor='#0a2559'"
+                        onmouseout="this.style.backgroundColor='#0C2C6B'">
+                        Next
+                    </button>
+                @else
+                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                        Next
+                    </span>
+                @endif
 
-            {{-- Next Page Link --}}
-            @if ($faqs->hasMorePages())
-                <button
-                    wire:click="nextPage"
-                    wire:loading.attr="disabled"
-                    class="px-4 py-2 text-white rounded transition cursor-pointer"
-                    style="background-color: #0C2C6B;"
-                    onmouseover="this.style.backgroundColor='#0a2559'"
-                    onmouseout="this.style.backgroundColor='#0C2C6B'"
-                >
-                    Next
-                </button>
-            @else
-                <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
-                    Next
-                </span>
-            @endif
-
-        </div>
-    @endif
+            </div>
+        @endif
     </div>
 
     <!-- MODAL -->
-    @if($isOpen)
-        <div
-            wire:key="faq-modal"
+    @if ($isOpen)
+        <div wire:key="faq-modal"
             class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm">
             <div class="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden">
                 <div class="bg-[#0C2C6B] px-6 py-4 text-white flex justify-between items-center">
                     <h3 class="text-lg font-bold">
                         {{ $faq_id ? 'Edit FAQ' : 'Add New FAQ' }}
                     </h3>
-                    <button
-                        wire:click="closeModal"
+                    <button wire:click="closeModal"
                         class="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 cursor-pointer flex items-center justify-center">
                         ✕
                     </button>
@@ -172,9 +179,7 @@
                             <label class="block text-xs font-bold uppercase text-slate-400 mb-1">
                                 Question
                             </label>
-                            <input
-                                type="text"
-                                wire:model="question"
+                            <input type="text" wire:model="question"
                                 class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#0C2C6B]">
                             @error('question')
                                 <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span>
@@ -185,9 +190,7 @@
                             <label class="block text-xs font-bold uppercase text-slate-400 mb-1">
                                 Answer
                             </label>
-                            <textarea
-                                rows="4"
-                                wire:model="answer"
+                            <textarea rows="4" wire:model="answer"
                                 class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#0C2C6B]"></textarea>
                             @error('answer')
                                 <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span>
@@ -198,8 +201,7 @@
                             <label class="block text-xs font-bold uppercase text-slate-400 mb-1">
                                 Status
                             </label>
-                            <select
-                                wire:model="status"
+                            <select wire:model="status"
                                 class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white">
                                 <option value="1">Active</option>
                                 <option value="0">Inactive</option>
@@ -208,14 +210,11 @@
                     </div>
 
                     <div class="flex justify-end gap-2 px-6 py-3 border-t bg-slate-50">
-                        <button
-                            type="button"
-                            wire:click="closeModal"
+                        <button type="button" wire:click="closeModal"
                             class="px-4 py-2 text-xs font-semibold bg-slate-200 rounded-lg hover:bg-slate-300 cursor-pointer">
                             Cancel
                         </button>
-                        <button
-                            type="submit"
+                        <button type="submit"
                             class="px-4 py-2 text-xs font-semibold text-white bg-[#0C2C6B] rounded-lg hover:bg-[#09204f] cursor-pointer shadow">
                             Save FAQ
                         </button>
@@ -226,33 +225,33 @@
     @endif
 
     @script
-    <script>
-        $wire.on('confirm-delete-faq', (event) => {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#E5B83B',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $wire.deleteFaq(event.id);
-                }
+        <script>
+            $wire.on('confirm-delete-faq', (event) => {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#E5B83B',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $wire.deleteFaq(event.id);
+                    }
+                });
             });
-        });
 
-        $wire.on('faq-deleted', () => {
-            Swal.fire({
-                title: 'Deleted!',
-                text: 'FAQ has been successfully deleted.',
-                icon: 'success',
-                timer: 1500,
-                showConfirmButton: false
+            $wire.on('faq-deleted', () => {
+                Swal.fire({
+                    title: 'Deleted!',
+                    text: 'FAQ has been successfully deleted.',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
             });
-        });
-    </script>
+        </script>
     @endscript
 
 </div>

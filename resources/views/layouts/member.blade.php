@@ -49,6 +49,7 @@
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -120,25 +121,59 @@ document.addEventListener('livewire:init', () => {
 
     });
 
+    // ACTIVATE ACCOUNT
+Livewire.on('swal:confirm', (event) => {
+
+    const data = Array.isArray(event) ? event[0] : event;
+
+    Swal.fire({
+        title: data.title,
+        text: data.text,
+        icon: data.icon,
+        showCancelButton: true,
+        confirmButtonText: 'Yes, proceed!',
+        confirmButtonColor: '#0B2A5B',
+        cancelButtonColor: '#d33',
+        allowOutsideClick: false
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+
+            Swal.fire({
+                title: 'Processing Activation...',
+                text: 'Please wait while we process your request.',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            Livewire.dispatch(data.method);
+        }
+    });
+});
+
     // CLOSE LOADING
     Livewire.on('swal-close', () => {
         Swal.close();
     });
 
     // SUCCESS ALERT
-    Livewire.on('show-success-after-close', (event) => {
+Livewire.on('swal:success', (event) => {
 
-        const data = Array.isArray(event) ? event[0] : event;
+    const data = Array.isArray(event) ? event[0] : event;
 
-        Swal.fire({
-            icon: 'success',
-            title: data.title,
-            text: data.text,
-            confirmButtonColor: '#0B2A5B'
-        });
-
+    Swal.fire({
+        icon: 'success',
+        title: data.title,
+        text: data.text,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#0B2A5B',
+        showConfirmButton: true
     });
 
+});
 });
 </script>
 

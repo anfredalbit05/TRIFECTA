@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,15 +11,9 @@
 
 
 
-    @vite([
-        'resources/css/app.css',
-        'resources/js/app.js'
-    ])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     @livewireStyles
 
@@ -54,174 +49,184 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
-        document.addEventListener('livewire:init', () => {
-            // Toast Listener
-            Livewire.on('toast', (event) => {
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: event.type,
-                    title: event.message,
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                });
+   <script>
+    document.addEventListener('livewire:init', () => {
+
+        // TOAST NOTIFICATIONS
+        Livewire.on('toast', (event) => {
+
+            const data = Array.isArray(event) ? event[0] : event;
+
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: data.type,
+                title: data.message,
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
             });
 
-            // Confirmation Alert Listener
-            Livewire.on('swal:confirm', (event) => {
-                const data = Array.isArray(event) ? event[0] : event;
-
-                Swal.fire({
-                    title: data.title || 'Are you sure?',
-                    text: data.text || 'Do you want to proceed?',
-                    icon: data.icon || 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#0B2A5B',
-                    cancelButtonColor: '#D79B10',
-                    confirmButtonText: 'Yes, proceed!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Livewire.dispatch(data.nextMethod);
-                    }
-                });
-            });
         });
-    </script>
+
+        // GENERAL CONFIRMATION
+        Livewire.on('swal:confirm', (event) => {
+
+            const data = Array.isArray(event) ? event[0] : event;
+
+            Swal.fire({
+                title: data.title || 'Are you sure?',
+                text: data.text || 'Do you want to proceed?',
+                icon: data.icon || 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, proceed!',
+                confirmButtonColor: '#0B2A5B',
+                cancelButtonColor: '#D79B10',
+                allowOutsideClick: false
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Please wait...',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    Livewire.dispatch(data.method || data.nextMethod);
+                }
+
+            });
+
+        });
+
+        // APPLICATION SUBMISSION
+        Livewire.on('swal-confirm-submission', () => {
+
+            Swal.fire({
+                title: 'Save Application?',
+                text: 'Are you sure you want to submit this application?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, submit it!',
+                confirmButtonColor: '#0B2A5B',
+                cancelButtonColor: '#d33'
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    Swal.fire({
+                        title: 'Submitting...',
+                        text: 'Please wait.',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    Livewire.dispatch('confirmed-save-application');
+                }
+
+            });
+
+        });
+
+        // CLOSE LOADING
+        Livewire.on('swal-close', () => {
+            Swal.close();
+        });
+
+        // SUCCESS ALERT WITH OK BUTTON
+        Livewire.on('swal:success', (event) => {
+
+            const data = Array.isArray(event) ? event[0] : event;
+
+            Swal.close();
+
+            Swal.fire({
+                icon: 'success',
+                title: data.title || 'Success!',
+                text: data.text || 'Operation completed successfully.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#0B2A5B',
+                showConfirmButton: true,
+                allowOutsideClick: false
+            });
+
+        });
+
+    });
+</script>
 
 
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 
-<script>
-    let mapInstance = null;
+    <script>
+        let mapInstance = null;
 
 
 
-function initMapIfVisible() {
-    const mapElement = document.getElementById('map');
+        function initMapIfVisible() {
+            const mapElement = document.getElementById('map');
 
-    // Your default coordinates
-    const defaultLat = 7.446819564242066;
-    const defaultLng = 125.80932758793946;
+            // Your default coordinates
+            const defaultLat = 7.446819564242066;
+            const defaultLng = 125.80932758793946;
 
-    if (mapElement) {
-        if (!mapInstance) {
-            mapInstance = L.map('map').setView([defaultLat, defaultLng], 15);
+            if (mapElement) {
+                if (!mapInstance) {
+                    mapInstance = L.map('map').setView([defaultLat, defaultLng], 15);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(mapInstance);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap'
+                    }).addTo(mapInstance);
 
-            // Add a draggable marker initialized at your default coordinates
-            let marker = L.marker([defaultLat, defaultLng], {draggable: true}).addTo(mapInstance);
+                    // Add a draggable marker initialized at your default coordinates
+                    let marker = L.marker([defaultLat, defaultLng], {
+                        draggable: true
+                    }).addTo(mapInstance);
 
-            marker.on('dragend', function (e) {
-                const latlng = marker.getLatLng();
-                Livewire.dispatch('set-coordinates', { lat: latlng.lat, lng: latlng.lng });
-            });
+                    marker.on('dragend', function(e) {
+                        const latlng = marker.getLatLng();
+                        Livewire.dispatch('set-coordinates', {
+                            lat: latlng.lat,
+                            lng: latlng.lng
+                        });
+                    });
 
-            mapInstance.on('click', function(e) {
-                marker.setLatLng(e.latlng);
-                Livewire.dispatch('set-coordinates', { lat: e.latlng.lat, lng: e.latlng.lng });
-            });
-        } else {
-            setTimeout(() => {
-                mapInstance.invalidateSize();
-            }, 200);
-        }
-    } else {
-        if (mapInstance) {
-            mapInstance.remove();
-            mapInstance = null;
-        }
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    initMapIfVisible();
-});
-</script>
-
-<script>
-document.addEventListener('livewire:init', () => {
-
-    Livewire.on('swal-confirm-submission', () => {
-
-        Swal.fire({
-            title: 'Save Application?',
-            text: 'Are you sure you want to submit this application?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, submit it!',
-            confirmButtonColor: '#0B2A5B',
-            cancelButtonColor: '#d33'
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-
-                Swal.fire({
-                    title: 'Submitting...',
-                    text: 'Please wait.',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-
-                Livewire.dispatch('confirmed-save-application');
+                    mapInstance.on('click', function(e) {
+                        marker.setLatLng(e.latlng);
+                        Livewire.dispatch('set-coordinates', {
+                            lat: e.latlng.lat,
+                            lng: e.latlng.lng
+                        });
+                    });
+                } else {
+                    setTimeout(() => {
+                        mapInstance.invalidateSize();
+                    }, 200);
+                }
+            } else {
+                if (mapInstance) {
+                    mapInstance.remove();
+                    mapInstance = null;
+                }
             }
+        }
 
+        document.addEventListener('DOMContentLoaded', function() {
+            initMapIfVisible();
         });
+    </script>
 
-    });
-
-    Livewire.on('swal-close', () => {
-        Swal.close();
-    });
-
-    Livewire.on('swal-success', (event) => {
-
-        const data = Array.isArray(event) ? event[0] : event;
-
-        Swal.fire({
-            icon: 'success',
-            title: data.title,
-            text: data.text,
-            confirmButtonColor: '#0B2A5B'
-        });
-
-    });
-
-});
-</script>
-
-
-<script>
-document.addEventListener('livewire:init', () => {
-
-    Livewire.on('show-success-after-close', (event) => {
-
-        const data = Array.isArray(event) ? event[0] : event;
-
-        Swal.close();
-
-        setTimeout(() => {
-            Swal.fire({
-                icon: 'success',
-                title: data.title,
-                text: data.text,
-                confirmButtonColor: '#0B2A5B'
-            });
-        }, 300);
-
-    });
-
-});
-</script>
 
 </body>
+
 </html>

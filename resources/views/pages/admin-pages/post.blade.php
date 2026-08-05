@@ -44,11 +44,12 @@
         </div>
 
         <!-- OVERVIEW -->
+     <!-- OVERVIEW -->
         <div
             x-show="tab === 'overview'"
             class="dashboard-main-card full-width-card"
         >
-            <x-admin-pages.post.overview />
+           <livewire:admin-pages.post.overview />
         </div>
 
         <!-- NEWS -->

@@ -24,17 +24,19 @@
                 Overview
             </a>
 
-            <a href="#"
+            {{-- <a href="#"
                @click.prevent="tab = 'my-dashboard'"
                :class="tab === 'my-dashboard' ? 'active' : ''">
                 My Dashboard
             </a>
 
+
             <a href="#"
                @click.prevent="tab = 'all-users'"
                :class="tab === 'all-users' ? 'active' : ''">
                 All Users
-            </a>
+            </a> --}}
+
         </div>
 
         <!-- OVERVIEW TAB -->
@@ -42,7 +44,7 @@
             <livewire:member-pages.dashboard.news-updates />
         </div>
 
-        <!-- MY DASHBOARD TAB -->
+        {{-- <!-- MY DASHBOARD TAB -->
         <div x-show="tab === 'my-dashboard'" x-cloak class="tab-card">
             <!-- Add content here -->
         </div>
@@ -50,7 +52,7 @@
         <!-- ALL USERS TAB -->
         <div x-show="tab === 'all-users'" x-cloak class="tab-card">
             <!-- Add content here -->
-        </div>
+        </div> --}}
 
     </div>
 

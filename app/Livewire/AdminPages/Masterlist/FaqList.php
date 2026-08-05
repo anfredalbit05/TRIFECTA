@@ -16,6 +16,7 @@ class FaqList extends Component
 
     public $isOpen = false;
     public $faq_id;
+    public string $search = ''; // Added search property
 
     // Form fields
     public $question;
@@ -200,11 +201,31 @@ class FaqList extends Component
         $this->dispatch('faq-deleted');
     }
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function resetTable(): void
+    {
+        $this->search = '';
+        $this->resetPage();
+    }
+
     public function render()
     {
+        $faqs = Faq::when(filled($this->search), function ($query) {
+            $search = trim($this->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('question', 'like', "%{$search}%")
+                    ->orWhere('answer', 'like', "%{$search}%");
+            });
+        })
+            ->latest('FaqID')
+            ->paginate(10);
+
         return view('components.admin-pages.masterlist.faqs', [
-            'faqs' => Faq::latest('FaqID')
-                ->paginate(10)
+            'faqs' => $faqs
         ]);
     }
 }

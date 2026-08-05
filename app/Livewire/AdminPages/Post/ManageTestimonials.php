@@ -23,6 +23,8 @@ class ManageTestimonials extends Component
     public $selectedTestimonial = null;
     public $testimonialIdBeingEdited = null;
 
+    public $search = ''; // Added search property
+
     protected function hasPermission($action)
     {
         /** @var User|null $user */
@@ -235,10 +237,24 @@ class ManageTestimonials extends Component
         ]);
     }
 
+    public function resetTable(): void
+    {
+        $this->search = '';
+        $this->resetPage();
+    }
+
     public function render()
     {
         $testimonials = Testimonial::with('user')
             ->where('status', 'Published')
+            ->when(filled($this->search), function ($query) {
+                $search = trim($this->search);
+                $query->where(function ($q) use ($search) {
+                    $q->where('fullname', 'like', "%{$search}%")
+                        ->orWhere('designation', 'like', "%{$search}%")
+                        ->orWhere('testimony', 'like', "%{$search}%");
+                });
+            })
             ->latest('TestimonialsID')
             ->paginate(10);
 

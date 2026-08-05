@@ -6,9 +6,8 @@
             Members
         </h2>
 
-        @if($this->canCreate)
-            <button
-                onclick="Livewire.dispatch('open-application-modal')"
+        @if ($this->canCreate)
+            <button onclick="Livewire.dispatch('open-application-modal')"
                 class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
                 Add Member
             </button>
@@ -19,23 +18,32 @@
         Member management content and directory.
     </p>
 
-    <!-- SEARCH INPUT -->
-    <div class="relative max-w-sm mb-6">
-        <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
-            🔍
-        </span>
-        <input
-            type="text"
-            wire:model.live="search"
-            placeholder="Search members..."
-            class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
+    <!-- SEARCH INPUT & REFRESH BUTTON CONTAINER -->
+    <div class="flex items-center justify-between gap-4 mb-6">
+        <!-- SEARCH INPUT -->
+        <div class="relative max-w-sm w-full">
+            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
+                🔍
+            </span>
+            <input type="text" wire:model.live="search" placeholder="Search members..."
+                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
+        </div>
+
+        <!-- REFRESH BUTTON -->
+        <button wire:click="resetTable" wire:loading.attr="disabled" title="Refresh Table"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
+            <span wire:loading.remove wire:target="resetTable">🔄</span>
+            <span wire:loading wire:target="resetTable" class="animate-spin">⏳</span>
+            <span class="hidden sm:inline">Refresh</span>
+        </button>
     </div>
 
     <!-- MEMBERS TABLE -->
     <div class="member-table overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
+                <tr
+                    class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">Name</th>
                     <th class="py-3 px-4">Contact</th>
@@ -63,7 +71,8 @@
                         </td>
 
                         <td class="py-4 px-4">
-                            <span class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
+                            <span
+                                class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
                                 {{ $member->gender }}
                             </span>
                         </td>
@@ -73,12 +82,14 @@
                         </td>
 
                         <td class="py-4 px-4">
-                            @if(strtolower($member->status) === 'active')
-                                <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-xs font-semibold shadow-sm">
+                            @if (strtolower($member->status) === 'active')
+                                <span
+                                    class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-xs font-semibold shadow-sm">
                                     Active
                                 </span>
                             @else
-                                <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-slate-600 text-white text-xs font-semibold shadow-sm">
+                                <span
+                                    class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-slate-600 text-white text-xs font-semibold shadow-sm">
                                     Inactive
                                 </span>
                             @endif
@@ -89,44 +100,37 @@
                             <div class="flex gap-2 justify-center items-center">
 
                                 <!-- VIEW -->
-                                @if($this->canRead)
-                                    <button
-                                        wire:click="viewMember({{ $member->UserID }})"
-                                        title="View Member"
+                                @if ($this->canRead)
+                                    <button wire:click="viewMember({{ $member->UserID }})" title="View Member"
                                         class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-slate-600 text-white hover:bg-slate-700 transition cursor-pointer text-xs font-semibold shadow">
                                         👁️
                                     </button>
                                 @endif
 
                                 <!-- EDIT / UPDATE -->
-                                @if($this->canUpdate)
-                                    <button
-                                        wire:click="editMember({{ $member->UserID }})"
-                                        title="Update Member"
+                                @if ($this->canUpdate)
+                                    <button wire:click="editMember({{ $member->UserID }})" title="Update Member"
                                         class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
                                         ✏️
                                     </button>
                                 @endif
 
                                 <!-- STATUS / ACTIVATION ACTIONS (Requires Update Permission) -->
-                                @if($this->canUpdate)
-                                    @if(strtolower($member->status) === 'active')
-                                        <button
-                                            wire:click="confirmStatus({{ $member->UserID }})"
+                                @if ($this->canUpdate)
+                                    @if (strtolower($member->status) === 'active')
+                                        <button wire:click="confirmStatus({{ $member->UserID }})"
                                             title="Deactivate Member"
                                             class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition cursor-pointer text-xs font-semibold shadow">
                                             Deactivate
                                         </button>
                                     @elseif($member->has_pending_activation)
-                                        <button
-                                            wire:click="openReview({{ $member->UserID }})"
+                                        <button wire:click="openReview({{ $member->UserID }})"
                                             title="Review Activation"
                                             class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow">
                                             Pending
                                         </button>
                                     @else
-                                        <button
-                                            wire:click="openActivation({{ $member->UserID }})"
+                                        <button wire:click="openActivation({{ $member->UserID }})"
                                             title="Activate Member"
                                             class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
                                             Activate
@@ -147,52 +151,44 @@
             </tbody>
         </table>
 
-    <!-- PAGINATION -->
-    @if($members->hasPages())
-        <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
+        <!-- PAGINATION -->
+        @if ($members->hasPages())
+            <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
 
-            {{-- Previous Page Link --}}
-            @if ($members->onFirstPage())
-                <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
-                    Previous
+                {{-- Previous Page Link --}}
+                @if ($members->onFirstPage())
+                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                        Previous
+                    </span>
+                @else
+                    <button wire:click="previousPage" wire:loading.attr="disabled"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer"
+                        style="background-color: #D79B10;" onmouseover="this.style.backgroundColor='#c58d0f'"
+                        onmouseout="this.style.backgroundColor='#D79B10'">
+                        Previous
+                    </button>
+                @endif
+
+                <span class="text-sm text-gray-600">
+                    Page {{ $members->currentPage() }} of {{ $members->lastPage() }}
                 </span>
-            @else
-                <button
-                    wire:click="previousPage"
-                    wire:loading.attr="disabled"
-                    class="px-4 py-2 text-white rounded transition cursor-pointer"
-                    style="background-color: #D79B10;"
-                    onmouseover="this.style.backgroundColor='#c58d0f'"
-                    onmouseout="this.style.backgroundColor='#D79B10'"
-                >
-                    Previous
-                </button>
-            @endif
 
-            <span class="text-sm text-gray-600">
-                Page {{ $members->currentPage() }} of {{ $members->lastPage() }}
-            </span>
+                {{-- Next Page Link --}}
+                @if ($members->hasMorePages())
+                    <button wire:click="nextPage" wire:loading.attr="disabled"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer"
+                        style="background-color: #0C2C6B;" onmouseover="this.style.backgroundColor='#0a2559'"
+                        onmouseout="this.style.backgroundColor='#0C2C6B'">
+                        Next
+                    </button>
+                @else
+                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                        Next
+                    </span>
+                @endif
 
-            {{-- Next Page Link --}}
-            @if ($members->hasMorePages())
-                <button
-                    wire:click="nextPage"
-                    wire:loading.attr="disabled"
-                    class="px-4 py-2 text-white rounded transition cursor-pointer"
-                    style="background-color: #0C2C6B;"
-                    onmouseover="this.style.backgroundColor='#0a2559'"
-                    onmouseout="this.style.backgroundColor='#0C2C6B'"
-                >
-                    Next
-                </button>
-            @else
-                <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
-                    Next
-                </span>
-            @endif
-
-        </div>
-    @endif
+            </div>
+        @endif
     </div>
 
     <!-- LIVEWIRE MODAL COMPONENT -->
@@ -200,63 +196,61 @@
 
     <!-- SWEETALERT SCRIPTS -->
     @script
-    <script>
-        $wire.on('confirm-status', (data) => {
-            const actionText = data.action === 'deactivate'
-                ? "I'm sure to deactivate"
-                : "I'm sure to activate";
+        <script>
+            $wire.on('confirm-status', (data) => {
+                const actionText = data.action === 'deactivate' ?
+                    "I'm sure to deactivate" :
+                    "I'm sure to activate";
 
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'Type the confirmation text below to continue.',
-                icon: 'warning',
-                input: 'text',
-                inputPlaceholder: actionText,
-                inputAttributes: {
-                    autocapitalize: 'off'
-                },
-                showCancelButton: true,
-                confirmButtonColor: '#0C2C6B',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Confirm ' + data.action,
-                cancelButtonText: 'Cancel',
-                preConfirm: (value) => {
-                    if (value !== actionText) {
-                        Swal.showValidationMessage('Please type: ' + actionText);
-                        return false;
-                    }
-                    return true;
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Updating...',
-                        text: 'Please wait.',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        showConfirmButton: false,
-                        didOpen: () => {
-                            Swal.showLoading();
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'Type the confirmation text below to continue.',
+                    icon: 'warning',
+                    input: 'text',
+                    inputPlaceholder: actionText,
+                    inputAttributes: {
+                        autocapitalize: 'off'
+                    },
+                    showCancelButton: true,
+                    confirmButtonColor: '#0C2C6B',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Confirm ' + data.action,
+                    cancelButtonText: 'Cancel',
+                    preConfirm: (value) => {
+                        if (value !== actionText) {
+                            Swal.showValidationMessage('Please type: ' + actionText);
+                            return false;
                         }
-                    });
+                        return true;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Updating...',
+                            text: 'Please wait.',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
 
-                    $wire.updateStatus(data.id);
-                }
+                        $wire.updateStatus(data.id);
+                    }
+                });
             });
-        });
 
-        $wire.on('status-updated', () => {
-            Swal.fire({
-                title: 'Updated!',
-                text: 'Member status has been updated.',
-                icon: 'success',
-                timer: 1500,
-                showConfirmButton: false
+            $wire.on('status-updated', () => {
+                Swal.fire({
+                    title: 'Updated!',
+                    text: 'Member status has been updated.',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
             });
-        });
-    </script>
-
-
+        </script>
     @endscript
 
 </div>

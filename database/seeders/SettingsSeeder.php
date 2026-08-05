@@ -51,6 +51,29 @@ class SettingsSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+
+            // ===========================
+            // COVERAGE
+            // ===========================
+            [
+                'name' => 'bronze_coverage',
+                'value' => '75000',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'silver_coverage',
+                'value' => '150000',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'gold_coverage',
+                'value' => '250000',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
             // ===========================
             // AGE LIMITS
             // ===========================

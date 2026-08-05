@@ -10,6 +10,12 @@ use Livewire\Component;
 
 class Dashboard extends Component
 {
+    public function refreshDashboard()
+    {
+        // Simply triggers a component re-render with fresh database queries
+        session()->flash('message', 'Dashboard data refreshed successfully.');
+    }
+
     public function render()
     {
         $mapUsers = User::where('RoleID', 4)

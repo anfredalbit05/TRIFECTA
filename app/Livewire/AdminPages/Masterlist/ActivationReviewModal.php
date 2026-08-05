@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Mail\ActivationRejectedMail;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InviteeApprovedMail;
+use App\Mail\ActivationApprovedMail;
 
 class ActivationReviewModal extends Component
 {
@@ -227,21 +228,31 @@ class ActivationReviewModal extends Component
                 $level++;
             }
 
-            // Send Email to Activated User
+            // Send Email to Activated User (Without CCing admins to prevent spam flagging)
             if ($activatedUser && filled($activatedUser->email)) {
                 try {
-                    Mail::raw(
-                        "Congratulations!\n\nYour account has been approved successfully.\nYou can now log in and access all features.",
-                        function ($message) use ($activatedUser, $adminEmails) {
-                            $message->to($activatedUser->email)
-                                ->cc($adminEmails)
-                                ->subject('Account Approved');
-                        }
-                    );
+                    $totalAmount = MembershipFee::sum('Cost');
+
+                    Mail::to($activatedUser->email)
+                        ->send(new ActivationApprovedMail($activatedUser, $this->activation, (float) $totalAmount));
                 } catch (\Throwable $e) {
                     Log::error('Failed to send approval email to activated user.', ['error' => $e->getMessage()]);
                 }
             }
+
+            //    // Send Email to Activated User
+            // if ($activatedUser && filled($activatedUser->email)) {
+            //     try {
+            //         $totalAmount = MembershipFee::sum('Cost');
+
+            //         Mail::to($activatedUser->email)
+            //             ->cc($adminEmails)
+            //             ->send(new ActivationApprovedMail($activatedUser, $this->activation, $totalAmount));
+
+            //     } catch (\Throwable $e) {
+            //         Log::error('Failed to send approval email to activated user.', ['error' => $e->getMessage()]);
+            //     }
+            // }
 
             // Send Email to Upline / Referral User
             if ($this->referralUser && filled($this->referralUser->email)) {
@@ -334,7 +345,6 @@ class ActivationReviewModal extends Component
 
             $this->dispatch('swal:success', title: 'Rejected!', message: 'Activation rejected successfully.');
             $this->closeModal();
-
         } finally {
             $this->isRejecting = false;
         }

@@ -83,7 +83,7 @@
         </div>
 
      {{-- Tree Viewport Container --}}
-        <div class="w-full overflow-hidden py-12 px-4 sm:px-12 relative transition-all duration-200 min-h-[480px] touch-none">
+        <div class="w-full overflow-hidden py-12 px-4 sm:px-12 relative transition-all duration-200 min-h-[480px] touch-none cursor-pointer">
 
             <template x-if="isFullscreen">
                 <button @click="toggleFullscreen()" class="absolute top-4 right-4 px-3 py-1.5 bg-slate-800 text-white rounded-lg text-xs font-semibold shadow-md z-30">

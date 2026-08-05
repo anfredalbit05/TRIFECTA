@@ -704,11 +704,6 @@
                         {{ $branch->branchname }}
                     </span>
                 </h3>
-                <span class="team-field-card-role">
-                    <span class="inline-block">
-                        {{ $branch->type }} ({{ $branch->branchCode }})
-                    </span>
-                </span>
                 <p class="team-field-card-text">
                     <span class="block">
                         {{ $branch->address }}

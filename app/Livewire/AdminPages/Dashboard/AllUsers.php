@@ -248,6 +248,13 @@ class AllUsers extends Component
         session()->flash('message', 'User access permissions updated successfully.');
     }
 
+
+    public function resetTable(): void
+    {
+        $this->search = '';
+        $this->resetPage();
+    }
+
 public function render()
     {
         $users = User::query()

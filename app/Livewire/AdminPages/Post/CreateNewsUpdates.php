@@ -27,6 +27,8 @@ class CreateNewsUpdates extends Component
     public $selectedPost = null;
     public $postIdBeingEdited = null;
 
+    public string $search = ''; // Added search property
+
     // Helper to check permissions dynamically
     protected function hasPermission($action)
     {
@@ -201,7 +203,7 @@ class CreateNewsUpdates extends Component
         $this->selectedPost = null;
     }
 
-  public function deletePost($id): void
+    public function deletePost($id): void
     {
         if (!$this->canDelete) {
             return;
@@ -234,10 +236,29 @@ class CreateNewsUpdates extends Component
         session()->flash('success', 'News update deleted successfully.');
     }
 
-public function render()
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function resetTable(): void
+    {
+        $this->search = '';
+        $this->resetPage();
+    }
+
+    public function render()
     {
         $newsUpdates = NewsUpdate::with('user')
             ->where('status', 'Published')
+            ->when(filled($this->search), function ($query) {
+                $search = trim($this->search);
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('details', 'like', "%{$search}%")
+                        ->orWhere('category', 'like', "%{$search}%");
+                });
+            })
             ->latest()
             ->paginate(10);
 

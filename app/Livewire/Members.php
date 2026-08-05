@@ -26,7 +26,7 @@ class Members extends Component
     |--------------------------------------------------------------------------
     */
 
-   protected function hasPermission($action): bool
+    protected function hasPermission($action): bool
     {
         $user = Auth::user();
 
@@ -95,8 +95,8 @@ class Members extends Component
 
     public function render()
     {
-       $members = User::query()
-       ->where('RoleID', 4)
+        $members = User::query()
+            ->where('RoleID', 4)
             ->withExists([
                 'activations as has_pending_activation' => function ($query) {
                     $query->where('status', 'Pending');
@@ -107,9 +107,9 @@ class Members extends Component
 
                 $query->where(function ($q) use ($search) {
                     $q->where('firstname', 'like', "%{$search}%")
-                      ->orWhere('middlename', 'like', "%{$search}%")
-                      ->orWhere('lastname', 'like', "%{$search}%")
-                      ->orWhere('username', 'like', "%{$search}%");
+                        ->orWhere('middlename', 'like', "%{$search}%")
+                        ->orWhere('lastname', 'like', "%{$search}%")
+                        ->orWhere('username', 'like', "%{$search}%");
                 });
             })
             ->latest()
@@ -196,13 +196,21 @@ class Members extends Component
             return;
         }
 
+         $isActivating = strtolower($member->status) !== 'active';
+
         $member->status = strtolower($member->status) === 'active' ? 'Inactive' : 'Active';
         $member->save();
 
         Log::info('Member status updated successfully', ['UserID' => $member->UserID, 'new_status' => $member->status]);
 
+         $this->dispatch('swal:success', [
+        'title' => 'Success!',
+        'text' => $isActivating
+            ? 'Member has been activated successfully.'
+            : 'Member has been deactivated successfully.',
+        ]);
+
         $this->dispatch('members-refresh');
-        $this->dispatch('status-updated');
     }
 
     /*
@@ -268,7 +276,7 @@ class Members extends Component
         $this->dispatch('open-view-member', UserID: $member->UserID);
     }
 
-        public function handleActivationBroadcast($event): void
+    public function handleActivationBroadcast($event): void
     {
         // This method will automatically trigger in real-time
         // whenever an activation event is broadcasted on the channel.
@@ -277,4 +285,15 @@ class Members extends Component
         $this->skipRender = false;
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Reset / Refresh Table Action
+    |--------------------------------------------------------------------------
+    */
+    public function resetTable(): void
+    {
+        $this->search = '';
+        $this->resetPage();
+        $this->skipRender = false;
+    }
 }

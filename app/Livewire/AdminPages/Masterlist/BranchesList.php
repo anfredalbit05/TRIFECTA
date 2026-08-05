@@ -18,20 +18,18 @@ class BranchesList extends Component
 
     public $isOpen = false;
     public $branch_id;
+    public string $search = ''; // Added search property
 
     // Form fields
     public $branchCode;
     public $branchname;
-    public $type;
     public $address;
     public $status = true;
     public $UserID;
 
     // Validation rules
     protected $rules = [
-        'branchCode' => 'required|string|max:20',
         'branchname' => 'required|string|max:150',
-        'type' => 'required|in:Branch,Satellite',
         'address' => 'required|string',
         'status' => 'boolean',
         'UserID' => 'nullable|exists:users,UserID',
@@ -110,7 +108,7 @@ class BranchesList extends Component
         }
 
         $this->resetValidation();
-        $this->reset(['branchCode', 'branchname', 'type', 'address', 'status', 'UserID', 'branch_id']);
+        $this->reset(['branchCode', 'branchname', 'address', 'status', 'UserID', 'branch_id']);
         $this->isOpen = true;
     }
 
@@ -118,7 +116,7 @@ class BranchesList extends Component
     {
         $this->isOpen = false;
         $this->resetValidation();
-        $this->reset(['branchCode', 'branchname', 'type', 'address', 'status', 'UserID', 'branch_id']);
+        $this->reset(['branchCode', 'branchname', 'address', 'status', 'UserID', 'branch_id']);
     }
 
     public function editBranch($id)
@@ -130,10 +128,7 @@ class BranchesList extends Component
         $this->resetValidation();
         $branch = Branch::findOrFail($id);
 
-        $this->branch_id = $branch->BranchID;
-        $this->branchCode = $branch->branchCode;
         $this->branchname = $branch->branchname;
-        $this->type = $branch->type;
         $this->address = $branch->address;
         $this->status = $branch->status;
         $this->UserID = $branch->UserID;
@@ -153,9 +148,7 @@ class BranchesList extends Component
         $this->validate();
 
         $data = [
-            'branchCode' => $this->branchCode,
             'branchname' => $this->branchname,
-            'type' => $this->type,
             'address' => $this->address,
             'status' => $this->status,
             'UserID' => $this->UserID ?: (Auth::id() ?? 1),
@@ -195,12 +188,33 @@ class BranchesList extends Component
         $this->dispatch('branch-deleted');
     }
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function resetTable(): void
+    {
+        $this->search = '';
+        $this->resetPage();
+    }
+
     public function render()
     {
+        $branches = Branch::where('status', true)
+            ->when(filled($this->search), function ($query) {
+                $search = trim($this->search);
+                $query->where(function ($q) use ($search) {
+                    $q->where('branchCode', 'like', "%{$search}%")
+                        ->orWhere('branchname', 'like', "%{$search}%")
+                        ->orWhere('address', 'like', "%{$search}%");
+                });
+            })
+            ->latest('BranchID')
+            ->paginate(10);
+
         return view('components.admin-pages.masterlist.branches', [
-            'branches' => Branch::where('status', true)
-                ->latest('BranchID')
-                ->paginate(10)
+            'branches' => $branches
         ]);
     }
 }

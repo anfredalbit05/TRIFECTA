@@ -336,13 +336,16 @@
         });
     });
 
-    window.addEventListener('swal:success', event => {
+     window.addEventListener('swal:success', event => {
         Swal.fire({
             icon: 'success',
             title: event.detail[0].title,
             text: event.detail[0].text,
-            timer: 2000,
-            showConfirmButton: false
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#0B2A5B',
+            allowOutsideClick: false
+        }).then(() => {
+            Livewire.dispatch('members-refresh');
         });
     });
 

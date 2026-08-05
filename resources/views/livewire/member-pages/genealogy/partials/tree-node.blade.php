@@ -9,7 +9,7 @@
     {{-- User Card Node --}}
     <div
         @class([
-            'group relative flex flex-col items-center p-4 w-full sm:w-[160px] bg-white rounded-xl border-2 shadow-sm transition-all duration-200 z-10 shrink-0',
+            'group relative flex flex-col items-center p-4 w-full sm:w-[160px] bg-white rounded-xl border-2 shadow-sm transition-all duration-200 z-10 shrink-0 cursor-pointer',
             'border-blue-700 ring-2 ring-blue-700/10' => ($node['status'] ?? '') === 'Active',
             'border-slate-200' => ($node['status'] ?? '') !== 'Active',
         ])

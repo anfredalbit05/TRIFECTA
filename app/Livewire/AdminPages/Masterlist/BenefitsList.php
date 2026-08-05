@@ -15,6 +15,7 @@ class BenefitsList extends Component
     protected $paginationTheme = 'tailwind';
     public $isOpen = false;
     public $benefit_id;
+    public string $search = ''; // Added search property
 
     // Form fields
     public $name;
@@ -111,7 +112,7 @@ class BenefitsList extends Component
             'benefit_id'
         ]);
 
-        $this->holdertype = 'Primary Owner';
+        $this->holdertype = 'Both';
         $this->status = true;
 
         $this->isOpen = true;
@@ -202,12 +203,33 @@ class BenefitsList extends Component
         $this->dispatch('benefit-deleted');
     }
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function resetTable(): void
+    {
+        $this->search = '';
+        $this->resetPage();
+    }
+
     public function render()
     {
+        $benefits = Benefit::where('status', true)
+            ->when(filled($this->search), function ($query) {
+                $search = trim($this->search);
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('details', 'like', "%{$search}%")
+                        ->orWhere('holdertype', 'like', "%{$search}%");
+                });
+            })
+            ->latest('BentID')
+            ->paginate(10);
+
         return view('components.admin-pages.masterlist.benefits', [
-            'benefits' => Benefit::where('status', true)
-                ->latest('BentID')
-                ->paginate(10)
+            'benefits' => $benefits
         ]);
     }
 }

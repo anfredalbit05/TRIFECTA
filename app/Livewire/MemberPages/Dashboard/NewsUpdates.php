@@ -23,6 +23,11 @@ class NewsUpdates extends Component
 
     public $image = null;
 
+    public function refreshDashboard()
+    {
+        session()->flash('success', 'Dashboard data refreshed successfully.');
+    }
+
     public function createPost(): void
     {
         $this->validate([
@@ -184,35 +189,31 @@ class NewsUpdates extends Component
     }
 
 
-
 public function render()
-{
-    $newsUpdates = NewsUpdate::with('user')
-        ->where('status', 'Published')
-        ->latest()
-        ->get();
+    {
+        $newsUpdates = NewsUpdate::with('user')
+            ->where('status', 'Published')
+            ->latest()
+            ->get();
 
+        $userID = Auth::user()->UserID;
 
-    $userID = Auth::user()->UserID;
+        $totalAmount = Wallet::where(
+                'UserID',
+                $userID
+            )
+            ->where(
+                'status',
+                'Active'
+            )
+            ->sum('amount');
 
-
-    $totalAmount = Wallet::where(
-            'UserID',
-            $userID
-        )
-        ->where(
-            'status',
-            'Active'
-        )
-        ->sum('amount');
-
-
-    return view(
-        'livewire.member-pages.dashboard.overview',
-        [
-            'newsUpdates' => $newsUpdates,
-            'totalAmount' => $totalAmount,
-        ]
-    );
-}
+        return view(
+            'livewire.member-pages.dashboard.overview',
+            [
+                'newsUpdates' => $newsUpdates,
+                'totalAmount' => $totalAmount,
+            ]
+        );
+    }
 }
