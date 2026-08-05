@@ -56,6 +56,9 @@ return new class extends Migration
                 'Suspended',
             ])->default('Inactive');
 
+
+            $table->text('signature')->nullable();
+
             $table->string('policy_number', 50)->nullable();
 
             $table->rememberToken();

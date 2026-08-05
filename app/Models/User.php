@@ -62,6 +62,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
     'RoleID',
     'branchCode',
     'status',
+    'signature'
 ])]
 
 #[Hidden([

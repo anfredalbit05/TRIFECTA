@@ -12,6 +12,8 @@ use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+
 class Account extends Component
 {
     public string $username = '';
@@ -87,6 +89,32 @@ class Account extends Component
             'account-success',
             'Account information updated successfully.'
         );
+    }
+
+    public function downloadPdf()
+    {
+        /** @var User $user */
+        $user = User::with('beneficiaries')->findOrFail(Auth::id());
+
+        $beneficiaries = $user->beneficiaries;
+
+        $renderer = new ImageRenderer(
+            new RendererStyle(80),
+            new SvgImageBackEnd()
+        );
+
+        $writer = new Writer($renderer);
+
+        $referralUrl = url('/?ref=' . ($user->referralCode ?? ''));
+        $qrCode = $writer->writeString($referralUrl);
+
+        $pdf = Pdf::loadView('pdf.id-card', [
+            'user' => $user,
+            'beneficiaries' => $beneficiaries,
+            'qrCode' => $qrCode,
+        ]);
+
+        return $pdf->download('unitylife-id-card.pdf');
     }
 
     public function render()

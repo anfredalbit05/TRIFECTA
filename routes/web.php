@@ -15,6 +15,8 @@ use App\Http\Controllers\PolicyController;
 use App\Livewire\LoginModal;
 use App\Livewire\MemberPages\MyProfile\MyProfile;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+
 /*
 |--------------------------------------------------------------------------
 | Public Pages
@@ -49,6 +51,20 @@ Route::get('/register/{referralCode}', function ($referralCode) {
 });
 
 Route::get('secret-login', LoginModal::class)->name('login');
+
+
+
+Route::get('/my-id-pdf', function () {
+
+    $user = Auth::user();
+
+    $pdf = Pdf::loadView('livewire.member-pages.my-profile.id-card-pdf-component', [
+        'user' => $user,
+    ]);
+
+    return $pdf->download('id-card.pdf');
+
+})->middleware('auth');
 
 /*
 |--------------------------------------------------------------------------
