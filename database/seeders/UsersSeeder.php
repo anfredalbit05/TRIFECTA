@@ -63,7 +63,7 @@ class UsersSeeder extends Seeder
             ],
             [
                 'username' => 'sysadmin.albit',
-                'password' => Hash::make('Admin@2026'),
+                'password' => Hash::make('Admin@110525'),
 
                 'lastname' => 'Albit',
                 'firstname' => 'Anfrid',

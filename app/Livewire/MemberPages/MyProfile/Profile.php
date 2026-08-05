@@ -12,9 +12,6 @@ use BaconQrCode\Writer;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use Illuminate\Support\Facades\Log;
-use Barryvdh\DomPDF\Facade\Pdf;
-
 
 class Profile extends Component
 {
@@ -30,13 +27,14 @@ class Profile extends Component
     public ?string $contactno = null;
     public ?string $address = null;
 
-    // ID Card & Emergency Preview Fields
+    // ID Card & Form Fields
     public string $civilStatus = 'Single';
     public string $sex = 'Male';
     public string $qrCode = '';
     public string $referralUrl = '';
     public $beneficiaries = [];
 
+    // Temporary static fields for emergency contacts (won't throw DB errors)
     public string $emergencyName = '';
     public string $emergencyAddress = '';
     public string $emergencyRelationship = '';
@@ -61,16 +59,11 @@ class Profile extends Component
         $this->contactno = $user->contactno ?? '';
         $this->address = $user->address ?? '';
 
-        // Load ID preview and emergency fields
-        $this->civilStatus = $user->civil_status ?? 'Single';
-        $this->sex = $user->sex ?? 'Male';
+        // Correctly mapped database columns: 'civilstatus' and 'gender'
+        $this->civilStatus = $user->civilstatus ?? 'Single';
+        $this->sex = $user->gender ?? 'Male';
         $this->beneficiaries = $user->beneficiaries;
         $this->referralUrl = url('/?ref=' . ($user->referralCode ?? ''));
-
-        $this->emergencyName = $user->emergency_name ?? '';
-        $this->emergencyAddress = $user->emergency_address ?? '';
-        $this->emergencyRelationship = $user->emergency_relationship ?? '';
-        $this->emergencyContactno = $user->emergency_contactno ?? '';
 
         $this->signature = $user->signature ?? null;
 
@@ -81,12 +74,12 @@ class Profile extends Component
     }
 
     // Save signature coming from canvas dataURL
-    public function saveSignature($dataUrl)
+    public function saveSignature($dataUrl): void
     {
         $this->signature = $dataUrl;
 
         /** @var User $user */
-        $user = Auth::user();
+        $user = User::findOrFail(Auth::id());
         $user->update(['signature' => $dataUrl]);
 
         session()->flash('profile-success', 'Signature saved successfully.');
@@ -110,34 +103,26 @@ class Profile extends Component
             'address' => ['nullable', 'string'],
             'civilStatus' => ['required', 'string'],
             'sex' => ['required', 'string'],
-            'emergencyName' => ['nullable', 'string', 'max:150'],
-            'emergencyAddress' => ['nullable', 'string', 'max:255'],
-            'emergencyRelationship' => ['nullable', 'string', 'max:50'],
-            'emergencyContactno' => ['nullable', 'string', 'max:20'],
         ]);
 
         /** @var User $user */
-        $user = Auth::user();
+        $user = User::findOrFail(Auth::id());
 
+        // Update database using exact migration column names
         $user->update([
-            'firstname' => $this->firstname,
-            'lastname' => $this->lastname,
-            'middlename' => $this->middlename,
-            'birthdate' => $this->birthdate,
-            'contactno' => $this->contactno,
-            'address' => $this->address,
-            'civil_status' => $this->civilStatus,
-            'sex' => $this->sex,
-            'emergency_name' => $this->emergencyName,
-            'emergency_address' => $this->emergencyAddress,
-            'emergency_relationship' => $this->emergencyRelationship,
-            'emergency_contactno' => $this->emergencyContactno,
+            'firstname'   => $this->firstname,
+            'lastname'    => $this->lastname,
+            'middlename'  => $this->middlename,
+            'birthdate'   => $this->birthdate,
+            'contactno'   => $this->contactno,
+            'address'     => $this->address,
+            'civilstatus' => $this->civilStatus, // Mapped to 'civilstatus' DB column
+            'gender'      => $this->sex,         // Mapped to 'gender' DB column
         ]);
 
-        $user->refresh();
         $this->dispatch('profile-updated');
 
-        session()->flash('profile-success', 'Personal information and emergency details updated successfully.');
+        session()->flash('profile-success', 'Personal information updated successfully.');
     }
 
     public function updateProfilePicture(): void
@@ -147,7 +132,7 @@ class Profile extends Component
         ]);
 
         /** @var User $user */
-        $user = Auth::user();
+        $user = User::findOrFail(Auth::id());
 
         if (!empty($user->profilepic) && Storage::disk('public')->exists($user->profilepic)) {
             Storage::disk('public')->delete($user->profilepic);
@@ -159,14 +144,38 @@ class Profile extends Component
             'profilepic' => $path,
         ]);
 
-        $user->refresh();
         $this->dispatch('profile-updated');
         $this->reset('profilepic');
 
         session()->flash('picture-success', 'Profile picture updated successfully.');
     }
 
-    public function requestPhysicalId()
+    // Add this method inside your Profile class in Profile.php
+
+    public function removeProfilePicture(): void
+    {
+        /** @var User $user */
+        $user = User::findOrFail(Auth::id());
+
+        // 1. Delete the existing file from disk if it exists
+        if (!empty($user->profilepic) && Storage::disk('public')->exists($user->profilepic)) {
+            Storage::disk('public')->delete($user->profilepic);
+        }
+
+        // 2. Reset the database field to null or the default path
+        // Using default path matching your migration default:
+        $user->update([
+            'profilepic' => 'images/profiles/default-avatar.png',
+        ]);
+
+        // 3. Reset local property, dispatch event, and send alert
+        $this->reset('profilepic');
+        $this->dispatch('profile-updated');
+
+        session()->flash('picture-success', 'Profile picture removed successfully.');
+    }
+
+    public function requestPhysicalId(): void
     {
         session()->flash('id-success', 'Physical ID request submitted successfully!');
     }
