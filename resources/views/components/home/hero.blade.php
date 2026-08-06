@@ -161,7 +161,7 @@
 
                         <a
                             onclick="Livewire.dispatch('open-application-modal')"
-                            class="hero-btn-primary">
+                            class="hero-btn-primary cursor-pointer">
 
                             Join Now
 

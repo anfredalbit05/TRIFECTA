@@ -205,7 +205,7 @@
         </div>
     </section>
 
-    <!-- =========================
+    {{-- <!-- =========================
          NEWSLETTER SUBSCRIPTION
     ========================== -->
     <section class="news-newsletter-section">
@@ -247,6 +247,6 @@
                 </button>
             </form>
         </div>
-    </section>
+    </section> --}}
 
 </div>

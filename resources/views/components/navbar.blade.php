@@ -85,14 +85,14 @@
                     <button
                         type="button"
                         onclick="Livewire.dispatch('open-application-modal')"
-                        class="rounded-full bg-[#D79B10] px-6 py-2.5 text-sm font-extrabold text-white shadow-lg shadow-[#D79B10]/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#E5B83B] hover:shadow-xl">
+                        class="rounded-full bg-[#D79B10] px-6 py-2.5 text-sm font-extrabold text-white shadow-lg shadow-[#D79B10]/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#E5B83B] hover:shadow-xl cursor-pointer">
                         JOIN
                     </button>
 
                     <button
                         type="button"
                         onclick="Livewire.dispatch('open-login-modal')"
-                        class="rounded-full border border-[#D79B10]/60 bg-white/5 px-6 py-2.5 text-sm font-bold text-[#E5B83B] backdrop-blur transition-all duration-300 hover:border-[#E5B83B] hover:bg-[#D79B10] hover:text-[#0C2C6B]">
+                        class="rounded-full border border-[#D79B10]/60 bg-white/5 px-6 py-2.5 text-sm font-bold text-[#E5B83B] backdrop-blur transition-all duration-300 hover:border-[#E5B83B] hover:bg-[#D79B10] hover:text-[#0C2C6B] cursor-pointer">
                         Login
                     </button>
 
@@ -196,7 +196,7 @@
                                 <button
                                     type="button"
                                     onclick="confirmNavbarLogout()"
-                                    class="flex w-full items-center gap-3 px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition">
+                                    class="flex w-full items-center gap-3 px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition cursor-pointer cursor-pointer">
                                     <span>🚪</span>
                                     <span>Logout</span>
                                 </button>
@@ -302,14 +302,14 @@
                         <button
                             type="button"
                             onclick="Livewire.dispatch('open-application-modal')"
-                            class="w-full rounded-xl bg-[#D79B10] py-3 font-bold text-white transition hover:bg-[#E5B83B]">
+                            class="w-full rounded-xl bg-[#D79B10] py-3 font-bold text-white transition hover:bg-[#E5B83B] cursor-pointer">
                             JOIN
                         </button>
 
                         <button
                             type="button"
                             onclick="Livewire.dispatch('open-login-modal')"
-                            class="w-full rounded-xl border border-[#D79B10] py-3 font-bold text-[#E5B83B] transition hover:bg-[#D79B10] hover:text-[#0C2C6B]">
+                            class="w-full rounded-xl border border-[#D79B10] py-3 font-bold text-[#E5B83B] transition hover:bg-[#D79B10] hover:text-[#0C2C6B] cursor-pointer">
                             Login
                         </button>
 
@@ -349,7 +349,7 @@
                         <button
                             type="button"
                             onclick="confirmMobileLogout()"
-                            class="w-full rounded-xl border border-red-400/50 py-3 font-bold text-red-300 transition hover:bg-red-500/20 hover:text-white">
+                            class="w-full rounded-xl border border-red-400/50 py-3 font-bold text-red-300 transition hover:bg-red-500/20 hover:text-white cursor-pointer">
                             🚪 Logout
                         </button>
                     </form>

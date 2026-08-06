@@ -653,7 +653,7 @@
         <div class="about-btn-group-center">
             <button
                 onclick="Livewire.dispatch('open-application-modal')"
-                class="about-btn-primary">
+                class="about-btn-primary cursor-pointer">
                 <x-editable-text
                     key="about_cta_btn_primary"
                     :value="$contexts['about_cta_btn_primary'] ?? 'Become a Member'"

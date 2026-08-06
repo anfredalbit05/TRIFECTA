@@ -66,7 +66,7 @@
                     <button
                         type="submit"
                         wire:loading.attr="disabled"
-                        class="w-full py-3.5 bg-[#0B2A5B] hover:bg-[#071D3F] text-white font-bold text-sm rounded-xl shadow-lg transition duration-200 mt-2 flex items-center justify-center disabled:opacity-75 disabled:cursor-not-allowed">
+                        class="w-full py-3.5 bg-[#0B2A5B] hover:bg-[#071D3F] text-white font-bold text-sm rounded-xl shadow-lg transition duration-200 mt-2 flex items-center justify-center disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer">
 
                         <!-- Normal State -->
                         <span wire:loading.remove wire:target="login">
