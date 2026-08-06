@@ -41,6 +41,8 @@
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
         <!-- Left Side: Profile Picture, Form Fields -->
         <div class="space-y-6 sm:space-y-8">
+
+
             <!-- Profile Picture Card -->
             <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div class="border-b border-slate-200 bg-slate-50 px-4 sm:px-6 py-4 sm:py-5 text-center sm:text-left">
@@ -51,21 +53,27 @@
 
                 <div
                     class="flex flex-col items-center gap-6 px-4 sm:px-6 py-6 sm:flex-row sm:items-center text-center sm:text-left">
+                    <!-- Live Preview Image Container -->
                     <div
                         class="h-28 w-28 shrink-0 overflow-hidden rounded-full border-4 border-slate-100 bg-slate-100 shadow-sm mx-auto sm:mx-0">
-                        @php
-                            $profilePic = auth()->user()->profilepic;
-                        @endphp
-
-                        @if (!$profilePic || $profilePic === 'images/profiles/default-avatar.png')
-                            <img src="{{ asset('images/profiles/default-avatar.png') }}"
-                                class="h-full w-full object-cover" alt="Default profile picture">
+                        @if ($profilepic)
+                            <!-- Shows live preview of the newly selected file before saving -->
+                            <img src="{{ $profilepic->temporaryUrl() }}" class="h-full w-full object-cover"
+                                alt="New profile picture preview">
                         @else
-                            <img src="{{ Str::startsWith($profilePic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic) }}"
-                                class="h-full w-full object-cover" alt="Profile picture">
+                            @php
+                                $profilePic = auth()->user()->profilepic;
+                            @endphp
+
+                            @if (!$profilePic || $profilePic === 'images/profiles/default-avatar.png')
+                                <img src="{{ asset('images/profiles/default-avatar.png') }}"
+                                    class="h-full w-full object-cover" alt="Default profile picture">
+                            @else
+                                <img src="{{ Storage::url($profilePic) }}" class="h-full w-full object-cover"
+                                    alt="Profile picture">
+                            @endif
                         @endif
                     </div>
-
 
                     <div class="flex-1 w-full flex flex-col items-center sm:items-start">
                         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
@@ -367,9 +375,10 @@
                         <div>
                             <h5
                                 class="text-center font-bold text-slate-900 tracking-wide text-[10px] sm:text-[11px] mb-1">
-                                UNITYLIFE TERM AND TERMINATION
+                                TRUE LIFE DAYONGAN TERM AND TERMINATION
                             </h5>
-                            <p class="text-[7px] sm:text-[8px] font-semibold text-slate-700 mb-1">UNITYLIFE may
+                            <p class="text-[7px] sm:text-[8px] font-semibold text-slate-700 mb-1">TRUE LIFE DAYONGAN
+                                may
                                 terminate this MEMBERSHIP, for the following grounds:</p>
                             <ul class="list-disc list-inside text-[7px] sm:text-[8px] text-slate-600 space-y-0.5">
                                 <li>Fraud or misrepresentation</li>
@@ -482,58 +491,43 @@
                 this.pad = new SignaturePad(canvas);
 
                 @if ($signature)
-                    this.pad.fromDataURL("{{ asset('storage/' . $signature) }}");
+                    // Use Storage::url() for consistency and reliability
+                    this.pad.fromDataURL("{{ Storage::url($signature) }}");
                 @endif
             },
-
 
             clearPad() {
                 this.pad.clear();
                 @this.call('removeSignature');
             },
 
-
             savePad() {
-
                 if (this.pad.isEmpty()) {
-
                     Swal.fire({
                         title: 'No Signature',
                         text: 'Please provide a signature first.',
                         icon: 'warning',
                         confirmButtonColor: '#0C2C6B'
                     });
-
                     return;
                 }
 
-
                 const dataUrl = this.pad.toDataURL();
-
 
                 Swal.fire({
                     title: 'Save Signature?',
                     text: 'Your signature will be saved to your profile.',
                     icon: 'question',
-
                     showCancelButton: true,
-
                     confirmButtonColor: '#0B2A5B',
                     cancelButtonColor: '#D79B10',
-
                     confirmButtonText: 'Yes, Save it',
                     cancelButtonText: 'Cancel'
-
                 }).then((result) => {
-
                     if (result.isConfirmed) {
-
                         @this.call('saveSignature', dataUrl);
-
                     }
-
                 });
-
             }
         }
     }
@@ -554,5 +548,4 @@
         });
 
     });
-
 </script>

@@ -27,6 +27,8 @@ class ViewMemberModal extends Component
     public $mobile = '';
     public $email = '';
     public $username = '';
+    public $referralCode = '';
+    public $uplineCode = '';
 
    public ?string $activationStatus = null;
 
@@ -56,6 +58,9 @@ class ViewMemberModal extends Component
         $this->mobile = $user->contactno;
         $this->email = $user->email;
         $this->username = $user->username;
+
+        $this->referralCode = $user->referralCode;
+        $this->uplineCode = $user->uplineCode;
 
         $activation = Activation::where('UserID', $UserID)
             ->latest()

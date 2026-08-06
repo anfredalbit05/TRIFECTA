@@ -84,7 +84,7 @@ class Profile extends Component
 
     $imageData = base64_decode($image);
 
-    $filename = 'signatures/signature_' . $user->UserID . '_' . time() . '.png';
+   $filename = 'images/SIG_' . $user->UserID . '_' . time() . '.png';
 
     // Delete old signature if exists
     if ($user->signature && Storage::disk('public')->exists($user->signature)) {
@@ -159,7 +159,7 @@ public function removeSignature(): void
         session()->flash('profile-success', 'Personal information updated successfully.');
     }
 
-    public function updateProfilePicture(): void
+   public function updateProfilePicture(): void
     {
         $this->validate([
             'profilepic' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
@@ -172,7 +172,11 @@ public function removeSignature(): void
             Storage::disk('public')->delete($user->profilepic);
         }
 
-        $path = $this->profilepic->store('profiles', 'public');
+        // 1. Generate your custom filename
+        $filename = 'PRO_' . $user->UserID . '_' . time() . '.' . $this->profilepic->extension();
+
+        // 2. Use storeAs() to save it inside the 'images' folder with the custom name
+        $path = $this->profilepic->storeAs('images', $filename, 'public');
 
         $user->update([
             'profilepic' => $path,

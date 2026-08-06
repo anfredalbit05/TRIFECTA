@@ -1,20 +1,23 @@
 <div>
-    @if($open)
+    @if ($open)
         {{-- ================================================= --}}
         {{-- MODAL BACKDROP --}}
         {{-- ================================================= --}}
-        <div class="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-black/70 p-3 backdrop-blur-sm sm:p-4">
+        <div
+            class="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-black/70 p-3 backdrop-blur-sm sm:p-4">
 
             {{-- ================================================= --}}
             {{-- MODAL CONTAINER --}}
             {{-- ================================================= --}}
-            <div class="my-auto flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-2xl">
+            <div
+                class="my-auto flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-2xl">
 
                 {{-- ================================================= --}}
                 {{-- HEADER --}}
                 {{-- ================================================= --}}
 
-                <div class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4 shadow-sm">
+                <div
+                    class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4 shadow-sm">
                     <div>
                         <h2 class="text-lg font-extrabold text-[#0B2A5B] sm:text-xl">
                             Membership Application
@@ -24,12 +27,9 @@
                         </p>
                     </div>
 
-                    <button
-                        wire:click="close"
-                        type="button"
+                    <button wire:click="close" type="button"
                         class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 font-bold text-slate-500 transition hover:bg-rose-100 hover:text-rose-600"
-                        title="Close"
-                    >
+                        title="Close">
                         ✕
                     </button>
                 </div>
@@ -43,7 +43,8 @@
                     {{-- APPLICANT INFORMATION --}}
                     {{-- ================================================= --}}
                     <div class="space-y-4">
-                        <h3 class="rounded-xl bg-[#0B2A5B] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#E8B923] shadow-sm sm:text-sm">
+                        <h3
+                            class="rounded-xl bg-[#0B2A5B] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#E8B923] shadow-sm sm:text-sm">
                             Applicant Information
                         </h3>
 
@@ -53,12 +54,8 @@
                                 <label class="mb-1 block text-xs font-bold text-slate-700">
                                     Surname *
                                 </label>
-                                <input
-                                    wire:model.live="surname"
-                                    type="text"
-                                    placeholder="Dela Cruz"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                >
+                                <input wire:model.live="surname" type="text" placeholder="Dela Cruz"
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
                             </div>
 
                             {{-- FIRST NAME --}}
@@ -66,12 +63,8 @@
                                 <label class="mb-1 block text-xs font-bold text-slate-700">
                                     First Name *
                                 </label>
-                                <input
-                                    wire:model.live="first_name"
-                                    type="text"
-                                    placeholder="Juan"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                >
+                                <input wire:model.live="first_name" type="text" placeholder="Juan"
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
                             </div>
 
                             {{-- MIDDLE NAME --}}
@@ -79,12 +72,8 @@
                                 <label class="mb-1 block text-xs font-bold text-slate-700">
                                     Middle Name (Optional)
                                 </label>
-                                <input
-                                    wire:model.live="middle_name"
-                                    type="text"
-                                    placeholder="Santos"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                >
+                                <input wire:model.live="middle_name" type="text" placeholder="Santos"
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
                             </div>
 
                             {{-- GENDER --}}
@@ -92,10 +81,8 @@
                                 <label class="mb-1 block text-xs font-bold text-slate-700">
                                     Gender *
                                 </label>
-                                <select
-                                    wire:model="gender"
-                                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                >
+                                <select wire:model="gender"
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
                                     <option value="">Select Gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
@@ -108,10 +95,8 @@
                                 <label class="mb-1 block text-xs font-bold text-slate-700">
                                     Civil Status *
                                 </label>
-                                <select
-                                    wire:model="civil_status"
-                                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                >
+                                <select wire:model="civil_status"
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
                                     <option value="">Select Status</option>
                                     <option value="Single">Single</option>
                                     <option value="Married">Married</option>
@@ -119,209 +104,229 @@
                                     <option value="Separated">Separated</option>
                                 </select>
                             </div>
-{{-- BIRTHDATE WITH FULL YEAR, MONTH, & DAY PICKER --}}
-<div
-   wire:key="birthdate-picker-{{ $userId ?? 'new' }}"
-x-data="{
-    openPicker: false,
-    step: 'year',
-    selectedYear: '2000',
-    selectedMonth: '01',
-    selectedDay: '01',
-    years: Array.from({length: 80}, (_, i) => 2026 - i),
-    months: [
-        {name: 'January', val: '01'}, {name: 'February', val: '02'}, {name: 'March', val: '03'},
-        {name: 'April', val: '04'}, {name: 'May', val: '05'}, {name: 'June', val: '06'},
-        {name: 'July', val: '07'}, {name: 'August', val: '08'}, {name: 'September', val: '09'},
-        {name: 'October', val: '10'}, {name: 'November', val: '11'}, {name: 'December', val: '12'}
-    ],
-    get daysInMonth() {
-        return Array.from({length: new Date(this.selectedYear, this.selectedMonth, 0).getDate()}, (_, i) => String(i + 1).padStart(2, '0'));
-    },
-    get formattedDate() {
-        return `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
-    },
-  init() {
-    this.$watch('$wire.birthdate', (value) => {
-        if (!value) return;
+                            {{-- BIRTHDATE WITH FULL YEAR, MONTH, & DAY PICKER --}}
+                            <div wire:key="birthdate-picker-{{ $userId ?? 'new' }}" x-data="{
+                                openPicker: false,
+                                step: 'year',
+                                selectedYear: '2000',
+                                selectedMonth: '01',
+                                selectedDay: '01',
+                                years: Array.from({ length: 80 }, (_, i) => 2026 - i),
+                                months: [
+                                    { name: 'January', val: '01' }, { name: 'February', val: '02' }, { name: 'March', val: '03' },
+                                    { name: 'April', val: '04' }, { name: 'May', val: '05' }, { name: 'June', val: '06' },
+                                    { name: 'July', val: '07' }, { name: 'August', val: '08' }, { name: 'September', val: '09' },
+                                    { name: 'October', val: '10' }, { name: 'November', val: '11' }, { name: 'December', val: '12' }
+                                ],
+                                get daysInMonth() {
+                                    return Array.from({ length: new Date(this.selectedYear, this.selectedMonth, 0).getDate() }, (_, i) => String(i + 1).padStart(2, '0'));
+                                },
+                                get formattedDate() {
+                                    return `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
+                                },
+                                init() {
+                                    this.$watch('$wire.birthdate', (value) => {
+                                        if (!value) return;
 
-        let parts = value.split('-');
+                                        let parts = value.split('-');
 
-        if (parts.length === 3) {
-            this.selectedYear = parts[0];
-            this.selectedMonth = parts[1];
-            this.selectedDay = parts[2];
-        }
-    });
+                                        if (parts.length === 3) {
+                                            this.selectedYear = parts[0];
+                                            this.selectedMonth = parts[1];
+                                            this.selectedDay = parts[2];
+                                        }
+                                    });
 
-    if (this.$wire.birthdate) {
-        let parts = this.$wire.birthdate.split('-');
+                                    if (this.$wire.birthdate) {
+                                        let parts = this.$wire.birthdate.split('-');
 
-        this.selectedYear = parts[0];
-        this.selectedMonth = parts[1];
-        this.selectedDay = parts[2];
-    }
-},
-    confirmDate() {
-        let formatted = `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
-        @this.set('birthdate', formatted);
-        this.openPicker = false;
-        this.step = 'year';
-    }
-}" class="relative">
-    <label class="mb-1 block text-xs font-bold text-slate-700">
-        Birthdate *
-    </label>
+                                        this.selectedYear = parts[0];
+                                        this.selectedMonth = parts[1];
+                                        this.selectedDay = parts[2];
+                                    }
+                                },
+                                confirmDate() {
+                                    let formatted = `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
+                                    @this.set('birthdate', formatted);
+                                    this.openPicker = false;
+                                    this.step = 'year';
+                                }
+                            }"
+                                class="relative">
+                                <label class="mb-1 block text-xs font-bold text-slate-700">
+                                    Birthdate *
+                                </label>
 
-    {{-- Trigger Input Box --}}
-    <div
-        @click="openPicker = true"
-        class="flex w-full cursor-pointer items-center justify-between rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-    >
-        <span x-text="$wire.birthdate || 'Select Date of Birth'"></span>
-        <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-        </svg>
-    </div>
+                                {{-- Trigger Input Box --}}
+                                <div @click="openPicker = true"
+                                    class="flex w-full cursor-pointer items-center justify-between rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                    <span x-text="$wire.birthdate || 'Select Date of Birth'"></span>
+                                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                </div>
 
-    {{-- CUSTOM MATERIAL-STYLE POPUP MODAL --}}
-    <div x-show="openPicker" x-cloak class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-        <div @click.away="openPicker = false" class="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+                                {{-- CUSTOM MATERIAL-STYLE POPUP MODAL --}}
+                                <div x-show="openPicker" x-cloak
+                                    class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+                                    <div @click.away="openPicker = false"
+                                        class="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
 
-            {{-- Header Banner --}}
-            <div class="bg-[#E8B923] p-5 text-[#0B2A5B]">
-                <span class="text-[10px] font-bold uppercase tracking-widest opacity-80">Select Date of Birth</span>
-                <div class="mt-1 flex items-center justify-between">
-                    <h2 class="text-xl font-extrabold" x-text="formattedDate"></h2>
-                </div>
-                <div class="mt-2 flex gap-2 text-xs font-bold">
-                    <button type="button" @click="step = 'year'" :class="step == 'year' ? 'underline opacity-100' : 'opacity-70'" class="hover:opacity-100">Year</button>
-                    <span>/</span>
-                    <button type="button" @click="step = 'month'" :class="step == 'month' ? 'underline opacity-100' : 'opacity-70'" class="hover:opacity-100">Month</button>
-                    <span>/</span>
-                    <button type="button" @click="step = 'day'" :class="step == 'day' ? 'underline opacity-100' : 'opacity-70'" class="hover:opacity-100">Day</button>
-                </div>
-            </div>
+                                        {{-- Header Banner --}}
+                                        <div class="bg-[#E8B923] p-5 text-[#0B2A5B]">
+                                            <span
+                                                class="text-[10px] font-bold uppercase tracking-widest opacity-80">Select
+                                                Date of Birth</span>
+                                            <div class="mt-1 flex items-center justify-between">
+                                                <h2 class="text-xl font-extrabold" x-text="formattedDate"></h2>
+                                            </div>
+                                            <div class="mt-2 flex gap-2 text-xs font-bold">
+                                                <button type="button" @click="step = 'year'"
+                                                    :class="step == 'year' ? 'underline opacity-100' : 'opacity-70'"
+                                                    class="hover:opacity-100">Year</button>
+                                                <span>/</span>
+                                                <button type="button" @click="step = 'month'"
+                                                    :class="step == 'month' ? 'underline opacity-100' : 'opacity-70'"
+                                                    class="hover:opacity-100">Month</button>
+                                                <span>/</span>
+                                                <button type="button" @click="step = 'day'"
+                                                    :class="step == 'day' ? 'underline opacity-100' : 'opacity-70'"
+                                                    class="hover:opacity-100">Day</button>
+                                            </div>
+                                        </div>
 
-            {{-- Body Content --}}
-            <div class="p-4">
-                {{-- Year Grid --}}
-                <div x-show="step == 'year'">
-                    <div class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
-                        <span>Select Year</span>
-                        <button type="button" @click="step = 'month'" class="text-xs text-[#0B2A5B] hover:underline">Next: Month &rarr;</button>
-                    </div>
-                    <div class="grid h-64 grid-cols-3 gap-2 overflow-y-auto pr-1 text-center">
-                        <template x-for="yr in years" :key="yr">
-                            <button
-                                type="button"
-                                @click="selectedYear = yr; step = 'month'"
-                                :class="selectedYear == yr ? 'bg-[#0B2A5B] text-white font-bold' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
-                                class="rounded-lg py-2.5 text-sm transition"
-                                x-text="yr"
-                            ></button>
-                        </template>
-                    </div>
-                </div>
+                                        {{-- Body Content --}}
+                                        <div class="p-4">
+                                            {{-- Year Grid --}}
+                                            <div x-show="step == 'year'">
+                                                <div
+                                                    class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
+                                                    <span>Select Year</span>
+                                                    <button type="button" @click="step = 'month'"
+                                                        class="text-xs text-[#0B2A5B] hover:underline">Next: Month
+                                                        &rarr;</button>
+                                                </div>
+                                                <div
+                                                    class="grid h-64 grid-cols-3 gap-2 overflow-y-auto pr-1 text-center">
+                                                    <template x-for="yr in years" :key="yr">
+                                                        <button type="button"
+                                                            @click="selectedYear = yr; step = 'month'"
+                                                            :class="selectedYear == yr ? 'bg-[#0B2A5B] text-white font-bold' :
+                                                                'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                                                            class="rounded-lg py-2.5 text-sm transition"
+                                                            x-text="yr"></button>
+                                                    </template>
+                                                </div>
+                                            </div>
 
-                {{-- Month Grid --}}
-                <div x-show="step == 'month'">
-                    <div class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
-                        <button type="button" @click="step = 'year'" class="text-xs text-slate-500 hover:underline">&larr; Back</button>
-                        <span>Select Month</span>
-                        <button type="button" @click="step = 'day'" class="text-xs text-[#0B2A5B] hover:underline">Next: Day &rarr;</button>
-                    </div>
-                    <div class="grid h-64 grid-cols-2 gap-2 overflow-y-auto pr-1 text-center">
-                        <template x-for="m in months" :key="m.val">
-                            <button
-                                type="button"
-                                @click="selectedMonth = m.val; step = 'day'"
-                                :class="selectedMonth == m.val ? 'bg-[#0B2A5B] text-white font-bold' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
-                                class="rounded-lg py-3 text-sm transition"
-                                x-text="m.name"
-                            ></button>
-                        </template>
-                    </div>
-                </div>
+                                            {{-- Month Grid --}}
+                                            <div x-show="step == 'month'">
+                                                <div
+                                                    class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
+                                                    <button type="button" @click="step = 'year'"
+                                                        class="text-xs text-slate-500 hover:underline">&larr;
+                                                        Back</button>
+                                                    <span>Select Month</span>
+                                                    <button type="button" @click="step = 'day'"
+                                                        class="text-xs text-[#0B2A5B] hover:underline">Next: Day
+                                                        &rarr;</button>
+                                                </div>
+                                                <div
+                                                    class="grid h-64 grid-cols-2 gap-2 overflow-y-auto pr-1 text-center">
+                                                    <template x-for="m in months" :key="m.val">
+                                                        <button type="button"
+                                                            @click="selectedMonth = m.val; step = 'day'"
+                                                            :class="selectedMonth == m.val ?
+                                                                'bg-[#0B2A5B] text-white font-bold' :
+                                                                'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                                                            class="rounded-lg py-3 text-sm transition"
+                                                            x-text="m.name"></button>
+                                                    </template>
+                                                </div>
+                                            </div>
 
-                {{-- Day Grid --}}
-                <div x-show="step == 'day'">
-                    <div class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
-                        <button type="button" @click="step = 'month'" class="text-xs text-slate-500 hover:underline">&larr; Back</button>
-                        <span>Select Day</span>
-                        <span></span>
-                    </div>
-                    <div class="grid h-64 grid-cols-5 gap-2 overflow-y-auto pr-1 text-center">
-                        <template x-for="d in daysInMonth" :key="d">
-                            <button
-                                type="button"
-                                @click="selectedDay = d"
-                                :class="selectedDay == d ? 'bg-[#0B2A5B] text-white font-bold' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
-                                class="rounded-lg py-2.5 text-sm transition"
-                                x-text="d"
-                            ></button>
-                        </template>
-                    </div>
-                </div>
-            </div>
+                                            {{-- Day Grid --}}
+                                            <div x-show="step == 'day'">
+                                                <div
+                                                    class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
+                                                    <button type="button" @click="step = 'month'"
+                                                        class="text-xs text-slate-500 hover:underline">&larr;
+                                                        Back</button>
+                                                    <span>Select Day</span>
+                                                    <span></span>
+                                                </div>
+                                                <div
+                                                    class="grid h-64 grid-cols-5 gap-2 overflow-y-auto pr-1 text-center">
+                                                    <template x-for="d in daysInMonth" :key="d">
+                                                        <button type="button" @click="selectedDay = d"
+                                                            :class="selectedDay == d ? 'bg-[#0B2A5B] text-white font-bold' :
+                                                                'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                                                            class="rounded-lg py-2.5 text-sm transition"
+                                                            x-text="d"></button>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
 
-            {{-- Footer Actions --}}
-            <div class="flex items-center justify-between border-t bg-slate-50 px-5 py-3">
-                <button type="button" @click="openPicker = false" class="rounded-lg px-4 py-2 text-xs font-bold text-slate-500 transition hover:bg-slate-200">
-                    Cancel
-                </button>
-                <button type="button" @click="confirmDate()" class="rounded-lg bg-[#0B2A5B] px-6 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123b7a]">
-                    OK
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+                                        {{-- Footer Actions --}}
+                                        <div class="flex items-center justify-between border-t bg-slate-50 px-5 py-3">
+                                            <button type="button" @click="openPicker = false"
+                                                class="rounded-lg px-4 py-2 text-xs font-bold text-slate-500 transition hover:bg-slate-200">
+                                                Cancel
+                                            </button>
+                                            <button type="button" @click="confirmDate()"
+                                                class="rounded-lg bg-[#0B2A5B] px-6 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123b7a]">
+                                                OK
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             {{-- COMPLETE ADDRESS --}}
-{{-- COMPLETE ADDRESS --}}
-<div class="sm:col-span-2 lg:col-span-3 space-y-2">
-    <label class="mb-1 block text-xs font-bold text-slate-700">
-        Complete Address *
-    </label>
-    <div class="flex gap-2">
-        <input
-            wire:model.live="address"
-            type="text"
-            placeholder="House No., Street, Barangay, City/Municipality, Province"
-            class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-        >
+                            <div class="sm:col-span-2 lg:col-span-3 space-y-2">
+                                <label class="mb-1 block text-xs font-bold text-slate-700">
+                                    Complete Address *
+                                </label>
+                                <div class="flex gap-2">
+                                    <input wire:model.live="address" type="text"
+                                        placeholder="House No., Street, Barangay, City/Municipality, Province"
+                                        class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
 
-        {{-- MAP PIN BUTTON --}}
-<button
-    type="button"
-    wire:click="toggleMap"
-    class="flex items-center gap-1.5 shrink-0 px-4 py-2 bg-[#0B2A5B] hover:bg-[#123b7a] text-white text-xs font-bold rounded-xl shadow-sm transition"
->
-    {{ $showMapModal ? 'Close Map' : 'Pin Map' }}
-</button>
-    </div>
+                                    {{-- MAP PIN BUTTON --}}
+                                    <button type="button" wire:click="toggleMap"
+                                        class="flex items-center gap-1.5 shrink-0 px-4 py-2 bg-[#0B2A5B] hover:bg-[#123b7a] text-white text-xs font-bold rounded-xl shadow-sm transition">
+                                        {{ $showMapModal ? 'Close Map' : 'Pin Map' }}
+                                    </button>
+                                </div>
 
-<div
-    x-data
-    x-show="$wire.showMapModal"
-    class="mt-3 overflow-hidden rounded-xl border border-slate-300 bg-white p-3 shadow-sm"
->
+                                <div x-data x-show="$wire.showMapModal"
+                                    class="mt-3 overflow-hidden rounded-xl border border-slate-300 bg-white p-3 shadow-sm space-y-3">
 
-    <h4 class="mb-2 text-sm font-bold text-[#0B2A5B]">
-        Select Location
-    </h4>
+                                    <h4 class="text-sm font-bold text-[#0B2A5B]">
+                                        Select Location (Search or Click on Map)
+                                    </h4>
 
-    <div class="h-[350px] rounded-lg border">
-        <div
-            id="map"
-            wire:ignore
-            class="h-full w-full"
-        ></div>
-    </div>
+                                    {{-- Search Input and Button Container --}}
+                                    <div class="flex gap-2">
+                                        <input id="leaflet-search-input" type="text"
+                                            placeholder="Search location (e.g., Lafilipina)..."
+                                            class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                        <button id="leaflet-search-btn" type="button"
+                                            class="shrink-0 px-4 py-2 bg-[#0B2A5B] hover:bg-[#123b7a] text-white text-xs font-bold rounded-xl shadow-sm transition">
+                                            Search
+                                        </button>
+                                    </div>
 
-</div>
-</div>
+                                    <div class="h-[350px] rounded-lg border">
+                                        <div id="map" wire:ignore class="h-full w-full"></div>
+                                    </div>
+
+                                </div>
+                            </div>
 
 
 
@@ -333,7 +338,8 @@ x-data="{
                     {{-- BENEFICIARY INFORMATION --}}
                     {{-- ================================================= --}}
                     <div class="space-y-4">
-                        <h3 class="flex items-center justify-between rounded-xl bg-[#0B2A5B] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#E8B923] shadow-sm sm:text-sm">
+                        <h3
+                            class="flex items-center justify-between rounded-xl bg-[#0B2A5B] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#E8B923] shadow-sm sm:text-sm">
                             <span>Beneficiary Information</span>
                             <span class="text-[10px] font-normal uppercase text-slate-200">
                                 Up to 3 Dependents
@@ -341,222 +347,242 @@ x-data="{
                         </h3>
 
                         <div class="space-y-4">
-                            @for($i = 0; $i < 3; $i++)
-                                <div class="grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:grid-cols-2 sm:p-4 lg:grid-cols-3">
+                            @for ($i = 0; $i < 3; $i++)
+                                <div
+                                    class="grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:grid-cols-2 sm:p-4 lg:grid-cols-3">
                                     {{-- FULL NAME --}}
                                     <div>
                                         <label class="mb-1 block text-xs font-bold text-slate-700">
                                             Beneficiary {{ $i + 1 }} Full Name
                                         </label>
-                                        <input
-                                            wire:model.live="beneficiaries.{{ $i }}.fullname"
-                                            type="text"
-                                            placeholder="Full name of beneficiary"
-                                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                        >
+                                        <input wire:model.live="beneficiaries.{{ $i }}.fullname"
+                                            type="text" placeholder="Full name of beneficiary"
+                                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
                                     </div>
 
-                               {{-- BENEFICIARY BIRTHDATE WITH CUSTOM YEAR-GRID PICKER --}}
-{{-- BENEFICIARY BIRTHDATE WITH FULL YEAR, MONTH, & DAY PICKER --}}
-<div
+                                    {{-- BENEFICIARY BIRTHDATE WITH CUSTOM YEAR-GRID PICKER --}}
+                                    {{-- BENEFICIARY BIRTHDATE WITH FULL YEAR, MONTH, & DAY PICKER --}}
+                                    <div wire:key="beneficiary-picker-{{ $i }}-{{ $userId ?? 'new' }}"
+                                        x-data="{
+                                            birthdate: @entangle('beneficiaries.' . $i . '.birthdate'),
 
-    wire:key="beneficiary-picker-{{ $i }}-{{ $userId ?? 'new' }}"
-x-data="{
-    birthdate: @entangle('beneficiaries.' . $i . '.birthdate'),
+                                            openPicker: false,
+                                            step: 'year',
 
-    openPicker: false,
-    step: 'year',
+                                            selectedYear: '2000',
+                                            selectedMonth: '01',
+                                            selectedDay: '01',
 
-    selectedYear: '2000',
-    selectedMonth: '01',
-    selectedDay: '01',
+                                            years: Array.from({ length: 90 }, (_, i) => 2026 - i),
 
-    years: Array.from({ length: 90 }, (_, i) => 2026 - i),
+                                            months: [
+                                                { name: 'January', val: '01' },
+                                                { name: 'February', val: '02' },
+                                                { name: 'March', val: '03' },
+                                                { name: 'April', val: '04' },
+                                                { name: 'May', val: '05' },
+                                                { name: 'June', val: '06' },
+                                                { name: 'July', val: '07' },
+                                                { name: 'August', val: '08' },
+                                                { name: 'September', val: '09' },
+                                                { name: 'October', val: '10' },
+                                                { name: 'November', val: '11' },
+                                                { name: 'December', val: '12' }
+                                            ],
 
-    months: [
-        { name: 'January', val: '01' },
-        { name: 'February', val: '02' },
-        { name: 'March', val: '03' },
-        { name: 'April', val: '04' },
-        { name: 'May', val: '05' },
-        { name: 'June', val: '06' },
-        { name: 'July', val: '07' },
-        { name: 'August', val: '08' },
-        { name: 'September', val: '09' },
-        { name: 'October', val: '10' },
-        { name: 'November', val: '11' },
-        { name: 'December', val: '12' }
-    ],
+                                            get daysInMonth() {
+                                                return Array.from({
+                                                        length: new Date(
+                                                            this.selectedYear,
+                                                            this.selectedMonth,
+                                                            0
+                                                        ).getDate()
+                                                    },
+                                                    (_, i) => String(i + 1).padStart(2, '0')
+                                                );
+                                            },
 
-    get daysInMonth() {
-        return Array.from(
-            {
-                length: new Date(
-                    this.selectedYear,
-                    this.selectedMonth,
-                    0
-                ).getDate()
-            },
-            (_, i) => String(i + 1).padStart(2, '0')
-        );
-    },
+                                            get formattedDate() {
+                                                return `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
+                                            },
 
-    get formattedDate() {
-        return `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
-    },
+                                            init() {
+                                                this.$watch('birthdate', (value) => {
+                                                    if (typeof value !== 'string') return;
 
-    init() {
-        this.$watch('birthdate', (value) => {
-            if (typeof value !== 'string') return;
+                                                    let parts = value.split('-');
 
-            let parts = value.split('-');
+                                                    if (parts.length === 3) {
+                                                        this.selectedYear = parts[0];
+                                                        this.selectedMonth = parts[1];
+                                                        this.selectedDay = parts[2];
+                                                    }
+                                                });
 
-            if (parts.length === 3) {
-                this.selectedYear = parts[0];
-                this.selectedMonth = parts[1];
-                this.selectedDay = parts[2];
-            }
-        });
+                                                if (typeof this.birthdate === 'string') {
+                                                    let parts = this.birthdate.split('-');
 
-        if (typeof this.birthdate === 'string') {
-            let parts = this.birthdate.split('-');
+                                                    if (parts.length === 3) {
+                                                        this.selectedYear = parts[0];
+                                                        this.selectedMonth = parts[1];
+                                                        this.selectedDay = parts[2];
+                                                    }
+                                                }
+                                            },
 
-            if (parts.length === 3) {
-                this.selectedYear = parts[0];
-                this.selectedMonth = parts[1];
-                this.selectedDay = parts[2];
-            }
-        }
-    },
+                                            confirmDate() {
+                                                this.birthdate =
+                                                    `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
 
-    confirmDate() {
-        this.birthdate =
-            `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
+                                                this.openPicker = false;
+                                                this.step = 'year';
+                                            }
+                                        }" class="relative">
+                                        <label class="mb-1 block text-xs font-bold text-slate-700">
+                                            Birthdate
+                                        </label>
 
-        this.openPicker = false;
-        this.step = 'year';
-    }
-}" class="relative">
-    <label class="mb-1 block text-xs font-bold text-slate-700">
-        Birthdate
-    </label>
+                                        {{-- Trigger Input Box --}}
+                                        <div @click="openPicker = true"
+                                            class="flex w-full cursor-pointer items-center justify-between rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                            <span x-text="birthdate || 'Select Birthdate'"></span>
+                                            <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                </path>
+                                            </svg>
+                                        </div>
 
-    {{-- Trigger Input Box --}}
-    <div
-        @click="openPicker = true"
-        class="flex w-full cursor-pointer items-center justify-between rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-    >
-       <span x-text="birthdate || 'Select Birthdate'"></span>
-        <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-        </svg>
-    </div>
+                                        {{-- CUSTOM MATERIAL-STYLE POPUP MODAL --}}
+                                        <div x-show="openPicker" x-cloak
+                                            class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+                                            <div @click.away="openPicker = false"
+                                                class="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
 
-    {{-- CUSTOM MATERIAL-STYLE POPUP MODAL --}}
-    <div x-show="openPicker" x-cloak class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-        <div @click.away="openPicker = false" class="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+                                                {{-- Header Banner --}}
+                                                <div class="bg-[#E8B923] p-5 text-[#0B2A5B]">
+                                                    <span
+                                                        class="text-[10px] font-bold uppercase tracking-widest opacity-80">Select
+                                                        Beneficiary Birthdate</span>
+                                                    <div class="mt-1 flex items-center justify-between">
+                                                        <h2 class="text-xl font-extrabold" x-text="formattedDate">
+                                                        </h2>
+                                                    </div>
+                                                    <div class="mt-2 flex gap-2 text-xs font-bold">
+                                                        <button type="button" @click="step = 'year'"
+                                                            :class="step == 'year' ? 'underline opacity-100' : 'opacity-70'"
+                                                            class="hover:opacity-100">Year</button>
+                                                        <span>/</span>
+                                                        <button type="button" @click="step = 'month'"
+                                                            :class="step == 'month' ? 'underline opacity-100' : 'opacity-70'"
+                                                            class="hover:opacity-100">Month</button>
+                                                        <span>/</span>
+                                                        <button type="button" @click="step = 'day'"
+                                                            :class="step == 'day' ? 'underline opacity-100' : 'opacity-70'"
+                                                            class="hover:opacity-100">Day</button>
+                                                    </div>
+                                                </div>
 
-            {{-- Header Banner --}}
-            <div class="bg-[#E8B923] p-5 text-[#0B2A5B]">
-                <span class="text-[10px] font-bold uppercase tracking-widest opacity-80">Select Beneficiary Birthdate</span>
-                <div class="mt-1 flex items-center justify-between">
-                    <h2 class="text-xl font-extrabold" x-text="formattedDate"></h2>
-                </div>
-                <div class="mt-2 flex gap-2 text-xs font-bold">
-                    <button type="button" @click="step = 'year'" :class="step == 'year' ? 'underline opacity-100' : 'opacity-70'" class="hover:opacity-100">Year</button>
-                    <span>/</span>
-                    <button type="button" @click="step = 'month'" :class="step == 'month' ? 'underline opacity-100' : 'opacity-70'" class="hover:opacity-100">Month</button>
-                    <span>/</span>
-                    <button type="button" @click="step = 'day'" :class="step == 'day' ? 'underline opacity-100' : 'opacity-70'" class="hover:opacity-100">Day</button>
-                </div>
-            </div>
+                                                {{-- Body Content --}}
+                                                <div class="p-4">
+                                                    {{-- Year Grid --}}
+                                                    <div x-show="step == 'year'">
+                                                        <div
+                                                            class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
+                                                            <span>Select Year</span>
+                                                            <button type="button" @click="step = 'month'"
+                                                                class="text-xs text-[#0B2A5B] hover:underline">Next:
+                                                                Month &rarr;</button>
+                                                        </div>
+                                                        <div
+                                                            class="grid h-64 grid-cols-3 gap-2 overflow-y-auto pr-1 text-center">
+                                                            <template x-for="yr in years" :key="yr">
+                                                                <button type="button"
+                                                                    @click="selectedYear = yr; step = 'month'"
+                                                                    :class="selectedYear == yr ?
+                                                                        'bg-[#0B2A5B] text-white font-bold' :
+                                                                        'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                                                                    class="rounded-lg py-2.5 text-sm transition"
+                                                                    x-text="yr"></button>
+                                                            </template>
+                                                        </div>
+                                                    </div>
 
-            {{-- Body Content --}}
-            <div class="p-4">
-                {{-- Year Grid --}}
-                <div x-show="step == 'year'">
-                    <div class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
-                        <span>Select Year</span>
-                        <button type="button" @click="step = 'month'" class="text-xs text-[#0B2A5B] hover:underline">Next: Month &rarr;</button>
-                    </div>
-                    <div class="grid h-64 grid-cols-3 gap-2 overflow-y-auto pr-1 text-center">
-                        <template x-for="yr in years" :key="yr">
-                            <button
-                                type="button"
-                                @click="selectedYear = yr; step = 'month'"
-                                :class="selectedYear == yr ? 'bg-[#0B2A5B] text-white font-bold' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
-                                class="rounded-lg py-2.5 text-sm transition"
-                                x-text="yr"
-                            ></button>
-                        </template>
-                    </div>
-                </div>
+                                                    {{-- Month Grid --}}
+                                                    <div x-show="step == 'month'">
+                                                        <div
+                                                            class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
+                                                            <button type="button" @click="step = 'year'"
+                                                                class="text-xs text-slate-500 hover:underline">&larr;
+                                                                Back</button>
+                                                            <span>Select Month</span>
+                                                            <button type="button" @click="step = 'day'"
+                                                                class="text-xs text-[#0B2A5B] hover:underline">Next:
+                                                                Day &rarr;</button>
+                                                        </div>
+                                                        <div
+                                                            class="grid h-64 grid-cols-2 gap-2 overflow-y-auto pr-1 text-center">
+                                                            <template x-for="m in months" :key="m.val">
+                                                                <button type="button"
+                                                                    @click="selectedMonth = m.val; step = 'day'"
+                                                                    :class="selectedMonth == m.val ?
+                                                                        'bg-[#0B2A5B] text-white font-bold' :
+                                                                        'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                                                                    class="rounded-lg py-3 text-sm transition"
+                                                                    x-text="m.name"></button>
+                                                            </template>
+                                                        </div>
+                                                    </div>
 
-                {{-- Month Grid --}}
-                <div x-show="step == 'month'">
-                    <div class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
-                        <button type="button" @click="step = 'year'" class="text-xs text-slate-500 hover:underline">&larr; Back</button>
-                        <span>Select Month</span>
-                        <button type="button" @click="step = 'day'" class="text-xs text-[#0B2A5B] hover:underline">Next: Day &rarr;</button>
-                    </div>
-                    <div class="grid h-64 grid-cols-2 gap-2 overflow-y-auto pr-1 text-center">
-                        <template x-for="m in months" :key="m.val">
-                            <button
-                                type="button"
-                                @click="selectedMonth = m.val; step = 'day'"
-                                :class="selectedMonth == m.val ? 'bg-[#0B2A5B] text-white font-bold' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
-                                class="rounded-lg py-3 text-sm transition"
-                                x-text="m.name"
-                            ></button>
-                        </template>
-                    </div>
-                </div>
+                                                    {{-- Day Grid --}}
+                                                    <div x-show="step == 'day'">
+                                                        <div
+                                                            class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
+                                                            <button type="button" @click="step = 'month'"
+                                                                class="text-xs text-slate-500 hover:underline">&larr;
+                                                                Back</button>
+                                                            <span>Select Day</span>
+                                                            <span></span>
+                                                        </div>
+                                                        <div
+                                                            class="grid h-64 grid-cols-5 gap-2 overflow-y-auto pr-1 text-center">
+                                                            <template x-for="d in daysInMonth" :key="d">
+                                                                <button type="button" @click="selectedDay = d"
+                                                                    :class="selectedDay == d ?
+                                                                        'bg-[#0B2A5B] text-white font-bold' :
+                                                                        'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                                                                    class="rounded-lg py-2.5 text-sm transition"
+                                                                    x-text="d"></button>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                {{-- Day Grid --}}
-                <div x-show="step == 'day'">
-                    <div class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
-                        <button type="button" @click="step = 'month'" class="text-xs text-slate-500 hover:underline">&larr; Back</button>
-                        <span>Select Day</span>
-                        <span></span>
-                    </div>
-                    <div class="grid h-64 grid-cols-5 gap-2 overflow-y-auto pr-1 text-center">
-                        <template x-for="d in daysInMonth" :key="d">
-                            <button
-                                type="button"
-                                @click="selectedDay = d"
-                                :class="selectedDay == d ? 'bg-[#0B2A5B] text-white font-bold' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
-                                class="rounded-lg py-2.5 text-sm transition"
-                                x-text="d"
-                            ></button>
-                        </template>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Footer Actions --}}
-            <div class="flex items-center justify-between border-t bg-slate-50 px-5 py-3">
-                <button type="button" @click="openPicker = false" class="rounded-lg px-4 py-2 text-xs font-bold text-slate-500 transition hover:bg-slate-200">
-                    Cancel
-                </button>
-                <button type="button" @click="confirmDate()" class="rounded-lg bg-[#0B2A5B] px-6 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123b7a]">
-                    OK
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+                                                {{-- Footer Actions --}}
+                                                <div
+                                                    class="flex items-center justify-between border-t bg-slate-50 px-5 py-3">
+                                                    <button type="button" @click="openPicker = false"
+                                                        class="rounded-lg px-4 py-2 text-xs font-bold text-slate-500 transition hover:bg-slate-200">
+                                                        Cancel
+                                                    </button>
+                                                    <button type="button" @click="confirmDate()"
+                                                        class="rounded-lg bg-[#0B2A5B] px-6 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123b7a]">
+                                                        OK
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     {{-- RELATIONSHIP --}}
                                     <div>
                                         <label class="mb-1 block text-xs font-bold text-slate-700">
                                             Relationship
                                         </label>
-                                        <input
-                                            wire:model.live="beneficiaries.{{ $i }}.relationship"
-                                            type="text"
-                                            placeholder="Father, Mother, Spouse..."
-                                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                        >
+                                        <input wire:model.live="beneficiaries.{{ $i }}.relationship"
+                                            type="text" placeholder="Father, Mother, Spouse..."
+                                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
                                     </div>
                                 </div>
                             @endfor
@@ -567,7 +593,8 @@ x-data="{
                     {{-- SECURITY INFORMATION --}}
                     {{-- ================================================= --}}
                     <div class="space-y-4">
-                        <h3 class="rounded-xl bg-[#0B2A5B] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#E8B923] shadow-sm sm:text-sm">
+                        <h3
+                            class="rounded-xl bg-[#0B2A5B] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#E8B923] shadow-sm sm:text-sm">
                             Security Information
                         </h3>
 
@@ -577,12 +604,8 @@ x-data="{
                                 <label class="mb-1 block text-xs font-bold text-slate-700">
                                     Mobile Number *
                                 </label>
-                                <input
-                                    wire:model.live="mobile"
-                                    type="tel"
-                                    placeholder="0917XXXXXXX"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                >
+                                <input wire:model.live="mobile" type="tel" placeholder="0917XXXXXXX"
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
                             </div>
 
                             {{-- EMAIL --}}
@@ -590,12 +613,8 @@ x-data="{
                                 <label class="mb-1 block text-xs font-bold text-slate-700">
                                     Email Address (Optional)
                                 </label>
-                                <input
-                                    wire:model="email"
-                                    type="email"
-                                    placeholder="juan@example.com"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                >
+                                <input wire:model="email" type="email" placeholder="juan@example.com"
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
                             </div>
 
                             {{-- SPACER FOR DESKTOP GRID --}}
@@ -606,12 +625,8 @@ x-data="{
                                 <label class="mb-1 block text-xs font-bold text-slate-700">
                                     Username *
                                 </label>
-                                <input
-                                    wire:model="username"
-                                    type="text"
-                                    placeholder="Juan123"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                >
+                                <input wire:model="username" type="text" placeholder="Juan123"
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
                             </div>
 
                             {{-- PASSWORD --}}
@@ -619,12 +634,8 @@ x-data="{
                                 <label class="mb-1 block text-xs font-bold text-slate-700">
                                     Password *
                                 </label>
-                                <input
-                                    wire:model="password"
-                                    type="password"
-                                    placeholder="********"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                >
+                                <input wire:model="password" type="password" placeholder="********"
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
                             </div>
 
                             {{-- CONFIRM PASSWORD --}}
@@ -632,12 +643,8 @@ x-data="{
                                 <label class="mb-1 block text-xs font-bold text-slate-700">
                                     Confirm Password *
                                 </label>
-                                <input
-                                    wire:model="password_confirmation"
-                                    type="password"
-                                    placeholder="********"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                >
+                                <input wire:model="password_confirmation" type="password" placeholder="********"
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
                             </div>
                         </div>
                     </div>
@@ -647,23 +654,24 @@ x-data="{
                     {{-- ACCEPTANCE OF TERMS --}}
                     {{-- ================================================= --}}
                     <div class="space-y-3">
-                        <h3 class="rounded-xl bg-[#0B2A5B] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#E8B923] shadow-sm sm:text-sm">
+                        <h3
+                            class="rounded-xl bg-[#0B2A5B] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#E8B923] shadow-sm sm:text-sm">
                             Acceptance of Terms
                         </h3>
 
-                        <div class="max-h-32 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs leading-relaxed text-slate-600 sm:text-sm">
+                        <div
+                            class="max-h-32 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs leading-relaxed text-slate-600 sm:text-sm">
                             <p class="mb-1 font-semibold text-slate-800">
                                 Membership Terms & Policy Summary:
                             </p>
-                            I acknowledge that the information provided is true, accurate, and correct to the best of my knowledge. I agree to the standard micro-insurance coverage guidelines, claim procedures, and privacy policies established by Dayongan and partner underwriters.
+                            I acknowledge that the information provided is true, accurate, and correct to the best of my
+                            knowledge. I agree to the standard micro-insurance coverage guidelines, claim procedures,
+                            and privacy policies established by Dayongan and partner underwriters.
                         </div>
 
                         <label class="mt-3 flex cursor-pointer select-none items-start gap-3 sm:items-center">
-                            <input
-                                type="checkbox"
-                                wire:model.live="agree"
-                                class="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#0B2A5B] focus:ring-[#0B2A5B] sm:mt-0"
-                            >
+                            <input type="checkbox" wire:model.live="agree"
+                                class="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#0B2A5B] focus:ring-[#0B2A5B] sm:mt-0">
                             <span class="text-xs font-semibold text-slate-700 sm:text-sm">
                                 I have read and agree to the terms and conditions.
                             </span>
@@ -677,53 +685,37 @@ x-data="{
                 {{-- ================================================= --}}
                 {{-- FOOTER ACTIONS --}}
                 {{-- ================================================= --}}
-                <div class="flex flex-col items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 p-4 sm:flex-row">
+                <div
+                    class="flex flex-col items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 p-4 sm:flex-row">
                     <span class="text-center text-xs text-slate-500 sm:text-left">
                         * Please verify all details before submitting.
                     </span>
 
                     <div class="flex w-full items-center gap-3 sm:w-auto">
-                        <button
-                            wire:click="close"
-                            type="button"
-                            class="w-1/2 rounded-xl border border-slate-300 px-5 py-2.5 text-center text-xs font-bold text-slate-600 transition hover:bg-slate-100 sm:w-auto"
-                        >
+                        <button wire:click="close" type="button"
+                            class="w-1/2 rounded-xl border border-slate-300 px-5 py-2.5 text-center text-xs font-bold text-slate-600 transition hover:bg-slate-100 sm:w-auto">
                             Cancel
                         </button>
 
-                <button
-    wire:click="{{ $isEditMode ? 'confirmUpdate' : 'submit' }}"
-    wire:loading.attr="disabled"
-    type="button"
-    @disabled(!$agree && !$isEditMode)
-    class="flex w-1/2 items-center justify-center rounded-xl bg-[#D4A017] px-6 py-2.5 text-xs font-bold text-[#0B2A5B] shadow-md transition hover:bg-[#E8B923] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
->
-    <span
-        wire:loading.remove
-        wire:target="{{ $isEditMode ? 'confirmUpdate' : 'submit' }}"
-    >
-        {{ $isEditMode ? 'Update Member' : 'Submit Application' }}
-    </span>
+                        <button wire:click="{{ $isEditMode ? 'confirmUpdate' : 'submit' }}"
+                            wire:loading.attr="disabled" type="button" @disabled(!$agree && !$isEditMode)
+                            class="flex w-1/2 items-center justify-center rounded-xl bg-[#D4A017] px-6 py-2.5 text-xs font-bold text-[#0B2A5B] shadow-md transition hover:bg-[#E8B923] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
+                            <span wire:loading.remove wire:target="{{ $isEditMode ? 'confirmUpdate' : 'submit' }}">
+                                {{ $isEditMode ? 'Update Member' : 'Submit Application' }}
+                            </span>
 
-    <div
-        wire:loading.flex
-        wire:target="{{ $isEditMode ? 'confirmUpdate' : 'submit' }}"
-        class="items-center justify-center gap-2"
-    >
-        <svg
-            class="h-4 w-4 shrink-0 animate-spin text-[#0B2A5B]"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-        >
-            ...
-        </svg>
+                            <div wire:loading.flex wire:target="{{ $isEditMode ? 'confirmUpdate' : 'submit' }}"
+                                class="items-center justify-center gap-2">
+                                <svg class="h-4 w-4 shrink-0 animate-spin text-[#0B2A5B]"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    ...
+                                </svg>
 
-        <span class="whitespace-nowrap">
-            {{ $isEditMode ? 'Updating...' : 'Submitting...' }}
-        </span>
-    </div>
-</button>
+                                <span class="whitespace-nowrap">
+                                    {{ $isEditMode ? 'Updating...' : 'Submitting...' }}
+                                </span>
+                            </div>
+                        </button>
                     </div>
                 </div>
 
@@ -733,14 +725,39 @@ x-data="{
 
     @endif
 
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-  <script>
-    let map = null;
-    let marker = null;
+    <!-- Leaflet Control Geocoder CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
-    document.addEventListener('livewire:initialized', () => {
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-        Livewire.on('destroy-map', () => {
+    <!-- Leaflet Control Geocoder JS -->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script>
+        let map = null;
+let marker = null;
+
+document.addEventListener('livewire:initialized', () => {
+
+    Livewire.on('destroy-map', () => {
+        if (map) {
+            map.remove();
+            map = null;
+            marker = null;
+        }
+    });
+
+    Livewire.on('map-opened', (data) => {
+        setTimeout(() => {
+
+            const defaultLat = 7.442294461028405;
+            const defaultLng = 125.81370503321095;
+
+            const lat = data.latitude ?? defaultLat;
+            const lng = data.longitude ?? defaultLng;
 
             if (map) {
                 map.remove();
@@ -748,85 +765,114 @@ x-data="{
                 marker = null;
             }
 
-        });
+            // Initialize Map
+            map = L.map('map').setView([lat, lng], 15);
 
-        Livewire.on('map-opened', (data) => {
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+
+            // Add marker if coordinates exist
+            if (data.latitude !== null && data.longitude !== null) {
+                marker = L.marker([lat, lng]).addTo(map);
+                map.setView([lat, lng], 16);
+            }
+
+            // Reusable search function for both Enter key and Button click
+            const searchInput = document.getElementById('leaflet-search-input');
+            const searchBtn = document.getElementById('leaflet-search-btn');
+
+            function performSearch() {
+                if (!searchInput) return;
+                const query = searchInput.value.trim();
+                if (!query) return;
+
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(results => {
+                        if (results && results.length > 0) {
+                            const r = results[0];
+                            const center = [parseFloat(r.lat), parseFloat(r.lon)];
+
+                            map.setView(center, 16);
+
+                            if (marker) {
+                                marker.setLatLng(center);
+                            } else {
+                                marker = L.marker(center).addTo(map);
+                            }
+
+                            // Dispatch to Livewire with coordinates and address
+                            Livewire.dispatch('set-coordinates', {
+                                lat: r.lat,
+                                lng: r.lon,
+                                address: r.display_name
+                            });
+                        } else {
+                            alert('Location not found.');
+                        }
+                    })
+                    .catch(error => console.error('Geocoding error:', error));
+            }
+
+            if (searchInput) {
+                // Trigger via Enter key
+                searchInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        performSearch();
+                    }
+                });
+            }
+
+            if (searchBtn) {
+                // Trigger via Button click (Ideal for mobile users)
+                searchBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    performSearch();
+                });
+            }
+
+            // Map Click Event
+            map.on('click', function(e) {
+                if (marker) {
+                    marker.setLatLng(e.latlng);
+                } else {
+                    marker = L.marker(e.latlng).addTo(map);
+                }
+
+                Livewire.dispatch('set-coordinates', {
+                    lat: e.latlng.lat,
+                    lng: e.latlng.lng
+                });
+            });
 
             setTimeout(() => {
+                map.invalidateSize();
+            }, 100);
 
-                const defaultLat = 7.442294461028405;
-                const defaultLng = 125.81370503321095;
+        }, 300);
+    });
 
-                const lat = data.latitude ?? defaultLat;
-                const lng = data.longitude ?? defaultLng;
+});
 
-                if (map) {
-                    map.remove();
-                    map = null;
-                    marker = null;
-                }
+        document.addEventListener('livewire:init', () => {
 
-                map = L.map('map').setView([lat, lng], 15);
+            // VALIDATION ERROR ALERT
+            Livewire.on('validation-error', (event) => {
+                // Extract the payload correctly from Livewire 3 event structure
+                const data = event.detail ? event.detail : (Array.isArray(event) ? event[0] : event);
 
-                L.tileLayer(
-                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    {
-                        attribution: '&copy; OpenStreetMap'
-                    }
-                ).addTo(map);
-
-                if (
-                    data.latitude !== null &&
-                    data.longitude !== null
-                ) {
-                    marker = L.marker([lat, lng]).addTo(map);
-
-                    map.setView([lat, lng], 16);
-                }
-
-                map.on('click', function (e) {
-
-                    if (marker) {
-                        marker.setLatLng(e.latlng);
-                    } else {
-                        marker = L.marker(e.latlng).addTo(map);
-                    }
-
-                    Livewire.dispatch('set-coordinates', {
-                        lat: e.latlng.lat,
-                        lng: e.latlng.lng
-                    });
-
+                Swal.fire({
+                    icon: 'error',
+                    title: data.title || 'Error',
+                    html: data.html || data.text || 'Please check the required fields.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0B2A5B',
+                    allowOutsideClick: false
                 });
-
-                setTimeout(() => {
-                    map.invalidateSize();
-                }, 100);
-
-            }, 300);
-
-        });
-
-    });
-
-      document.addEventListener('livewire:init', () => {
-
-        // VALIDATION ERROR ALERT
-        Livewire.on('validation-error', (event) => {
-            // Extract the payload correctly from Livewire 3 event structure
-            const data = event.detail ? event.detail : (Array.isArray(event) ? event[0] : event);
-
-            Swal.fire({
-                icon: 'error',
-                title: data.title || 'Error',
-                html: data.html || data.text || 'Please check the required fields.',
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#0B2A5B',
-                allowOutsideClick: false
             });
+
         });
-
-    });
-
-</script>
+    </script>
 </div>

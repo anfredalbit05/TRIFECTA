@@ -104,33 +104,57 @@
                                 </p>
                             </div>
 
-                        </div>
-
-                    </div>
-
-                    <!-- Address -->
-                    <div class="mb-6 rounded-xl border border-slate-200 shadow-sm">
-
-                        <div class="border-b border-slate-200 bg-slate-50 px-5 py-3">
-
-                            <h3 class="font-bold text-slate-800">
-
-                                📍 Address
-
-                            </h3>
-
-                        </div>
-
-                        <div class="p-5">
+                            <div class="rounded-lg bg-slate-50 p-4">
+                                <p class="text-xs uppercase text-slate-400">Referral Code</p>
+                                <p class="mt-1 font-semibold">{{ $referralCode }}</p>
+                            </div>
 
                             <div class="rounded-lg bg-slate-50 p-4">
-
-                                {{ $address }}
-
+                                <p class="text-xs uppercase text-slate-400">Upline Code</p>
+                                <p class="mt-1 font-semibold">{{ $uplineCode }}</p>
                             </div>
 
                         </div>
 
+                    </div>
+
+                  <!-- Address & Map Integration -->
+                    <div class="mb-6 rounded-xl border border-slate-200 shadow-sm"
+                         x-data="{
+                            map: null,
+                            initMap() {
+                                if (this.map) {
+                                    this.map.remove();
+                                }
+                                let lat = {{ $latitude ?? 7.442294461028405 }};
+                                let lng = {{ $longitude ?? 125.81370503321095 }};
+
+                                setTimeout(() => {
+                                    this.map = L.map('member-map').setView([lat, lng], 15);
+                                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                        maxZoom: 19,
+                                        attribution: '&copy; OpenStreetMap'
+                                    }).addTo(this.map);
+                                    L.marker([lat, lng]).addTo(this.map).bindPopup('Member Location').openPopup();
+                                }, 150);
+                            }
+                         }"
+                         x-init="initMap()"
+                    >
+                        <div class="border-b border-slate-200 bg-slate-50 px-5 py-3">
+                            <h3 class="font-bold text-slate-800">📍 Address & Pinpoint Location</h3>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <div class="rounded-lg bg-slate-50 p-4">
+                                <p class="text-xs uppercase text-slate-400 mb-1">Text Address</p>
+                                {{ $address ?: 'No address provided' }}
+                            </div>
+
+                            <!-- Leaflet Map Container -->
+                            <div class="overflow-hidden rounded-lg border border-slate-200">
+                                <div id="member-map" class="h-100 w-full z-0"></div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Contact Information -->

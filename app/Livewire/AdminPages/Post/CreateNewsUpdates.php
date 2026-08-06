@@ -121,7 +121,7 @@ class CreateNewsUpdates extends Component
         $this->showCreateModal = true;
     }
 
-    public function savePost(): void
+   public function savePost(): void
     {
         // Check permissions based on whether it's an update or create
         if ($this->postIdBeingEdited && !$this->canUpdate) {
@@ -152,7 +152,12 @@ class CreateNewsUpdates extends Component
                 if ($news->image) {
                     Storage::disk('public')->delete($news->image);
                 }
-                $imagePath = $this->image->store('news-images', 'public');
+
+                // 1. Generate custom filename for update (e.g., NAU_UserID_timestamp.png)
+                $filename = 'NAU_' . ($user->UserID ?? '0') . '_' . time() . '.' . $this->image->extension();
+
+                // 2. Use storeAs instead of store
+                $imagePath = $this->image->storeAs('news-images', $filename, 'public');
             }
 
             $news->update([
@@ -166,7 +171,11 @@ class CreateNewsUpdates extends Component
         } else {
             $imagePath = null;
             if ($this->image) {
-                $imagePath = $this->image->store('news-images', 'public');
+                // 1. Generate custom filename for creation
+                $filename = 'NAU_' . ($user->UserID ?? '0') . '_' . time() . '.' . $this->image->extension();
+
+                // 2. Use storeAs instead of store
+                $imagePath = $this->image->storeAs('news-images', $filename, 'public');
             }
 
             NewsUpdate::create([
@@ -203,38 +212,33 @@ class CreateNewsUpdates extends Component
         $this->selectedPost = null;
     }
 
-    public function deletePost($id): void
-    {
-        if (!$this->canDelete) {
-            return;
-        }
-
-        $news = NewsUpdate::where('ID', $id)->first();
-
-        if (!$news) {
-            return;
-        }
-
-        if ($news->image) {
-            // Note: based on your folder path public/storage/news-images/
-            // $news->image usually returns 'news-images/filename.jpg'
-            $publicPath = public_path('storage/' . $news->image);
-
-            if (file_exists($publicPath)) {
-                @unlink($publicPath);
-            }
-        }
-
-        NewsUpdate::where('ID', $id)->delete();
-
-        if ($this->selectedPost && $this->selectedPost->ID == $id) {
-            $this->selectedPost = null;
-        }
-
-        $this->resetPage();
-
-        session()->flash('success', 'News update deleted successfully.');
+   public function deletePost($id): void
+{
+    if (!$this->canDelete) {
+        return;
     }
+
+    $news = NewsUpdate::where('ID', $id)->first();
+
+    if (!$news) {
+        return;
+    }
+
+    // Delete the image using Laravel's Storage facade
+    if ($news->image && Storage::disk('public')->exists($news->image)) {
+        Storage::disk('public')->delete($news->image);
+    }
+
+    NewsUpdate::where('ID', $id)->delete();
+
+    if ($this->selectedPost && $this->selectedPost->ID == $id) {
+        $this->selectedPost = null;
+    }
+
+    $this->resetPage();
+
+    session()->flash('success', 'News update deleted successfully.');
+}
 
     public function updatingSearch()
     {

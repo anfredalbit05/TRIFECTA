@@ -573,15 +573,21 @@ public function open($upline = null)
 }
 
 
-    #[On('set-coordinates')]
-    public function setCoordinates($lat, $lng): void
+ #[On('set-coordinates')]
+    public function setCoordinates($lat, $lng, $address = null): void
     {
         $this->latitude = (float) $lat;
         $this->longitude = (float) $lng;
 
+        // If the geocoder returned a place name, auto-fill the address field
+        if (!empty($address)) {
+            $this->address = ucwords(strtolower($address));
+        }
+
         logger([
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
+            'address' => $this->address,
         ]);
     }
 
