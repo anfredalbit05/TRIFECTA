@@ -65,7 +65,7 @@
 
     </div>
 
-    <!-- SUMMARY STATISTICS & EXCEL EXPORT / PRINT FILTERS -->
+    {{-- <!-- SUMMARY STATISTICS & EXCEL EXPORT / PRINT FILTERS -->
     <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm mb-6">
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-100">
             <div>
@@ -149,15 +149,15 @@
                     <span wire:loading wire:target="exportExcel" class="animate-spin text-xs">⏳</span>
                 </button>
 
-                {{-- <!-- PRINT ICON BUTTON -->
+                <!-- PRINT ICON BUTTON -->
                 <button onclick="window.print()" title="Print Report"
                     class="w-10 h-10 inline-flex items-center justify-center bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-blue-600 rounded-xl shadow-sm transition cursor-pointer">
                     <span class="text-base">🖨️</span>
-                </button> --}}
+                </button>
 
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- MAP CONTAINER -->
     <div class="mt-8 bg-white p-6 rounded-xl shadow-md border border-gray-100">
