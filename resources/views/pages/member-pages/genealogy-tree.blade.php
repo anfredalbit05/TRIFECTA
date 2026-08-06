@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="genealogy-container" x-data="{ tab: 'invitee' }">
+<div class="genealogy-container"  x-data="{ tab: $persist('invitee').as('genealogy-tree-tab') }">
 
     <!-- HEADER -->
     <nav class="genealogy-nav">

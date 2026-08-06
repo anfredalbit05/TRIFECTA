@@ -7,7 +7,7 @@
 
 <div
     class="dashboard-container"
-    x-data="{ tab: 'profile' }"
+    x-data="{ tab: $persist('profile').as('my-profile-tab') }"
     @account-activated.window="$wire.$refresh()">
 
     <!-- MY PROFILE NAVIGATION -->

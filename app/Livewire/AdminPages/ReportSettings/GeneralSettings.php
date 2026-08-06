@@ -12,12 +12,12 @@ use Livewire\WithPagination;
 
 class GeneralSettings extends Component
 {
+    use WithPagination;
 
-     use WithPagination;
     public $isOpen = false;
     public $setting_id;
 
-    // Form fields matching your schema
+    // Form fields
     public $name;
     public $value;
 
@@ -41,7 +41,7 @@ class GeneralSettings extends Component
             return true;
         }
 
-        $module = Module::where('modulename', 'Report & Settings - General')->first(); // Adjust modulename if needed
+        $module = Module::where('modulename', 'Report & Settings - General')->first();
 
         if (!$module) {
             return false;
@@ -64,7 +64,6 @@ class GeneralSettings extends Component
         };
     }
 
-    // Computed properties for permissions in Blade
     public function getCanCreateProperty()
     {
         return $this->hasPermission('create');
@@ -121,107 +120,99 @@ class GeneralSettings extends Component
         $this->isOpen = true;
     }
 
-public function saveSetting()
-{
-    if ($this->setting_id && !$this->canUpdate) {
-        return;
-    }
-    if (!$this->setting_id && !$this->canCreate) {
-        return;
-    }
-
-    // Check which required fields are empty
-    $emptyFields = [];
-
-    if (empty(trim($this->name))) {
-        $emptyFields[] = 'Setting Name';
-    }
-
-    if (empty(trim($this->value))) {
-        $emptyFields[] = 'Value';
-    }
-
-    if (!empty($emptyFields)) {
-        if (count($emptyFields) > 1) {
-            $text = 'The following fields are empty:<br><br><b>• ' . implode('</b><br><b>• ', $emptyFields) . '</b>';
-        } else {
-            $text = 'The <b>' . $emptyFields[0] . '</b> field is empty.';
+    public function saveSetting()
+    {
+        if ($this->setting_id && !$this->canUpdate) {
+            return;
+        }
+        if (!$this->setting_id && !$this->canCreate) {
+            return;
         }
 
-        $this->dispatch('swal:error', [
-            'title' => 'Missing Fields',
-            'text' => $text
+        $emptyFields = [];
+
+        if (empty(trim($this->name))) {
+            $emptyFields[] = 'Setting Name';
+        }
+
+        if (empty(trim($this->value)) && $this->value !== '0') {
+            $emptyFields[] = 'Value';
+        }
+
+        if (!empty($emptyFields)) {
+            $text = count($emptyFields) > 1
+                ? 'The following fields are empty:<br><br><b>• ' . implode('</b><br><b>• ', $emptyFields) . '</b>'
+                : 'The <b>' . $emptyFields[0] . '</b> field is empty.';
+
+            $this->dispatch('swal:error', [
+                'title' => 'Missing Fields',
+                'text' => $text
+            ]);
+            return;
+        }
+
+        $this->validate();
+
+        $existingQuery = Setting::where('name', $this->name);
+        if ($this->setting_id) {
+            $existingQuery->where('SettingsID', '!=', $this->setting_id);
+        }
+
+        if ($existingQuery->exists()) {
+            $this->dispatch('swal:error', [
+                'title' => 'Duplicate Error',
+                'text' => 'A setting with this name already exists.'
+            ]);
+            return;
+        }
+
+        if ($this->setting_id) {
+            $this->dispatch('confirm-update');
+            return;
+        }
+
+        Setting::create([
+            'name' => $this->name,
+            'value' => $this->value,
         ]);
-        return;
-    }
 
-    // Run standard validation for max length, etc.
-    $this->validate();
-
-    // Check for existing setting name (ignoring current ID if updating)
-    $existingQuery = Setting::where('name', $this->name);
-    if ($this->setting_id) {
-        $existingQuery->where('SettingsID', '!=', $this->setting_id);
-    }
-
-    if ($existingQuery->exists()) {
-        $this->dispatch('swal:error', [
-            'title' => 'Duplicate Error',
-            'text' => 'A setting with this name already exists.'
-        ]);
-        return;
-    }
-
-    // If updating, trigger SweetAlert confirmation first
-    if ($this->setting_id) {
-        $this->dispatch('confirm-update');
-        return;
-    }
-
-    // Otherwise, create new record
-    Setting::create([
-        'name' => $this->name,
-        'value' => $this->value,
-    ]);
-
-    $this->closeModal();
-
-    $this->dispatch('swal:success', [
-        'title' => 'Success!',
-        'text' => 'Setting successfully created!'
-    ]);
-}
-
-public function performUpdate()
-{
-    if (!$this->setting_id || !$this->canUpdate) {
-        return;
-    }
-
-    $setting = Setting::findOrFail($this->setting_id);
-
-    // Check if any data actually changed
-    if ($setting->name === $this->name && $setting->value === $this->value) {
         $this->closeModal();
+
         $this->dispatch('swal:success', [
-            'title' => 'No Changes!',
-            'text' => 'Nothing was changed.'
+            'title' => 'Success!',
+            'text' => 'Setting successfully created!'
         ]);
-        return;
     }
 
-    $setting->update([
-        'name' => $this->name,
-        'value' => $this->value,
-    ]);
+    public function performUpdate()
+    {
+        if (!$this->setting_id || !$this->canUpdate) {
+            return;
+        }
 
-    $this->closeModal();
+        $setting = Setting::findOrFail($this->setting_id);
 
-    $this->dispatch('swal:success', [
-        'title' => 'Success!',
-        'text' => 'Setting successfully updated!'
-    ]);
-}
+        if ($setting->name === $this->name && $setting->value === $this->value) {
+            $this->closeModal();
+            $this->dispatch('swal:success', [
+                'title' => 'No Changes!',
+                'text' => 'Nothing was changed.'
+            ]);
+            return;
+        }
+
+        $setting->update([
+            'name' => $this->name,
+            'value' => $this->value,
+        ]);
+
+        $this->closeModal();
+
+        $this->dispatch('swal:success', [
+            'title' => 'Success!',
+            'text' => 'Setting successfully updated!'
+        ]);
+    }
 
     public function confirmDeleteSetting($id)
     {

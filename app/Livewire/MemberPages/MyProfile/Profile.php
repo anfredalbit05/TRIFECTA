@@ -59,6 +59,12 @@ class Profile extends Component
         $this->contactno = $user->contactno ?? '';
         $this->address = $user->address ?? '';
 
+        // Emergency Contact fields mapping
+        $this->emergencyName = $user->emergencyName ?? '';
+        $this->emergencyAddress = $user->emergencyAddress ?? '';
+        $this->emergencyRelationship = $user->emergencyRelationship ?? '';
+        $this->emergencyContactno = $user->emergencyContactno ?? '';
+
         // Correctly mapped database columns: 'civilstatus' and 'gender'
         $this->civilStatus = $user->civilstatus ?? 'Single';
         $this->sex = $user->gender ?? 'Male';
@@ -137,12 +143,15 @@ public function removeSignature(): void
             'address' => ['nullable', 'string'],
             'civilStatus' => ['required', 'string'],
             'sex' => ['required', 'string'],
+            'emergencyName'         => ['nullable', 'string', 'max:255'],
+            'emergencyRelationship' => ['nullable', 'string', 'max:255'],
+            'emergencyContactno'    => ['nullable', 'string', 'max:50'],
+            'emergencyAddress'      => ['nullable', 'string'],
         ]);
 
         /** @var User $user */
         $user = User::findOrFail(Auth::id());
 
-        // Update database using exact migration column names
         $user->update([
             'firstname'   => $this->firstname,
             'lastname'    => $this->lastname,
@@ -150,16 +159,19 @@ public function removeSignature(): void
             'birthdate'   => $this->birthdate,
             'contactno'   => $this->contactno,
             'address'     => $this->address,
-            'civilstatus' => $this->civilStatus, // Mapped to 'civilstatus' DB column
-            'gender'      => $this->sex,         // Mapped to 'gender' DB column
+            'civilstatus' => $this->civilStatus,
+            'gender'      => $this->sex,
+            'emergencyName'         => $this->emergencyName,
+            'emergencyRelationship' => $this->emergencyRelationship,
+            'emergencyContactno'    => $this->emergencyContactno,
+            'emergencyAddress'      => $this->emergencyAddress,
         ]);
 
-        $this->dispatch('profile-updated');
-
-        session()->flash('profile-success', 'Personal information updated successfully.');
+        // Use a dedicated event name for profile details
+        $this->dispatch('profile-details-updated');
     }
 
-   public function updateProfilePicture(): void
+    public function updateProfilePicture(): void
     {
         $this->validate([
             'profilepic' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
@@ -172,45 +184,32 @@ public function removeSignature(): void
             Storage::disk('public')->delete($user->profilepic);
         }
 
-        // 1. Generate your custom filename
         $filename = 'PRO_' . $user->UserID . '_' . time() . '.' . $this->profilepic->extension();
-
-        // 2. Use storeAs() to save it inside the 'images' folder with the custom name
         $path = $this->profilepic->storeAs('images', $filename, 'public');
 
         $user->update([
             'profilepic' => $path,
         ]);
 
-        $this->dispatch('profile-updated');
         $this->reset('profilepic');
-
-        session()->flash('picture-success', 'Profile picture updated successfully.');
+        $this->dispatch('picture-updated');
     }
-
-    // Add this method inside your Profile class in Profile.php
 
     public function removeProfilePicture(): void
     {
         /** @var User $user */
         $user = User::findOrFail(Auth::id());
 
-        // 1. Delete the existing file from disk if it exists
         if (!empty($user->profilepic) && Storage::disk('public')->exists($user->profilepic)) {
             Storage::disk('public')->delete($user->profilepic);
         }
 
-        // 2. Reset the database field to null or the default path
-        // Using default path matching your migration default:
         $user->update([
             'profilepic' => 'images/profiles/default-avatar.png',
         ]);
 
-        // 3. Reset local property, dispatch event, and send alert
         $this->reset('profilepic');
-        $this->dispatch('profile-updated');
-
-        session()->flash('picture-success', 'Profile picture removed successfully.');
+        $this->dispatch('picture-updated');
     }
 
     public function requestPhysicalId(): void

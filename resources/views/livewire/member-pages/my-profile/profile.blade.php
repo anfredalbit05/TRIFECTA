@@ -2,7 +2,22 @@
     use Illuminate\Support\Str;
 @endphp
 
-<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8" x-data="{ activeTab: 'front', idTab: 'front' }">
+<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8"
+    x-data="profileForm({
+        firstname: @js($firstname),
+        lastname: @js($lastname),
+        middlename: @js($middlename),
+        birthdate: @js($birthdate),
+        contactno: @js($contactno),
+        address: @js($address),
+        civilStatus: @js($civilStatus),
+        sex: @js($sex),
+        emergencyName: @js($emergencyName),
+        emergencyRelationship: @js($emergencyRelationship),
+        emergencyContactno: @js($emergencyContactno),
+        emergencyAddress: @js($emergencyAddress)
+    })"
+>
     <!-- Header -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between text-center sm:text-left">
         <div>
@@ -17,10 +32,8 @@
 
     <!-- Success Messages -->
     @if (session()->has('profile-success'))
-        <div
-            class="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 sm:px-5 py-4 text-emerald-800">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
+        <div class="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 sm:px-5 py-4 text-emerald-800">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
             <p class="text-xs sm:text-sm font-medium">{{ session('profile-success') }}</p>
@@ -28,10 +41,8 @@
     @endif
 
     @if (session()->has('picture-success'))
-        <div
-            class="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 sm:px-5 py-4 text-emerald-800">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
+        <div class="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 sm:px-5 py-4 text-emerald-800">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
             <p class="text-xs sm:text-sm font-medium">{{ session('picture-success') }}</p>
@@ -41,55 +52,42 @@
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
         <!-- Left Side: Profile Picture, Form Fields -->
         <div class="space-y-6 sm:space-y-8">
-
-
             <!-- Profile Picture Card -->
             <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div class="border-b border-slate-200 bg-slate-50 px-4 sm:px-6 py-4 sm:py-5 text-center sm:text-left">
                     <h3 class="font-semibold text-sm sm:text-base text-slate-900">Profile Picture</h3>
-                    <p class="mt-1 text-xs sm:text-sm text-slate-500">Upload a clear profile picture. Maximum file size
-                        is 2 MB.</p>
+                    <p class="mt-1 text-xs sm:text-sm text-slate-500">Upload a clear profile picture. Maximum file size is 2 MB.</p>
                 </div>
 
-                <div
-                    class="flex flex-col items-center gap-6 px-4 sm:px-6 py-6 sm:flex-row sm:items-center text-center sm:text-left">
-                    <!-- Live Preview Image Container -->
-                    <div
-                        class="h-28 w-28 shrink-0 overflow-hidden rounded-full border-4 border-slate-100 bg-slate-100 shadow-sm mx-auto sm:mx-0">
+                <div class="flex flex-col items-center gap-6 px-4 sm:px-6 py-6 sm:flex-row sm:items-center text-center sm:text-left">
+                    <div class="h-28 w-28 shrink-0 overflow-hidden rounded-full border-4 border-slate-100 bg-slate-100 shadow-sm mx-auto sm:mx-0">
                         @if ($profilepic)
-                            <!-- Shows live preview of the newly selected file before saving -->
-                            <img src="{{ $profilepic->temporaryUrl() }}" class="h-full w-full object-cover"
-                                alt="New profile picture preview">
+                            <img src="{{ $profilepic->temporaryUrl() }}" class="h-full w-full object-cover" alt="New profile picture preview">
                         @else
                             @php
                                 $profilePic = auth()->user()->profilepic;
                             @endphp
 
                             @if (!$profilePic || $profilePic === 'images/profiles/default-avatar.png')
-                                <img src="{{ asset('images/profiles/default-avatar.png') }}"
-                                    class="h-full w-full object-cover" alt="Default profile picture">
+                                <img src="{{ asset('images/profiles/default-avatar.png') }}" class="h-full w-full object-cover" alt="Default profile picture">
                             @else
-                                <img src="{{ Storage::url($profilePic) }}" class="h-full w-full object-cover"
-                                    alt="Profile picture">
+                                <img src="{{ Storage::url($profilePic) }}" class="h-full w-full object-cover" alt="Profile picture">
                             @endif
                         @endif
                     </div>
 
                     <div class="flex-1 w-full flex flex-col items-center sm:items-start">
                         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-                            <!-- Choose New Picture Button -->
                             <label for="profilepic"
                                 class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-white transition w-full sm:w-auto bg-[#0C2C6B] hover:bg-[#071a42] text-center whitespace-nowrap">
                                 Choose New Picture
                             </label>
-                            <input id="profilepic" type="file" wire:model="profilepic" accept="image/*"
-                                class="hidden">
+                            <input id="profilepic" type="file" wire:model="profilepic" accept="image/*" class="hidden">
 
-                            <!-- Remove Picture Button: Shows ONLY if user has a custom picture and hasn't picked a new file yet -->
                             @if (!$profilepic && auth()->user()->profilepic && auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
                                 <button type="button" wire:click="removeProfilePicture"
                                     wire:confirm="Are you sure you want to remove your profile picture?"
-                                    class="inline-flex items-center justify-center gap-2 rounded-xl px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 transition w-full sm:w-auto text-center whitespace-nowrap">
+                                    class="inline-flex items-center justify-center gap-2 rounded-xl px-4 sm:px-5 py-3 text-white sm:text-sm font-semibold bg-[#D79B10] transition w-full sm:w-auto text-center whitespace-nowrap cursor-pointer">
                                     Remove Picture
                                 </button>
                             @endif
@@ -99,10 +97,9 @@
                             <p class="mt-2 text-xs sm:text-sm text-red-600">{{ $message }}</p>
                         @enderror
 
-                        <!-- Save Button: Shows ONLY when a new file is selected -->
                         @if ($profilepic)
                             <button type="button" wire:click="updateProfilePicture"
-                                class="mt-3 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-emerald-700 w-full sm:w-auto text-center whitespace-nowrap">
+                                class="mt-3 inline-flex items-center justify-center rounded-xl bg-[#D79B10] px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-[#B8830D] w-full sm:w-auto text-center whitespace-nowrap cursor-pointer">
                                 Save Profile Picture
                             </button>
                         @endif
@@ -113,13 +110,11 @@
             <!-- Personal Information Form Card -->
             <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div class="border-b border-slate-200 bg-slate-50 px-4 sm:px-6 py-4 sm:py-5 text-center sm:text-left">
-                    <h3 class="font-semibold text-sm sm:text-base text-slate-900">Personal Details & Emergency Contact
-                    </h3>
-                    <p class="mt-1 text-xs sm:text-sm text-slate-500">Update your account info and emergency contact
-                        details for the ID back side.</p>
+                    <h3 class="font-semibold text-sm sm:text-base text-slate-900">Personal Details & Emergency Contact</h3>
+                    <p class="mt-1 text-xs sm:text-sm text-slate-500">Update your account info and emergency contact details for the ID back side.</p>
                 </div>
 
-                <form wire:submit="saveProfile">
+                <form @submit.prevent="confirmSave">
                     <div class="grid gap-4 sm:gap-5 p-4 sm:p-6 md:grid-cols-2 text-left">
                         <div>
                             <label class="mb-2 block text-xs sm:text-sm font-medium text-slate-700">First Name</label>
@@ -184,8 +179,7 @@
                         </div>
 
                         <div>
-                            <label class="mb-2 block text-xs sm:text-sm font-medium text-slate-700">Contact
-                                Number</label>
+                            <label class="mb-2 block text-xs sm:text-sm font-medium text-slate-700">Contact Number</label>
                             <input type="text" wire:model="contactno"
                                 class="w-full rounded-xl border border-slate-300 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-100">
                             @error('contactno')
@@ -204,15 +198,12 @@
 
                         <!-- Emergency Contact Details Section -->
                         <div class="md:col-span-2 pt-4 border-t border-slate-200">
-                            <h4 class="font-semibold text-slate-900 text-xs sm:text-sm mb-1">In Case of Emergency (ICE)
-                                Details</h4>
-                            <p class="text-xs text-slate-500 mb-4">This will sync directly to the back of your ID card
-                                preview.</p>
+                            <h4 class="font-semibold text-slate-900 text-xs sm:text-sm mb-1">In Case of Emergency (ICE) Details</h4>
+                            <p class="text-xs text-slate-500 mb-4">This will sync directly to the back of your ID card preview.</p>
                         </div>
 
                         <div>
-                            <label class="mb-2 block text-xs sm:text-sm font-medium text-slate-700">Emergency Contact
-                                Name</label>
+                            <label class="mb-2 block text-xs sm:text-sm font-medium text-slate-700">Emergency Contact Name</label>
                             <input type="text" wire:model="emergencyName"
                                 class="w-full rounded-xl border border-slate-300 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-100"
                                 placeholder="Full name">
@@ -222,8 +213,7 @@
                         </div>
 
                         <div>
-                            <label
-                                class="mb-2 block text-xs sm:text-sm font-medium text-slate-700">Relationship</label>
+                            <label class="mb-2 block text-xs sm:text-sm font-medium text-slate-700">Relationship</label>
                             <input type="text" wire:model="emergencyRelationship"
                                 class="w-full rounded-xl border border-slate-300 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-100"
                                 placeholder="e.g. Spouse, Parent">
@@ -233,8 +223,7 @@
                         </div>
 
                         <div>
-                            <label class="mb-2 block text-xs sm:text-sm font-medium text-slate-700">Emergency Contact
-                                No.</label>
+                            <label class="mb-2 block text-xs sm:text-sm font-medium text-slate-700">Emergency Contact No.</label>
                             <input type="text" wire:model="emergencyContactno"
                                 class="w-full rounded-xl border border-slate-300 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-100"
                                 placeholder="Mobile number">
@@ -244,8 +233,7 @@
                         </div>
 
                         <div>
-                            <label class="mb-2 block text-xs sm:text-sm font-medium text-slate-700">Emergency
-                                Address</label>
+                            <label class="mb-2 block text-xs sm:text-sm font-medium text-slate-700">Emergency Address</label>
                             <input type="text" wire:model="emergencyAddress"
                                 class="w-full rounded-xl border border-slate-300 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-100"
                                 placeholder="Address">
@@ -255,7 +243,13 @@
                         </div>
                     </div>
 
-
+                    <div class="flex justify-center sm:justify-end border-t border-slate-200 bg-slate-50 px-4 sm:px-6 py-4 sm:py-5">
+                        <button type="submit" wire:loading.attr="disabled" wire:target="saveProfile"
+                            class="rounded-xl bg-[#0C2C6B] px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-[#071a42] disabled:opacity-60 w-full sm:w-auto cursor-pointer">
+                            <span wire:loading.remove wire:target="saveProfile">Save Personal Information</span>
+                            <span wire:loading wire:target="saveProfile">Saving...</span>
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -266,8 +260,7 @@
             <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm p-4 sm:p-6 text-left"
                 x-data="signaturePadSetup()" x-init="initPad()">
                 <h3 class="font-semibold text-sm sm:text-base text-slate-900 mb-1">Signature</h3>
-                <p class="text-xs text-slate-500 mb-4">Draw your signature inside the box below to display on your ID
-                    front preview.</p>
+                <p class="text-xs text-slate-500 mb-4">Draw your signature inside the box below to display on your ID front preview.</p>
 
                 <div class="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 p-2 relative w-full">
                     <canvas x-ref="signatureCanvas"
@@ -288,7 +281,8 @@
 
             <!-- Live ID Preview Card Section -->
             <div
-                class="bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-200 flex flex-col items-center justify-between shadow-inner h-fit overflow-x-hidden">
+                class="bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-200 flex flex-col items-center justify-between shadow-inner h-fit overflow-x-hidden"
+                x-data="idPdfDownload()">
                 <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-1">
                     👁️ Live ID Preview
                 </h4>
@@ -297,19 +291,15 @@
                     <!-- FRONT SIDE -->
                     <div id="id-card-front"
                         class="w-full min-w-[340px] sm:max-w-[420px] aspect-[1.58/1] bg-white rounded-xl shadow-lg border border-slate-300 p-3 sm:p-4 flex flex-col justify-between relative overflow-hidden text-xs shrink-0">
-                        <!-- Card Header -->
                         <div class="flex justify-between items-center border-b pb-2">
                             <div class="font-bold text-[#0C2C6B] text-xs sm:text-sm">True Life Dayongan</div>
-                            <div
-                                class="text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 bg-blue-100 text-blue-800 rounded">
+                            <div class="text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 bg-blue-100 text-blue-800 rounded">
                                 PRIMARY MEMBER
                             </div>
                         </div>
 
-                        <!-- Card Body -->
                         <div class="flex gap-2 sm:gap-3 my-auto items-center">
-                            <div
-                                class="w-16 sm:w-20 h-20 sm:h-24 border border-slate-300 bg-slate-100 flex items-center justify-center text-slate-400 text-center text-[9px] shrink-0 overflow-hidden rounded">
+                            <div class="w-16 sm:w-20 h-20 sm:h-24 border border-slate-300 bg-slate-100 flex items-center justify-center text-slate-400 text-center text-[9px] shrink-0 overflow-hidden rounded">
                                 @if ($profilepic && is_object($profilepic))
                                     <img src="{{ $profilepic->temporaryUrl() }}" class="h-full w-full object-cover">
                                 @elseif ($profilePic && $profilePic !== 'images/profiles/default-avatar.png')
@@ -335,32 +325,25 @@
                             </div>
                         </div>
 
-                        <!-- Card Footer / Beneficiaries & Signature -->
                         <div class="border-t pt-1 flex justify-between items-end">
                             <div class="w-1/3">
-                                <p class="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase">BENEFICIARIES:
-                                </p>
+                                <p class="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase">BENEFICIARIES:</p>
                                 @forelse($beneficiaries->take(3) as $b)
-                                    <p class="text-[8px] sm:text-[9px] truncate text-slate-700">• {{ $b->fullname }}
-                                    </p>
+                                    <p class="text-[8px] sm:text-[9px] truncate text-slate-700">• {{ $b->fullname }}</p>
                                 @empty
                                     <p class="text-[8px] sm:text-[9px] text-slate-400">No beneficiaries added</p>
                                 @endforelse
                             </div>
 
-                            <!-- SIGNATURE DISPLAYED ON ID -->
                             <div class="flex flex-col items-center justify-end mx-1">
-                                <div
-                                    class="w-20 sm:w-24 h-7 sm:h-8 flex items-center justify-center border-b border-slate-400">
+                                <div class="w-20 sm:w-24 h-7 sm:h-8 flex items-center justify-center border-b border-slate-400">
                                     @if ($signature)
-                                        <img src="{{ asset('storage/' . $signature) }}"
-                                            class="max-h-6 sm:max-h-7 object-contain">
+                                        <img src="{{ asset('storage/' . $signature) }}" class="max-h-6 sm:max-h-7 object-contain">
                                     @else
                                         <span class="text-[7px] text-slate-400 italic">No Signature</span>
                                     @endif
                                 </div>
-                                <span
-                                    class="text-[5px] sm:text-[6px] text-slate-500 tracking-tighter mt-0.5">SIGNATURE</span>
+                                <span class="text-[5px] sm:text-[6px] text-slate-500 tracking-tighter mt-0.5">SIGNATURE</span>
                             </div>
 
                             <div class="w-8 h-8 sm:w-10 sm:h-10 [&>svg]:w-full [&>svg]:h-full shrink-0">
@@ -373,47 +356,36 @@
                     <div id="id-card-back"
                         class="hidden w-full min-w-[340px] sm:max-w-[420px] aspect-[1.58/1] bg-white rounded-xl shadow-lg border border-slate-300 p-3 sm:p-4 flex flex-col justify-between relative overflow-hidden text-[9px] sm:text-[10px] shrink-0">
                         <div>
-                            <h5
-                                class="text-center font-bold text-slate-900 tracking-wide text-[10px] sm:text-[11px] mb-1">
+                            <h5 class="text-center font-bold text-slate-900 tracking-wide text-[10px] sm:text-[11px] mb-1">
                                 TRUE LIFE DAYONGAN TERM AND TERMINATION
                             </h5>
-                            <p class="text-[7px] sm:text-[8px] font-semibold text-slate-700 mb-1">TRUE LIFE DAYONGAN
-                                may
-                                terminate this MEMBERSHIP, for the following grounds:</p>
+                            <p class="text-[7px] sm:text-[8px] font-semibold text-slate-700 mb-1">TRUE LIFE DAYONGAN may terminate this MEMBERSHIP, for the following grounds:</p>
                             <ul class="list-disc list-inside text-[7px] sm:text-[8px] text-slate-600 space-y-0.5">
                                 <li>Fraud or misrepresentation</li>
                                 <li>Misuse of True Life Dayongan name and materials</li>
                                 <li>Violation of company rules or applicable laws</li>
                             </ul>
-                            <p class="text-[6px] sm:text-[7px] text-slate-500 mt-1">Termination shall be without
-                                prejudice to any liabilities incurred prior to termination.</p>
+                            <p class="text-[6px] sm:text-[7px] text-slate-500 mt-1">Termination shall be without prejudice to any liabilities incurred prior to termination.</p>
                         </div>
 
                         <div class="border-t pt-1 mt-1 flex justify-between items-end">
                             <div class="w-3/5 space-y-0.5">
                                 <p class="font-bold text-[8px] sm:text-[9px] text-slate-800">IN CASE OF EMERGENCY:</p>
-                                <p class="truncate"><strong>NAME:</strong>
-                                    {{ strtoupper($emergencyName ?: '____________________') }}</p>
-                                <p class="truncate"><strong>ADDRESS:</strong>
-                                    {{ strtoupper($emergencyAddress ?: '____________________') }}</p>
-                                <p class="truncate"><strong>RELATIONSHIP:</strong>
-                                    {{ strtoupper($emergencyRelationship ?: '____________________') }}</p>
-                                <p class="truncate"><strong>CONTACT NO.:</strong>
-                                    {{ strtoupper($emergencyContactno ?: '____________________') }}</p>
+                                <p class="truncate"><strong>NAME:</strong> {{ strtoupper($emergencyName ?: '____________________') }}</p>
+                                <p class="truncate"><strong>ADDRESS:</strong> {{ strtoupper($emergencyAddress ?: '____________________') }}</p>
+                                <p class="truncate"><strong>RELATIONSHIP:</strong> {{ strtoupper($emergencyRelationship ?: '____________________') }}</p>
+                                <p class="truncate"><strong>CONTACT NO.:</strong> {{ strtoupper($emergencyContactno ?: '____________________') }}</p>
                             </div>
                             <div class="text-center w-2/5 flex flex-col items-center">
-                                <div class="font-serif italic text-xs sm:text-sm tracking-tighter text-slate-800">Sey
-                                </div>
+                                <div class="font-serif italic text-xs sm:text-sm tracking-tighter text-slate-800">Sey</div>
                                 <div class="w-full border-t border-slate-400 mt-0.5"></div>
-                                <p class="text-[6px] sm:text-[7px] font-bold text-slate-700 leading-none mt-0.5">
-                                    REYMARK P. BAUTISTA</p>
+                                <p class="text-[6px] sm:text-[7px] font-bold text-slate-700 leading-none mt-0.5">REYMARK P. BAUTISTA</p>
                                 <p class="text-[5px] sm:text-[6px] text-slate-500">GENERAL MANAGER</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Front/Back Toggle Buttons (Vanilla JS Handled) -->
                 <div class="flex gap-2 mt-4">
                     <button type="button" id="btn-front" onclick="switchIdTab('front')"
                         class="px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-[#0C2C6B] text-white">Front</button>
@@ -421,9 +393,8 @@
                         class="px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-slate-200 text-slate-700">Back</button>
                 </div>
 
-                <!-- Print / Download Trigger Actions -->
-                <div class="flex flex-col sm:flex-row gap-2 w-full mt-4" x-data="idPdfDownload()">
-                    <button type="button"
+                <div class="flex flex-col sm:flex-row gap-2 w-full mt-4">
+                    <button type="button" @click="downloadPdf"
                         class="flex-1 rounded-xl bg-slate-200 py-3 text-xs font-semibold cursor-pointer">
                         📥 Download ID (PDF)
                     </button>
@@ -433,14 +404,6 @@
                     </button>
                 </div>
             </div>
-            <div
-                class="flex justify-center sm:justify-end border-t border-slate-200 bg-slate-50 px-4 sm:px-6 py-4 sm:py-5">
-                <button type="submit" wire:loading.attr="disabled" wire:target="saveProfile"
-                    class="rounded-xl bg-[#0C2C6B] px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-[#071a42] disabled:opacity-60 w-full sm:w-auto cursor-pointer">
-                    <span wire:loading.remove wire:target="saveProfile">Save Personal Information</span>
-                    <span wire:loading wire:target="saveProfile">Saving...</span>
-                </button>
-            </div>
         </div>
     </div>
 </div>
@@ -448,7 +411,134 @@
 <!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+
+
 <script>
+ function profileForm(initialValues) {
+        return {
+            initial: initialValues,
+
+            async confirmSave() {
+                const current = {
+                    'First Name': await @this.get('firstname'),
+                    'Last Name': await @this.get('lastname'),
+                    'Middle Name': await @this.get('middlename'),
+                    'Birthdate': await @this.get('birthdate'),
+                    'Contact No': await @this.get('contactno'),
+                    'Address': await @this.get('address'),
+                    'Civil Status': await @this.get('civilStatus'),
+                    'Sex': await @this.get('sex'),
+                    'Emergency Name': await @this.get('emergencyName'),
+                    'Emergency Relationship': await @this.get('emergencyRelationship'),
+                    'Emergency Contact No': await @this.get('emergencyContactno'),
+                    'Emergency Address': await @this.get('emergencyAddress'),
+                };
+
+                const keysMap = {
+                    'First Name': 'firstname',
+                    'Last Name': 'lastname',
+                    'Middle Name': 'middlename',
+                    'Birthdate': 'birthdate',
+                    'Contact No': 'contactno',
+                    'Address': 'address',
+                    'Civil Status': 'civilStatus',
+                    'Sex': 'sex',
+                    'Emergency Name': 'emergencyName',
+                    'Emergency Relationship': 'emergencyRelationship',
+                    'Emergency Contact No': 'emergencyContactno',
+                    'Emergency Address': 'emergencyAddress',
+                };
+
+                let changes = [];
+                for (const [label, key] of Object.entries(keysMap)) {
+                    const oldVal = String(this.initial[key] || '').trim();
+                    const newVal = String(current[label] || '').trim();
+                    if (oldVal !== newVal) {
+                        changes.push(`<li><b>${label}:</b> "${oldVal || 'None'}" ➔ "${newVal || 'None'}"</li>`);
+                    }
+                }
+
+                // If NOTHING changed, show an info modal and STOP here
+                if (changes.length === 0) {
+                    Swal.fire({
+                        title: 'No Changes Detected',
+                        text: 'You haven’t modified any profile details.',
+                        icon: 'info',
+                        confirmButtonColor: '#0C2C6B',
+                        confirmButtonText: 'OK',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    });
+                    return; // Exit function so it doesn't try to save
+                }
+
+                // If changes WERE found, show confirmation modal
+                let htmlContent = `
+                    <div style="text-align: left; max-height: 220px; overflow-y: auto; font-size: 13px;" class="mt-2 space-y-1">
+                        <p class="font-semibold text-slate-800 mb-2">Detected Modifications (${changes.length}):</p>
+                        <ul style="list-style-type: disc; padding-left: 20px;" class="space-y-1 text-slate-600">
+                            ${changes.join('')}
+                        </ul>
+                    </div>
+                `;
+
+                Swal.fire({
+                    title: 'Confirm Profile Update',
+                    html: htmlContent,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0C2C6B',
+                    cancelButtonColor: '#D79B10',
+                    confirmButtonText: 'Yes, Save Changes',
+                    cancelButtonText: 'Cancel',
+                    width: '520px',
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        @this.call('saveProfile');
+                    }
+                });
+            }
+        }
+    }
+
+    document.addEventListener('livewire:initialized', () => {
+    // Listener for Profile Details Update
+    Livewire.on('profile-details-updated', () => {
+        Swal.fire({
+            title: 'Updated Successfully!',
+            text: 'Your personal and emergency contact information has been updated.',
+            icon: 'success',
+            confirmButtonColor: '#0C2C6B',
+            confirmButtonText: 'OK',
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.reload();
+            }
+        });
+    });
+
+    // Listener for Profile Picture Update (Add this block)
+    Livewire.on('picture-updated', () => {
+        Swal.fire({
+            title: 'Picture Updated!',
+            text: 'Your profile picture has been updated successfully.',
+            icon: 'success',
+            confirmButtonColor: '#0C2C6B',
+            confirmButtonText: 'OK',
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.reload();
+            }
+        });
+    });
+});
+
+
     function switchIdTab(target) {
         const frontEl = document.getElementById('id-card-front');
         const backEl = document.getElementById('id-card-back');
@@ -458,49 +548,33 @@
         if (target === 'front') {
             frontEl.classList.remove('hidden');
             backEl.classList.add('hidden');
-
-            btnFront.className =
-                "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-[#0C2C6B] text-white";
-
-            btnBack.className =
-                "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-slate-200 text-slate-700";
-
+            btnFront.className = "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-[#0C2C6B] text-white";
+            btnBack.className = "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-slate-200 text-slate-700";
         } else {
             backEl.classList.remove('hidden');
             frontEl.classList.add('hidden');
-
-            btnBack.className =
-                "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-[#0C2C6B] text-white";
-
-            btnFront.className =
-                "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-slate-200 text-slate-700";
+            btnBack.className = "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-[#0C2C6B] text-white";
+            btnFront.className = "px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-slate-200 text-slate-700";
         }
     }
-
 
     function signaturePadSetup() {
         return {
             pad: null,
-
             initPad() {
                 const canvas = this.$refs.signatureCanvas;
-
                 canvas.width = canvas.offsetWidth;
                 canvas.height = canvas.offsetHeight;
-
                 this.pad = new SignaturePad(canvas);
 
                 @if ($signature)
-                    // Use Storage::url() for consistency and reliability
                     this.pad.fromDataURL("{{ Storage::url($signature) }}");
                 @endif
             },
-
             clearPad() {
                 this.pad.clear();
                 @this.call('removeSignature');
             },
-
             savePad() {
                 if (this.pad.isEmpty()) {
                     Swal.fire({
@@ -532,20 +606,37 @@
         }
     }
 
+    function idPdfDownload() {
+        return {
+            downloadPdf() {
+                const front = document.getElementById('id-card-front');
+                const back = document.getElementById('id-card-back');
 
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.flexDirection = 'column';
+                container.style.gap = '20px';
+                container.style.alignItems = 'center';
 
-    document.addEventListener('livewire:init', () => {
+                const frontClone = front.cloneNode(true);
+                const backClone = back.cloneNode(true);
 
-        Livewire.on('signature-saved', () => {
+                frontClone.classList.remove('hidden');
+                backClone.classList.remove('hidden');
 
-            Swal.fire({
-                title: 'Saved!',
-                text: 'Your signature has been saved successfully.',
-                icon: 'success',
-                confirmButtonColor: '#0C2C6B'
-            });
+                container.appendChild(frontClone);
+                container.appendChild(backClone);
 
-        });
+                const opt = {
+                    margin:       10,
+                    filename:     'member-id-card.pdf',
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
 
-    });
+                html2pdf().from(container).set(opt).save();
+            }
+        }
+    }
 </script>

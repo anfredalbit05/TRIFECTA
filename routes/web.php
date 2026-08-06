@@ -14,56 +14,34 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\PolicyController;
 use App\Livewire\LoginModal;
 use App\Livewire\MemberPages\MyProfile\MyProfile;
-
 use Barryvdh\DomPDF\Facade\Pdf;
 
 /*
 |--------------------------------------------------------------------------
-| Public Pages
+| Public Pages (Protected by Maintenance Mode)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('inactive')->group(function () {
-
-Route::get('/about', About::class)->name('about');
-
-Route::get('/team', Team::class)->name('team');
-
-Route::get('/how-it-works', How::class)->name('how-it-works');
-
-Route::get('/testimonials', Testimonials::class)->name('testimonials');
-
-Route::get('/news', NewsUpdates::class)->name('news');
-
-Route::get('/contact', Contact::class)->name('contact');
-
-Route::get('/register/{referralCode}', function ($referralCode) {
-
-    return redirect()->route(
-        'home',
-        ['ref' => $referralCode]
-    );
-
-})->name('register.referral');
-
-
+Route::middleware(['maintenance'])->group(function () {
     Route::get('/', Home::class)->name('home');
+    Route::get('/about', About::class)->name('about');
+    Route::get('/team', Team::class)->name('team');
+    Route::get('/how-it-works', How::class)->name('how-it-works');
+    Route::get('/testimonials', Testimonials::class)->name('testimonials');
+    Route::get('/news', NewsUpdates::class)->name('news');
+    Route::get('/contact', Contact::class)->name('contact');
 });
 
-Route::get('secret-login', LoginModal::class)->name('login');
-
-
+Route::get('/register/{referralCode}', function ($referralCode) {
+    return redirect()->route('home', ['ref' => $referralCode]);
+})->name('register.referral');
 
 Route::get('/my-id-pdf', function () {
-
     $user = Auth::user();
-
     $pdf = Pdf::loadView('livewire.member-pages.my-profile.id-card-pdf-component', [
         'user' => $user,
     ]);
-
     return $pdf->download('id-card.pdf');
-
 })->middleware('auth');
 
 /*
@@ -73,13 +51,11 @@ Route::get('/my-id-pdf', function () {
 */
 
 Route::middleware(['auth'])->group(function () {
-
     Route::get('/dashboard', function () {
         if (Auth::user()->RoleID != 4) {
             return view('pages.admin-pages.dashboard');
         }
-
-    return view('pages.member-pages.dashboard');
+        return view('pages.member-pages.dashboard');
     })->name('dashboard');
 
     Route::get('/genealogy-tree', function () {
@@ -98,47 +74,30 @@ Route::middleware(['auth'])->group(function () {
         return view('pages.admin-pages.report-settings');
     })->name('report-settings');
 
-         Route::get('/certificate/download', [CertificateController::class, 'download'])
+    Route::get('/certificate/download', [CertificateController::class, 'download'])
         ->name('certificate.download');
 
-        Route::get(
-    '/policy/download',
-    [PolicyController::class, 'download']
-)->middleware('auth')
- ->name('policy.download');
+    Route::get('/policy/download', [PolicyController::class, 'download'])
+        ->name('policy.download');
 
+    Route::get('/my-profile', function () {
+        $currentUserId = Auth::id();
+        $activation = Activation::where('ProcessedBy', $currentUserId)
+            ->latest()
+            ->first();
+        $activationStatus = $activation?->status;
 
-Route::get('/my-profile', function () {
-
-    $currentUserId = Auth::id();
-
-    $activation = Activation::where('ProcessedBy', $currentUserId)
-        ->latest()
-        ->first();
-
-    $activationStatus = $activation?->status;
-
-    return view(
-        'pages.member-pages.my-profile',
-        compact('activationStatus')
-    );
-
-})->name('my-profile');
+        return view('pages.member-pages.my-profile', compact('activationStatus'));
+    })->name('my-profile');
 
     Route::post('/logout', function () {
-
         Auth::logout();
-
         request()->session()->invalidate();
-
         request()->session()->regenerateToken();
-
         return redirect()->route('home');
-
     })->name('logout');
-
 });
 
-
+Route::get('/secret-login', Home::class)->defaults('autoLogin', true)->name('secret.login');
 
 require __DIR__.'/settings.php';

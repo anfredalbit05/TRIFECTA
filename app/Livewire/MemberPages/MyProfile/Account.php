@@ -51,45 +51,73 @@ class Account extends Component
         );
     }
 
-    public function save(): void
-    {
-        /** @var User $user */
-        $user = Auth::user();
+ public function save(): void
+{
+    /** @var User $user */
+    $user = Auth::user();
 
-        $this->validate([
-            'username' => [
-                'required',
-                'string',
-                'max:50',
-                Rule::unique('users', 'username')->ignore($user->UserID, 'UserID'),
-            ],
-            'email' => [
-                'required',
-                'email',
-                Rule::unique('users', 'email')->ignore($user->UserID, 'UserID'),
-            ],
-            'status' => [
-                'required',
-                Rule::in(['Active', 'Inactive']),
-            ],
-        ]);
+    $this->validate([
+        'username' => [
+            'required',
+            'string',
+            'max:50',
+            Rule::unique('users', 'username')->ignore($user->UserID, 'UserID'),
+        ],
+        'email' => [
+            'required',
+            'email',
+            Rule::unique('users', 'email')->ignore($user->UserID, 'UserID'),
+        ],
+        'status' => [
+            'required',
+            Rule::in(['Active', 'Inactive']),
+        ],
+    ]);
 
-        $data = [
-            'username' => $this->username,
-            'email' => $this->email,
-        ];
+    // Track individual changes
+    $changes = [];
 
-        if ($user->RoleID != 4) {
-            $data['status'] = $this->status;
-        }
-
-        $user->update($data);
-
-        session()->flash(
-            'account-success',
-            'Account information updated successfully.'
-        );
+    if ($this->username !== $user->username) {
+        $changes[] = "<b>Username:</b> {$user->username} &rarr; {$this->username}";
     }
+
+    if ($this->email !== $user->email) {
+        $changes[] = "<b>Email:</b> {$user->email} &rarr; {$this->email}";
+    }
+
+    if ($user->RoleID != 4 && $this->status !== $user->status) {
+        $changes[] = "<b>Status:</b> {$user->status} &rarr; {$this->status}";
+    }
+
+    // If no changes exist, show info alert
+    if (empty($changes)) {
+        $this->js("Swal.fire({ title: 'No Changes Detected', text: 'You haven’t modified any account details.', icon: 'info', confirmButtonColor: '#0C2C6B' })");
+        return;
+    }
+
+    // Dispatch event with the list of changes
+    $this->dispatch('prompt-save-confirmation', changes: $changes);
+}
+
+public function executeSave(): void
+{
+    /** @var User $user */
+    $user = Auth::user();
+
+    $data = [
+        'username' => $this->username,
+        'email' => $this->email,
+    ];
+
+    if ($user->RoleID != 4) {
+        $data['status'] = $this->status;
+    }
+
+    $user->update($data);
+
+    $this->dispatch('account-updated');
+}
+
 
     public function downloadPdf()
     {

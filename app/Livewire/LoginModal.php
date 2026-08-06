@@ -116,4 +116,12 @@ class LoginModal extends Component
     {
         return view('livewire.login-modal');
     }
+
+    public function mount()
+    {
+        // Automatically open the login modal if the current request is the secret login route
+        if (request()->routeIs('secret.login') || request()->has('auto_login')) {
+            $this->openLogin = true;
+        }
+    }
 }

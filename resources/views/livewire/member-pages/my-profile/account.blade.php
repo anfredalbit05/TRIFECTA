@@ -1,4 +1,4 @@
-<div class="w-full space-y-8" x-data="{ copied: false }">
+<div class="w-full space-y-8" x-data="accountForm()">
 
     <!-- Header -->
     <div>
@@ -9,18 +9,6 @@
             Manage your username, email address, and account details.
         </p>
     </div>
-
-    <!-- Success Message -->
-    @if (session()->has('account-success'))
-        <div class="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-800">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            <p class="text-sm font-medium">
-                {{ session('account-success') }}
-            </p>
-        </div>
-    @endif
 
     <!-- Account Form Card -->
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -33,7 +21,8 @@
             </p>
         </div>
 
-        <form wire:submit="save">
+        <!-- Intercept submit with SweetAlert confirmation -->
+        <form @submit.prevent="confirmSave">
             <div class="grid gap-5 p-6 md:grid-cols-2">
                 <!-- Username -->
                 <div>
@@ -77,7 +66,7 @@
                     type="submit"
                     wire:loading.attr="disabled"
                     wire:target="save"
-                    class="rounded-xl bg-[#0C2C6B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#071a42] disabled:opacity-60">
+                    class="rounded-xl bg-[#0C2C6B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#071a42] disabled:opacity-60 cursor-pointer">
                     <span wire:loading.remove wire:target="save">
                         Save Account Information
                     </span>
@@ -111,7 +100,6 @@
                         <select
                             wire:model="status"
                             class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm">
-
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
                         </select>
@@ -207,7 +195,7 @@
     </div>
 
     <!-- Toast Notification Component -->
-<div
+    <div
         x-show="copied"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 -translate-y-4"
@@ -226,3 +214,57 @@
     </div>
 
 </div>
+
+<script>
+    function accountForm() {
+        return {
+            copied: false,
+            async confirmSave() {
+                @this.call('save');
+            }
+        }
+    }
+
+    document.addEventListener('livewire:initialized', () => {
+        // Receives the 'changes' array from backend and displays them in SweetAlert
+        Livewire.on('prompt-save-confirmation', (event) => {
+            // Livewire 3 passes parameters inside an array, handle both v2/v3 safely
+            const changes = Array.isArray(event) ? event[0] : event.changes;
+
+            const changesHtml = changes ? changes.join('<br>') : '';
+
+            Swal.fire({
+                title: 'Confirm Account Update',
+                html: `Are you sure you want to update these details?<br><br><div style="text-align: left; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px;">${changesHtml}</div>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0C2C6B',
+                cancelButtonColor: '#D79B10',
+                confirmButtonText: 'Yes, Save Changes',
+                cancelButtonText: 'Cancel',
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    @this.call('executeSave');
+                }
+            });
+        });
+
+        // Triggered when save is completed successfully
+        Livewire.on('account-updated', () => {
+            Swal.fire({
+                title: 'Account Updated!',
+                text: 'Your account information has been updated successfully.',
+                icon: 'success',
+                confirmButtonColor: '#0C2C6B',
+                confirmButtonText: 'OK',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.reload();
+                }
+            });
+        });
+    });
+</script>

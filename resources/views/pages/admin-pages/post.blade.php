@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="dashboard-container" x-data="{ tab: 'overview' }">
+<div class="dashboard-container"  x-data="{ tab: $persist('oveview').as('overview-tab') }">
 
     <!-- POST TOP NAVIGATION -->
     <nav class="dashboard-nav">

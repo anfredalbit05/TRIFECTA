@@ -147,7 +147,7 @@ class ActivationReviewModal extends Component
             foreach ($membershipFees as $fee) {
                 Ledger::create([
                     'RefID'        => $fee->FeeID,
-                    'amount'       => $fee->Cost,
+                    'amount'       => -$fee->Cost,
                     'Source'       => 'MF', // Membership Fee
                     'ActivationID' => $this->activation->ActivationID,
                     'status'       => 'Completed',
@@ -172,7 +172,7 @@ class ActivationReviewModal extends Component
 
                 Ledger::create([
                     'RefID'        => $this->referralUser->UserID,
-                    'amount'       => 50.00,
+                    'amount'       => -50.00,
                     'Source'       => 'PF',
                     'ActivationID' => $this->activation->ActivationID,
                     'status'       => 'Completed',
@@ -253,10 +253,12 @@ class ActivationReviewModal extends Component
                         'status'       => 'Active',
                     ]);
 
+                    $negativeCommission = -$commissionAmount;
+
                     // Create Ledger Entry for Upline Commission/Override
                     Ledger::create([
                         'RefID'        => $uplineUser->UserID,
-                        'amount'       => $commissionAmount,
+                        'amount'       => $negativeCommission,
                         'Source'       => $sourceType,
                         'ActivationID' => $this->activation->ActivationID,
                         'status'       => 'Completed',

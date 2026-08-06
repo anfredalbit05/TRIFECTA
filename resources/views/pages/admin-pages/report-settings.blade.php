@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="dashboard-container" x-data="{ tab: 'overview' }">
+<div class="dashboard-container"  x-data="{ tab: $persist('overview').as('report-settings-tab') }">
 
     <!-- REPORT & SETTINGS NAVIGATION -->
     <nav class="dashboard-nav">
@@ -71,13 +71,13 @@
             <x-admin-pages.report-settings.users-accounts />
         </div>
 
-        <!-- REPORTS -->
-        <div
-            x-show="tab === 'reports'"
-            x-cloak
-            class="dashboard-main-card full-width-card">
-            <x-admin-pages.report-settings.reports />
-        </div>
+    <!-- REPORTS -->
+<div
+    x-show="tab === 'reports'"
+    x-cloak
+    class="dashboard-main-card full-width-card">
+    <livewire:admin-pages.report-settings.reports />
+</div>
 
     </div>
 

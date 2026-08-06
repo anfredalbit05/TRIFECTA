@@ -21,14 +21,12 @@ class Security extends Component
             'currentPassword' => [
                 'required',
             ],
-
             'newPassword' => [
                 'required',
                 'string',
                 'min:8',
                 'different:currentPassword',
             ],
-
             'newPasswordConfirmation' => [
                 'required',
                 'same:newPassword',
@@ -52,6 +50,15 @@ class Security extends Component
             return;
         }
 
+        // If inputs & current password match, trigger confirmation prompt
+        $this->dispatch('prompt-password-confirmation');
+    }
+
+    public function executePasswordChange(): void
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
         $user->update([
             'password' => Hash::make(
                 $this->newPassword
@@ -64,10 +71,7 @@ class Security extends Component
             'newPasswordConfirmation',
         ]);
 
-        session()->flash(
-            'security-success',
-            'Password changed successfully.'
-        );
+        $this->dispatch('password-updated');
     }
 
     public function render()

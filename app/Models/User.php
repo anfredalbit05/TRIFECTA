@@ -55,6 +55,12 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
     'email',
     'policy_number',
 
+    // Emergency Contact Information (Added)
+    'emergencyName',
+    'emergencyRelationship',
+    'emergencyContactno',
+    'emergencyAddress',
+
     // Profile Picture
     'profilepic',
 
