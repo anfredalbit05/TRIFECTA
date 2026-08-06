@@ -105,6 +105,24 @@ class ActivationReviewModal extends Component
                 'status' => 'Approved',
             ]);
 
+          // Get the currently authenticated admin user
+            $admin = Auth::user();
+
+            // Build the full name, safely handling any nullable middle name
+            $adminName = trim(implode(' ', [
+                $admin->firstname ?? '',
+                $admin->middlename ?? '',
+                $admin->lastname ?? ''
+            ]));
+
+            // Log the approval history with the admin's full name
+            ActivationHistory::create([
+                'ActivationID' => $this->activation->ActivationID,
+                'AdminID' => Auth::id(),
+                'status' => 'Approved',
+                'remarks' => "Activation approved by {$adminName}.",
+            ]);
+
             // Get CC Admins
             $adminEmails = User::join('roles', 'users.RoleID', '=', 'roles.RoleID')
                 ->whereIn('roles.rolename', ['Super Administrator', 'Administrator'])
