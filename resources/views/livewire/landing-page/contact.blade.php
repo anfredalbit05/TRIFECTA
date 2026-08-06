@@ -326,7 +326,7 @@
 
                     <!-- Submit Button -->
                     <div>
-                        <button type="submit" class="contact-form-submit-btn">
+                        <button type="submit" class="contact-form-submit-btn cursor-pointer">
                             <span wire:loading.remove>Submit Inquiry</span>
                             <span wire:loading>Submitting...</span>
                         </button>
