@@ -1,81 +1,62 @@
-<div class="masterlist-overview w-full px-4 sm:px-6 lg:px-8 py-6">
+<div class="space-y-6">
 
-    <!-- HEADER WITH REFRESH BUTTON -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
+    <!-- HEADER WITH CONTROLS -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h2 class="masterlist-title text-2xl font-bold text-gray-800">
-                Dashboard
+            <h2 class="text-xl sm:text-2xl font-bold text-[#0C2C6B]">
+                Dashboard Overview
             </h2>
-            <p class="masterlist-description text-gray-500">
-                Masterlist overview information.
+            <p class="text-xs sm:text-sm text-slate-500">
+                Masterlist overview information, regional distributions, and system statistics.
             </p>
         </div>
 
         <!-- REFRESH BUTTON -->
         <button wire:click="refreshDashboard" wire:loading.attr="disabled" title="Refresh Dashboard"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer self-start sm:self-auto">
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer self-start sm:self-auto">
             <span wire:loading.remove wire:target="refreshDashboard">🔄</span>
             <span wire:loading wire:target="refreshDashboard" class="animate-spin">⏳</span>
             <span>Refresh</span>
         </button>
     </div>
 
-    <!-- SUMMARY GRID -->
-    <div class="master-summary-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
+    <!-- KPI CARDS -->
+    @php
+        $cards = [
+            ['Total Members', $totalMembers, '👥', 'bg-blue-600'],
+            ['Active Branches', $activeBranches, '🏢', 'bg-purple-600'],
+            ['Benefits', $totalBenefits, '🎁', 'bg-pink-600'],
+            ['Inquiries', $totalInquiries, '📩', 'bg-red-600'],
+        ];
+    @endphp
 
-        <!-- Total Members Card -->
-        <div class="master-summary-card bg-white p-6 rounded-xl shadow-md border border-gray-100 flex flex-col justify-between">
-            <h3 class="text-sm font-semibold tracking-wide text-gray-500 uppercase">
-                Total Members
-            </h3>
-            <p class="text-3xl font-extrabold text-[#0C2C6B] mt-2">
-                {{ $totalMembers }}
-            </p>
-        </div>
-
-        <!-- Active Branches Card -->
-        <div class="master-summary-card bg-white p-6 rounded-xl shadow-md border border-gray-100 flex flex-col justify-between">
-            <h3 class="text-sm font-semibold tracking-wide text-gray-500 uppercase">
-                Active Branches
-            </h3>
-            <p class="text-3xl font-extrabold text-[#0C2C6B] mt-2">
-                {{ $activeBranches }}
-            </p>
-        </div>
-
-        <!-- Benefits Card -->
-        <div class="master-summary-card bg-white p-6 rounded-xl shadow-md border border-gray-100 flex flex-col justify-between">
-            <h3 class="text-sm font-semibold tracking-wide text-gray-500 uppercase">
-                Benefits
-            </h3>
-            <p class="text-3xl font-extrabold text-[#0C2C6B] mt-2">
-                {{ $totalBenefits }}
-            </p>
-        </div>
-
-        <!-- Inquiries Card -->
-        <div class="master-summary-card bg-white p-6 rounded-xl shadow-md border border-gray-100 flex flex-col justify-between">
-            <h3 class="text-sm font-semibold tracking-wide text-gray-500 uppercase">
-                Inquiries
-            </h3>
-            <p class="text-3xl font-extrabold text-[#0C2C6B] mt-2">
-                {{ $totalInquiries }}
-            </p>
-        </div>
-
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        @foreach ($cards as $card)
+            <div class="rounded-xl text-white p-4 sm:p-5 shadow-lg transition-transform hover:-translate-y-1 {{ $card[3] }}">
+                <div class="text-2xl sm:text-3xl mb-2">
+                    {{ $card[2] }}
+                </div>
+                <p class="text-[10px] sm:text-xs uppercase tracking-wider opacity-80 font-medium">
+                    {{ $card[0] }}
+                </p>
+                <h3 class="text-xl sm:text-2xl font-bold mt-1">
+                    {{ number_format($card[1]) }}
+                </h3>
+            </div>
+        @endforeach
     </div>
 
-    {{-- <!-- SUMMARY STATISTICS & EXCEL EXPORT / PRINT FILTERS -->
-    <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm mb-6">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-100">
+    <!-- SUMMARY STATISTICS & EXCEL EXPORT / PRINT SECTION -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-6">
+        <!-- Top Filter Bar -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
-                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Summary Overview</h3>
-                <p class="text-xs text-slate-500">Filter stats overview or select specific options below to export and print reports.</p>
+                <h3 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider">Summary Overview of Members</h3>
+                <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">Filter stats overview or select specific options below to export and print reports.</p>
             </div>
-
-            <div class="flex items-center gap-3">
-                <!-- TIME FRAME FILTER -->
-                <select wire:model.live="summaryFilter" class="text-xs border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-slate-50 font-semibold text-slate-700">
+            <div class="w-full sm:w-auto">
+                <select wire:model.live="summaryFilter"
+                    class="w-full sm:w-auto text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-slate-50 font-semibold text-slate-700 shadow-sm cursor-pointer">
                     <option value="all">Overview: All Time</option>
                     <option value="year">Overview: This Year</option>
                     <option value="month">Overview: This Month</option>
@@ -85,29 +66,28 @@
             </div>
         </div>
 
-        <!-- CARDS GRID -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <div class="bg-slate-50 rounded-lg p-3 border border-slate-100">
-                <p class="text-xs font-medium text-slate-500">Total Members</p>
-                <p class="text-xl font-bold text-slate-800 mt-1">{{ $this->summaryStats['total'] }}</p>
+        <!-- STATS CARDS GRID -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 flex flex-col justify-between">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Members</p>
+                <p class="text-xl sm:text-2xl font-bold text-slate-800 mt-2">{{ number_format($this->summaryStats['total']) }}</p>
             </div>
-            <div class="bg-blue-50/50 rounded-lg p-3 border border-blue-100">
-                <p class="text-xs font-medium text-blue-600">Active Members</p>
-                <p class="text-xl font-bold text-[#0C2C6B] mt-1">{{ $this->summaryStats['active'] }}</p>
+            <div class="bg-blue-50/50 rounded-xl p-4 border border-blue-100 flex flex-col justify-between">
+                <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider">Active Members</p>
+                <p class="text-xl sm:text-2xl font-bold text-[#0C2C6B] mt-2">{{ number_format($this->summaryStats['active']) }}</p>
             </div>
-            <div class="bg-slate-100 rounded-lg p-3 border border-slate-200">
-                <p class="text-xs font-medium text-slate-600">Inactive Members</p>
-                <p class="text-xl font-bold text-slate-700 mt-1">{{ $this->summaryStats['inactive'] }}</p>
+            <div class="bg-slate-100/70 rounded-xl p-4 border border-slate-200 flex flex-col justify-between">
+                <p class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Inactive Members</p>
+                <p class="text-xl sm:text-2xl font-bold text-slate-700 mt-2">{{ number_format($this->summaryStats['inactive']) }}</p>
             </div>
         </div>
 
-        <!-- EXCEL EXPORT & PRINT BAR WITH ICON BUTTONS -->
-        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                <span class="text-xs font-bold text-slate-700">Report Filters:</span>
-
-                <!-- YEAR SELECTOR (2020 to Current Year 2026) -->
-                <select wire:model.live="exportYear" class="text-xs border border-slate-200 rounded-lg px-2.5 py-2 bg-white font-medium text-slate-700 shadow-sm">
+        <!-- REPORT FILTERS & EXPORT TOOLBAR -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full lg:w-auto">
+                <!-- YEAR SELECTOR -->
+                <select wire:model.live="exportYear"
+                    class="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white font-medium text-slate-700 shadow-sm cursor-pointer">
                     <option value="">All Years</option>
                     @for ($year = 2020; $year <= date('Y'); $year++)
                         <option value="{{ $year }}">{{ $year }}</option>
@@ -115,7 +95,8 @@
                 </select>
 
                 <!-- MONTH SELECTOR -->
-                <select wire:model.live="exportMonth" class="text-xs border border-slate-200 rounded-lg px-2.5 py-2 bg-white font-medium text-slate-700 shadow-sm">
+                <select wire:model.live="exportMonth"
+                    class="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white font-medium text-slate-700 shadow-sm cursor-pointer">
                     <option value="">All Months</option>
                     <option value="1">January</option>
                     <option value="2">February</option>
@@ -132,121 +113,155 @@
                 </select>
 
                 <!-- STATUS SELECTOR -->
-                <select wire:model.live="exportStatus" class="text-xs border border-slate-200 rounded-lg px-2.5 py-2 bg-white font-medium text-slate-700 shadow-sm">
+                <select wire:model.live="exportStatus"
+                    class="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white font-medium text-slate-700 shadow-sm cursor-pointer">
                     <option value="">All Statuses</option>
                     <option value="Active">Active Only</option>
                     <option value="Inactive">Inactive Only</option>
                 </select>
             </div>
 
-            <!-- ICON BUTTONS CONTAINER -->
-            <div class="flex items-center gap-2 w-full md:w-auto justify-end">
-
-                <!-- EXCEL EXPORT ICON BUTTON -->
+            <!-- ACTION BUTTONS -->
+            <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
+                <!-- EXCEL EXPORT BUTTON -->
                 <button wire:click="exportExcel" wire:loading.attr="disabled" title="Export to Excel (.xls)"
-                    class="w-10 h-10 inline-flex items-center justify-center bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-emerald-600 rounded-xl shadow-sm transition cursor-pointer">
+                    class="flex-1 sm:flex-none h-10 px-4 inline-flex items-center justify-center gap-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-emerald-600 rounded-xl shadow-sm transition text-xs font-semibold cursor-pointer">
                     <span wire:loading.remove wire:target="exportExcel" class="text-base">📥</span>
                     <span wire:loading wire:target="exportExcel" class="animate-spin text-xs">⏳</span>
+                    <span>Export Excel</span>
                 </button>
-
-                <!-- PRINT ICON BUTTON -->
+                <!-- PRINT REPORT BUTTON -->
                 <button onclick="window.print()" title="Print Report"
-                    class="w-10 h-10 inline-flex items-center justify-center bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-blue-600 rounded-xl shadow-sm transition cursor-pointer">
+                    class="flex-1 sm:flex-none h-10 px-4 inline-flex items-center justify-center gap-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-blue-600 rounded-xl shadow-sm transition text-xs font-semibold cursor-pointer">
                     <span class="text-base">🖨️</span>
+                    <span>Print Report</span>
                 </button>
-
             </div>
         </div>
-    </div> --}}
+    </div>
 
     <!-- MAP CONTAINER -->
-    <div class="mt-8 bg-white p-6 rounded-xl shadow-md border border-gray-100">
-        <h3 class="text-lg font-bold text-gray-800 mb-4">
+    <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
+        <h3 class="font-bold text-[#0C2C6B] text-base sm:text-lg mb-4">
             Member Locations
         </h3>
-        <div id="users-map" class="w-full h-[500px] rounded-xl"></div>
+        <div id="users-map" class="w-full h-[350px] sm:h-[450px] lg:h-[500px] rounded-xl border border-slate-200"></div>
     </div>
 
-
-    <!-- PRINT STYLING & HEADERS -->
-<div id="printable-report" class="hidden print:block font-sans mb-6">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <p style="margin: 0; font-size: 12px;">Republic of the Philippines</p>
-        <p style="margin: 0; font-size: 14px; font-weight: bold;">Provincial Government of Davao del Norte</p>
-        <p style="margin: 0; font-size: 11px; color: #555;">Government Center, Mankilam, Tagum City</p>
-        <h2 style="margin: 15px 0 5px 0; font-size: 16px; font-weight: bold; text-transform: uppercase;">LIST OF MEMBERS</h2>
-        <p style="margin: 0; font-size: 10px; color: #777;">Generated on: {{ now()->format('F d, Y h:i A') }}</p>
+    <!-- PRINTABLE REPORT TEMPLATE & TABLE (Hidden on screen, visible only when printing) -->
+    <div id="printable-report" class="hidden print:block font-sans mb-4">
+        <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#1b365d]">
+            <h1 class="m-0 text-2xl font-bold text-[#1b365d] font-serif">TRUE LIFE DAYONGAN</h1>
+            <p class="my-1 text-[11px] font-bold text-[#c5a059] uppercase tracking-wider">&mdash; S O L I D A R I T A S &mdash;</p>
+            <p class="my-0.5 text-[8px] text-[#1b365d] uppercase tracking-wider">&mdash; Vitae Auxilium &mdash;</p>
+            <h2 class="mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold">LIST OF MEMBERS</h2>
+        </div>
     </div>
+
+    <div class="member-table hidden print:block overflow-x-auto">
+        <table class="w-full border-collapse font-sans text-[10px]">
+            <thead>
+                <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[22px]">
+                    <th class="border border-slate-900 p-1">#</th>
+                    <th class="border border-slate-900 p-1">Full Name</th>
+                    <th class="border border-slate-900 p-1">Birthdate</th>
+                    <th class="border border-slate-900 p-1">Gender</th>
+                    <th class="border border-slate-900 p-1">Civil Status</th>
+                    <th class="border border-slate-900 p-1">Contact Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($printMembers as $index => $member)
+                    @php
+                        $fullName = trim(
+                            ($member->lastname ?? '') .
+                                ', ' .
+                                ($member->firstname ?? '') .
+                                ' ' .
+                                ($member->middlename ?? ''),
+                        );
+                        $birthdateFormatted = $member->birthdate ? date('F d, Y', strtotime($member->birthdate)) : '-';
+                    @endphp
+                    <tr>
+                        <td class="border border-slate-900 p-1 text-center">{{ $index + 1 }}</td>
+                        <td class="border border-slate-900 p-1 font-bold">{{ $fullName }}</td>
+                        <td class="border border-slate-900 p-1 text-center">{{ $birthdateFormatted }}</td>
+                        <td class="border border-slate-900 p-1 text-center">{{ $member->gender ?? '-' }}</td>
+                        <td class="border border-slate-900 p-1 text-center">{{ $member->civilstatus ?? '-' }}</td>
+                        <td class="border border-slate-900 p-1 text-center">{{ $member->contactno ?? '-' }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="border border-slate-900 p-2.5 text-center">No members found for the selected filters.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <style>
+        @media print {
+            @page {
+                size: auto;
+                margin: 8mm;
+            }
+
+            body * {
+                visibility: hidden !important;
+            }
+
+            #printable-report,
+            #printable-report *,
+            .member-table,
+            .member-table * {
+                visibility: visible !important;
+            }
+
+            #printable-report {
+                display: block !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+            }
+
+            .member-table {
+                display: block !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 110px !important;
+                width: 100% !important;
+            }
+
+            table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+            }
+
+            th,
+            td {
+                border: 1px solid #000 !important;
+                padding: 4px !important;
+            }
+
+            th {
+                background-color: #0C2C6B !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
 </div>
 
-<style>
-    @media print {
-        @page {
-            size: auto;
-            margin: 0; /* Setting margins to zero forces browsers to hide headers and footers */
-        }
-
-        body * {
-            visibility: hidden;
-        }
-        #printable-report, #printable-report *,
-        .member-table, .member-table * {
-            visibility: visible;
-        }
-        #printable-report {
-            display: block !important;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-        }
-        .member-table {
-            position: absolute;
-            top: 120px;
-            left: 0;
-            width: 100%;
-            border: none !important;
-            box-shadow: none !important;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1.5px solid #000 !important;
-            padding: 6px !important;
-            font-size: 11px;
-        }
-        th {
-            background-color: #0C2C6B !important;
-            color: white !important;
-            -webkit-print-color-adjust: exact;
-        }
-        /* Hide UI components like filters, search boxes, and actions column when printing */
-        .members-container > div:not(.member-table),
-        .members-header,
-        .members-description,
-        .relative.max-w-sm,
-        button,
-        td:last-child,
-        th:last-child {
-            display: none !important;
-        }
-    }
-</style>
-
-</div>
-
-
-
+<!-- MAP INITIALIZATION SCRIPT -->
 <script>
-    let myMap = null; // Store map instance globally within script scope
+    let myMap = null;
 
     function initMap() {
         const mapContainer = document.getElementById('users-map');
         if (!mapContainer) return;
 
-        // If a map instance already exists on this container, remove it properly
         if (myMap !== null) {
             myMap.remove();
             myMap = null;
@@ -280,9 +295,9 @@
                     }).addTo(myMap);
 
                     marker.bindPopup(`
-                        <div>
-                            Name:<strong> ${user.FirstName} ${user.LastName}</strong> <br>
-                            Address:<strong> ${user.address}</strong><br>
+                        <div style="font-size: 12px; line-height: 1.4;">
+                            Name: <strong>${user.FirstName} ${user.LastName}</strong><br>
+                            Address: <strong>${user.address}</strong>
                         </div>
                     `);
 
@@ -298,13 +313,14 @@
         }, 100);
     }
 
-    // Initialize map on initial page load
     document.addEventListener('DOMContentLoaded', initMap);
 
-    // Re-initialize map whenever Livewire finishes updating/refreshing the component
     document.addEventListener('livewire:initialized', () => {
         initMap();
-        Livewire.hook('morph.updated', ({ el, component }) => {
+        Livewire.hook('morph.updated', ({
+            el,
+            component
+        }) => {
             if (document.getElementById('users-map')) {
                 initMap();
             }
