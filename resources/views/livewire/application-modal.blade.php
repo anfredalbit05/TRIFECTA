@@ -737,7 +737,7 @@
     <!-- Leaflet Control Geocoder JS -->
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script>
-        let map = null;
+    let map = null;
 let marker = null;
 
 document.addEventListener('livewire:initialized', () => {
@@ -778,7 +778,7 @@ document.addEventListener('livewire:initialized', () => {
                 map.setView([lat, lng], 16);
             }
 
-            // Reusable search function for both Enter key and Button click
+            // Search input and button elements
             const searchInput = document.getElementById('leaflet-search-input');
             const searchBtn = document.getElementById('leaflet-search-btn');
 
@@ -802,11 +802,10 @@ document.addEventListener('livewire:initialized', () => {
                                 marker = L.marker(center).addTo(map);
                             }
 
-                            // Dispatch to Livewire with coordinates and address
+                            // Dispatches ONLY coordinates so the address text input remains untouched
                             Livewire.dispatch('set-coordinates', {
                                 lat: r.lat,
-                                lng: r.lon,
-                                address: r.display_name
+                                lng: r.lon
                             });
                         } else {
                             alert('Location not found.');
@@ -826,14 +825,14 @@ document.addEventListener('livewire:initialized', () => {
             }
 
             if (searchBtn) {
-                // Trigger via Button click (Ideal for mobile users)
+                // Trigger via Button click
                 searchBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     performSearch();
                 });
             }
 
-            // Map Click Event
+            // Map Click Event (Moves pin and updates coordinates only)
             map.on('click', function(e) {
                 if (marker) {
                     marker.setLatLng(e.latlng);
@@ -855,7 +854,6 @@ document.addEventListener('livewire:initialized', () => {
     });
 
 });
-
         document.addEventListener('livewire:init', () => {
 
             // VALIDATION ERROR ALERT

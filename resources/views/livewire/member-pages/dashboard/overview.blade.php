@@ -30,7 +30,7 @@
             <hr>
 
             <div class="wallet-block">
-                <span class="wallet-label">Fidelity Wallet</span>
+                <span class="wallet-label">Provident Fund</span>
                 <h2 class="wallet-value">₱100.00</h2>
             </div>
 
