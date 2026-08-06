@@ -276,7 +276,7 @@
                         <button
                             wire:click="closeModal"
                             type="button"
-                            class="w-full sm:w-auto px-5 py-2.5 border border-slate-300 rounded-xl text-slate-600 text-xs font-bold hover:bg-slate-100 transition">
+                            class="w-full sm:w-auto px-5 py-2.5 border0 bg-[#D79B10] text-white rounded-xl shadow-md transition cursor-pointer">
                             Cancel
                         </button>
 
@@ -285,7 +285,7 @@
                             type="button"
                             wire:click="confirmActivate"
                             wire:loading.attr="disabled"
-                            class="w-full sm:w-auto px-6 py-2.5 bg-[#D4A017] hover:bg-[#E8B923] text-[#0B2A5B] font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center">
+                            class="w-full sm:w-auto px-6 py-2.5 bg-[#0B2A5B] hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center cursor-pointer">
                             <span wire:loading.remove wire:target="confirmActivate">
                                 {{ $isReactivation ? 'Reactivate Account' : 'Activate Account' }}
                             </span>

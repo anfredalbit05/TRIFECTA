@@ -147,7 +147,7 @@ class ActivationReviewModal extends Component
             foreach ($membershipFees as $fee) {
                 Ledger::create([
                     'RefID'        => $fee->FeeID,
-                    'amount'       => -$fee->Cost,
+                    'amount'       => $fee->Cost,
                     'Source'       => 'MF', // Membership Fee
                     'ActivationID' => $this->activation->ActivationID,
                     'status'       => 'Completed',

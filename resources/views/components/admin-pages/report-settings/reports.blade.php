@@ -53,7 +53,7 @@
                         </td>
 
                         <td class="py-4 px-4 font-semibold text-slate-900">
-                            <span class="px-2.5 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-800">
+                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-[#0C2C6B]/10 text-[#0C2C6B] border border-[#0C2C6B]/30">
                                 {{ $ledger->Source }}
                             </span>
                         </td>
@@ -66,13 +66,13 @@
                             {{ $ledger->RefID ?? 'N/A' }}
                         </td>
 
-                        <td class="py-4 px-4 font-semibold {{ $ledger->amount < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
+                        <td class="py-4 px-4 font-semibold {{ $ledger->amount < 0 ? 'text-[#D79B10]' : 'text-emerald-600' }}">
                             {{ number_format($ledger->amount, 2) }}
                         </td>
 
                         <td class="py-4 px-4">
                             <span class="px-2.5 py-1 text-xs font-semibold rounded-full
-                                {{ $ledger->status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                                {{ $ledger->status === 'Completed' ? 'bg-[#0C2C6B]/10 text-[#0C2C6B] border border-[#0C2C6B]/30' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
                                 {{ $ledger->status }}
                             </span>
                         </td>

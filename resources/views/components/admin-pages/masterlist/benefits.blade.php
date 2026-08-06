@@ -1,23 +1,23 @@
 <div class="benefits-container w-full px-4 sm:px-6 lg:px-8 py-6">
 
-    <!-- HEADER -->
-    <div class="members-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
-        <h2 class="masterlist-title text-2xl font-bold text-slate-800">
-            Benefits
-        </h2>
+    <!-- HEADER & BENEFIT TOGGLE BUTTON -->
+    <div class="members-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+            <h2 class="masterlist-title text-2xl font-bold text-slate-800">Benefits</h2>
+            <p class="masterlist-description text-sm text-slate-500 mt-0.5">Available member incentives and rewards.</p>
+        </div>
 
-        @if($this->canCreate)
+        @if ($this->canCreate)
             <button
+                type="button"
                 wire:click="openCreateModal"
-                class="masterlist-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-sm font-semibold shadow transition cursor-pointer">
+                class="masterlist-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer shadow bg-[#0C2C6B] text-white hover:bg-[#09204f] w-full sm:w-auto"
+            >
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Add Benefit
             </button>
         @endif
     </div>
-
-    <p class="masterlist-description text-sm text-slate-500 mb-6">
-        Available member incentives and rewards.
-    </p>
 
     <!-- Success Message Notification -->
     @if (session()->has('message'))
@@ -35,9 +35,10 @@
             </span>
             <input
                 type="text"
-                wire:model.live="search"
+                wire:model.live.debounce.300ms="search"
                 placeholder="Search benefits..."
-                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
+                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm"
+            >
         </div>
 
         <!-- REFRESH BUTTON -->
@@ -45,7 +46,8 @@
             wire:click="resetTable"
             wire:loading.attr="disabled"
             title="Refresh Table"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
+            class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer"
+        >
             <span wire:loading.remove wire:target="resetTable">🔄</span>
             <span wire:loading wire:target="resetTable" class="animate-spin">⏳</span>
             <span class="hidden sm:inline">Refresh</span>

@@ -17,6 +17,9 @@ class GeneralSettings extends Component
     public $isOpen = false;
     public $setting_id;
 
+    // Search Property
+    public string $search = '';
+
     // Form fields
     public $name;
     public $value;
@@ -25,6 +28,17 @@ class GeneralSettings extends Component
         'name' => 'required|string|max:100',
         'value' => 'nullable|string',
     ];
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function resetTable(): void
+    {
+        $this->search = '';
+        $this->resetPage();
+    }
 
     // Helper to check permissions dynamically
     protected function hasPermission($action)
@@ -236,8 +250,19 @@ class GeneralSettings extends Component
 
     public function render()
     {
+        $settings = Setting::query()
+            ->when(filled($this->search), function ($query) {
+                $search = trim($this->search);
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('value', 'like', "%{$search}%");
+                });
+            })
+            ->latest('SettingsID')
+            ->paginate(10);
+
         return view('components.admin-pages.report-settings.general', [
-            'settings' => Setting::latest('SettingsID')->paginate(10)
+            'settings' => $settings
         ]);
     }
 }

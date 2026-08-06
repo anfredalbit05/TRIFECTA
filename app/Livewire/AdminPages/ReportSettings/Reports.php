@@ -37,7 +37,7 @@ class Reports extends Component
                         ->orWhere('RefID', 'like', "%{$search}%");
                 });
             })
-            ->latest('LedgerID')
+            ->latest('TransactionID')
             ->paginate(10);
 
         return view('components.admin-pages.report-settings.reports', [

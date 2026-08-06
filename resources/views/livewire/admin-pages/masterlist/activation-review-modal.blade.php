@@ -332,7 +332,7 @@
                             wire:loading.attr="disabled"
                             wire:target="rejectActivation"
                             onclick="confirmReject()"
-                            class="rounded-xl bg-red-500 px-6 py-2.5 text-xs font-bold text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+                            class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
                         >
                             <span wire:loading.remove wire:target="rejectActivation">
                                 Reject
@@ -348,7 +348,7 @@
                             wire:loading.attr="disabled"
                             wire:target="approve"
                             onclick="confirmApprove()"
-                            class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
+                            class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
                         >
                             <span wire:loading.remove wire:target="approve">
                                 Approve Activation
@@ -378,11 +378,11 @@
                     rows: 5
                 },
                 showCancelButton: true,
-                confirmButtonText: 'Reject',
                 cancelButtonText: 'Cancel',
-                confirmButtonColor: '#dc2626',
-                cancelButtonColor: '#64748b',
-                reverseButtons: true,
+                confirmButtonText: 'Reject',
+                cancelButtonColor: '#D79B10',
+                confirmButtonColor: '#0B2A5B',
+                reverseButtons: false,
                 inputValidator: (value) => {
                     if (!value || value.trim() === '') {
                         return 'Remarks are required.';
@@ -416,8 +416,7 @@
                 confirmButtonText: 'Approve',
                 cancelButtonText: 'Cancel',
                 confirmButtonColor: '#0B2A5B',
-                cancelButtonColor: '#64748b',
-                reverseButtons: true,
+                cancelButtonColor: '#D79B10',
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({

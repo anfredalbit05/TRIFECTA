@@ -46,6 +46,7 @@
             <span class="hidden sm:inline">Refresh</span>
         </button>
     </div>
+
     <!-- SUCCESS NOTIFICATION -->
     @if(session()->has('success'))
         <div class="flex items-center gap-3 p-4 mb-6 text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl shadow-sm">
