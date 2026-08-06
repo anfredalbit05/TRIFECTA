@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+
 
 
 class Members extends Component
@@ -84,110 +84,7 @@ class Members extends Component
         return $this->hasPermission('delete'); // checks can_delete
     }
 
-    public function getSummaryStatsProperty(): array
-    {
-        $query = User::query()->where('RoleID', 4);
 
-        if ($this->summaryFilter === 'today') {
-            $query->whereDate('created_at', today());
-        } elseif ($this->summaryFilter === 'week') {
-            $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
-        } elseif ($this->summaryFilter === 'month') {
-            $query->whereMonth('created_at', now()->month)
-                  ->whereYear('created_at', now()->year);
-        } elseif ($this->summaryFilter === 'year') {
-            $query->whereYear('created_at', now()->year);
-        }
-
-        $total = (clone $query)->count();
-        $active = (clone $query)->whereRaw('LOWER(status) = ?', ['active'])->count();
-        $inactive = (clone $query)->whereRaw('LOWER(status) != ?', ['active'])->count();
-
-        return [
-            'total' => $total,
-            'active' => $active,
-            'inactive' => $inactive,
-        ];
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Export to Excel CSV Method
-    |--------------------------------------------------------------------------
-    */
-    public function exportExcel(): StreamedResponse
-    {
-        $query = User::query()->where('RoleID', 4);
-
-        // Filter by Year if selected
-        if (!empty($this->exportYear)) {
-            $query->whereYear('created_at', $this->exportYear);
-        }
-
-        // Filter by Month if selected
-        if (!empty($this->exportMonth)) {
-            $query->whereMonth('created_at', $this->exportMonth);
-        }
-
-        // Filter by Status if selected
-        if (!empty($this->exportStatus)) {
-            if (strtolower($this->exportStatus) === 'active') {
-                $query->whereRaw('LOWER(status) = ?', ['active']);
-            } else {
-                $query->whereRaw('LOWER(status) != ?', ['active']);
-            }
-        }
-
-        $members = $query->latest()->get();
-
-        $fileName = 'members_report_' . date('Y-m-d_H-i-s') . '.xls';
-
-        $headers = [
-            'Content-Type' => 'application/vnd.ms-excel',
-            'Content-Disposition' => "attachment; filename=\"$fileName\"",
-        ];
-
-        return response()->stream(function () use ($members) {
-            echo '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
-            echo '<head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head>';
-            echo '<body>';
-            echo '<table border="1">';
-
-            // Header Row Style
-            echo '<tr style="background-color: #0C2C6B; color: #FFFFFF; font-weight: bold;">';
-            echo '<th>ID</th>';
-            echo '<th>First Name</th>';
-            echo '<th>Middle Name</th>';
-            echo '<th>Last Name</th>';
-            echo '<th>Username</th>';
-            echo '<th>Contact Number</th>';
-            echo '<th>Gender</th>';
-            echo '<th>Birthdate</th>';
-            echo '<th>Status</th>';
-            echo '<th>Date Registered</th>';
-            echo '</tr>';
-
-            // Data Rows
-            foreach ($members as $member) {
-                echo '<tr>';
-                echo '<td>' . htmlspecialchars($member->UserID) . '</td>';
-                echo '<td>' . htmlspecialchars($member->firstname) . '</td>';
-                echo '<td>' . htmlspecialchars($member->middlename) . '</td>';
-                echo '<td>' . htmlspecialchars($member->lastname) . '</td>';
-                echo '<td>' . htmlspecialchars($member->username) . '</td>';
-                echo '<td>' . htmlspecialchars($member->contactno) . '</td>';
-                echo '<td>' . htmlspecialchars($member->gender) . '</td>';
-                echo '<td>' . htmlspecialchars($member->birthdate) . '</td>';
-                echo '<td>' . htmlspecialchars($member->status) . '</td>';
-                echo '<td>' . htmlspecialchars($member->created_at) . '</td>';
-                echo '</tr>';
-            }
-
-            echo '</table>';
-            echo '</body>';
-            echo '</html>';
-        }, 200, $headers);
-    }
 
     /*
     |--------------------------------------------------------------------------
