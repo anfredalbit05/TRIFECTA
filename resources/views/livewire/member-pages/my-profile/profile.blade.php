@@ -382,7 +382,7 @@
                                 terminate this MEMBERSHIP, for the following grounds:</p>
                             <ul class="list-disc list-inside text-[7px] sm:text-[8px] text-slate-600 space-y-0.5">
                                 <li>Fraud or misrepresentation</li>
-                                <li>Misuse of Unitylife name and materials</li>
+                                <li>Misuse of True Life Dayongan name and materials</li>
                                 <li>Violation of company rules or applicable laws</li>
                             </ul>
                             <p class="text-[6px] sm:text-[7px] text-slate-500 mt-1">Termination shall be without
