@@ -140,6 +140,31 @@ class ActivationReviewModal extends Component
 
             /*
             |--------------------------------------------------------------------------
+            | Add PF (50.00) to the Direct Upline / Referral User Wallet & Ledger
+            |--------------------------------------------------------------------------
+            */
+            if ($this->referralUser) {
+                Wallet::create([
+                    'UserID'       => $this->referralUser->UserID,
+                    'ActivationID' => $this->activation->ActivationID,
+                    'amount'       => 50.00,
+                    'source'       => 'PF',
+                    'status'       => 'Active',
+                ]);
+
+                Ledger::create([
+                    'RefID'        => $this->referralUser->UserID,
+                    'amount'       => 50.00,
+                    'Source'       => 'PF',
+                    'ActivationID' => $this->activation->ActivationID,
+                    'status'       => 'Completed',
+                ]);
+
+                Log::info("PF entry (50.00) written for referral UserID: {$this->referralUser->UserID}");
+            }
+
+            /*
+            |--------------------------------------------------------------------------
             | Multi-Tier Referral Commission Structure with Dynamic Sponsoring Count
             |--------------------------------------------------------------------------
             */

@@ -371,11 +371,11 @@ function showLogoutConfirmation(formId) {
         text: 'Are you sure you want to logout?',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#6b7280',
+        confirmButtonColor: '#0B2A5B',
+        cancelButtonColor: '#D79B10',
         confirmButtonText: 'Yes, Logout',
-        cancelButtonText: 'Cancel',
-        reverseButtons: true
+        cancelButtonText: 'Cancel'
+        // Removed reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) {
             document.getElementById(formId).submit();

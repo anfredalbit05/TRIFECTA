@@ -27,7 +27,9 @@ return new class extends Migration
                 'CL', // Claim
                 'RF', // Refund
                 'OT', // Others
+                'PF',
             ])->default('OT');
+
 
             $table->foreignId('ActivationID')
                 ->nullable()

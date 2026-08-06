@@ -12,8 +12,8 @@
             text: 'You will be logged out from your account.',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#D79B10',
-            cancelButtonColor: '#6b7280',
+            confirmButtonColor: '#0B2A5B',
+            cancelButtonColor: '#D79B10',
             confirmButtonText: 'Yes, logout',
             cancelButtonText: 'Cancel'
         }).then((result) => {

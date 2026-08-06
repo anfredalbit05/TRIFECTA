@@ -18,6 +18,89 @@
         Member management content and directory.
     </p>
 
+    <!-- SUMMARY STATISTICS & EXCEL EXPORT FILTERS -->
+    <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm mb-6">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-100">
+            <div>
+                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Summary Overview</h3>
+                <p class="text-xs text-slate-500">Filter stats overview or select specific options below to export to Excel.</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- TIME FRAME FILTER -->
+                <select wire:model.live="summaryFilter" class="text-xs border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-slate-50 font-semibold text-slate-700">
+                    <option value="all">Overview: All Time</option>
+                    <option value="year">Overview: This Year</option>
+                    <option value="month">Overview: This Month</option>
+                    <option value="week">Overview: This Week</option>
+                    <option value="today">Overview: Today</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- CARDS GRID -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div class="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                <p class="text-xs font-medium text-slate-500">Total Members</p>
+                <p class="text-xl font-bold text-slate-800 mt-1">{{ $this->summaryStats['total'] }}</p>
+            </div>
+            <div class="bg-blue-50/50 rounded-lg p-3 border border-blue-100">
+                <p class="text-xs font-medium text-blue-600">Active Members</p>
+                <p class="text-xl font-bold text-[#0C2C6B] mt-1">{{ $this->summaryStats['active'] }}</p>
+            </div>
+            <div class="bg-slate-100 rounded-lg p-3 border border-slate-200">
+                <p class="text-xs font-medium text-slate-600">Inactive Members</p>
+                <p class="text-xl font-bold text-slate-700 mt-1">{{ $this->summaryStats['inactive'] }}</p>
+            </div>
+        </div>
+
+        <!-- EXCEL EXPORT OPTIONS BAR -->
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                <span class="text-xs font-bold text-slate-700">Excel Filters:</span>
+
+                <!-- YEAR SELECTOR (2020 to Current Year 2026) -->
+                <select wire:model.live="exportYear" class="text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white font-medium text-slate-700">
+                    <option value="">All Years</option>
+                    @for ($year = 2020; $year <= date('Y'); $year++)
+                        <option value="{{ $year }}">{{ $year }}</option>
+                    @endfor
+                </select>
+
+                <!-- MONTH SELECTOR -->
+                <select wire:model.live="exportMonth" class="text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white font-medium text-slate-700">
+                    <option value="">All Months</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+
+                <!-- STATUS SELECTOR -->
+                <select wire:model.live="exportStatus" class="text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white font-medium text-slate-700">
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active Only</option>
+                    <option value="Inactive">Inactive Only</option>
+                </select>
+            </div>
+
+            <!-- EXPORT TO EXCEL BUTTON -->
+            <button wire:click="exportExcel" wire:loading.attr="disabled"
+                class="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-semibold rounded-lg shadow transition cursor-pointer w-full lg:w-auto justify-center">
+                <span wire:loading.remove wire:target="exportExcel">📊 Export to Excel</span>
+                <span wire:loading wire:target="exportExcel" class="animate-spin">⏳ Generating...</span>
+            </button>
+        </div>
+    </div>
+
     <!-- SEARCH INPUT & REFRESH BUTTON CONTAINER -->
     <div class="flex items-center justify-between gap-4 mb-6">
         <!-- SEARCH INPUT -->
@@ -193,6 +276,7 @@
 
     <!-- LIVEWIRE MODAL COMPONENT -->
     <livewire:member-pages.my-profile.activation-modal />
+
 
     <!-- SWEETALERT SCRIPTS -->
     @script

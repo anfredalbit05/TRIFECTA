@@ -6,15 +6,19 @@ use Livewire\Component;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use App\Models\User;
 
 class LoginModal extends Component
 {
     public bool $openLogin = false;
+    public bool $isForgotPassword = false; // Toggle view
 
     public string $email = '';
     public string $password = '';
     public bool $remember = false;
+
+    public string $forgotEmail = ''; // Specific email for password reset
 
     #[On('open-login-modal')]
     public function openModal()
@@ -27,16 +31,46 @@ class LoginModal extends Component
         $this->reset([
             'email',
             'password',
-            'remember'
+            'remember',
+            'forgotEmail',
+            'isForgotPassword'
         ]);
 
         $this->resetValidation();
         $this->openLogin = false;
     }
 
+    public function toggleForgotPassword()
+    {
+        $this->isForgotPassword = !$this->isForgotPassword;
+        $this->resetValidation();
+    }
+
+    public function sendPasswordResetLink()
+    {
+        $this->validate([
+            'forgotEmail' => 'required|email|exists:users,email',
+        ], [
+            'forgotEmail.required' => 'Please enter your account email address.',
+            'forgotEmail.email' => 'Please enter a valid email address.',
+            'forgotEmail.exists' => 'We can not find a user with that email address.',
+        ]);
+
+        $status = Password::sendResetLink(['email' => $this->forgotEmail]);
+
+        $this->dispatch('swal:close');
+
+        if ($status == Password::RESET_LINK_SENT) {
+            $this->dispatch('swal:info', message: __($status));
+            $this->toggleForgotPassword();
+            $this->reset('forgotEmail');
+        } else {
+            $this->addError('forgotEmail', __($status));
+        }
+    }
+
     public function login()
     {
-        // 1. Validate inputs
         $this->validate([
             'email' => 'required',
             'password' => 'required',
@@ -45,13 +79,6 @@ class LoginModal extends Component
             'password.required' => 'Please enter your password.',
         ]);
 
-        // Trigger loading SweetAlert on frontend
-        $this->dispatch('swal:loading');
-
-        // Add a small artificial pause (e.g., ~1.5 to 3 seconds) to let users see the loading state smoothly
-        usleep(1500000); // 1.5 seconds delay
-
-        // 2. Find account using email, mobile number, or username
         $user = User::where('email', $this->email)
             ->orWhere('contactno', $this->email)
             ->orWhere('username', $this->email)
@@ -63,28 +90,20 @@ class LoginModal extends Component
             return;
         }
 
-        // 3. Verify password
         if (!Hash::check($this->password, $user->password)) {
             $this->dispatch('swal:close');
             $this->addError('password', 'Incorrect password.');
             return;
         }
 
-        // 4. Authenticate user session
         Auth::login($user, $this->remember);
         session()->regenerate();
 
-        // 5. Reset inputs & close modal view backdrop
-        $this->reset([
-            'email',
-            'password',
-            'remember',
-        ]);
+        $this->reset(['email', 'password', 'remember', 'forgotEmail', 'isForgotPassword']);
         $this->resetValidation();
         $this->openLogin = false;
 
-        // Trigger success SweetAlert with message (displays for 3 seconds then redirects)
-        $this->dispatch('swal:success', message: 'Welcome back, ' . ($user->name ?? $user->firstname) . '!');
+        $this->dispatch('swal:successed', message: 'Welcome back, ' . ($user->name ?? $user->firstname) . '!');
     }
 
     public function switchToRegister()

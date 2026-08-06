@@ -31,7 +31,7 @@
 
             <div class="wallet-block">
                 <span class="wallet-label">Provident Fund</span>
-                <h2 class="wallet-value">₱100.00</h2>
+                <h2 class="wallet-value">₱{{ number_format($providentFundAmount, 2) }}</h2>
             </div>
 
             <hr>
@@ -39,7 +39,7 @@
             <div class="wallet-summary">
                 <div>
                     <span>Total Earnings</span>
-                    ₱{{ number_format($totalAmount, 2) }}
+                    ₱{{ number_format($totalEarnings, 2) }}
                 </div>
                 <div>
                     <span>Total Withdrawals</span>
