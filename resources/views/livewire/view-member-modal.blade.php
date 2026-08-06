@@ -257,108 +257,48 @@
 
 </div>
 
-                    <!-- Beneficiaries -->
-                    <div class="rounded-xl border border-slate-200 shadow-sm">
+                 <!-- Beneficiaries -->
+<div class="rounded-xl border border-slate-200 shadow-sm">
+    <div class="border-b border-slate-200 bg-slate-50 px-5 py-3">
+        <h3 class="font-bold text-slate-800">
+            👨‍👩‍👧 Beneficiaries
+        </h3>
+    </div>
+    <div class="p-5">
+        @forelse ($beneficiaries as $index => $beneficiary)
+            <div class="mb-4 rounded-xl border border-slate-200 p-4">
 
-                        <div class="border-b border-slate-200 bg-slate-50 px-5 py-3">
+                <!-- Header without the badge -->
+                <div class="mb-4 flex items-center justify-between">
+                    <h4 class="font-bold text-slate-700">
+                        Beneficiary {{ $index + 1 }}
+                    </h4>
+                </div>
 
-                            <h3 class="font-bold text-slate-800">
-
-                                👨‍👩‍👧 Beneficiaries
-
-                            </h3>
-
-                        </div>
-
-                        <div class="p-5">
-
-                            @forelse ($beneficiaries as $index => $beneficiary)
-
-                                <div class="mb-4 rounded-xl border border-slate-200 p-4">
-
-                                    <div class="mb-4 flex items-center justify-between">
-
-                                        <h4 class="font-bold text-slate-700">
-
-                                            Beneficiary {{ $index + 1 }}
-
-                                        </h4>
-
-                                        <span class="rounded-md bg-[#0C2C6B] px-3 py-1 text-xs font-semibold text-white">
-
-                                            {{ $beneficiary['relationship'] ?: 'N/A' }}
-
-                                        </span>
-
-                                    </div>
-
-                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-
-                                        <div class="rounded-lg bg-slate-50 p-4">
-
-                                            <p class="text-xs uppercase text-slate-400">
-
-                                                Full Name
-
-                                            </p>
-
-                                            <p class="mt-1 font-semibold">
-
-                                                {{ $beneficiary['fullname'] ?: 'N/A' }}
-
-                                            </p>
-
-                                        </div>
-
-                                        <div class="rounded-lg bg-slate-50 p-4">
-
-                                            <p class="text-xs uppercase text-slate-400">
-
-                                                Birthdate
-
-                                            </p>
-
-                                            <p class="mt-1 font-semibold">
-
-                                                {{ $beneficiary['birthdate'] ?: 'N/A' }}
-
-                                            </p>
-
-                                        </div>
-
-                                        <div class="rounded-lg bg-slate-50 p-4">
-
-                                            <p class="text-xs uppercase text-slate-400">
-
-                                                Relationship
-
-                                            </p>
-
-                                            <p class="mt-1 font-semibold">
-
-                                                {{ $beneficiary['relationship'] ?: 'N/A' }}
-
-                                            </p>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            @empty
-
-                                <div class="rounded-lg border border-dashed border-slate-300 p-10 text-center text-slate-500">
-
-                                    No beneficiaries found.
-
-                                </div>
-
-                            @endforelse
-
-                        </div>
-
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <div class="rounded-lg bg-slate-50 p-4">
+                        <p class="text-xs uppercase text-slate-400">Full Name</p>
+                        <p class="mt-1 font-semibold">{{ $beneficiary['fullname'] ?: 'N/A' }}</p>
                     </div>
+
+                    <div class="rounded-lg bg-slate-50 p-4">
+                        <p class="text-xs uppercase text-slate-400">Birthdate</p>
+                        <p class="mt-1 font-semibold">{{ $beneficiary['birthdate'] ?: 'N/A' }}</p>
+                    </div>
+
+                    <div class="rounded-lg bg-slate-50 p-4">
+                        <p class="text-xs uppercase text-slate-400">Relationship</p>
+                        <p class="mt-1 font-semibold">{{ $beneficiary['relationship'] ?: 'N/A' }}</p>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="rounded-lg border border-dashed border-slate-300 p-10 text-center text-slate-500">
+                No beneficiaries found.
+            </div>
+        @endforelse
+    </div>
+</div>
 
                 </div>
 
