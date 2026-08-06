@@ -43,7 +43,7 @@ class Dashboard extends Component
             ]);
 
         return view('components.admin-pages.masterlist.dashboard', [
-            'totalMembers' => User::where('RoleID', '!=', 1)->count(),
+            'totalMembers' => User::where('RoleID', 4)->count(),
             'activeBranches' => Branch::where('status', true)->count(),
             'totalBenefits' => Benefit::where('status', true)->count(),
             'totalInquiries' => Inquiry::count(),
