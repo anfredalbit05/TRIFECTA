@@ -82,7 +82,7 @@ class Dashboard extends Component
     | Export to Excel CSV Method
     |--------------------------------------------------------------------------
     */
-    public function exportExcel(): StreamedResponse
+   public function exportExcel(): StreamedResponse
 {
     $query = User::query()->where('RoleID', 4);
 
@@ -110,7 +110,7 @@ class Dashboard extends Component
     $fileName = 'members_report_' . date('Y-m-d_H-i-s') . '.xls';
 
     $headers = [
-        'Content-Type' => 'application/vnd.ms-excel',
+        'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
         'Content-Disposition' => "attachment; filename=\"$fileName\"",
     ];
 
@@ -135,11 +135,12 @@ class Dashboard extends Component
         echo '<tr style="background-color: #0C2C6B; color: #FFFFFF; font-weight: bold; text-align: center; height: 25px;">';
         echo '<th style="padding: 5px;">#</th>';
         echo '<th style="padding: 5px;">Full Name</th>';
-        echo '<th style="padding: 5px;">Contact Number</th>';
-        echo '<th style="padding: 5px;">Gender</th>';
         echo '<th style="padding: 5px;">Birthdate</th>';
-        echo '<th style="padding: 5px;">Status</th>';
-        echo '<th style="padding: 5px;">Date Created</th>';
+        echo '<th style="padding: 5px;">Gender</th>';
+        echo '<th style="padding: 5px;">Civil Status</th>';
+        echo '<th style="padding: 5px;">Contact Number</th>';
+
+
         echo '</tr>';
 
         // Data Rows
@@ -147,16 +148,14 @@ class Dashboard extends Component
         foreach ($members as $member) {
             $fullName = trim($member->lastname . ', ' . $member->firstname . ' ' . ($member->middlename ?? ''));
             $birthdateFormatted = $member->birthdate ? date('F d, Y', strtotime($member->birthdate)) : '-';
-            $dateCreatedFormatted = $member->created_at ? $member->created_at->format('n/j/Y') : '';
 
             echo '<tr>';
             echo '<td style="text-align: center; padding: 4px;">' . $index++ . '</td>';
             echo '<td style="padding: 4px; font-weight: bold;">' . htmlspecialchars($fullName) . '</td>';
-            echo '<td style="padding: 4px; text-align: center;">' . htmlspecialchars($member->contactno ?? '-') . '</td>';
-            echo '<td style="padding: 4px; text-align: center;">' . htmlspecialchars($member->gender ?? '-') . '</td>';
             echo '<td style="padding: 4px; text-align: center;">' . htmlspecialchars($birthdateFormatted) . '</td>';
-            echo '<td style="padding: 4px; text-align: center;">' . htmlspecialchars($member->status) . '</td>';
-            echo '<td style="padding: 4px; text-align: center;">' . htmlspecialchars($dateCreatedFormatted) . '</td>';
+            echo '<td style="padding: 4px; text-align: center;">' . htmlspecialchars($member->gender ?? '-') . '</td>';
+            echo '<td style="padding: 4px; text-align: center;">' . htmlspecialchars($member->civilstatus ?? '-') . '</td>';
+            echo '<td style="padding: 4px; text-align: center;">' . htmlspecialchars($member->contactno ?? '-') . '</td>';
             echo '</tr>';
         }
 

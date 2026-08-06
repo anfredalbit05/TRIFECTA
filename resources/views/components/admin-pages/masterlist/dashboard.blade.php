@@ -140,7 +140,7 @@
             </div>
 
             <!-- ICON BUTTONS CONTAINER -->
-            {{-- <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+            <div class="flex items-center gap-2 w-full md:w-auto justify-end">
 
                 <!-- EXCEL EXPORT ICON BUTTON -->
                 <button wire:click="exportExcel" wire:loading.attr="disabled" title="Export to Excel (.xls)"
@@ -149,13 +149,13 @@
                     <span wire:loading wire:target="exportExcel" class="animate-spin text-xs">⏳</span>
                 </button>
 
-                <!-- PRINT ICON BUTTON -->
+                {{-- <!-- PRINT ICON BUTTON -->
                 <button onclick="window.print()" title="Print Report"
                     class="w-10 h-10 inline-flex items-center justify-center bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-blue-600 rounded-xl shadow-sm transition cursor-pointer">
                     <span class="text-base">🖨️</span>
-                </button>
+                </button> --}}
 
-            </div> --}}
+            </div>
         </div>
     </div>
 
@@ -180,20 +180,19 @@
 </div>
 
 <style>
-   @media print {
-      @page {
-        size: auto;
-        margin: 10mm; /* This controls the print margins and suppresses browser headers */
-    }
+    @media print {
+        @page {
+            size: auto;
+            margin: 0; /* Setting margins to zero forces browsers to hide headers and footers */
+        }
 
-    body * {
-        visibility: hidden;
-    }
+        body * {
+            visibility: hidden;
+        }
         #printable-report, #printable-report *,
         .member-table, .member-table * {
             visibility: visible;
         }
-
         #printable-report {
             display: block !important;
             position: absolute;
@@ -214,7 +213,7 @@
             width: 100%;
         }
         th, td {
-            border: 1px solid #000 !important;
+            border: 1.5px solid #000 !important;
             padding: 6px !important;
             font-size: 11px;
         }
