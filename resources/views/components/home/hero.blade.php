@@ -101,7 +101,7 @@
                             Join Now
                         </a>
                         <a
-                            href="#learn-more"
+                            href="{{ route('how-it-works') }}"
                             class="hero-btn-secondary">
                             Learn More
                         </a>

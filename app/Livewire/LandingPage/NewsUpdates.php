@@ -5,12 +5,17 @@ namespace App\Livewire\LandingPage;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Layout;
+use Livewire\WithPagination; // <-- 1. Import pagination trait
 use App\Models\Context;
 use App\Models\NewsUpdate;
 
 #[Layout('layouts.app')]
 class NewsUpdates extends Component
 {
+    use WithPagination; // <-- 2. Use the trait
+
+    protected $paginationTheme = 'tailwind'; // <-- 3. Ensure Tailwind style
+
     public array $contexts = [];
     public string $selectedCategory = 'all';
 
@@ -22,6 +27,7 @@ class NewsUpdates extends Component
     public function setCategory(string $category): void
     {
         $this->selectedCategory = trim($category);
+        $this->resetPage(); // <-- 4. Reset pagination back to page 1 when filter changes!
     }
 
     public function loadContexts(): void
@@ -60,7 +66,8 @@ class NewsUpdates extends Component
             $query->whereRaw('TRIM(category) = ?', [trim($this->selectedCategory)]);
         }
 
-        $newsUpdates = $query->latest()->get();
+        // 5. Replace ->get() with ->paginate(6) (e.g., 2 rows of 3 columns)
+        $newsUpdates = $query->latest()->paginate(6);
 
         return view('livewire.landing-page.news', [
             'featuredPost'      => $featuredPost,

@@ -159,51 +159,97 @@
     </div>
 </section>
 
-    <!-- =========================
-         ARTICLE GRID SECTION
-    ========================== -->
-    <section class="news-grid-section">
-        <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div class="news-grid">
+   <!-- =========================
+     ARTICLE GRID SECTION
+========================= -->
+<section class="news-grid-section">
+    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+        <div class="news-grid">
 
-                @forelse($newsUpdates as $article)
-                    <!-- Article Card -->
-                    <article class="news-card" id="news-{{ $article->ID }}" wire:key="article-{{ $article->ID }}">
-                        <div>
-                            <div class="news-card-image-wrapper">
-                                <img src="{{ $article->image ? asset('storage/' . $article->image) : asset('images/hero-bg.jpg') }}"
-                                     alt="{{ $article->title }}"
-                                     class="news-card-image">
+            @forelse($newsUpdates as $article)
+                <!-- Article Card -->
+                <article class="news-card" id="news-{{ $article->ID }}" wire:key="article-{{ $article->ID }}">
+                    <div>
+                        <div class="news-card-image-wrapper">
+                            <img src="{{ $article->image ? asset('storage/' . $article->image) : asset('images/hero-bg.jpg') }}"
+                                 alt="{{ $article->title }}"
+                                 class="news-card-image">
                             <span class="news-card-badge {{ $article->category === 'Insurance' ? 'news-badge-health' : 'news-badge-service' }}">
                                 {{ $article->category ?? 'General' }}
                             </span>
-                            </div>
-                            <div class="news-card-body">
-                                <span class="news-card-date">{{ $article->created_at ? $article->created_at->format('M d, Y') : '' }}</span>
-                                <h3 class="news-card-title">
-                                    {{ $article->title }}
-                                </h3>
-                                <p class="news-card-excerpt">
-                                    {{ Str::limit(strip_tags($article->details), 120) }}
-                                </p>
-                            </div>
                         </div>
-                        <div class="news-card-footer">
-                            <span class="news-card-read-time">{{ $article->created_at ? $article->created_at->diffForHumans() : '' }}</span>
-                            <a href="#news-{{ $article->ID }}" class="news-card-link">Read More &rarr;</a>
+                        <div class="news-card-body">
+                            <span class="news-card-date">{{ $article->created_at ? $article->created_at->format('M d, Y') : '' }}</span>
+                            <h3 class="news-card-title">
+                                {{ $article->title }}
+                            </h3>
+                            <p class="news-card-excerpt">
+                                {{ Str::limit(strip_tags($article->details), 120) }}
+                            </p>
                         </div>
-                    </article>
-                @empty
-                    <div class="col-span-full text-center py-12">
-                        <div class="text-4xl mb-3">📰</div>
-                        <h3 class="text-lg font-bold text-gray-700">No news updates found</h3>
-                        <p class="text-sm text-gray-500">There are currently no updates under this category.</p>
                     </div>
-                @endforelse
+                    <div class="news-card-footer">
+                        <span class="news-card-read-time">{{ $article->created_at ? $article->created_at->diffForHumans() : '' }}</span>
+                        <a href="#news-{{ $article->ID }}" class="news-card-link">Read More &rarr;</a>
+                    </div>
+                </article>
+            @empty
+                <div class="col-span-full text-center py-12">
+                    <div class="text-4xl mb-3">📰</div>
+                    <h3 class="text-lg font-bold text-gray-700">No news updates found</h3>
+                    <p class="text-sm text-gray-500">There are currently no updates under this category.</p>
+                </div>
+            @endforelse
 
-            </div>
         </div>
-    </section>
+
+        <!-- Custom Pagination Controls -->
+        <div class="mt-12 flex justify-center items-center space-x-4">
+
+            {{-- Previous Page Link --}}
+            @if ($newsUpdates->onFirstPage())
+                <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                    Previous
+                </span>
+            @else
+                <button
+                    wire:click="previousPage"
+                    wire:loading.attr="disabled"
+                    class="px-4 py-2 text-white rounded transition cursor-pointer"
+                    style="background-color: #D79B10;"
+                    onmouseover="this.style.backgroundColor='#c58d0f'"
+                    onmouseout="this.style.backgroundColor='#D79B10'"
+                >
+                    Previous
+                </button>
+            @endif
+
+            <span class="text-sm text-gray-600">
+                Page {{ $newsUpdates->currentPage() }} of {{ max($newsUpdates->lastPage(), 1) }}
+            </span>
+
+            {{-- Next Page Link --}}
+            @if ($newsUpdates->hasMorePages())
+                <button
+                    wire:click="nextPage"
+                    wire:loading.attr="disabled"
+                    class="px-4 py-2 text-white rounded transition cursor-pointer"
+                    style="background-color: #0C2C6B;"
+                    onmouseover="this.style.backgroundColor='#0a2559'"
+                    onmouseout="this.style.backgroundColor='#0C2C6B'"
+                >
+                    Next
+                </button>
+            @else
+                <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                    Next
+                </span>
+            @endif
+
+        </div>
+
+    </div>
+</section>
 
     {{-- <!-- =========================
          NEWSLETTER SUBSCRIPTION

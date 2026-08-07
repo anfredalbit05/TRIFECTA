@@ -579,7 +579,7 @@
 
             @forelse($faqs as $faq)
 
-                <div class="hiw-faq-card">
+                <div class="hiw-faq-card" wire:key="faq-{{ $faq->FaqID }}">
 
                     <h3 class="hiw-faq-question">
                         {{ $faq->question }}
@@ -604,6 +604,52 @@
             @endforelse
 
         </div>
+
+        <!-- Custom Pagination Controls -->
+        <div class="mt-8 flex justify-center items-center space-x-4">
+
+            {{-- Previous Page Link --}}
+            @if ($faqs->onFirstPage())
+                <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                    Previous
+                </span>
+            @else
+                <button
+                    wire:click="previousPage"
+                    wire:loading.attr="disabled"
+                    class="px-4 py-2 text-white rounded transition cursor-pointer"
+                    style="background-color: #D79B10;"
+                    onmouseover="this.style.backgroundColor='#c58d0f'"
+                    onmouseout="this.style.backgroundColor='#D79B10'"
+                >
+                    Previous
+                </button>
+            @endif
+
+            <span class="text-sm text-gray-600">
+                Page {{ $faqs->currentPage() }} of {{ max($faqs->lastPage(), 1) }}
+            </span>
+
+            {{-- Next Page Link --}}
+            @if ($faqs->hasMorePages())
+                <button
+                    wire:click="nextPage"
+                    wire:loading.attr="disabled"
+                    class="px-4 py-2 text-white rounded transition cursor-pointer"
+                    style="background-color: #0C2C6B;"
+                    onmouseover="this.style.backgroundColor='#0a2559'"
+                    onmouseout="this.style.backgroundColor='#0C2C6B'"
+                >
+                    Next
+                </button>
+            @else
+                <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                    Next
+                </span>
+            @endif
+
+        </div>
+
     </div>
 </section>
 
@@ -632,7 +678,7 @@
         </p>
 
         <div class="hiw-cta-buttons">
-            <a href="#register" class="hiw-btn-primary">
+            <a  onclick="Livewire.dispatch('open-application-modal')" href="#register" class="hiw-btn-primary">
                 <x-editable-text
                     key="hiw_cta_btn_primary"
                     :value="$contexts['hiw_cta_btn_primary'] ?? ''"
@@ -641,7 +687,7 @@
                 />
             </a>
 
-            <a href="#contact" class="hiw-btn-secondary">
+            <a href="{{ route('contact') }}" class="hiw-btn-secondary">
                 <x-editable-text
                     key="hiw_cta_btn_secondary"
                     :value="$contexts['hiw_cta_btn_secondary'] ?? ''"

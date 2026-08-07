@@ -618,14 +618,10 @@
 
             @php
             $boardMembers = [
-                ['name'=>'Princes Manliguez','position'=>'Secretary'],
+                ['name'=>'Princes Manliguez','position'=>'Secretary', 'contact' => '09266958032'],
                 ['name'=>'Dr. Maria Carmelita','position'=>'Auditor', 'contact' => '09565003849'],
-                ['name'=>'Dr. Cherry Lynn Nierras-Dagala','position'=>'Treasurer'],
-                ['name'=>'Mr. Alfe Duron','position'=>'Board Member'],
-                ['name'=>'Ms. Ma. Daisy Colegado','position'=>'Board Member'],
-                ['name'=>'Mr. Bernard Laurente','position'=>'Board Member'],
-                ['name'=>'Mr. Pierre Hordista','position'=>'Board Member'],
-                ['name'=>'Mrs. Cheryl Eliot, RN','position'=>'Board Member'],
+                ['name'=>'Dr. Cherry Lynn Nierras-Dagala','position'=>'Treasurer', 'contact' => '09055596558'],
+                ['name'=>'Mr. Alfe Duron','position'=>'Board of Directors', 'contact' => '09933668594'],
             ];
             @endphp
 
@@ -750,7 +746,7 @@
                 </p>
             </div>
 
-            <a href="#contact" class="team-partner-btn">
+            <a href="{{ route('contact') }}" class="team-partner-btn">
                 <x-editable-text
                     key="team_partner_btn"
                     :value="$contexts['team_partner_btn'] ?? 'Contact Partner Desk'"
@@ -762,7 +758,7 @@
     </div>
 </section>
 
-
+{{--
 <!-- =========================
      CALL TO ACTION
 ========================== -->
@@ -804,6 +800,6 @@
             </a>
         </div>
     </div>
-</section>
+</section> --}}
 
 </div>
