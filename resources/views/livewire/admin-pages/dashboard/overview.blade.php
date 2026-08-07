@@ -7,19 +7,20 @@
                 Overview Analytics
             </h2>
             <p class="text-sm text-gray-500">
-                System performance and statistics overview for <span class="font-semibold text-gray-700" x-text="selectedYear">{{ $selectedYear }}</span>
+                System performance and statistics overview for <span class="font-semibold text-gray-700"
+                    x-text="selectedYear">{{ $selectedYear }}</span>
             </p>
         </div>
 
         <!-- ACTIONS: YEAR FILTER & REFRESH -->
         <div class="flex items-center gap-3">
             <!-- YEAR DROPDOWN -->
-                <select wire:model.live="selectedYear"
-                    class="bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] cursor-pointer">
-                    @foreach($availableYears as $year)
-                        <option value="{{ $year }}">{{ $year }}</option>
-                    @endforeach
-                </select>
+            <select wire:model.live="selectedYear"
+                class="bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] cursor-pointer">
+                @foreach ($availableYears as $year)
+                    <option value="{{ $year }}">{{ $year }}</option>
+                @endforeach
+            </select>
 
             <!-- REFRESH BUTTON -->
             <button wire:click="refreshAnalytics" wire:loading.attr="disabled" title="Refresh Analytics"
@@ -44,8 +45,9 @@
     @endphp
 
     <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
-        @foreach($cards as $card)
-            <div class="rounded-xl text-white p-5 shadow-lg transition-transform hover:-translate-y-1 {{ $card[3] }}">
+        @foreach ($cards as $card)
+            <div
+                class="rounded-xl text-white p-5 shadow-lg transition-transform hover:-translate-y-1 {{ $card[3] }}">
                 <div class="text-3xl mb-2">
                     {{ $card[2] }}
                 </div>
@@ -79,8 +81,9 @@
                                     {{ $member->created_at->diffForHumans() }}
                                 </p>
                             </div>
-                            <span class="text-xs font-semibold px-2.5 py-1 rounded-full {{ $member->status ? 'bg-green-50 text-green-600' : 'bg-gray-50 text-gray-500' }}">
-                                {{ $member->status ? 'Active' : 'Inactive' }}
+                            <span
+                                class="text-xs font-semibold px-2.5 py-1 rounded-full {{ $member->status === 'Active' ? 'bg-green-50 text-green-600' : 'bg-gray-50 text-gray-500' }}">
+                                {{ $member->status === 'Active' ? 'Active' : 'Inactive' }}
                             </span>
                         </div>
                     @empty
@@ -145,7 +148,8 @@
             <div class="divide-y divide-gray-100">
                 @forelse($recentNews as $news)
                     <div class="py-3 first:pt-0 last:pb-0">
-                        <p class="font-semibold text-gray-800 text-sm hover:text-[#0C2C6B] transition-colors cursor-pointer">
+                        <p
+                            class="font-semibold text-gray-800 text-sm hover:text-[#0C2C6B] transition-colors cursor-pointer">
                             {{ $news->title }}
                         </p>
                         <p class="text-xs text-gray-400 mt-1">
@@ -176,22 +180,25 @@
                         $rankColors = [
                             0 => 'bg-amber-100 text-amber-700 border-amber-200',
                             1 => 'bg-slate-100 text-slate-700 border-slate-200',
-                            2 => 'bg-orange-100 text-orange-700 border-orange-200'
+                            2 => 'bg-orange-100 text-orange-700 border-orange-200',
                         ];
                         $badgeStyle = $rankColors[$index] ?? 'bg-gray-50 text-gray-500 border-gray-100';
                     @endphp
 
-                    <div class="flex items-center justify-between p-3.5 bg-gray-50/70 hover:bg-gray-50 border border-gray-100/80 rounded-xl transition-all">
+                    <div
+                        class="flex items-center justify-between p-3.5 bg-gray-50/70 hover:bg-gray-50 border border-gray-100/80 rounded-xl transition-all">
                         <div class="flex items-center gap-3.5">
-                            <div class="w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold border {{ $badgeStyle }}">
+                            <div
+                                class="w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold border {{ $badgeStyle }}">
                                 #{{ $index + 1 }}
                             </div>
-                            <div class="w-12 h-12 rounded-full overflow-hidden bg-[#0C2C6B]/10 flex items-center justify-center shrink-0 border border-gray-200">
-                                @if(!empty($referrer->profilepic))
+                            <div
+                                class="w-12 h-12 rounded-full overflow-hidden bg-[#0C2C6B]/10 flex items-center justify-center shrink-0 border border-gray-200">
+                                @if (!empty($referrer->profilepic))
                                     <img src="{{ asset('storage/' . $referrer->profilepic) }}"
-                                         alt="{{ $referrer->firstname }}"
-                                         class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                                         @click="modalOpen = true; activeImage = '{{ asset('storage/' . $referrer->profilepic) }}'; activeName = '{{ $referrer->firstname }} {{ $referrer->lastname }}'; activeAddress = '{{ $referrer->address }}'">
+                                        alt="{{ $referrer->firstname }}"
+                                        class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                                        @click="modalOpen = true; activeImage = '{{ asset('storage/' . $referrer->profilepic) }}'; activeName = '{{ $referrer->firstname }} {{ $referrer->lastname }}'; activeAddress = '{{ $referrer->address }}'">
                                 @else
                                     <span class="text-[#0C2C6B] font-bold text-sm tracking-wide">
                                         {{ strtoupper(substr($referrer->firstname, 0, 1)) }}{{ strtoupper(substr($referrer->lastname, 0, 1)) }}
@@ -204,14 +211,16 @@
                                 </p>
                                 <p class="text-xs text-gray-400 font-mono mt-1 flex items-center gap-1">
                                     <span>Code:</span>
-                                    <span class="text-[#0C2C6B] font-semibold bg-white px-1.5 py-0.5 rounded border border-gray-200">
+                                    <span
+                                        class="text-[#0C2C6B] font-semibold bg-white px-1.5 py-0.5 rounded border border-gray-200">
                                         {{ $referrer->referralCode }}
                                     </span>
                                 </p>
                             </div>
                         </div>
                         <div class="text-right">
-                            <span class="inline-flex items-center gap-1 font-extrabold text-[#0C2C6B] bg-blue-50/80 border border-blue-100 px-3 py-1.5 rounded-xl text-sm shadow-sm">
+                            <span
+                                class="inline-flex items-center gap-1 font-extrabold text-[#0C2C6B] bg-blue-50/80 border border-blue-100 px-3 py-1.5 rounded-xl text-sm shadow-sm">
                                 {{ $referrer->total_invites }}
                                 <span class="text-xs font-medium text-blue-600/70">Invites</span>
                             </span>
@@ -226,23 +235,24 @@
             </div>
 
             <!-- IMAGE PREVIEW MODAL -->
-            <div x-show="modalOpen"
-                 x-transition.opacity
-                 class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-                 style="display: none;"
-                 @click.self="modalOpen = false">
+            <div x-show="modalOpen" x-transition.opacity
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" style="display: none;"
+                @click.self="modalOpen = false">
                 <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center relative shadow-2xl" @click.stop>
-                    <button @click="modalOpen = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-bold text-lg cursor-pointer">
+                    <button @click="modalOpen = false"
+                        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-bold text-lg cursor-pointer">
                         &times;
                     </button>
                     <h4 class="font-bold text-[#0C2C6B] text-base mb-4" x-text="activeName"></h4>
-                    <div class="w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-gray-100 shadow-inner mb-4">
+                    <div
+                        class="w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-gray-100 shadow-inner mb-4">
                         <img :src="activeImage" alt="Profile View" class="w-full h-full object-cover">
                     </div>
                     <p class="text-xs text-gray-500 mb-4 flex items-center justify-center gap-1">
                         📍 <span x-text="activeAddress"></span>
                     </p>
-                    <button @click="modalOpen = false" class="w-full bg-[#0C2C6B] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#081f4f] transition-colors cursor-pointer">
+                    <button @click="modalOpen = false"
+                        class="w-full bg-[#0C2C6B] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#081f4f] transition-colors cursor-pointer">
                         Close
                     </button>
                 </div>
@@ -310,7 +320,10 @@
     document.addEventListener('DOMContentLoaded', renderMonthlyChart);
     document.addEventListener('livewire:initialized', () => {
         renderMonthlyChart();
-        Livewire.hook('morph.updated', ({ el, component }) => {
+        Livewire.hook('morph.updated', ({
+            el,
+            component
+        }) => {
             renderMonthlyChart();
         });
     });
