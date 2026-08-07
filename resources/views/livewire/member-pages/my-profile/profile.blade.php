@@ -393,7 +393,7 @@
                         class="px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-slate-200 text-slate-700">Back</button>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-2 w-full mt-4">
+                {{-- <div class="flex flex-col sm:flex-row gap-2 w-full mt-4">
                     <button type="button" @click="downloadPdf"
                         class="flex-1 rounded-xl bg-slate-200 py-3 text-xs font-semibold cursor-pointer">
                         📥 Download ID (PDF)
@@ -402,7 +402,7 @@
                         class="flex-1 rounded-xl bg-[#0C2C6B] py-3 text-xs font-semibold text-white shadow transition hover:bg-[#071a42] cursor-pointer">
                         Request Physical ID
                     </button>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
