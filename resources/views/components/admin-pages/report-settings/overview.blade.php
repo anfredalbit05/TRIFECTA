@@ -56,61 +56,61 @@
         @endforeach
     </div>
 
-    <!-- SECOND ROW: RECENT TRANSACTIONS & INCOME SOURCES -->
+    <!-- SECOND ROW: MEMBERSHIP FEE COLLECTION BREAKDOWN & COLLECTION SUMMARY BY SOURCE -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        <!-- RECENT LEDGER TRANSACTIONS -->
+        <!-- MEMBERSHIP FEE COLLECTION BREAKDOWN -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
             <div>
                 <h3 class="font-bold text-[#0C2C6B] text-lg mb-4 flex items-center gap-2">
-                    Recent Ledger Activities
+                    Membership Fee Collection Breakdown
                 </h3>
-                <div class="divide-y divide-gray-100">
-                    @forelse($recentTransactions as $tx)
+                <div class="divide-y divide-gray-100 max-h-[250px] overflow-y-auto pr-1">
+                    @forelse($membershipFeeCollections as $fee)
                         <div class="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                             <div>
                                 <p class="font-semibold text-gray-800 text-sm">
-                                    Source: <span class="text-[#0C2C6B]">{{ $tx->Source }}</span>
-                                    <span class="text-xs text-gray-500 font-normal">(Ref: {{ $tx->RefID }})</span>
+                                    {{ $fee->FeeName }}
                                 </p>
                                 <p class="text-xs text-gray-400 mt-0.5">
-                                    {{ $tx->created_at ? $tx->created_at->diffForHumans() : 'N/A' }}
+                                    Fee ID: {{ $fee->FeeID }}
                                 </p>
                             </div>
                             <div class="text-right">
                                 <span class="block font-bold text-sm text-green-600">
-                                    +₱{{ number_format($tx->amount, 2) }}
+                                    +₱{{ number_format($fee->Total_Collection, 2) }}
                                 </span>
-                                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">
-                                    {{ $tx->status }}
+                                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-[#0C2C6B]">
+                                    {{ $selectedYear }}
                                 </span>
                             </div>
                         </div>
                     @empty
-                        <p class="text-sm text-gray-400 py-4 text-center">No ledger activity found for this year.</p>
+                        <p class="text-sm text-gray-400 py-4 text-center">No membership fees found.</p>
                     @endforelse
                 </div>
             </div>
         </div>
 
-        <!-- INCOME SOURCE DISTRIBUTION -->
+        <!-- COLLECTION SUMMARY BY SOURCE -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h3 class="font-bold text-[#0C2C6B] text-lg mb-4">
-                Income Sources Breakdown
+                Collection Summary by Source
             </h3>
             <div class="divide-y divide-gray-100 max-h-[250px] overflow-y-auto pr-1">
                 @forelse($incomeSources as $source)
                     <div class="flex justify-between items-center py-2.5 text-sm">
                         <div>
-                            <span class="font-semibold text-gray-800">{{ $source->Source }}</span>
-                            <span class="text-xs text-gray-400 ml-2">({{ $source->count }} entries)</span>
+                            <span class="font-semibold text-gray-800">{{ $source->Collection_Type }}</span>
+                            <span class="text-xs text-gray-400 ml-1">({{ $source->Source }})</span>
+                            <span class="text-xs text-gray-400 ml-1">({{ $source->count }} entries)</span>
                         </div>
                         <span class="font-bold text-[#0C2C6B] bg-blue-50 px-3 py-1 rounded-lg text-xs">
-                            ₱{{ number_format($source->total_amount, 2) }}
+                            ₱{{ number_format($source->Total_Collection, 2) }}
                         </span>
                     </div>
                 @empty
-                    <p class="text-sm text-gray-400 py-4 text-center">No income source metrics available.</p>
+                    <p class="text-sm text-gray-400 py-4 text-center">No collection summary available.</p>
                 @endforelse
             </div>
         </div>

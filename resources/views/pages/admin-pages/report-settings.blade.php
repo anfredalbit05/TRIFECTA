@@ -33,18 +33,18 @@
                 General
             </a>
 
-            {{-- <a
+            <a
                 href="#"
                 @click.prevent="tab='users'"
                 :class="tab === 'users' ? 'active' : ''">
-                Users
-            </a> --}}
+                Users Reports
+            </a>
 
             <a
                 href="#"
                 @click.prevent="tab='reports'"
                 :class="tab === 'reports' ? 'active' : ''">
-                Reports
+                Ledgers
             </a>
         </div>
 
@@ -63,13 +63,13 @@
             @livewire('admin-pages.report-settings.general-settings')
         </div>
 
-        {{-- <!-- USERS -->
+        <!-- USERS -->
         <div
             x-show="tab === 'users'"
             x-cloak
             class="dashboard-main-card full-width-card">
-            <x-admin-pages.report-settings.users-accounts />
-        </div> --}}
+            <livewire:admin-pages.report-settings.user-accounts />
+        </div>
 
     <!-- REPORTS -->
 <div

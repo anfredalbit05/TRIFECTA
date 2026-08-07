@@ -206,4 +206,24 @@ public function directDownlines(): HasManyThrough
     {
         return $this->belongsTo(Role::class, 'RoleID', 'RoleID');
     }
+
+    /**
+     * Get the wallets for the user.
+     */
+    public function wallets(): HasMany
+    {
+        return $this->hasMany(Wallet::class, 'UserID', 'UserID');
+    }
+
+   public function ledgers(): HasManyThrough
+{
+    return $this->hasManyThrough(
+        Ledger::class,
+        Activation::class,
+        'UserID',       // Foreign key on activations table (links to users.UserID)
+        'ActivationID', // Foreign key on ledgers table (links to activations.ActivationID)
+        'UserID',       // Local key on users table
+        'ActivationID'  // Local key on activations table
+    );
+}
 }
