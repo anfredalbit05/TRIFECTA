@@ -90,15 +90,15 @@ class Overview extends Component
             ->orderBy('m.FeeName')
             ->get();
 
-        // Collection Summary by Source (Predefined categories with Left Join)
+       // Collection Summary by Source (Predefined categories with Left Join and correct sequence)
         $incomeSources = DB::table(DB::raw("(
             SELECT 1 AS SEQUENCE, 'MF' AS Source, 'Membership Fee' AS Collection_Type
             UNION ALL SELECT 2, 'DR', 'Direct Referral'
             UNION ALL SELECT 3, 'OV', 'Overrides'
-            UNION ALL SELECT 4, 'CL', 'Claim'
-            UNION ALL SELECT 5, 'RF', 'Refund'
-            UNION ALL SELECT 6, 'OT', 'Others'
-            UNION ALL SELECT 7, 'PF', 'Provident Fund'
+            UNION ALL SELECT 4, 'PF', 'Provident Fund'
+            UNION ALL SELECT 5, 'CL', 'Claim'
+            UNION ALL SELECT 6, 'RF', 'Refund'
+            UNION ALL SELECT 7, 'OT', 'Others'
         ) as s"))
         ->leftJoin('ledgers as l', function ($join) use ($year) {
             $join->on('l.Source', '=', 's.Source')
