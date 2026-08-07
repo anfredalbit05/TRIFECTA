@@ -33,6 +33,7 @@ class AllUsers extends Component
     public string $contactno = '';
     public string $gender = '';
     public string $birthdate = '';
+    public string $address = ''; // Added missing property
     public string $status = '';
     public string $RoleID = '';
 
@@ -43,9 +44,8 @@ class AllUsers extends Component
         $this->initializeAccessMatrix();
     }
 
-  private function initializeAccessMatrix()
+    private function initializeAccessMatrix()
     {
-        // Fetch modules from the database using the correct column 'modulename'
         $modules = Module::pluck('modulename')->toArray();
 
         if (empty($modules)) {
@@ -105,6 +105,7 @@ class AllUsers extends Component
         $this->contactno = $user->contactno ?? '';
         $this->gender = $user->gender ?? '';
         $this->birthdate = $user->birthdate ? $user->birthdate->format('Y-m-d') : '';
+        $this->address = $user->address ?? ''; // Added loading address
         $this->status = $user->status ?? 'Active';
         $this->RoleID = $user->RoleID ?? '';
 
@@ -116,17 +117,13 @@ class AllUsers extends Component
         Log::info("Opening access modal for user ID: {$user->UserID}");
 
         $this->selectedUserId = $user->UserID;
-
-        // Reset/Initialize Matrix first
         $this->initializeAccessMatrix();
 
-        // If user has a RoleID, load existing privileges from database
         if ($user->RoleID) {
             $privileges = Privilege::where('RoleID', $user->RoleID)->with('module')->get();
 
             foreach ($privileges as $privilege) {
                 if ($privilege->module) {
-                    // Use 'modulename' to match your database column
                     $moduleName = $privilege->module->modulename;
                     if (isset($this->userAccess[$moduleName])) {
                         $this->userAccess[$moduleName] = [
@@ -167,12 +164,13 @@ class AllUsers extends Component
         if ($this->selectedUser) {
             $this->selectedUser->update([
                 'firstname' => $this->firstname,
-                'middlename' => $this->middlename,
+                'middlename' => $this->middlename !== '' ? $this->middlename : null,
                 'lastname' => $this->lastname,
                 'username' => $this->username,
-                'contactno' => $this->contactno,
-                'gender' => $this->gender,
-                'birthdate' => $this->birthdate,
+                'contactno' => $this->contactno !== '' ? $this->contactno : null,
+                'gender' => $this->gender !== '' ? $this->gender : null,
+                'birthdate' => $this->birthdate !== '' ? $this->birthdate : null,
+                'address' => $this->address !== '' ? $this->address : null,
                 'status' => $this->status,
                 'RoleID' => $this->RoleID,
             ]);
@@ -204,25 +202,15 @@ class AllUsers extends Component
 
         $user = $this->selectedUser;
 
-        if (!$user) {
-            Log::warning("SaveAccess failed: Selected user not found for ID: {$this->selectedUserId}");
+        if (!$user || !$user->RoleID) {
+            Log::warning("SaveAccess failed: User or RoleID not found.");
             return;
         }
-
-        if (!$user->RoleID) {
-            Log::warning("SaveAccess failed: User ID {$user->UserID} does not have a RoleID assigned.");
-            return;
-        }
-
-        Log::info("Processing privileges for Role ID: {$user->RoleID} with " . count($this->userAccess) . " modules.");
 
         foreach ($this->userAccess as $moduleName => $permissions) {
-            // Find module ID by 'modulename'
             $module = Module::where('modulename', $moduleName)->first();
 
             if ($module) {
-                Log::info("Found module '{$moduleName}' with ID: {$module->ModuleID}. Saving permissions...", $permissions);
-
                 Privilege::updateOrCreate(
                     [
                         'RoleID'   => $user->RoleID,
@@ -237,17 +225,12 @@ class AllUsers extends Component
                         'can_change_status' => $permissions['status'],
                     ]
                 );
-            } else {
-                Log::warning("Module not found in database for name: '{$moduleName}'");
             }
         }
-
-        Log::info("Successfully finished processing privileges for Role ID: {$user->RoleID}");
 
         $this->isAccessModalOpen = false;
         session()->flash('message', 'User access permissions updated successfully.');
     }
-
 
     public function resetTable(): void
     {
@@ -255,10 +238,10 @@ class AllUsers extends Component
         $this->resetPage();
     }
 
-public function render()
+    public function render()
     {
         $users = User::query()
-            ->where('RoleID', '!=', 4) // Exclude users with RoleID 4
+            ->where('RoleID', '!=', 4)
             ->when(filled($this->search), function ($query) {
                 $search = trim($this->search);
 
