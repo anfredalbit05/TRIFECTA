@@ -1,4 +1,4 @@
-<div class="w-full bg-slate-50 min-h-[500px] p-6 rounded-2xl border border-slate-200/80 shadow-sm"
+<div class="w-full bg-slate-50 min-h-[500px] p-6 rounded-2xl border border-slate-200/80 shadow-sm -mr-78"
      x-data="{
          scale: 0.75,
          isFullscreen: false,
