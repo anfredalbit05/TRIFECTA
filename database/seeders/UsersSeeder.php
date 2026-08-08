@@ -386,6 +386,40 @@ class UsersSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'username' => 'humanresources.team',
+                'password' => Hash::make('HR@2026'),
+
+                'lastname' => 'Resources',
+                'firstname' => 'Human',
+                'middlename' => null,
+
+                // Source only provides "09/19/19", which is ambiguous.
+                'birthdate' => null,
+
+                'contactno' => null,
+
+                'address' => null,
+
+                'email' => null,
+                'email_verified_at' => now(),
+
+                'profilepic' => 'images/profiles/default-avatar.png',
+
+                'referralCode' => strtoupper(Str::random(8)),
+                'uplineCode' => null,
+
+                'branchCode' => null,
+
+                'RoleID' => $executiveManagementRoleId,
+
+                'status' => 'Active',
+
+                'remember_token' => null,
+
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
             
 
         ]);
