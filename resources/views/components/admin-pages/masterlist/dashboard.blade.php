@@ -20,28 +20,37 @@
         </button>
     </div>
 
-    <!-- KPI CARDS -->
+    <!-- KPI CARDS (Dark Glassmorphism with #0C2C6B Base, Watermark Icons Only) -->
     @php
         $cards = [
-            ['Total Members', $totalMembers, '👥', 'bg-blue-600'],
-            ['Active Branches', $activeBranches, '🏢', 'bg-purple-600'],
-            ['Benefits', $totalBenefits, '🎁', 'bg-pink-600'],
-            ['Inquiries', $totalInquiries, '📩', 'bg-red-600'],
+            ['Total Members', $totalMembers, '👥', 'hover:shadow-blue-500/60'],
+            ['Active Branches', $activeBranches, '🏢', 'hover:shadow-blue-500/60'],
+            ['Benefits', $totalBenefits, '🎁', 'hover:shadow-blue-500/60'],
+            ['Inquiries', $totalInquiries, '📩', 'hover:shadow-blue-500/60'],
         ];
     @endphp
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         @foreach ($cards as $card)
-            <div class="rounded-xl text-white p-4 sm:p-5 shadow-lg transition-transform hover:-translate-y-1 {{ $card[3] }}">
-                <div class="text-2xl sm:text-3xl mb-2">
+            <div
+                class="relative overflow-hidden rounded-2xl p-4 sm:p-5 backdrop-blur-xl bg-gradient-to-br from-[#0C2C6B]/90 via-[#133880]/80 to-[#1b469b]/70 border border-white/10 {{ $card[3] }} shadow-xl transition-all duration-300 hover:-translate-y-1.5 group text-white">
+
+                <!-- Large Background Overlay Icon Watermark -->
+                <div
+                    class="absolute -right-3 -bottom-3 text-7xl text-white opacity-10 transition-transform duration-500 group-hover:scale-125 group-hover:opacity-20 pointer-events-none select-none brightness-0 invert">
                     {{ $card[2] }}
                 </div>
-                <p class="text-[10px] sm:text-xs uppercase tracking-wider opacity-80 font-medium">
-                    {{ $card[0] }}
-                </p>
-                <h3 class="text-xl sm:text-2xl font-bold mt-1">
-                    {{ number_format($card[1]) }}
-                </h3>
+
+                <!-- Content Container -->
+                <div class="relative z-10">
+                    <p class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-300 font-semibold opacity-90">
+                        {{ $card[0] }}
+                    </p>
+                    <h3 class="text-xl sm:text-2xl font-bold mt-1 text-white tracking-tight drop-shadow-sm">
+                        {{ number_format($card[1]) }}
+                    </h3>
+                </div>
+
             </div>
         @endforeach
     </div>
@@ -49,10 +58,13 @@
     <!-- SUMMARY STATISTICS & EXCEL EXPORT / PRINT SECTION -->
     <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-6">
         <!-- Top Filter Bar -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        <div
+            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
-                <h3 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider">Summary Overview of Members</h3>
-                <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">Filter stats overview or select specific options below to export and print reports.</p>
+                <h3 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider">Summary Overview of
+                    Members</h3>
+                <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">Filter stats overview or select specific options
+                    below to export and print reports.</p>
             </div>
             <div class="w-full sm:w-auto">
                 <select wire:model.live="summaryFilter"
@@ -70,20 +82,24 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 flex flex-col justify-between">
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Members</p>
-                <p class="text-xl sm:text-2xl font-bold text-slate-800 mt-2">{{ number_format($this->summaryStats['total']) }}</p>
+                <p class="text-xl sm:text-2xl font-bold text-slate-800 mt-2">
+                    {{ number_format($this->summaryStats['total']) }}</p>
             </div>
             <div class="bg-blue-50/50 rounded-xl p-4 border border-blue-100 flex flex-col justify-between">
                 <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider">Active Members</p>
-                <p class="text-xl sm:text-2xl font-bold text-[#0C2C6B] mt-2">{{ number_format($this->summaryStats['active']) }}</p>
+                <p class="text-xl sm:text-2xl font-bold text-[#0C2C6B] mt-2">
+                    {{ number_format($this->summaryStats['active']) }}</p>
             </div>
             <div class="bg-slate-100/70 rounded-xl p-4 border border-slate-200 flex flex-col justify-between">
                 <p class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Inactive Members</p>
-                <p class="text-xl sm:text-2xl font-bold text-slate-700 mt-2">{{ number_format($this->summaryStats['inactive']) }}</p>
+                <p class="text-xl sm:text-2xl font-bold text-slate-700 mt-2">
+                    {{ number_format($this->summaryStats['inactive']) }}</p>
             </div>
         </div>
 
         <!-- REPORT FILTERS & EXPORT TOOLBAR -->
-        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col lg:flex-row items-center justify-between gap-4">
+        <div
+            class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col lg:flex-row items-center justify-between gap-4">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full lg:w-auto">
                 <!-- YEAR SELECTOR -->
                 <select wire:model.live="exportYear"
@@ -152,9 +168,10 @@
     <div id="printable-report" class="hidden print:block font-sans mb-4">
         <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#1b365d]">
             <h1 class="m-0 text-2xl font-bold text-[#1b365d] font-serif">TRUE LIFE DAYONGAN</h1>
-            <p class="my-1 text-[11px] font-bold text-[#c5a059] uppercase tracking-wider">&mdash; S O L I D A R I T A S &mdash;</p>
+            <p class="my-1 text-[11px] font-bold text-[#c5a059] uppercase tracking-wider">&mdash; S O L I D A R I T A S
+                &mdash;</p>
             <p class="my-0.5 text-[8px] text-[#1b365d] uppercase tracking-wider">&mdash; Vitae Auxilium &mdash;</p>
-            <h2 class="mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold">LIST OF MEMBERS</h2>
+            <h2 class="mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold">LIST OF MEMBERS & BENEFICIARIES</h2>
         </div>
     </div>
 
@@ -168,6 +185,7 @@
                     <th class="border border-slate-900 p-1">Gender</th>
                     <th class="border border-slate-900 p-1">Civil Status</th>
                     <th class="border border-slate-900 p-1">Contact Number</th>
+                    <th class="border border-slate-900 p-1">Beneficiaries</th>
                 </tr>
             </thead>
             <tbody>
@@ -183,16 +201,36 @@
                         $birthdateFormatted = $member->birthdate ? date('F d, Y', strtotime($member->birthdate)) : '-';
                     @endphp
                     <tr>
-                        <td class="border border-slate-900 p-1 text-center">{{ $index + 1 }}</td>
-                        <td class="border border-slate-900 p-1 font-bold">{{ $fullName }}</td>
-                        <td class="border border-slate-900 p-1 text-center">{{ $birthdateFormatted }}</td>
-                        <td class="border border-slate-900 p-1 text-center">{{ $member->gender ?? '-' }}</td>
-                        <td class="border border-slate-900 p-1 text-center">{{ $member->civilstatus ?? '-' }}</td>
-                        <td class="border border-slate-900 p-1 text-center">{{ $member->contactno ?? '-' }}</td>
+                        <td class="border border-slate-900 p-1 text-center align-top">{{ $index + 1 }}</td>
+                        <td class="border border-slate-900 p-1 font-bold align-top">{{ $fullName }}</td>
+                        <td class="border border-slate-900 p-1 text-center align-top">{{ $birthdateFormatted }}</td>
+                        <td class="border border-slate-900 p-1 text-center align-top">{{ $member->gender ?? '-' }}
+                        </td>
+                        <td class="border border-slate-900 p-1 text-center align-top">
+                            {{ $member->civilstatus ?? '-' }}</td>
+                        <td class="border border-slate-900 p-1 text-center align-top">{{ $member->contactno ?? '-' }}
+                        </td>
+                        <td class="border border-slate-900 p-1 align-top">
+                            @if ($member->beneficiaries && $member->beneficiaries->count() > 0)
+                                <ul class="list-disc pl-3 m-0">
+                                    @foreach ($member->beneficiaries as $beneficiary)
+                                        <li>
+                                            <strong>{{ $beneficiary->fullname }}</strong>
+                                            @if ($beneficiary->relationship)
+                                                ({{ $beneficiary->relationship }})
+                                            @endif
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <span class="text-slate-500 italic">None</span>
+                            @endif
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="border border-slate-900 p-2.5 text-center">No members found for the selected filters.</td>
+                        <td colspan="7" class="border border-slate-900 p-2.5 text-center">No members found for the
+                            selected filters.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -200,58 +238,58 @@
     </div>
 
     <style>
-        @media print {
-            @page {
-                size: auto;
-                margin: 8mm;
-            }
-
-            body * {
-                visibility: hidden !important;
-            }
-
-            #printable-report,
-            #printable-report *,
-            .member-table,
-            .member-table * {
-                visibility: visible !important;
-            }
-
-            #printable-report {
-                display: block !important;
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-            }
-
-            .member-table {
-                display: block !important;
-                position: absolute !important;
-                left: 0 !important;
-                top: 110px !important;
-                width: 100% !important;
-            }
-
-            table {
-                border-collapse: collapse !important;
-                width: 100% !important;
-            }
-
-            th,
-            td {
-                border: 1px solid #000 !important;
-                padding: 4px !important;
-            }
-
-            th {
-                background-color: #0C2C6B !important;
-                color: white !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
+    @media print {
+        @page {
+            size: landscape;
+            margin: 8mm;
         }
-    </style>
+
+        body * {
+            visibility: hidden !important;
+        }
+
+        #printable-report,
+        #printable-report *,
+        .member-table,
+        .member-table * {
+            visibility: visible !important;
+        }
+
+        #printable-report {
+            display: block !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+        }
+
+        .member-table {
+            display: block !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 110px !important;
+            width: 100% !important;
+        }
+
+        table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+        }
+
+        th,
+        td {
+            border: 1px solid #000 !important;
+            padding: 4px !important;
+        }
+
+        th {
+            background-color: #0C2C6B !important;
+            color: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+    }
+</style>
 </div>
 
 <!-- MAP INITIALIZATION SCRIPT -->

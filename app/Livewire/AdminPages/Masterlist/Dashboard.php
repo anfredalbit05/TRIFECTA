@@ -52,7 +52,8 @@ class Dashboard extends Component
             }
         }
 
-        $printMembers = $query->latest()->get();
+        // Inside render() method:
+        $printMembers = $query->with('beneficiaries')->latest()->get();
 
         return view('components.admin-pages.masterlist.dashboard', [
             'totalMembers' => User::where('RoleID', 4)->count(),
@@ -99,7 +100,7 @@ class Dashboard extends Component
                 $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
             } elseif ($this->summaryFilter === 'month') {
                 $query->whereMonth('created_at', now()->month)
-                      ->whereYear('created_at', now()->year);
+                    ->whereYear('created_at', now()->year);
             } elseif ($this->summaryFilter === 'year') {
                 $query->whereYear('created_at', now()->year);
             }
@@ -123,19 +124,16 @@ class Dashboard extends Component
     */
     public function exportExcel(): StreamedResponse
     {
-        $query = User::query()->where('RoleID', 4);
+        $query = User::query()->where('RoleID', 4)->with('beneficiaries');
 
-        // Filter by Year if selected
         if (!empty($this->exportYear)) {
             $query->whereYear('created_at', $this->exportYear);
         }
 
-        // Filter by Month if selected
         if (!empty($this->exportMonth)) {
             $query->whereMonth('created_at', $this->exportMonth);
         }
 
-        // Filter by Status if selected
         if (!empty($this->exportStatus)) {
             if (strtolower($this->exportStatus) === 'active') {
                 $query->whereRaw('LOWER(status) = ?', ['active']);
@@ -158,31 +156,15 @@ class Dashboard extends Component
             echo '<head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head>';
             echo '<body>';
 
-            // DAYONGAN SOLIDARITAS HEADER
+            // HEADER
             echo '<div style="text-align: center; font-family: Arial, sans-serif; margin-bottom: 25px; border-bottom: 2px solid #1b365d; padding-bottom: 15px;">';
-
-            // Main Branding Container
-            echo '<div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">';
-
-            // Optional: Include your logo image file here if available
-            // echo '<img src="/images/dayongan-logo.png" alt="Logo" style="height: 55px; margin-right: 15px;">';
-
-            echo '<div>';
             echo '<h1 style="margin: 0; font-size: 28px; font-weight: bold; color: #1b365d; letter-spacing: 3px; font-family: Georgia, serif;">TRUE LIFE DAYONGAN</h1>';
             echo '<p style="margin: 4px 0; font-size: 12px; font-weight: bold; color: #c5a059; letter-spacing: 4px; text-transform: uppercase;">&mdash; S O L I D A R I T A S &mdash;</p>';
-            echo '<p style="margin: 2px 0 0 0; font-size: 9px; color: #1b365d; letter-spacing: 3px; text-transform: uppercase;">&mdash; Vitae Auxilium &mdash;</p>';
-            echo '</div>';
-
-            echo '</div>'; // End Branding Container
-
-            // Document Title & Timestamp
-            echo '<h2 style="margin: 15px 0 5px 0; font-size: 16px; font-weight: bold; text-transform: uppercase; color: #333;">LIST OF MEMBERS</h2>';
+            echo '<h2 style="margin: 15px 0 5px 0; font-size: 16px; font-weight: bold; text-transform: uppercase; color: #333;">LIST OF MEMBERS & BENEFICIARIES</h2>';
             echo '</div>';
 
             // DATA TABLE
             echo '<table border="1" style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11px; width: 100%;">';
-
-            // Header Row Style
             echo '<tr style="background-color: #0C2C6B; color: #FFFFFF; font-weight: bold; text-align: center; height: 25px;">';
             echo '<th style="padding: 5px;">#</th>';
             echo '<th style="padding: 5px;">Full Name</th>';
@@ -190,21 +172,35 @@ class Dashboard extends Component
             echo '<th style="padding: 5px;">Gender</th>';
             echo '<th style="padding: 5px;">Civil Status</th>';
             echo '<th style="padding: 5px;">Contact Number</th>';
+            echo '<th style="padding: 5px;">Beneficiaries</th>';
             echo '</tr>';
 
-            // Data Rows
             $index = 1;
             foreach ($members as $member) {
                 $fullName = trim($member->lastname . ', ' . $member->firstname . ' ' . ($member->middlename ?? ''));
                 $birthdateFormatted = $member->birthdate ? date('F d, Y', strtotime($member->birthdate)) : '-';
 
+                // Format beneficiaries list for Excel cell
+                // Format beneficiaries list for Excel cell
+                $beneficiariesList = '-';
+                if ($member->beneficiaries && $member->beneficiaries->count() > 0) {
+                    $beneficiariesFormatted = [];
+                    foreach ($member->beneficiaries as $ben) {
+                        $benName = $ben->fullname ?? 'N/A';
+                        $benRel = !empty($ben->relationship) ? ' (' . $ben->relationship . ')' : '';
+                        $beneficiariesFormatted[] = $benName . $benRel;
+                    }
+                    $beneficiariesList = implode('<br>', $beneficiariesFormatted);
+                }
+
                 echo '<tr>';
-                echo '<td style="text-align: center; padding: 4px;">' . $index++ . '</td>';
-                echo '<td style="padding: 4px; font-weight: bold;">' . htmlspecialchars($fullName) . '</td>';
-                echo '<td style="padding: 4px; text-align: center;">' . htmlspecialchars($birthdateFormatted) . '</td>';
-                echo '<td style="padding: 4px; text-align: center;">' . htmlspecialchars($member->gender ?? '-') . '</td>';
-                echo '<td style="padding: 4px; text-align: center;">' . htmlspecialchars($member->civilstatus ?? '-') . '</td>';
-                echo '<td style="padding: 4px; text-align: center;">' . htmlspecialchars($member->contactno ?? '-') . '</td>';
+                echo '<td style="text-align: center; padding: 4px; vertical-align: top;">' . $index++ . '</td>';
+                echo '<td style="padding: 4px; font-weight: bold; vertical-align: top;">' . htmlspecialchars($fullName) . '</td>';
+                echo '<td style="padding: 4px; text-align: center; vertical-align: top;">' . htmlspecialchars($birthdateFormatted) . '</td>';
+                echo '<td style="padding: 4px; text-align: center; vertical-align: top;">' . htmlspecialchars($member->gender ?? '-') . '</td>';
+                echo '<td style="padding: 4px; text-align: center; vertical-align: top;">' . htmlspecialchars($member->civilstatus ?? '-') . '</td>';
+                echo '<td style="padding: 4px; text-align: center; vertical-align: top;">' . htmlspecialchars($member->contactno ?? '-') . '</td>';
+                echo '<td style="padding: 4px; vertical-align: top;">' . $beneficiariesList . '</td>';
                 echo '</tr>';
             }
 

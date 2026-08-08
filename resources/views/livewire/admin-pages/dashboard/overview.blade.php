@@ -32,31 +32,40 @@
         </div>
     </div>
 
-    <!-- KPI CARDS -->
+    <!-- KPI CARDS (Dark Glassmorphism with #0C2C6B Base, White Icons, and Overlay Watermark) -->
     @php
         $cards = [
-            ['Members', $totalMembers, '👥', 'bg-blue-600'],
-            ['Active', $activeMembers, '✅', 'bg-green-600'],
-            ['Branches', $totalBranches, '🏢', 'bg-purple-600'],
-            ['Benefits', $totalBenefits, '🎁', 'bg-pink-600'],
-            ['Beneficiaries', $totalBeneficiaries, '💳', 'bg-orange-600'],
-            ['Inquiries', $totalInquiry, '📩', 'bg-red-600'],
+            ['Members', $totalMembers, '👥', 'hover:shadow-blue-500/60'],
+            ['Active', $activeMembers, '✅', 'hover:shadow-blue-500/60'],
+            ['Branches', $totalBranches, '🏢', 'hover:shadow-blue-500/60'],
+            ['Benefits', $totalBenefits, '🎁', 'hover:shadow-blue-500/60'],
+            ['Beneficiaries', $totalBeneficiaries, '💳', 'hover:shadow-blue-500/60'],
+            ['Inquiries', $totalInquiry, '📩', 'hover:shadow-blue-500/60'],
         ];
     @endphp
 
     <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
         @foreach ($cards as $card)
             <div
-                class="rounded-xl text-white p-5 shadow-lg transition-transform hover:-translate-y-1 {{ $card[3] }}">
-                <div class="text-3xl mb-2">
+                class="relative overflow-hidden rounded-2xl p-5 backdrop-blur-xl bg-gradient-to-br from-[#0C2C6B]/90 via-[#133880]/80 to-[#1b469b]/70 border border-white/10 {{ $card[3] }} shadow-xl transition-all duration-300 hover:-translate-y-1.5 group text-white">
+
+                <!-- Large Background Overlay Icon Watermark (Forced White with Low Opacity) -->
+                <div
+                    class="absolute -right-3 -bottom-3 text-7xl text-white opacity-10 transition-transform duration-500 group-hover:scale-125 group-hover:opacity-20 pointer-events-none select-none brightness-0 invert">
                     {{ $card[2] }}
                 </div>
-                <p class="text-xs uppercase tracking-wider opacity-80 font-medium">
-                    {{ $card[0] }}
-                </p>
-                <h3 class="text-2xl font-bold mt-1">
-                    {{ number_format($card[1]) }}
-                </h3>
+
+                <!-- Content Container -->
+                <div class="relative z-10">
+
+                    <p class="text-xs uppercase tracking-wider text-gray-300 font-semibold opacity-90">
+                        {{ $card[0] }}
+                    </p>
+                    <h3 class="text-2xl font-bold mt-1 text-white tracking-tight drop-shadow-sm">
+                        {{ number_format($card[1]) }}
+                    </h3>
+                </div>
+
             </div>
         @endforeach
     </div>
@@ -194,15 +203,19 @@
                             </div>
                             <div
                                 class="w-12 h-12 rounded-full overflow-hidden bg-[#0C2C6B]/10 flex items-center justify-center shrink-0 border border-gray-200">
-                                @if (!empty($referrer->profilepic))
-                                    <img src="{{ asset('storage/' . $referrer->profilepic) }}"
-                                        alt="{{ $referrer->firstname }}"
+                                @php
+                                    $referrerPic = $referrer->profilepic ?? null;
+                                @endphp
+
+                                @if (empty($referrerPic) || $referrerPic === 'images/profiles/default-avatar.png')
+                                    <img src="{{ asset('images/profiles/default-avatar.png') }}"
+                                        alt="Default profile picture"
                                         class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                                        @click="modalOpen = true; activeImage = '{{ asset('storage/' . $referrer->profilepic) }}'; activeName = '{{ $referrer->firstname }} {{ $referrer->lastname }}'; activeAddress = '{{ $referrer->address }}'">
+                                        @click="modalOpen = true; activeImage = '{{ asset('images/profiles/default-avatar.png') }}'; activeName = '{{ $referrer->firstname }} {{ $referrer->lastname }}'; activeAddress = '{{ $referrer->address }}'">
                                 @else
-                                    <span class="text-[#0C2C6B] font-bold text-sm tracking-wide">
-                                        {{ strtoupper(substr($referrer->firstname, 0, 1)) }}{{ strtoupper(substr($referrer->lastname, 0, 1)) }}
-                                    </span>
+                                    <img src="{{ asset('storage/' . $referrerPic) }}" alt="{{ $referrer->firstname }}"
+                                        class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                                        @click="modalOpen = true; activeImage = '{{ asset('storage/' . $referrerPic) }}'; activeName = '{{ $referrer->firstname }} {{ $referrer->lastname }}'; activeAddress = '{{ $referrer->address }}'">
                                 @endif
                             </div>
                             <div>
@@ -219,11 +232,11 @@
                             </div>
                         </div>
                         <div class="text-right">
-                            <span
-                                class="inline-flex items-center gap-1 font-extrabold text-[#0C2C6B] bg-blue-50/80 border border-blue-100 px-3 py-1.5 rounded-xl text-sm shadow-sm">
+                            <button wire:click="viewInvites({{ $referrer->UserID }})" type="button"
+                                class="inline-flex items-center gap-1 font-extrabold text-[#0C2C6B] bg-blue-50/80 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-xl text-sm shadow-sm transition cursor-pointer">
                                 {{ $referrer->total_invites }}
                                 <span class="text-xs font-medium text-blue-600/70">Invites</span>
-                            </span>
+                            </button>
                         </div>
                     </div>
                 @empty
@@ -232,6 +245,101 @@
                         <p class="text-sm text-gray-400">No referral records found for this year.</p>
                     </div>
                 @endforelse
+
+                <!-- INVITED PEOPLE LIST MODAL -->
+                @if ($showInvitesModal)
+                    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs">
+                        <div
+                            class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl flex flex-col max-h-[85vh] border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+
+                            <!-- Modal Header -->
+                            <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-[#0C2C6B] text-lg font-bold">
+                                        👥
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-[#0C2C6B] text-lg leading-snug">Invited Members</h3>
+                                        <p class="text-xs text-gray-500">
+                                            Referrals by <span
+                                                class="font-semibold text-gray-700">{{ $selectedReferrerName }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <button wire:click="closeInvitesModal" type="button"
+                                    class="w-8 h-8 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 font-bold transition cursor-pointer">
+                                    &times;
+                                </button>
+                            </div>
+
+                            <!-- Modal Sub-Header (Total Count Banner) -->
+                            <div
+                                class="flex items-center justify-between bg-blue-50/60 border border-blue-100/60 rounded-2xl px-4 py-3 my-4">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-blue-900/70">Total
+                                    Successful Invites</span>
+                                <span
+                                    class="inline-flex items-center gap-1 font-extrabold text-[#0C2C6B] bg-white border border-blue-200/60 px-3 py-1 rounded-xl text-sm shadow-2xs">
+                                    {{ count($referredUsers) }} <span
+                                        class="text-xs font-medium text-blue-600/70">Invites</span>
+                                </span>
+                            </div>
+
+                            <!-- Modal Body (Scrollable List) -->
+                            <div class="overflow-y-auto space-y-3 max-h-[42vh] pr-1">
+                                @forelse($referredUsers as $refUser)
+                                    <div
+                                        class="flex items-center justify-between p-3.5 bg-gray-50/70 hover:bg-gray-50 border border-gray-100 rounded-2xl transition-all">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-11 h-11 rounded-full overflow-hidden bg-[#0C2C6B]/10 flex items-center justify-center shrink-0 border border-gray-200 shadow-2xs">
+                                                @if (!empty($refUser->profilepic))
+                                                    <img src="{{ asset('storage/' . $refUser->profilepic) }}"
+                                                        alt="{{ $refUser->firstname }}"
+                                                        class="w-full h-full object-cover">
+                                                @else
+                                                    <span class="text-[#0C2C6B] font-bold text-xs tracking-wide">
+                                                        {{ strtoupper(substr($refUser->firstname, 0, 1)) }}{{ strtoupper(substr($refUser->lastname, 0, 1)) }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-bold text-gray-800 leading-tight">
+                                                    {{ $refUser->firstname }} {{ $refUser->lastname }}
+                                                </p>
+                                                <p class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                                                    <span>Joined:</span>
+                                                    <span
+                                                        class="font-medium text-gray-600">{{ \Carbon\Carbon::parse($refUser->activation_date)->format('M d, Y') }}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <span
+                                            class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100/60 shadow-2xs">
+                                            Approved
+                                        </span>
+                                    </div>
+                                @empty
+                                    <div class="text-center py-10">
+                                        <p class="text-4xl mb-2">📭</p>
+                                        <p class="text-sm font-bold text-gray-700">No Invites Found</p>
+                                        <p class="text-xs text-gray-400 mt-0.5">No referred members found for the
+                                            selected period.</p>
+                                    </div>
+                                @endforelse
+                            </div>
+
+                            <!-- Modal Footer -->
+                            <div class="pt-4 border-t border-gray-100 mt-4">
+                                <button wire:click="closeInvitesModal" type="button"
+                                    class="w-full bg-[#0C2C6B] text-white py-3 rounded-2xl text-sm font-semibold hover:bg-[#081f4f] transition-all shadow-md shadow-blue-900/10 cursor-pointer">
+                                    Close Window
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <!-- IMAGE PREVIEW MODAL -->
@@ -262,69 +370,67 @@
     </div>
 
     <!-- CHARTS SECTION -->
-    <div class="grid grid-cols-1 gap-6">
-        <div class="bg-white shadow-sm border border-gray-100 rounded-2xl p-6">
+    <div class="grid grid-cols-1 gap-6 mt-6">
+        <div class="bg-white shadow-sm border border-gray-100 rounded-2xl p-6" x-data="monthlyChart()"
+            @chart-data-updated.window="updateChart($event.detail)">
             <h3 class="font-bold text-[#0C2C6B] text-lg mb-4">
                 Monthly Registrations
             </h3>
             <div class="relative h-64 sm:h-80 w-full">
-                <canvas id="monthlyChart"></canvas>
+                <canvas id="monthlyChartCanvas"></canvas>
             </div>
         </div>
+
     </div>
 
-</div>
-
-<!-- CHART INITIALIZATION WITH LIVEWIRE RE-RENDER SUPPORT -->
+    <!-- CHART INITIALIZATION WITH ALPINE.JS -->
 <script>
-    let monthlyChartInstance = null;
-
-    function renderMonthlyChart() {
-        const ctx = document.getElementById('monthlyChart');
-        if (!ctx) return;
-
-        const monthlyLabels = @json($monthlyUsers->pluck('month'));
-        const monthlyData = @json($monthlyUsers->pluck('total'));
-
-        if (monthlyChartInstance) {
-            monthlyChartInstance.destroy();
-        }
-
-        monthlyChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: monthlyLabels,
-                datasets: [{
-                    label: 'New Members',
-                    data: monthlyData,
-                    backgroundColor: '#0C2C6B',
-                    borderRadius: 8
-                }]
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('monthlyChart', () => ({
+            chartInstance: null,
+            init() {
+                this.renderChart(
+                    @json($monthlyUsers->pluck('month')),
+                    @json($monthlyUsers->pluck('total'))
+                );
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1,
-                            precision: 0
+            renderChart(labels, data) {
+                const ctx = document.getElementById('monthlyChartCanvas');
+                if (!ctx) return;
+
+                if (this.chartInstance) {
+                    this.chartInstance.destroy();
+                }
+
+                this.chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'New Members',
+                            data: data,
+                            backgroundColor: '#0C2C6B',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    precision: 0
+                                }
+                            }
                         }
                     }
-                }
+                });
+            },
+            updateChart(detail) {
+                this.renderChart(detail.labels, detail.data);
             }
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', renderMonthlyChart);
-    document.addEventListener('livewire:initialized', () => {
-        renderMonthlyChart();
-        Livewire.hook('morph.updated', ({
-            el,
-            component
-        }) => {
-            renderMonthlyChart();
-        });
+        }));
     });
 </script>

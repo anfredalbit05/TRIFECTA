@@ -17,7 +17,7 @@ use Carbon\Carbon;
 class OverviewAnalytics extends Component
 {
     public $selectedYear;
-    public $availableYears = [];
+    public array $availableYears = [];
 
     public $totalMembers;
     public $activeMembers;
@@ -42,14 +42,16 @@ class OverviewAnalytics extends Component
     public $monthlyUsers;
     public $topReferrers;
 
+    public $showInvitesModal = false;
+    public $selectedReferrerName = '';
+    public array $referredUsers = [];
+
     public function mount()
     {
-        // Generate years from 2020 up to the current year (2026)
         $currentYear = Carbon::now()->year;
         $this->availableYears = range(2020, $currentYear);
-        rsort($this->availableYears); // Sort descending (2026, 2025, ... 2020)
+        rsort($this->availableYears);
 
-        // Default to the current year
         $this->selectedYear = $currentYear;
         $this->loadData();
     }
@@ -57,20 +59,58 @@ class OverviewAnalytics extends Component
     public function updatedSelectedYear()
     {
         $this->loadData();
+        $this->dispatchChartData();
     }
 
     public function refreshAnalytics()
     {
         $this->loadData();
+        $this->dispatchChartData();
+
         $label = $this->selectedYear === '2020-Present' ? '2020 to Present' : $this->selectedYear;
-        session()->flash('message', 'Analytics data refreshed successfully for ' . $label . '.');
+        $this->dispatch('swal:success', [
+            'title' => 'Refreshed!',
+            'text'  => 'Analytics data refreshed successfully for ' . $label . '.'
+        ]);
+    }
+
+    private function getMonthlyUserData($year)
+    {
+        $monthlyQuery = User::select(
+            DB::raw("MONTH(created_at) as month_num"),
+            DB::raw("COUNT(*) as total")
+        );
+
+        if ($year === '2020-Present') {
+            $monthlyQuery->whereYear('created_at', '>=', 2020);
+        } else {
+            $monthlyQuery->whereYear('created_at', $year);
+        }
+
+        $rawMonthlyUsers = $monthlyQuery
+            ->groupBy('month_num')
+            ->pluck('total', 'month_num');
+
+        return collect(range(1, 12))->map(function ($monthNum) use ($rawMonthlyUsers) {
+            return [
+                'month' => Carbon::create()->month($monthNum)->format('M'),
+                'total' => (int) ($rawMonthlyUsers->get($monthNum, 0)),
+            ];
+        });
+    }
+
+    private function dispatchChartData()
+    {
+        $this->dispatch('chart-data-updated',
+            labels: $this->monthlyUsers->pluck('month'),
+            data: $this->monthlyUsers->pluck('total')
+        );
     }
 
     public function loadData()
     {
         $year = $this->selectedYear;
 
-        // Reusable query filter handler for single year or 2020-Present range
         $applyFilter = function($query, $column = 'created_at') use ($year) {
             if ($year === '2020-Present') {
                 $query->whereYear($column, '>=', 2020);
@@ -79,20 +119,12 @@ class OverviewAnalytics extends Component
             }
         };
 
-        /*
-        |--------------------------------------------------------------------------
-        | MEMBER ANALYTICS
-        |--------------------------------------------------------------------------
-        */
+        // Member Analytics
         $this->totalMembers = User::where($applyFilter)->count();
         $this->activeMembers = User::where($applyFilter)->where('status', 1)->count();
         $this->inactiveMembers = User::where($applyFilter)->where('status', 0)->count();
 
-        /*
-        |--------------------------------------------------------------------------
-        | SYSTEM COUNTS
-        |--------------------------------------------------------------------------
-        */
+        // System Counts
         $this->totalBranches = Branch::where($applyFilter)->count();
         $this->totalBenefits = Benefit::where($applyFilter)->count();
         $this->totalBeneficiaries = Beneficiary::where($applyFilter)->count();
@@ -100,36 +132,20 @@ class OverviewAnalytics extends Component
         $this->totalFaq = Faq::where($applyFilter)->count();
         $this->totalInquiry = Inquiry::where($applyFilter)->count();
 
-        /*
-        |--------------------------------------------------------------------------
-        | INQUIRIES
-        |--------------------------------------------------------------------------
-        */
+        // Inquiries
         $this->unreadInquiry = Inquiry::where($applyFilter)->whereNull('date_read')->count();
         $this->readInquiry = Inquiry::where($applyFilter)->whereNotNull('date_read')->count();
 
-        /*
-        |--------------------------------------------------------------------------
-        | RECENT USERS & NEWS
-        |--------------------------------------------------------------------------
-        */
+        // Recent Users & News
         $this->recentMembers = User::where($applyFilter)->latest()->limit(5)->get();
         $this->recentNews = NewsUpdate::where($applyFilter)->latest()->limit(5)->get();
 
-        /*
-        |--------------------------------------------------------------------------
-        | BRANCH DISTRIBUTION
-        |--------------------------------------------------------------------------
-        */
+        // Branch Distribution
         $this->branchStats = Branch::withCount(['user' => function ($query) use ($applyFilter) {
             $applyFilter($query);
         }])->get();
 
-        /*
-        |--------------------------------------------------------------------------
-        | BENEFIT ANALYTICS
-        |--------------------------------------------------------------------------
-        */
+        // Benefit Analytics
         try {
             $this->benefitStats = Benefit::withCount(['beneficiaries' => function ($query) use ($applyFilter) {
                 $applyFilter($query);
@@ -138,32 +154,21 @@ class OverviewAnalytics extends Component
             $this->benefitStats = Benefit::all();
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | MONTHLY REGISTRATION
-        |--------------------------------------------------------------------------
-        */
-        $monthlyQuery = User::select(
-                DB::raw("DATE_FORMAT(created_at,'%b') as month"),
-                DB::raw("MONTH(created_at) as month_num"),
-                DB::raw("COUNT(*) as total")
-            );
+        // Monthly Registrations (Guarantees all 12 months)
+        $this->monthlyUsers = $this->getMonthlyUserData($year);
 
-        $applyFilter($monthlyQuery);
-
-        $this->monthlyUsers = $monthlyQuery
-            ->groupBy('month', 'month_num')
-            ->orderBy('month_num')
-            ->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | TOP REFERRERS LEADERBOARD
-        |--------------------------------------------------------------------------
-        */
+        // Top Referrers Leaderboard
         $referrerQuery = User::query()
             ->join('activations', 'users.referralCode', '=', 'activations.upline_code')
-            ->select('users.firstname', 'users.lastname', 'users.referralCode', 'users.profilepic', 'users.address', DB::raw('count(activations.ActivationID) as total_invites'))
+            ->select(
+                'users.UserID',
+                'users.firstname',
+                'users.lastname',
+                'users.referralCode',
+                'users.profilepic',
+                'users.address',
+                DB::raw('count(activations.ActivationID) as total_invites')
+            )
             ->where('activations.status', 'Approved');
 
         $applyFilter($referrerQuery, 'activations.created_at');
@@ -173,6 +178,40 @@ class OverviewAnalytics extends Component
             ->orderByDesc('total_invites')
             ->limit(5)
             ->get();
+    }
+
+    public function viewInvites($userId)
+    {
+        $year = $this->selectedYear;
+
+        $referrer = User::where('UserID', $userId)->first();
+        if (!$referrer) {
+            return;
+        }
+
+        $this->selectedReferrerName = $referrer->firstname . ' ' . $referrer->lastname;
+
+        $query = User::query()
+            ->join('activations', 'users.referralCode', '=', 'activations.upline_code')
+            ->where('activations.upline_code', $referrer->referralCode)
+            ->where('activations.status', 'Approved')
+            ->select('users.*', 'activations.created_at as activation_date');
+
+        if ($year === '2020-Present') {
+            $query->whereYear('activations.created_at', '>=', 2020);
+        } else {
+            $query->whereYear('activations.created_at', $year);
+        }
+
+        $this->referredUsers = $query->get()->toArray();
+        $this->showInvitesModal = true;
+    }
+
+    public function closeInvitesModal()
+    {
+        $this->showInvitesModal = false;
+        $this->referredUsers = [];
+        $this->selectedReferrerName = '';
     }
 
     public function render()

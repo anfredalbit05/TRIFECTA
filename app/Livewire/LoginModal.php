@@ -119,8 +119,8 @@ class LoginModal extends Component
 
     public function mount()
     {
-        // Automatically open the login modal if the current request is the secret login route
-        if (request()->routeIs('secret.login') || request()->has('auto_login')) {
+        // Only open the login modal automatically if the user is a GUEST (not authenticated)
+        if (!Auth::check() && (request()->routeIs('secret.login') || request()->has('auto_login'))) {
             $this->openLogin = true;
         }
     }

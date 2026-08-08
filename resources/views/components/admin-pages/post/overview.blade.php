@@ -20,40 +20,36 @@
         </button>
     </div>
 
-    <!-- SUMMARY METRICS GRID -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+   <!-- SUMMARY METRICS GRID (Dark Glassmorphism with #0C2C6B Base, Watermark Icons Only) -->
+@php
+    $cards = [
+        ['Published Testimonials', $totalTestimonials, '💬', 'hover:shadow-blue-500/60'],
+        ['Published News & Updates', $totalNews, '📰', 'hover:shadow-blue-500/60'],
+    ];
+@endphp
 
-        <!-- Total Testimonials Card -->
-        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 flex items-center justify-between">
-            <div>
-                <h3 class="text-sm font-semibold tracking-wide text-gray-500 uppercase">
-                    Published Testimonials
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+    @foreach ($cards as $card)
+        <div class="relative overflow-hidden rounded-2xl p-6 backdrop-blur-xl bg-gradient-to-br from-[#0C2C6B]/90 via-[#133880]/80 to-[#1b469b]/70 border border-white/10 {{ $card[3] }} shadow-xl transition-all duration-300 hover:-translate-y-1.5 group text-white">
+
+            <!-- Large Background Overlay Icon Watermark -->
+            <div class="absolute -right-3 -bottom-3 text-7xl text-white opacity-10 transition-transform duration-500 group-hover:scale-125 group-hover:opacity-20 pointer-events-none select-none brightness-0 invert">
+                {{ $card[2] }}
+            </div>
+
+            <!-- Content Container -->
+            <div class="relative z-10">
+                <h3 class="text-sm font-semibold tracking-wide text-gray-300 uppercase opacity-90">
+                    {{ $card[0] }}
                 </h3>
-                <p class="text-3xl font-extrabold text-[#0C2C6B] mt-2">
-                    {{ $totalTestimonials }}
+                <p class="text-3xl font-extrabold text-white mt-2 tracking-tight drop-shadow-sm">
+                    {{ number_format($card[1]) }}
                 </p>
             </div>
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-50 text-[#0C2C6B] text-xl">
-                💬
-            </div>
-        </div>
 
-        <!-- Total News & Updates Card -->
-        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 flex items-center justify-between">
-            <div>
-                <h3 class="text-sm font-semibold tracking-wide text-gray-500 uppercase">
-                    Published News & Updates
-                </h3>
-                <p class="text-3xl font-extrabold text-[#0C2C6B] mt-2">
-                    {{ $totalNews }}
-                </p>
-            </div>
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-50 text-[#0C2C6B] text-xl">
-                📰
-            </div>
         </div>
-
-    </div>
+    @endforeach
+</div>
 
     <!-- MAIN CONTENT CARD -->
     <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6">

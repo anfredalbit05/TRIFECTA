@@ -78,7 +78,7 @@
             </div>
 
             <!-- Right CTA & Auth Controls (Desktop) -->
-            <div class="hidden lg:flex items-center gap-3">
+            <div  iv class="hidden lg:flex items-center gap-3">
 
                 @guest
 
@@ -100,9 +100,9 @@
 
                     @php
                         $u = Auth::user();
-                        $fullName = trim(($u->firstname ?? '') . ' ' . ($u->lastname ?? ''));
+                        $fullName = $u->username;
                         if (empty($fullName)) {
-                            $fullName = $u->name ?? $u->username ?? 'User';
+                            $fullName = $u->username ?? 'User';
                         }
 
                         $roleID = (int)($u->RoleID ?? $u->roleID ?? 0);
@@ -183,7 +183,7 @@
 
                                 <a href="{{ route('dashboard') }}"
                                    class="flex items-center gap-3 px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-100 transition">
-                                    <span>🗂️</span>
+                                    <span></span>
                                     <span>My Dashboard</span>
                                 </a>
                             </div>
@@ -197,7 +197,7 @@
                                     type="button"
                                     onclick="confirmNavbarLogout()"
                                     class="flex w-full items-center gap-3 px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition cursor-pointer cursor-pointer">
-                                    <span>🚪</span>
+                                    <span></span>
                                     <span>Logout</span>
                                 </button>
                             </form>
@@ -339,7 +339,7 @@
 
                             <a href="{{ route('dashboard') }}"
                                class="block rounded-xl bg-[#D79B10] py-3 text-center font-bold text-white hover:bg-[#E5B83B] transition">
-                                📊 My Dashboard
+                                My Dashboard
                             </a>
 
 
@@ -350,7 +350,7 @@
                             type="button"
                             onclick="confirmMobileLogout()"
                             class="w-full rounded-xl border border-red-400/50 py-3 font-bold text-red-300 transition hover:bg-red-500/20 hover:text-white cursor-pointer">
-                            🚪 Logout
+                            Logout
                         </button>
                     </form>
 

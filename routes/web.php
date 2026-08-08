@@ -15,6 +15,7 @@ use App\Http\Controllers\PolicyController;
 use App\Livewire\LoginModal;
 use App\Livewire\MemberPages\MyProfile\MyProfile;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Setting;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,13 +37,7 @@ Route::get('/register/{referralCode}', function ($referralCode) {
     return redirect()->route('home', ['ref' => $referralCode]);
 })->name('register.referral');
 
-Route::get('/my-id-pdf', function () {
-    $user = Auth::user();
-    $pdf = Pdf::loadView('livewire.member-pages.my-profile.id-card-pdf-component', [
-        'user' => $user,
-    ]);
-    return $pdf->download('id-card.pdf');
-})->middleware('auth');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +47,17 @@ Route::get('/my-id-pdf', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
+        // 1. Check if maintenance mode is enabled
+        $maintenance = Setting::where('name', 'maintenance_mode')->value('value');
+
+        // 2. If maintenance is active and the user is NOT a Super Admin (RoleID 1)
+        if (($maintenance === '1' || $maintenance === 'true') && optional(Auth::user())->RoleID !== 1) {
+            return response()->view('maintenance', [], 503);
+        }
+        // if(Auth::check()){
+        //     return view('livewire.landing-page.home');
+        // }
+
         if (Auth::user()->RoleID != 4) {
             return view('pages.admin-pages.dashboard');
         }
@@ -90,6 +96,14 @@ Route::middleware(['auth'])->group(function () {
         return view('pages.member-pages.my-profile', compact('activationStatus'));
     })->name('my-profile');
 
+    Route::get('/my-id-pdf', function () {
+        $user = Auth::user();
+        $pdf = Pdf::loadView('livewire.member-pages.my-profile.id-card-pdf-component', [
+            'user' => $user,
+        ]);
+        return $pdf->download('id-card.pdf');
+    })->name('member-id-card');
+
     Route::post('/logout', function () {
         Auth::logout();
         request()->session()->invalidate();
@@ -100,4 +114,4 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('/secret-login', Home::class)->defaults('autoLogin', true)->name('secret.login');
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';

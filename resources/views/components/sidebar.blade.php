@@ -83,6 +83,11 @@ use Illuminate\Support\Str;
                             Masterlist
                         </a>
 
+                         {{-- <a
+                            class="menu-item ? 'active-menu' : '' }}">
+                            Satelite
+                        </a> --}}
+
                         <a href="{{ route('post') }}"
                             class="menu-item {{ request()->routeIs('post') ? 'active-menu' : '' }}">
                             Post
