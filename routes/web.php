@@ -16,6 +16,7 @@ use App\Livewire\LoginModal;
 use App\Livewire\MemberPages\MyProfile\MyProfile;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Setting;
+use App\Http\Controllers\MemberIdCardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -93,13 +94,8 @@ Route::middleware(['auth'])->group(function () {
         return view('pages.member-pages.my-profile', compact('activationStatus'));
     })->name('my-profile');
 
-    Route::get('/my-id-pdf', function () {
-        $user = Auth::user();
-        $pdf = Pdf::loadView('livewire.member-pages.my-profile.id-card-pdf-component', [
-            'user' => $user,
-        ]);
-        return $pdf->download('id-card.pdf');
-    })->name('member-id-card');
+    Route::get('/member/id-card/pdf', [MemberIdCardController::class, 'download'])
+        ->name('member.id-card.pdf');
 
     Route::post('/logout', function () {
         Auth::logout();

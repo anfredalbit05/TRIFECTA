@@ -282,7 +282,7 @@
             <!-- Live ID Preview Card Section -->
             <div
                 class="bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-200 flex flex-col items-center justify-between shadow-inner h-fit overflow-x-hidden"
-                x-data="idPdfDownload()">
+                >
                 <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-1">
                     👁️ Live ID Preview
                 </h4>
@@ -298,7 +298,7 @@
                             </div>
                         </div>
 
-                        <div class="flex gap-2 sm:gap-3 my-auto items-center">
+                      <div class="flex gap-2 sm:gap-3 my-auto items-center">
                             <div class="w-16 sm:w-20 h-20 sm:h-24 border border-slate-300 bg-slate-100 flex items-center justify-center text-slate-400 text-center text-[9px] shrink-0 overflow-hidden rounded">
                                 @if ($profilepic && is_object($profilepic))
                                     <img src="{{ $profilepic->temporaryUrl() }}" class="h-full w-full object-cover">
@@ -310,7 +310,7 @@
                                 @endif
                             </div>
 
-                            <div class="space-y-0.5 text-[9px] sm:text-[10px] text-slate-800 overflow-hidden">
+                            <div class="flex-1 space-y-0.5 text-[9px] sm:text-[10px] text-slate-800 overflow-hidden">
                                 <p><strong>ID No.:</strong> UL-{{ str_pad(auth()->id(), 5, '0', STR_PAD_LEFT) }}</p>
                                 <p><strong>FULL NAME:</strong>
                                     {{ strtoupper(trim("$firstname $middlename $lastname") ?: 'NAME HERE') }}</p>
@@ -322,6 +322,10 @@
                                     {{ $birthdate ? \Carbon\Carbon::parse($birthdate)->format('F d, Y') : 'N/A' }}</p>
                                 <p><strong>DATE JOINED:</strong>
                                     {{ auth()->user()->created_at?->format('F d, Y') ?? 'N/A' }}</p>
+                            </div>
+
+                            <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 ml-auto [&>svg]:w-full [&>svg]:h-full">
+                                {!! $qrCode !!}
                             </div>
                         </div>
 
@@ -346,9 +350,7 @@
                                 <span class="text-[5px] sm:text-[6px] text-slate-500 tracking-tighter mt-0.5">SIGNATURE</span>
                             </div>
 
-                            <div class="w-8 h-8 sm:w-10 sm:h-10 [&>svg]:w-full [&>svg]:h-full shrink-0">
-                                {!! $qrCode !!}
-                            </div>
+
                         </div>
                     </div>
 
@@ -393,8 +395,9 @@
                         class="px-4 py-1 text-xs font-semibold rounded shadow cursor-pointer bg-slate-200 text-slate-700">Back</button>
                 </div>
 
-                {{-- <div class="flex flex-col sm:flex-row gap-2 w-full mt-4">
-                    <button type="button" @click="downloadPdf"
+                <div class="flex flex-col sm:flex-row gap-2 w-full mt-4">
+                    <button type="button"
+                        onclick="window.location.href='{{ route('member.id-card.pdf') }}'"
                         class="flex-1 rounded-xl bg-slate-200 py-3 text-xs font-semibold cursor-pointer">
                         📥 Download ID (PDF)
                     </button>
@@ -402,7 +405,7 @@
                         class="flex-1 rounded-xl bg-[#0C2C6B] py-3 text-xs font-semibold text-white shadow transition hover:bg-[#071a42] cursor-pointer">
                         Request Physical ID
                     </button>
-                </div> --}}
+                </div>
             </div>
         </div>
     </div>
@@ -606,37 +609,255 @@
         }
     }
 
-    function idPdfDownload() {
-        return {
-            downloadPdf() {
-                const front = document.getElementById('id-card-front');
-                const back = document.getElementById('id-card-back');
+     document.addEventListener('alpine:init', () => {
 
-                const container = document.createElement('div');
-                container.style.display = 'flex';
-                container.style.flexDirection = 'column';
-                container.style.gap = '20px';
-                container.style.alignItems = 'center';
+        Alpine.data('idPdfDownload', () => ({
+            async downloadPdf() {
 
-                const frontClone = front.cloneNode(true);
-                const backClone = back.cloneNode(true);
+                const pdfTemplate = document.getElementById('pdf-membership-card');
 
-                frontClone.classList.remove('hidden');
-                backClone.classList.remove('hidden');
+                if (!pdfTemplate) {
+                    console.error(
+                        'idPdfDownload: #pdf-membership-card was not found.'
+                    );
 
-                container.appendChild(frontClone);
-                container.appendChild(backClone);
+                    Swal.fire({
+                        title: 'Download Failed',
+                        text: 'PDF card template was not found.',
+                        icon: 'error',
+                        confirmButtonColor: '#0C2C6B'
+                    });
 
-                const opt = {
-                    margin:       10,
-                    filename:     'member-id-card.pdf',
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true },
-                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
+                    return;
+                }
 
-                html2pdf().from(container).set(opt).save();
+                if (typeof html2pdf === 'undefined') {
+                    console.error(
+                        'idPdfDownload: html2pdf library did not load.'
+                    );
+
+                    Swal.fire({
+                        title: 'Download Failed',
+                        text: 'PDF generator did not load. Please refresh the page and try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#0C2C6B'
+                    });
+
+                    return;
+                }
+
+                let container = null;
+
+                try {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | CREATE PDF CONTAINER
+                    |--------------------------------------------------------------------------
+                    */
+
+                    container = document.createElement('div');
+
+                    container.id = 'pdf-download-container';
+
+                    container.style.position = 'fixed';
+                    container.style.left = '-100000px';
+                    container.style.top = '0';
+                    container.style.width = '760px';
+                    container.style.background = '#ffffff';
+                    container.style.padding = '10px';
+                    container.style.margin = '0';
+                    container.style.zIndex = '-9999';
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | CLONE PLAIN HTML CARD
+                    |--------------------------------------------------------------------------
+                    |
+                    | IMPORTANT:
+                    | We clone #pdf-membership-card instead of the Tailwind
+                    | #id-card-front / #id-card-back.
+                    |
+                    | Your PDF template uses normal HEX/RGBA colors only.
+                    |
+                    */
+
+                    const clone = pdfTemplate.cloneNode(true);
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | REMOVE HIDDEN ATTRIBUTE / DISPLAY NONE
+                    |--------------------------------------------------------------------------
+                    */
+
+                    clone.removeAttribute('hidden');
+
+                    clone.style.display = 'block';
+                    clone.style.visibility = 'visible';
+                    clone.style.position = 'static';
+                    clone.style.width = '100%';
+                    clone.style.background = '#ffffff';
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | MAKE SURE ALL ELEMENTS ARE VISIBLE
+                    |--------------------------------------------------------------------------
+                    */
+
+                    clone.querySelectorAll('*').forEach(element => {
+
+                        element.style.removeProperty('display');
+
+                        element.style.removeProperty('visibility');
+
+                    });
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | APPEND TO BODY
+                    |--------------------------------------------------------------------------
+                    */
+
+                    container.appendChild(clone);
+
+                    document.body.appendChild(container);
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | WAIT FOR IMAGES
+                    |--------------------------------------------------------------------------
+                    */
+
+                    await this.waitForImages(clone);
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | PDF OPTIONS
+                    |--------------------------------------------------------------------------
+                    */
+
+                    const options = {
+                        margin: 10,
+
+                        filename: 'member-id-card.pdf',
+
+                        image: {
+                            type: 'jpeg',
+                            quality: 0.98
+                        },
+
+                        html2canvas: {
+                            scale: 2,
+
+                            useCORS: true,
+
+                            allowTaint: false,
+
+                            backgroundColor: '#ffffff',
+
+                            logging: false,
+
+                            imageTimeout: 15000
+                        },
+
+                        jsPDF: {
+                            unit: 'mm',
+                            format: 'a4',
+                            orientation: 'portrait'
+                        },
+
+                        pagebreak: {
+                            mode: ['css', 'legacy']
+                        }
+                    };
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | GENERATE PDF
+                    |--------------------------------------------------------------------------
+                    */
+
+                    await html2pdf()
+                        .set(options)
+                        .from(clone)
+                        .save();
+
+                    console.log(
+                        'idPdfDownload: PDF generated successfully.'
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        'idPdfDownload: PDF generation failed',
+                        error
+                    );
+
+                    Swal.fire({
+                        title: 'Download Failed',
+                        text: 'Something went wrong while generating your ID card PDF.',
+                        icon: 'error',
+                        confirmButtonColor: '#0C2C6B'
+                    });
+
+                } finally {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | CLEANUP
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if (container && container.parentNode) {
+                        container.remove();
+                    }
+
+                }
+            },
+
+            /*
+            |--------------------------------------------------------------------------
+            | WAIT FOR ALL IMAGES
+            |--------------------------------------------------------------------------
+            */
+
+            waitForImages(root) {
+
+                const images = Array.from(
+                    root.querySelectorAll('img')
+                );
+
+                if (images.length === 0) {
+                    return Promise.resolve();
+                }
+
+                return Promise.all(
+                    images.map(img => {
+
+                        if (img.complete) {
+                            return Promise.resolve();
+                        }
+
+                        return new Promise(resolve => {
+
+                            img.addEventListener(
+                                'load',
+                                resolve,
+                                { once: true }
+                            );
+
+                            img.addEventListener(
+                                'error',
+                                resolve,
+                                { once: true }
+                            );
+
+                        });
+
+                    })
+                );
             }
-        }
-    }
+        }));
+
+    });
 </script>

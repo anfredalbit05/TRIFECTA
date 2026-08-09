@@ -22,148 +22,171 @@
         }
 
         .card {
-    width: 100%;
-    max-width: 760px;
-    margin: 0 auto;
-    background: #fff;
-    border: 1px solid #d9d9d9;
-    border-radius: 16px;
-    padding: 16px 18px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-}
+            width: 100%;
+            max-width: 760px;
+            margin: 0 auto 20px auto;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            border-radius: 16px;
+            padding: 16px 18px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
 
-/* HEADER */
+        /* HEADER */
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1.5px solid #000;
-    padding-bottom: 10px;
-    margin-bottom: 12px;
-}
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1.5px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+        }
 
-.title {
-    font-size: 22px;
-    font-weight: 700;
-    color: #0c2c6b;
-}
+        .title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0c2c6b;
+        }
 
-.badge {
-    background: #dbeafe;
-    color: #1d4ed8;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 5px 10px;
-    border-radius: 4px;
-}
+        .badge {
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
 
-/* BODY */
+        /* BODY */
 
-.content {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-}
+        .content {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
 
-.photo {
-    width: 82px;
-    height: 92px;
-    object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid #d1d5db;
-}
+        .photo {
+            width: 82px;
+            height: 92px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            background: #f1f5f9;
+        }
 
-.details {
-    flex: 1;
-    font-size: 12px;
-    line-height: 1.35;
-}
+        .details {
+            flex: 1;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #111;
+        }
 
-.details p {
-    margin: 2px 0;
-}
+        .details p {
+            margin: 2px 0;
+        }
 
-.details strong {
-    font-weight: 700;
-}
+        .details strong {
+            font-weight: 700;
+            color: #111;
+        }
 
-.card-divider {
-    border: 0;
-    border-top: 1px solid #d1d5db;
-    margin: 12px 0;
-}
+        .details .val {
+            color: #1d4ed8;
+            font-weight: 600;
+        }
 
-/* FOOTER */
+        .qrcode-top {
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
 
-.footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-}
+        .qrcode-top img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
 
-.beneficiaries {
-    width: 48%;
-    font-size: 10px;
-}
+        .card-divider {
+            border: 0;
+            border-top: 1.5px solid #000;
+            margin: 14px 0 12px 0;
+        }
 
-.beneficiaries strong {
-    display: block;
-    margin-bottom: 4px;
-}
+        /* FOOTER */
 
-.beneficiaries p {
-    margin: 1px 0;
-}
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
 
-.signature-section {
-    width: 24%;
-    text-align: center;
-}
+        .beneficiaries {
+            width: 55%;
+            font-size: 11px;
+        }
 
-.signature-img {
-    height: 24px;
-    object-fit: contain;
-    margin-bottom: -3px;
-}
+        .beneficiaries strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #334155;
+        }
 
-.signature-line {
-    border-top: 1px solid #3b82f6;
-}
+        .beneficiaries p {
+            margin: 1px 0;
+            color: #64748b;
+        }
 
-.signature-section small {
-    font-size: 7px;
-    color: #777;
-}
+        .signature-section {
+            width: 40%;
+            text-align: center;
+        }
 
-.qrcode-section {
-    width: 15%;
-    text-align: right;
-}
+        .signature-img {
+            height: 26px;
+            object-fit: contain;
+            margin-bottom: -3px;
+        }
 
-.qrcode-img {
-    width: 50px;
-    height: 50px;
-}
+        .signature-placeholder {
+            font-style: italic;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .signature-line {
+            border-top: 1px solid #94a3b8;
+        }
+
+        .signature-section small {
+            font-size: 8px;
+            color: #64748b;
+            letter-spacing: 0.5px;
+        }
 
         /* --- BACK CARD STYLES --- */
         .back-title {
             text-align: center;
-            font-size: 14px;
-            font-weight: bold;
-            color: #0C2C6B;
+            font-size: 15px;
+            font-weight: 700;
+            color: #0c2c6b;
             margin-top: 0;
             margin-bottom: 10px;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         .back-content {
             font-size: 11px;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
-        .back-content > p {
-            margin: 0 0 4px 0;
+        .back-content > p.intro {
+            margin: 0 0 6px 0;
+            font-weight: 700;
+            color: #111;
         }
 
         .back-content ul {
@@ -172,22 +195,24 @@
         }
 
         .back-content ul li {
-            margin-bottom: 2px;
+            margin-bottom: 3px;
+            color: #475569;
         }
 
         .termination-note {
             font-size: 10px;
-            color: #555;
-            margin-bottom: 10px;
+            color: #64748b;
+            margin-bottom: 4px;
         }
 
         .emergency-section {
-            margin-top: 5px;
+            margin-top: 6px;
         }
 
         .emergency-title {
-            font-weight: bold;
-            margin-bottom: 6px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #111;
         }
 
         .emergency-grid {
@@ -202,7 +227,12 @@
         }
 
         .emergency-fields p {
-            margin: 5px 0;
+            margin: 6px 0;
+            color: #111;
+        }
+
+        .emergency-fields strong {
+            font-weight: 700;
         }
 
         .manager-section {
@@ -210,20 +240,27 @@
             text-align: center;
         }
 
+        .manager-signature-script {
+            font-family: 'Brush Script MT', cursive, sans-serif;
+            font-size: 20px;
+            color: #111;
+        }
+
         .manager-line {
             border-top: 1px solid #0C2C6B;
-            margin-top: 25px;
-            margin-bottom: 2px;
+            margin-top: 22px;
+            margin-bottom: 3px;
         }
 
         .manager-name {
             font-size: 10px;
-            font-weight: bold;
+            font-weight: 700;
+            color: #0c2c6b;
         }
 
         .manager-title {
             font-size: 8px;
-            color: #333;
+            color: #64748b;
         }
     </style>
 </head>
@@ -238,59 +275,63 @@
                 <div class="badge">PRIMARY MEMBER</div>
             </div>
 
-        <div class="content">
+            <div class="content">
 
-    <div class="photo-box">
-        <img class="photo"
-             src="{{ !empty($user->profilepic)
-                        ? public_path('storage/'.$user->profilepic)
-                        : public_path('images/profiles/default-avatar.png') }}">
-    </div>
+                <div class="photo-box">
+                    <img class="photo"
+                         src="{{ !empty($user->profilepic)
+                                   ? public_path('storage/'.$user->profilepic)
+                                   : public_path('images/profiles/default-avatar.png') }}">
+                </div>
 
-    <div class="details">
+                <div class="details">
+                    <p><strong>ID No.:</strong>
+                        <span class="val">UL-{{ str_pad($user->id, 5, '0', STR_PAD_LEFT) }}</span>
+                    </p>
 
-        <p><strong>ID No.:</strong>
-            UL-{{ str_pad($user->id, 5, '0', STR_PAD_LEFT) }}
-        </p>
+                    <p>
+                        <strong>FULL NAME:</strong>
+                        <span class="val">{{ strtoupper($user->firstname.' '.$user->middlename.' '.$user->lastname) }}</span>
+                    </p>
 
-        <p>
-            <strong>FULL NAME:</strong>
-            {{ strtoupper($user->firstname.' '.$user->middlename.' '.$user->lastname) }}
-        </p>
+                    <p>
+                        <strong>ADDRESS:</strong>
+                        <span class="val">{{ strtoupper($user->address ?? 'N/A') }}</span>
+                    </p>
 
-        <p>
-            <strong>ADDRESS:</strong>
-            {{ strtoupper($user->address ?? 'N/A') }}
-        </p>
+                    <p>
+                        <strong>SEX:</strong> <span class="val">{{ strtoupper($user->sex ?? 'N/A') }}</span>
 
-        <p>
-            <strong>SEX:</strong> {{ strtoupper($user->sex ?? 'N/A') }}
+                        &nbsp;&nbsp;
 
-            &nbsp;&nbsp;
+                        <strong>STATUS:</strong>
+                        <span class="val">{{ strtoupper($user->civilStatus ?? 'N/A') }}</span>
+                    </p>
 
-            <strong>STATUS:</strong>
-            {{ strtoupper($user->civilStatus ?? 'N/A') }}
-        </p>
+                    <p>
+                        <strong>BIRTH DATE:</strong>
+                        <span class="val">{{ $user->birthdate
+                            ? \Carbon\Carbon::parse($user->birthdate)->format('F d, Y')
+                            : 'N/A' }}</span>
+                    </p>
 
-        <p>
-            <strong>BIRTH DATE:</strong>
+                    <p>
+                        <strong>DATE JOINED:</strong>
+                        <span class="val">{{ $user->created_at
+                            ? $user->created_at->format('F d, Y')
+                            : 'N/A' }}</span>
+                    </p>
+                </div>
 
-            {{ $user->birthdate
-                ? \Carbon\Carbon::parse($user->birthdate)->format('F d, Y')
-                : 'N/A' }}
-        </p>
+                <div class="qrcode-top">
+                    @if(!empty($user->qrcode) && file_exists(public_path($user->qrcode)))
+                        <img src="{{ public_path($user->qrcode) }}" alt="QR Code">
+                    @else
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=UL-{{ str_pad($user->id ?? 1, 5, '0', STR_PAD_LEFT) }}" alt="QR Code">
+                    @endif
+                </div>
 
-        <p>
-            <strong>DATE JOINED:</strong>
-
-            {{ $user->created_at
-                ? $user->created_at->format('F d, Y')
-                : 'N/A' }}
-        </p>
-
-    </div>
-
-</div>
+            </div>
 
             <hr class="card-divider">
 
@@ -302,7 +343,7 @@
                             <p>• {{ $b->fullname }}</p>
                         @endforeach
                     @else
-                        <p>• None specified</p>
+                        <p>No beneficiaries added</p>
                     @endif
                 </div>
 
@@ -310,31 +351,23 @@
                     @if(!empty($user->signature) && file_exists(public_path($user->signature)))
                         <img class="signature-img" src="{{ public_path($user->signature) }}" alt="Signature">
                     @else
-                        <div style="height: 30px;"></div>
+                        <div class="signature-placeholder">No Signature</div>
                     @endif
                     <div class="signature-line"></div>
                     <small>SIGNATURE</small>
-                </div>
-
-                <div class="qrcode-section">
-                    @if(!empty($user->qrcode) && file_exists(public_path($user->qrcode)))
-                        <img class="qrcode-img" src="{{ public_path($user->qrcode) }}" alt="QR Code">
-                    @else
-                        <img class="qrcode-img" src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=UL-{{ str_pad($user->id ?? 1, 5, '0', STR_PAD_LEFT) }}" alt="QR Code">
-                    @endif
                 </div>
             </div>
         </div>
 
         <!-- ==================== BACK CARD ==================== -->
         <div class="card">
-            <h3 class="back-title">UNITYLIFE TERM AND TERMINATION</h3>
+            <h3 class="back-title">TRUE LIFE DAYONGAN TERM AND TERMINATION</h3>
 
             <div class="back-content">
-                <p>UNITYLIFE may terminate this MEMBERSHIP, for the following grounds:</p>
+                <p class="intro">TRUE LIFE DAYONGAN may terminate this MEMBERSHIP, for the following grounds:</p>
                 <ul>
                     <li>Fraud or misrepresentation</li>
-                    <li>Misuse of Unitylife name and materials</li>
+                    <li>Misuse of True Life Dayongan name and materials</li>
                     <li>Violation of company rules or applicable laws</li>
                 </ul>
                 <div class="termination-note">Termination shall be without prejudice to any liabilities incurred prior to termination.</div>
@@ -356,7 +389,7 @@
                             @if(!empty($managerSignature) && file_exists(public_path($managerSignature)))
                                 <img src="{{ public_path($managerSignature) }}" alt="Manager Signature" style="height: 25px; object-fit: contain; display: block; margin: 0 auto;">
                             @else
-                                <div style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 20px; color: #111;">Sey</div>
+                                <div class="manager-signature-script">Sey</div>
                             @endif
                             <div class="manager-line"></div>
                             <div class="manager-name">REYMARK P. BAUTISTA</div>
