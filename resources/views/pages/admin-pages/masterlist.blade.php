@@ -22,11 +22,11 @@
                     Overview
                 </a>
 
-                @if(auth()->user()->RoleID == 1)
+
                 <a href="#" @click.prevent="tab = 'admin-users'" :class="tab === 'admin-users' ? 'active' : ''">
                     Admin Users
                 </a>
-                @endif
+
 
                 <a href="#" @click.prevent="tab = 'members'" :class="tab === 'members' ? 'active' : ''">
                     Members

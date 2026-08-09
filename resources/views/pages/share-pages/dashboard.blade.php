@@ -19,7 +19,7 @@
         <!-- NAVIGATION MENU -->
         <div class="dashboard-nav-menu">
 
-             @if(auth()->user()->RoleID == 1)
+             @if(auth()->user()->RoleID != 4)
               <a href="#"
                @click.prevent="tab='analytics'"
                :class="tab === 'analytics' ? 'active' : ''">

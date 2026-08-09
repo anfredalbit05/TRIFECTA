@@ -8,6 +8,7 @@ use App\Models\Privilege;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class AdminUsers extends Component
 {
@@ -72,6 +73,64 @@ class AdminUsers extends Component
                 'printall' => false,
             ];
         }
+    }
+
+      /*
+    |--------------------------------------------------------------------------
+    | Permission Checkers (ModuleID 4 assumed for Benefits)
+    |--------------------------------------------------------------------------
+    */
+
+    protected function hasPermission($action): bool
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return false;
+        }
+
+        // Super Admin override (RoleID 1)
+        if ((int) $user->RoleID === 1) {
+            return true;
+        }
+
+        $column = 'can_' . $action;
+
+        if ($user->role && method_exists($user->role, 'permissions')) {
+            $hasPerm = optional($user->role->permissions)
+                ->where('ModuleID', 1)
+                ->where($column, 1)
+                ->isNotEmpty();
+
+            if ($hasPerm) {
+                return true;
+            }
+        }
+
+        return Privilege::where('RoleID', $user->RoleID)
+            ->where('ModuleID', 1)
+            ->where($column, 1)
+            ->exists();
+    }
+
+    public function getCanCreateProperty(): bool
+    {
+        return $this->hasPermission('create');
+    }
+
+    public function getCanReadProperty(): bool
+    {
+        return $this->hasPermission('read');
+    }
+
+    public function getCanUpdateProperty(): bool
+    {
+        return $this->hasPermission('update');
+    }
+
+    public function getCanDeleteProperty(): bool
+    {
+        return $this->hasPermission('delete');
     }
 
     public function getSelectedUserProperty()
@@ -256,7 +315,7 @@ class AdminUsers extends Component
             ->latest('UserID')
             ->paginate(10);
 
-        return view('livewire.admin-pages.dashboard.all-users', [
+        return view('livewire.admin-pages.dashboard.admin-users', [
             'users' => $users,
         ]);
     }

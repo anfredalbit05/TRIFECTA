@@ -389,7 +389,6 @@ class UsersSeeder extends Seeder
             [
                 'username' => 'truelifedayongan',
                 'password' => Hash::make('HR@2026'),
-
                 'lastname' => 'Resources',
                 'firstname' => 'Human',
                 'middlename' => null,
