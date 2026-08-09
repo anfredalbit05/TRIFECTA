@@ -261,7 +261,7 @@ class GeneralSettings extends Component
             ->latest('SettingsID')
             ->paginate(10);
 
-        return view('components.admin-pages.report-settings.general', [
+        return view('livewire.admin-pages.report-settings.general', [
             'settings' => $settings
         ]);
     }

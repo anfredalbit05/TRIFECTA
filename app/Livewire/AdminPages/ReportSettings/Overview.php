@@ -212,7 +212,7 @@ class Overview extends Component
         ->orderBy('x.Sequence')
         ->get();
 
-        return view('components.admin-pages.report-settings.overview', [
+        return view('livewire.admin-pages.report-settings.overview', [
             'totalIncome'            => $totalIncome,
             'totalReportsGenerated'    => $totalReportsGenerated,
             'totalSettingsCount'       => $totalSettingsCount,

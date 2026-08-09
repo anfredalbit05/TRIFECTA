@@ -60,7 +60,7 @@
             x-show="tab === 'general'"
             x-cloak
             class="dashboard-main-card full-width-card">
-            @livewire('admin-pages.report-settings.general-settings')
+            <livewire:admin-pages.report-settings.general-settings />
         </div>
 
         <!-- USERS -->
@@ -71,13 +71,13 @@
             <livewire:admin-pages.report-settings.user-accounts />
         </div>
 
-    <!-- REPORTS -->
-<div
-    x-show="tab === 'reports'"
-    x-cloak
-    class="dashboard-main-card full-width-card">
-    <livewire:admin-pages.report-settings.reports />
-</div>
+            <!-- REPORTS -->
+        <div
+            x-show="tab === 'reports'"
+            x-cloak
+            class="dashboard-main-card full-width-card">
+            <livewire:admin-pages.report-settings.reports />
+        </div>
 
     </div>
 

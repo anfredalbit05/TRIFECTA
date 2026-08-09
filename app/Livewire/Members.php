@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
-
+use Carbon\Carbon;
 
 
 class Members extends Component
@@ -16,6 +16,8 @@ class Members extends Component
     use WithPagination;
 
     public string $search = '';
+    public $selectedYear;
+    public $selectedMonth; // Added month property
 
     public string $summaryFilter = 'all';
 
@@ -27,6 +29,13 @@ class Members extends Component
     public bool $skipRender = true;
 
     protected $paginationTheme = 'tailwind';
+
+    public function mount()
+    {
+        // Sets the default filter display to the current year
+        $this->selectedYear = Carbon::now()->year;
+        $this->selectedMonth = '';
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -114,7 +123,6 @@ class Members extends Component
             ])
             ->when(filled($this->search), function ($query) {
                 $search = trim($this->search);
-
                 $query->where(function ($q) use ($search) {
                     $q->where('firstname', 'like', "%{$search}%")
                         ->orWhere('middlename', 'like', "%{$search}%")
@@ -122,12 +130,29 @@ class Members extends Component
                         ->orWhere('username', 'like', "%{$search}%");
                 });
             })
+            ->when($this->selectedYear, function ($query) {
+                $query->whereYear('created_at', $this->selectedYear);
+            })
+            ->when(filled($this->selectedMonth), function ($query) {
+                // Filters based on the month created
+                $query->whereMonth('created_at', $this->selectedMonth);
+            })
             ->latest()
             ->paginate(10);
 
         return view('components.admin-pages.masterlist.members', [
             'members' => $members,
         ]);
+    }
+
+    public function updatedSelectedYear()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSelectedMonth()
+    {
+        $this->resetPage();
     }
 
     public function updatingSearch()
@@ -304,6 +329,8 @@ class Members extends Component
     {
         $this->search = '';
         $this->summaryFilter = 'all';
+        $this->selectedYear = Carbon::now()->year; // Reset to current year
+        $this->selectedMonth = '';                  // Clear month filter
         $this->exportYear = '';
         $this->exportMonth = '';
         $this->exportStatus = '';

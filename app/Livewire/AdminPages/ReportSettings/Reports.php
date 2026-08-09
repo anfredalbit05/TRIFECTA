@@ -40,7 +40,7 @@ class Reports extends Component
             ->latest('TransactionID')
             ->paginate(10);
 
-        return view('components.admin-pages.report-settings.reports', [
+        return view('livewire.admin-pages.report-settings.reports', [
             'ledgers' => $ledgers
         ]);
     }

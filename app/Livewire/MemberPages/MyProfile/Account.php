@@ -22,9 +22,6 @@ class Account extends Component
     public string $referralUrl = '';
     public string $status = '';
 
-    // Added property to hold read-only beneficiaries
-    public $beneficiaries = [];
-
     public function mount(): void
     {
         $userId = Auth::id();
@@ -35,8 +32,6 @@ class Account extends Component
         $this->username = $user->username ?? '';
         $this->email = $user->email ?? '';
         $this->status = $user->status ?? '';
-        $this->beneficiaries = $user->beneficiaries;
-
         $this->referralUrl = url('/?ref=' . $user->referralCode);
 
         $renderer = new ImageRenderer(

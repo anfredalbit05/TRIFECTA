@@ -1,114 +1,91 @@
-<div class="w-full space-y-8" x-data="accountForm()">
+{{--
+=====================================================================
+ ACCOUNT INFORMATION PAGE
+=====================================================================
+ Styling lives in profile.css (section 10 — reuses shared classes
+ from the card / form / alert sections defined earlier in that
+ file). This file only references semantic classes.
+ Sections:
+   1. Header
+   2. Login details form (username / email)
+   3. Account details (status + referral code)
+   4. Referral QR & link
+   5. Toast notification
+   6. Scripts
+=====================================================================
+--}}
 
-    <!-- Header -->
+<div class="account-page" x-data="accountForm()">
+
+    {{-- ============================= 1. HEADER ============================= --}}
     <div>
-        <h2 class="text-2xl font-bold tracking-tight text-slate-900">
-            Account Information
-        </h2>
-        <p class="mt-1 text-sm text-slate-500">
+        <h2 class="profile-header-title">Account Information</h2>
+        <p class="profile-header-subtitle">
             Manage your username, email address, and account details.
         </p>
     </div>
 
-    <!-- Account Form Card -->
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div class="border-b border-slate-200 bg-slate-50 px-6 py-5">
-            <h3 class="font-semibold text-slate-900">
-                Login Details
-            </h3>
-            <p class="mt-1 text-sm text-slate-500">
-                These details are used to access your account.
-            </p>
+    {{-- ==================== 2. LOGIN DETAILS FORM ==================== --}}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Login Details</h3>
+            <p class="card-subtitle">These details are used to access your account.</p>
         </div>
 
-        <!-- Intercept submit with SweetAlert confirmation -->
+        {{-- Intercept submit with SweetAlert confirmation --}}
         <form @submit.prevent="confirmSave">
-            <div class="grid gap-5 p-6 md:grid-cols-2">
-                <!-- Username -->
-                <div>
-                    <label class="mb-2 block text-sm font-medium text-slate-700">
-                        Username
-                    </label>
-                    <input
-                        type="text"
-                        wire:model="username"
-                        autocomplete="username"
-                        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-100">
-
+            <div class="form-grid">
+                {{-- Username --}}
+                <div class="form-field">
+                    <label class="form-label">Username</label>
+                    <input type="text" wire:model="username" autocomplete="username" class="form-input">
                     @error('username')
-                        <p class="mt-2 text-xs text-red-600">
-                            {{ $message }}
-                        </p>
+                        <p class="field-error">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <!-- Email -->
-                <div>
-                    <label class="mb-2 block text-sm font-medium text-slate-700">
-                        Email Address
-                    </label>
-                    <input
-                        type="email"
-                        wire:model="email"
-                        autocomplete="email"
-                        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-100">
-
+                {{-- Email --}}
+                <div class="form-field">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" wire:model="email" autocomplete="email" class="form-input">
                     @error('email')
-                        <p class="mt-2 text-xs text-red-600">
-                            {{ $message }}
-                        </p>
+                        <p class="field-error">{{ $message }}</p>
                     @enderror
                 </div>
             </div>
 
-            <div class="flex justify-end border-t border-slate-200 bg-slate-50 px-6 py-5">
-                <button
-                    type="submit"
-                    wire:loading.attr="disabled"
-                    wire:target="save"
-                    class="rounded-xl bg-[#0C2C6B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#071a42] disabled:opacity-60 cursor-pointer">
-                    <span wire:loading.remove wire:target="save">
-                        Save Account Information
-                    </span>
-                    <span wire:loading wire:target="save">
-                        Saving...
-                    </span>
+            <div class="card-footer">
+                <button type="submit" wire:loading.attr="disabled" wire:target="save" class="btn-submit">
+                    <span wire:loading.remove wire:target="save">Save Account Information</span>
+                    <span wire:loading wire:target="save">Saving...</span>
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- Read-only Account Information Card -->
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div class="border-b border-slate-200 bg-slate-50 px-6 py-5">
-            <h3 class="font-semibold text-slate-900">
-                Account Details
-            </h3>
-            <p class="mt-1 text-sm text-slate-500">
-                Information managed by the system.
-            </p>
+    {{-- ================= 3. READ-ONLY ACCOUNT DETAILS ================= --}}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Account Details</h3>
+            <p class="card-subtitle">Information managed by the system.</p>
         </div>
 
         <div class="grid divide-y divide-slate-200 md:grid-cols-2 md:divide-x md:divide-y-0">
-            <!-- Status -->
-            <div class="p-6">
-                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    Account Status
-                </p>
+            {{-- Status --}}
+            <div class="account-detail-cell">
+                <p class="account-detail-label">Account Status</p>
                 <div class="mt-3">
                     @if (auth()->user()->RoleID != 4)
-                        <select
-                            wire:model="status"
-                            class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm">
+                        <select wire:model="status" class="status-select">
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
                         </select>
                     @else
                         <span @class([
-                            'inline-flex rounded-full px-3 py-1 text-xs font-semibold',
-                            'bg-emerald-100 text-emerald-700' => auth()->user()->status === 'Active',
-                            'bg-amber-100 text-amber-700' => auth()->user()->status === 'Inactive',
-                            'bg-red-100 text-red-700' => auth()->user()->status === 'Suspended',
+                            'status-badge',
+                            'status-badge--active' => auth()->user()->status === 'Active',
+                            'status-badge--inactive' => auth()->user()->status === 'Inactive',
+                            'status-badge--suspended' => auth()->user()->status === 'Suspended',
                         ])>
                             {{ auth()->user()->status }}
                         </span>
@@ -116,32 +93,24 @@
                 </div>
             </div>
 
-            <!-- Referral Code -->
-            <div class="p-6">
-                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    Referral Code
-                </p>
-                <p class="mt-3 break-all font-mono text-sm font-semibold text-slate-800">
-                    {{ auth()->user()->referralCode ?? 'Not available' }}
-                </p>
+            {{-- Referral Code --}}
+            <div class="account-detail-cell">
+                <p class="account-detail-label">Referral Code</p>
+                <p class="account-detail-value">{{ auth()->user()->referralCode ?? 'Not available' }}</p>
             </div>
         </div>
 
-        <!-- Referral QR & Link Section -->
-        <div class="border-t border-slate-200 p-6">
-            <div class="flex flex-col items-center">
-                <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        {{-- ==================== 4. REFERRAL QR & LINK ==================== --}}
+        <div class="referral-section">
+            <div class="referral-wrap">
+                <div class="qr-frame">
                     {!! $qrCode !!}
                 </div>
 
-                <p class="mt-4 text-xs text-slate-500 text-center">
-                    Scan to register using your referral code.
-                </p>
+                <p class="referral-note">Scan to register using your referral code.</p>
 
-                <div class="mt-4 w-full max-w-md rounded-xl bg-slate-100 px-4 py-3">
-                    <p class="break-all text-center text-sm font-medium text-slate-700">
-                        {{ $referralUrl }}
-                    </p>
+                <div class="referral-box">
+                    <p class="referral-text">{{ $referralUrl }}</p>
                 </div>
 
                 <button
@@ -151,50 +120,14 @@
                         copied = true;
                         setTimeout(() => copied = false, 3000);
                     "
-                    class="mt-4 rounded-xl bg-[#0C2C6B] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#071a42] cursor-pointer">
+                    class="btn-copy">
                     Copy Referral Link
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Read-Only Beneficiaries Card -->
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div class="border-b border-slate-200 bg-slate-50 px-6 py-5">
-            <h3 class="font-semibold text-slate-900">
-                Registered Beneficiaries
-            </h3>
-        </div>
-
-        <div class="p-6">
-            @if(count($beneficiaries) > 0)
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
-                                <th class="pb-3 px-3">Full Name</th>
-                                <th class="pb-3 px-3">Birthdate</th>
-                                <th class="pb-3 px-3">Relationship</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 text-sm text-slate-700">
-                            @foreach($beneficiaries as $beneficiary)
-                                <tr>
-                                    <td class="py-3 px-3 font-medium text-slate-900">{{ $beneficiary->fullname ?? 'N/A' }}</td>
-                                    <td class="py-3 px-3">{{ $beneficiary->birthdate ? \Carbon\Carbon::parse($beneficiary->birthdate)->format('M d, Y') : 'N/A' }}</td>
-                                    <td class="py-3 px-3">{{ $beneficiary->relationship ?? 'N/A' }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <p class="text-sm text-slate-500 text-center py-4">No beneficiaries registered.</p>
-            @endif
-        </div>
-    </div>
-
-    <!-- Toast Notification Component -->
+    {{-- ==================== 5. TOAST NOTIFICATION ==================== --}}
     <div
         x-show="copied"
         x-transition:enter="transition ease-out duration-300"
@@ -204,17 +137,16 @@
         x-transition:leave-start="opacity-100 translate-y-0"
         x-transition:leave-end="opacity-0 -translate-y-4"
         style="display: none;"
-        class="fixed top-5 right-5 z-50 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-800 shadow-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        class="toast">
+        <svg xmlns="http://www.w3.org/2000/svg" class="alert-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
-        <p class="text-sm font-medium">
-            Referral link copied to clipboard!
-        </p>
+        <p class="alert-text">Referral link copied to clipboard!</p>
     </div>
 
 </div>
 
+{{-- ============================= 6. SCRIPTS ============================= --}}
 <script>
     function accountForm() {
         return {

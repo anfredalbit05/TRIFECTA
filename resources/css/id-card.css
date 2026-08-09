@@ -1,0 +1,422 @@
+/*
+|--------------------------------------------------------------------------
+| DOMPDF PAGE
+|--------------------------------------------------------------------------
+|
+| Controller sets: 85.6mm × 54mm
+| Do NOT set the paper size here.
+|
+*/
+
+@page {
+    margin: 0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 0;
+    color: #1f2933;
+}
+
+/*
+|--------------------------------------------------------------------------
+| PDF PAGE CONTAINER
+|--------------------------------------------------------------------------
+|
+| IMPORTANT: This is what controls pagination.
+| One .pdf-page = ONE PDF PAGE.
+|
+*/
+
+.pdf-page {
+    position: relative;
+    width: 85.6mm;
+    height: 54mm;
+    margin: 0;
+    padding: 0;
+    page-break-after: always;
+    page-break-inside: avoid;
+}
+
+.pdf-page:last-child {
+    page-break-after: auto;
+}
+
+/*
+|--------------------------------------------------------------------------
+| ID CARD
+|--------------------------------------------------------------------------
+|
+| Slightly smaller than the physical page so DomPDF cannot overflow.
+|
+*/
+
+.card {
+    position: relative;
+    width: 85.0mm;
+    height: 53.2mm;
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    border: 0.3mm solid #e2e5ea;
+    overflow: hidden;
+    font-size: 5pt;
+}
+
+/*
+|--------------------------------------------------------------------------
+| FRONT
+|--------------------------------------------------------------------------
+*/
+
+.brand {
+    position: absolute;
+    top: 3mm;
+    left: 4mm;
+    font-size: 8.5pt;
+    font-weight: bold;
+    color: #17335e;
+}
+
+.badge {
+    position: absolute;
+    top: 3.4mm;
+    right: 4mm;
+    background: #e6f0fd;
+    color: #2563eb;
+    font-size: 5pt;
+    font-weight: bold;
+    letter-spacing: 0.3pt;
+    padding: 1mm 2.5mm;
+    border-radius: 3mm;
+}
+
+.divider-top {
+    position: absolute;
+    top: 8.1mm;
+    left: 4mm;
+    right: 4mm;
+    border-top: 0.5pt solid #1a2b4c;
+}
+
+/*
+|--------------------------------------------------------------------------
+| PHOTO
+|--------------------------------------------------------------------------
+*/
+
+.photo-box {
+    position: absolute;
+    top: 11mm;
+    left: 4mm;
+    width: 15.5mm;
+    height: 19.5mm;
+    border: 0.4pt solid #9aa1ac;
+    text-align: center;
+    overflow: hidden;
+    color: #9aa1ac;
+    font-size: 5pt;
+    line-height: 19.5mm;
+}
+
+.photo-box img {
+    display: block;
+    width: 15.5mm;
+    height: 19.5mm;
+    object-fit: cover;
+}
+
+/*
+|--------------------------------------------------------------------------
+| MEMBER DETAILS
+|--------------------------------------------------------------------------
+*/
+
+.details {
+    position: absolute;
+    top: 10.2mm;
+    left: 22mm;
+    width: 42mm;
+    /* Remove 'height: 22.5mm;' so it doesn't hard-clip content */
+    min-height: 21.5mm;
+    font-size: 4.6pt; /* Slightly smaller font to fit wrapped text better */
+    line-height: 2.5mm; /* Tighter line-height to save vertical space */
+    overflow: hidden;
+}
+
+.details .label {
+    font-weight: bold;
+    color: #17335e;
+}
+
+.details .val {
+    font-weight: bold;
+    color: #1f2933;
+}
+
+/*
+|--------------------------------------------------------------------------
+| QR CODE
+|--------------------------------------------------------------------------
+*/
+
+.qr-cell {
+    position: absolute;
+    top: 10mm;
+    right: 4mm;
+    width: 15mm;
+    height: 15mm;
+    text-align: center;
+    overflow: hidden;
+}
+
+.qr-cell img {
+    display: block;
+    width: 15mm;
+    height: 15mm;
+}
+
+/*
+|--------------------------------------------------------------------------
+| BENEFICIARIES
+|--------------------------------------------------------------------------
+*/
+
+.divider-mid {
+    position: absolute;
+    top: 34mm;
+    left: 4mm;
+    right: 4mm;
+    border-top: 0.4pt solid #c7ccd4;
+}
+
+.ben-label {
+    position: absolute;
+    top: 36mm;
+    left: 4mm;
+    font-size: 5pt;
+    font-weight: bold;
+    color: #1f2933;
+}
+
+.ben-content {
+    position: absolute;
+    top: 40mm;
+    left: 4mm;
+    width: 50mm;
+    height: 9mm;
+    font-size: 5pt;
+    line-height: 2.5mm;
+    overflow: hidden;
+    color: #1f2933;
+}
+
+.ben-content ul {
+    margin: 0;
+    padding-left: 3mm;
+}
+
+.ben-content li {
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+}
+
+/*
+|--------------------------------------------------------------------------
+| MEMBER SIGNATURE
+|--------------------------------------------------------------------------
+*/
+
+.member-signature {
+    display: block;
+    width: 25mm;
+    height: 7mm;
+    margin: 0 auto;
+    object-fit: contain;
+}
+
+.sig-cell {
+    position: absolute;
+    bottom: 2.5mm;
+    right: 4mm;
+    width: 26mm;
+    text-align: center;
+}
+
+.sig-line {
+    border-top: 0.4pt solid #1f2933;
+    margin-bottom: 0.7mm;
+}
+
+.sig-caption {
+    font-size: 4pt;
+    letter-spacing: 0.5pt;
+    color: #4b5563;
+}
+
+/*
+|--------------------------------------------------------------------------
+| BACK
+|--------------------------------------------------------------------------
+*/
+
+.terms-title {
+    position: absolute;
+    top: 3.2mm;
+    left: 4mm;
+    right: 4mm;
+    text-align: center;
+    font-size: 6.5pt;
+    font-weight: bold;
+    color: #17335e;
+}
+
+.terms-intro {
+    position: absolute;
+    top: 8.2mm;
+    left: 4mm;
+    right: 4mm;
+    font-size: 4.6pt;
+    font-weight: bold;
+    color: #2563eb;
+    line-height: 2.3mm;
+}
+
+.terms-list {
+    position: absolute;
+    top: 12.3mm;
+    left: 4mm;
+    right: 4mm;
+    margin: 0;
+    padding-left: 3mm;
+    font-size: 4.5pt;
+    line-height: 2.4mm;
+    color: #b8721a;
+}
+
+.terms-list li {
+    margin: 0;
+    padding: 0;
+}
+
+.terms-note {
+    position: absolute;
+    top: 20.5mm;
+    left: 4mm;
+    right: 4mm;
+    font-size: 4.2pt;
+    font-style: italic;
+    color: #6b7280;
+    line-height: 2.2mm;
+}
+
+.divider-back {
+    position: absolute;
+    top: 25mm;
+    left: 4mm;
+    right: 4mm;
+    border-top: 0.4pt solid #c7ccd4;
+}
+
+/*
+|--------------------------------------------------------------------------
+| EMERGENCY
+|--------------------------------------------------------------------------
+*/
+
+.emergency-title {
+    position: absolute;
+    top: 26.5mm;
+    left: 4mm;
+    font-size: 4.8pt;
+    font-weight: bold;
+}
+
+.emergency-fields {
+    position: absolute;
+    top: 31mm;
+    left: 4mm;
+    width: 43mm;
+    font-size: 4.4pt;
+}
+
+.ef-row {
+    /* Removed fixed height and overflow clipping to allow rows to expand */
+    margin-bottom: 1.2mm;
+}
+
+.ef-label {
+    display: inline-block;
+    vertical-align: top; /* Aligns label to the top when value spans multiple lines */
+    width: 15mm;
+    font-weight: bold;
+    color: #17335e;
+}
+
+.ef-value {
+    display: inline-block;
+    vertical-align: top; /* Aligns value text to the top */
+    width: 27mm;
+    font-weight: normal;
+    color: #1f2933;
+
+    /* Allow text to wrap to the next line */
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+/* ============================================================
+   MANAGER / CEO / COO SIGNATURE
+   ============================================================ */
+
+.manager-cell {
+    position: absolute;
+    bottom: 1.8mm;
+    right: 4mm;
+    width: 30mm;
+    height: 14mm;
+    text-align: center;
+    overflow: hidden;
+}
+
+.manager-script {
+    height: 7mm;
+    font-family: 'Zapfino', 'Brush Script MT', cursive;
+    font-size: 8pt;
+    line-height: 7mm;
+    color: #1f2933;
+}
+
+.manager-line {
+    width: 27mm;
+    margin: 0 auto;
+    border-top: 0.4pt solid #1f2933;
+}
+
+.manager-name {
+    height: 2.8mm;
+    margin-top: 0.5mm;
+    font-size: 3.8pt;
+    line-height: 2.8mm;
+    font-weight: bold;
+    color: #17335e;
+}
+
+.manager-title {
+    font-size: 3.2pt;
+    line-height: 2mm;
+    color: #4b5563;
+}

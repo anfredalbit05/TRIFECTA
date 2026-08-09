@@ -91,7 +91,7 @@ Route::middleware(['auth'])->group(function () {
             ->first();
         $activationStatus = $activation?->status;
 
-        return view('pages.member-pages.my-profile', compact('activationStatus'));
+        return view('pages.share-pages.my-profile', compact('activationStatus'));
     })->name('my-profile');
 
     Route::get('/member/id-card/pdf', [MemberIdCardController::class, 'download'])

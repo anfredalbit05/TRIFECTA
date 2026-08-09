@@ -1,0 +1,889 @@
+/*
+=================================================================
+ PROFILE / ID CARD PAGE — COMPONENT STYLES
+=================================================================
+ This file holds every class referenced by profile.blade.php.
+ It assumes Tailwind is already wired up in your build (postcss /
+ vite). Keep the three directives below at the very top of your
+ real Tailwind entry file (e.g. resources/css/app.css) — if you
+ already have them there, just paste the @layer block underneath.
+-----------------------------------------------------------------
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+-----------------------------------------------------------------
+
+ Breakpoints used throughout (Tailwind defaults):
+   base  = phones, < 640px
+   sm:   >= 640px  (large phones / small tablets, portrait)
+   md:   >= 768px  (tablets, landscape)
+   lg:   >= 1024px (small laptops)
+   xl:   >= 1280px (desktop)
+ Every section below is checked against all five.
+*/
+
+@layer components {
+
+  /* ===============================================================
+     1. PAGE LAYOUT
+     =============================================================== */
+
+  .profile-page {
+    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8;
+  }
+
+  .profile-header {
+    @apply flex flex-col gap-4 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left;
+  }
+
+  .profile-header-title {
+    @apply text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-slate-900;
+  }
+
+  .profile-header-subtitle {
+    @apply mt-1 text-xs sm:text-sm text-slate-500;
+  }
+
+  .profile-grid {
+    @apply grid grid-cols-1 gap-6 sm:gap-8 xl:grid-cols-2;
+  }
+
+  .profile-col {
+    @apply space-y-6 sm:space-y-8;
+  }
+
+  /* ===============================================================
+     2. ALERTS
+     =============================================================== */
+
+  .alert-success {
+    @apply flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 sm:px-5 py-4 text-emerald-800;
+  }
+
+  .alert-icon {
+    @apply mt-0.5 h-5 w-5 shrink-0;
+  }
+
+  .alert-text {
+    @apply text-xs sm:text-sm font-medium;
+  }
+
+  /* ===============================================================
+     3. GENERIC CARD
+     =============================================================== */
+
+  .card {
+    @apply overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm;
+  }
+
+  .card-header {
+    @apply border-b border-slate-200 bg-slate-50 px-4 sm:px-6 py-4 sm:py-5 text-center sm:text-left;
+  }
+
+  .card-title {
+    @apply font-semibold text-sm sm:text-base text-slate-900;
+  }
+
+  .card-subtitle {
+    @apply mt-1 text-xs sm:text-sm text-slate-500;
+  }
+
+  .card-body {
+    @apply p-4 sm:p-6;
+  }
+
+  .card-footer {
+    @apply flex flex-col sm:flex-row justify-center sm:justify-end gap-2 border-t border-slate-200 bg-slate-50 px-4 sm:px-6 py-4 sm:py-5;
+  }
+
+  /* ===============================================================
+     4. BUTTONS
+     -----------------------------------------------------------------
+     .btn-base holds everything shared by every button variant so
+     each variant only needs to declare its color + hover state.
+     Every button is full-width below sm: and auto-width from sm: up,
+     matching how they're actually used in forms/cards on mobile.
+     =============================================================== */
+
+  .btn-base {
+    @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 sm:px-5 py-3 text-center text-xs sm:text-sm font-semibold text-white transition;
+  }
+
+  .btn-primary {
+    @apply btn-base bg-[#0C2C6B] hover:bg-[#071a42];
+  }
+
+  .btn-secondary {
+    @apply btn-base bg-[#D79B10] hover:bg-[#B8830D];
+  }
+
+  .btn-warning {
+    @apply btn-base bg-[#D79B10] hover:bg-[#B8830D];
+  }
+
+  .btn-submit {
+    @apply w-full sm:w-auto cursor-pointer rounded-xl bg-[#0C2C6B] px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-[#071a42] disabled:opacity-60;
+  }
+
+  .btn-clear {
+    @apply w-full sm:w-auto cursor-pointer rounded-lg bg-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-300;
+  }
+
+  .btn-save {
+    @apply w-full sm:w-auto cursor-pointer rounded-lg bg-[#0C2C6B] px-5 py-2 text-xs font-semibold text-white hover:bg-[#071a42];
+  }
+
+  .btn-download {
+    @apply flex-1 cursor-pointer rounded-xl bg-slate-200 py-3 text-xs font-semibold;
+  }
+
+  /* ===============================================================
+     5. AVATAR / PROFILE PICTURE
+     =============================================================== */
+
+  .avatar-section {
+    @apply flex flex-col items-center gap-6 px-4 sm:px-6 py-6 text-center sm:flex-row sm:items-center sm:text-left;
+  }
+
+  .avatar-frame {
+    @apply mx-auto sm:mx-0 h-24 w-24 sm:h-28 sm:w-28 shrink-0 overflow-hidden rounded-full border-4 border-slate-100 bg-slate-100 shadow-sm;
+  }
+
+  .avatar-img {
+    @apply h-full w-full object-cover;
+  }
+
+  .avatar-actions {
+    @apply flex w-full flex-1 flex-col items-center sm:items-start;
+  }
+
+  .avatar-buttons-row {
+    @apply flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center;
+  }
+
+  /* ===============================================================
+     6. FORM FIELDS
+     -----------------------------------------------------------------
+     .field-base holds everything shared by input/select/textarea so
+     they stay in lockstep. Grid moves 1 → 2 columns at md:, matching
+     tablet-and-up widths where two fields comfortably fit side by side.
+     =============================================================== */
+
+  .form-grid {
+    @apply grid grid-cols-1 gap-4 sm:gap-5 p-4 sm:p-6 text-left md:grid-cols-2;
+  }
+
+  .form-field {
+    /* single-column field wrapper — reserved for per-field layout hooks */
+  }
+
+  .form-field-full {
+    @apply md:col-span-2;
+  }
+
+  .form-label {
+    @apply mb-2 block text-xs sm:text-sm font-medium text-slate-700;
+  }
+
+  .field-base {
+    @apply w-full rounded-xl border border-slate-300 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-100;
+  }
+
+  .form-input {
+    @apply field-base;
+  }
+
+  .form-select {
+    @apply field-base bg-white;
+  }
+
+  .form-textarea {
+    @apply field-base resize-none;
+  }
+
+  .form-section-divider {
+    @apply border-t border-slate-200 pt-4 md:col-span-2;
+  }
+
+  .form-section-title {
+    @apply mb-1 text-xs sm:text-sm font-semibold text-slate-900;
+  }
+
+  .form-section-desc {
+    @apply mb-4 text-xs text-slate-500;
+  }
+
+  .field-error {
+    @apply mt-2 text-xs sm:text-sm text-red-600;
+  }
+
+  /* ===============================================================
+     7. BENEFICIARIES TABLE
+     -----------------------------------------------------------------
+     .table-wrap provides the horizontal scroll fallback for phones —
+     keep it on the wrapping <div>, not the <table>, so sticky/shadow
+     effects aren't clipped.
+     =============================================================== */
+
+  .table-wrap {
+    @apply overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0;
+  }
+
+  .table {
+    @apply w-full min-w-[560px] sm:min-w-0 border-collapse text-left;
+  }
+
+  .table-head-row {
+    @apply border-b border-slate-200 text-xs font-semibold uppercase text-slate-500;
+  }
+
+  .table-head-cell {
+    @apply px-3 pb-3;
+  }
+
+  .table-body {
+    @apply divide-y divide-slate-100 text-sm text-slate-700;
+  }
+
+  .table-cell {
+    @apply px-3 py-3;
+  }
+
+  .table-cell-primary {
+    @apply px-3 py-3 font-medium text-slate-900;
+  }
+
+  .table-empty {
+    @apply py-4 text-center text-sm text-slate-500;
+  }
+
+  /* ===============================================================
+     8. SIGNATURE PAD
+     =============================================================== */
+
+  .signature-card {
+    @apply overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 text-left shadow-sm;
+  }
+
+  .signature-title {
+    @apply mb-1 text-sm sm:text-base font-semibold text-slate-900;
+  }
+
+  .signature-desc {
+    @apply mb-4 text-xs text-slate-500;
+  }
+
+  .signature-pad-frame {
+    @apply relative w-full rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-2;
+  }
+
+  .signature-canvas {
+    @apply h-28 sm:h-32 md:h-36 w-full touch-none rounded bg-white cursor-crosshair;
+  }
+
+  .signature-actions {
+    @apply mt-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2;
+  }
+
+  /* ===============================================================
+     9. LIVE ID PREVIEW
+     -----------------------------------------------------------------
+     The card itself is a fixed-aspect-ratio replica of a physical ID,
+     so it intentionally does NOT reflow its internal layout across
+     breakpoints — only its overall scale changes. Below ~360px width
+     it scales down further via CSS transform so it never forces the
+     page into horizontal scroll.
+     =============================================================== */
+
+  .id-preview-card {
+    @apply flex h-fit flex-col items-center justify-between overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-6 shadow-inner;
+  }
+
+  .id-preview-title {
+    @apply mb-4 flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-slate-500;
+  }
+
+  .id-card-viewport {
+    @apply flex w-full justify-center overflow-x-auto py-2;
+  }
+
+  /* -- shared card face -- */
+  .id-card {
+    @apply relative aspect-[1.58/1] w-full max-w-[320px] sm:max-w-[420px] shrink-0 overflow-hidden rounded-xl border border-slate-300 bg-white p-2.5 sm:p-4 shadow-lg;
+  }
+
+  .id-card-front {
+    @apply flex flex-col justify-between text-xs;
+  }
+
+  .id-card-back {
+    @apply flex flex-col justify-between text-[9px] sm:text-[10px];
+  }
+
+  /* -- front face -- */
+  .id-card-top {
+    @apply flex items-center justify-between border-b pb-2;
+  }
+
+  .id-org-name {
+    @apply text-xs sm:text-sm font-bold text-[#0C2C6B];
+  }
+
+  .id-badge {
+    @apply rounded bg-blue-100 px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold text-blue-800;
+  }
+
+  .id-card-mid {
+    @apply my-auto flex items-center gap-2 sm:gap-3;
+  }
+
+  .id-photo-box {
+    @apply flex h-16 sm:h-20 md:h-24 w-14 sm:w-16 md:w-20 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-300 bg-slate-100 text-center text-[8px] sm:text-[9px] text-slate-400;
+  }
+
+  .id-details {
+    @apply flex-1 space-y-0.5 overflow-hidden text-[8px] sm:text-[9px] md:text-[10px] text-slate-800;
+  }
+
+  .id-qr {
+    @apply ml-auto h-12 sm:h-14 md:h-16 w-12 sm:w-14 md:w-16 shrink-0 [&>svg]:h-full [&>svg]:w-full;
+  }
+
+  .id-card-bottom {
+    @apply flex items-end justify-between border-t pt-1;
+  }
+
+  .id-beneficiaries {
+    @apply w-1/3;
+  }
+
+  .id-beneficiaries-title {
+    @apply text-[7px] sm:text-[8px] md:text-[9px] font-bold uppercase text-slate-500;
+  }
+
+  .id-beneficiary-line {
+    @apply truncate text-[7px] sm:text-[8px] md:text-[9px] text-slate-700;
+  }
+
+  .id-beneficiary-empty {
+    @apply text-[7px] sm:text-[8px] md:text-[9px] text-slate-400;
+  }
+
+  .id-signature-block {
+    @apply mx-1 flex flex-col items-center justify-end;
+  }
+
+  .id-signature-line {
+    @apply flex h-6 sm:h-7 md:h-8 w-16 sm:w-20 md:w-24 items-center justify-center border-b border-slate-400;
+  }
+
+  .id-signature-img {
+    @apply max-h-5 sm:max-h-6 md:max-h-7 object-contain;
+  }
+
+  .id-signature-empty {
+    @apply text-[7px] italic text-slate-400;
+  }
+
+  .id-signature-label {
+    @apply mt-0.5 text-[6px] sm:text-[7px] tracking-tighter text-slate-500;
+  }
+
+  /* -- back face -- */
+  .id-back-title {
+    @apply mb-1 text-center text-[9px] sm:text-[10px] md:text-[11px] font-bold tracking-wide text-slate-900;
+  }
+
+  .id-back-text {
+    @apply mb-1 text-[7px] sm:text-[8px] font-semibold text-slate-700;
+  }
+
+  .id-back-list {
+    @apply list-inside list-disc space-y-0.5 text-[7px] sm:text-[8px] text-slate-600;
+  }
+
+  .id-back-note {
+    @apply mt-1 text-[6px] sm:text-[7px] text-slate-500;
+  }
+
+  .id-back-bottom {
+    @apply mt-1 flex items-end justify-between border-t pt-1;
+  }
+
+  .id-ice-block {
+    @apply w-3/5 space-y-0.5;
+  }
+
+  .id-ice-title {
+    @apply text-[7px] sm:text-[8px] md:text-[9px] font-bold text-slate-800;
+  }
+
+  .id-ice-line {
+    @apply truncate text-[6px] sm:text-[7px] md:text-[8px];
+  }
+
+  .id-signatory-block {
+    @apply flex w-2/5 flex-col items-center text-center;
+  }
+
+  .id-signatory-script {
+    @apply font-serif text-[11px] sm:text-xs md:text-sm italic tracking-tighter text-slate-800;
+  }
+
+  .id-signatory-divider {
+    @apply mt-0.5 w-full border-t border-slate-400;
+  }
+
+  .id-signatory-name {
+    @apply mt-0.5 text-[6px] sm:text-[7px] font-bold leading-none text-slate-700;
+  }
+
+  .id-signatory-role {
+    @apply text-[6px] sm:text-[7px] text-slate-500;
+  }
+
+  /* -- tabs + actions -- */
+  .id-tabs {
+    @apply mt-4 flex gap-2;
+  }
+
+  .id-tab {
+    @apply cursor-pointer rounded px-3 sm:px-4 py-1 text-xs font-semibold shadow;
+  }
+
+  .id-tab--active {
+    @apply bg-[#0C2C6B] text-white;
+  }
+
+  .id-tab--inactive {
+    @apply bg-slate-200 text-slate-700;
+  }
+
+  .id-actions {
+    @apply mt-4 flex w-full flex-col gap-2 sm:flex-row;
+  }
+
+  /* ===============================================================
+     10. ACCOUNT INFORMATION PAGE
+     -----------------------------------------------------------------
+     Reuses shared classes from section 1–6 above:
+       .profile-header-title / .profile-header-subtitle
+       .card / .card-header / .card-title / .card-subtitle / .card-footer
+       .form-grid / .form-field / .form-label / .form-input / .form-select
+       .field-error / .btn-submit / .alert-icon / .alert-text
+     Only page-specific pieces are defined below.
+     =============================================================== */
+
+  .account-page {
+    @apply w-full space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-8;
+  }
+
+  /* -- read-only account details grid -- */
+  .account-detail-cell {
+    @apply p-4 sm:p-6;
+  }
+
+  .account-detail-label {
+    @apply text-xs font-semibold uppercase tracking-wider text-slate-500;
+  }
+
+  .account-detail-value {
+    @apply mt-3 break-all font-mono text-xs sm:text-sm font-semibold text-slate-800;
+  }
+
+  .status-select {
+    @apply field-base bg-white;
+  }
+
+  .status-badge {
+    @apply inline-flex rounded-full px-3 py-1 text-xs font-semibold;
+  }
+
+  .status-badge--active {
+    @apply bg-emerald-100 text-emerald-700;
+  }
+
+  .status-badge--inactive {
+    @apply bg-amber-100 text-amber-700;
+  }
+
+  .status-badge--suspended {
+    @apply bg-red-100 text-red-700;
+  }
+
+  /* -- referral QR / link section -- */
+  .referral-section {
+    @apply border-t border-slate-200 p-4 sm:p-6;
+  }
+
+  .referral-wrap {
+    @apply flex flex-col items-center;
+  }
+
+  .qr-frame {
+    @apply rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-sm [&>svg]:h-28 [&>svg]:w-28 sm:[&>svg]:h-36 sm:[&>svg]:w-36 md:[&>svg]:h-40 md:[&>svg]:w-40;
+  }
+
+  .referral-note {
+    @apply mt-4 text-center text-xs text-slate-500;
+  }
+
+  .referral-box {
+    @apply mt-4 w-full max-w-md rounded-xl bg-slate-100 px-4 py-3;
+  }
+
+  .referral-text {
+    @apply break-all text-center text-xs sm:text-sm font-medium text-slate-700;
+  }
+
+  .btn-copy {
+    @apply mt-4 w-full sm:w-auto cursor-pointer rounded-xl bg-[#0C2C6B] px-5 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-[#071a42];
+  }
+
+  /* -- toast notification -- */
+  .toast {
+    @apply fixed top-4 inset-x-4 z-50 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 sm:px-5 py-4 text-emerald-800 shadow-lg sm:inset-x-auto sm:right-5 sm:max-w-sm;
+  }
+
+  /* ===============================================================
+     11. SECURITY / CHANGE PASSWORD PAGE
+     -----------------------------------------------------------------
+     Reuses shared classes from earlier sections:
+       .account-page / .profile-header-title / .profile-header-subtitle
+       .alert-success / .alert-icon / .alert-text
+       .card / .card-header / .card-title / .card-subtitle / .card-footer
+       .form-label / .field-error / .btn-submit / .field-base
+     =============================================================== */
+
+  /* -- amber security notice -- */
+  .notice-warning {
+    @apply flex items-start gap-3 sm:gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:p-5;
+  }
+
+  .notice-icon-wrap {
+    @apply flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700;
+  }
+
+  .notice-icon {
+    @apply h-5 w-5;
+  }
+
+  .notice-title {
+    @apply text-sm sm:text-base font-semibold text-amber-900;
+  }
+
+  .notice-text {
+    @apply mt-1 text-xs sm:text-sm leading-6 text-amber-800;
+  }
+
+  /* -- password form layout -- */
+  .password-form-body {
+    @apply mx-auto max-w-2xl space-y-6 p-4 sm:p-6;
+  }
+
+  .password-input-wrap {
+    @apply relative;
+  }
+
+  .password-input-row {
+    @apply relative flex items-center;
+  }
+
+  .password-input {
+    @apply field-base pr-10;
+  }
+
+  .password-input-transparent {
+    @apply w-full bg-transparent px-3.5 sm:px-4 py-2.5 sm:py-3 pr-10 text-xs sm:text-sm outline-none;
+  }
+
+  .password-toggle {
+    @apply absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none;
+  }
+
+  .password-toggle-icon {
+    @apply h-5 w-5 cursor-pointer;
+  }
+
+  /* -- floating-border boxes (new password / confirm password) -- */
+  .password-strength-box {
+    @apply relative rounded-2xl border-2 bg-white transition-all duration-300;
+  }
+
+  .password-static-box {
+    @apply relative rounded-2xl border-2 border-slate-300 bg-white transition-all duration-300 focus-within:border-slate-500;
+  }
+
+  .password-float-label {
+    @apply absolute -top-3 left-4 bg-white px-1.5 text-xs font-semibold transition-colors duration-300;
+  }
+
+  .password-static-label {
+    @apply absolute -top-3 left-4 bg-white px-1.5 text-xs font-semibold text-slate-600;
+  }
+
+  /* -- tone helpers: applied dynamically via Alpine :class for strength colors -- */
+  .tone-weak-border   { @apply border-red-400; }
+  .tone-medium-border { @apply border-amber-400; }
+  .tone-strong-border { @apply border-emerald-500; }
+
+  .tone-weak-text   { @apply text-red-500; }
+  .tone-medium-text { @apply text-amber-500; }
+  .tone-strong-text { @apply text-emerald-500; }
+
+  .tone-weak-bg   { @apply bg-red-400; }
+  .tone-medium-bg { @apply bg-amber-400; }
+  .tone-strong-bg { @apply bg-emerald-500; }
+
+  /* -- strength meter -- */
+  .password-meter {
+    @apply mt-3 space-y-3;
+  }
+
+  .password-meter-row {
+    @apply flex items-center justify-between text-xs;
+  }
+
+  .password-meter-label {
+    @apply font-medium text-slate-500;
+  }
+
+  .password-meter-value {
+    @apply font-bold transition-colors duration-300;
+  }
+
+  .password-meter-track {
+    @apply h-1.5 w-full overflow-hidden rounded-full bg-slate-100;
+  }
+
+  .password-meter-fill {
+    @apply h-full transition-all duration-500;
+  }
+
+  /* Checklist: 2 columns on phones so labels don't truncate, scaling
+     up to 5 across as width allows. */
+  .password-checklist {
+    @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-2 gap-y-1.5 pt-1 text-[10px] sm:text-[11px] text-slate-600;
+  }
+
+  .password-checklist-item {
+    @apply flex items-center space-x-1 text-slate-400;
+  }
+
+  .password-checklist-item--met {
+    @apply text-emerald-600 font-medium;
+  }
+
+  /* ===============================================================
+     12. ACCOUNT ACTIVITY PAGE
+     -----------------------------------------------------------------
+     Reuses shared classes from earlier sections:
+       .account-page / .profile-header-title / .profile-header-subtitle
+       .card / .card-title / .card-subtitle / .notice-icon
+     =============================================================== */
+
+  /* -- page header with icon badge -- */
+  .page-header {
+    @apply flex items-center gap-3;
+  }
+
+  .page-header-icon-wrap {
+    @apply flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-700;
+  }
+
+  .page-header-icon {
+    @apply h-5 w-5 sm:h-6 sm:w-6;
+  }
+
+  /* -- blue "info" notice (mirrors .notice-warning but a different tone) -- */
+  .notice-info {
+    @apply flex items-start gap-3 sm:gap-4 rounded-2xl border border-blue-100 bg-blue-50 p-4 sm:p-5;
+  }
+
+  .notice-icon-wrap-info {
+    @apply flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600;
+  }
+
+  .notice-title-info {
+    @apply text-sm sm:text-base font-semibold text-blue-900;
+  }
+
+  .notice-text-info {
+    @apply mt-1 text-xs sm:text-sm leading-6 text-blue-700;
+  }
+
+  /* -- activity list card header -- */
+  .activity-list-header {
+    @apply flex flex-col gap-3 border-b border-slate-200 bg-slate-50 px-4 sm:px-6 py-4 sm:py-5 sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  .activity-count-badge {
+    @apply w-fit rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600;
+  }
+
+  /* -- empty state -- */
+  .empty-state {
+    @apply flex flex-col items-center justify-center px-4 sm:px-6 py-10 sm:py-16 text-center;
+  }
+
+  .empty-state-icon-wrap {
+    @apply mb-5 flex h-14 w-14 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-slate-100 text-slate-400;
+  }
+
+  .empty-state-icon {
+    @apply h-7 w-7 sm:h-10 sm:w-10;
+  }
+
+  .empty-state-title {
+    @apply text-base sm:text-lg font-semibold text-slate-800;
+  }
+
+  .empty-state-text {
+    @apply mt-2 max-w-md text-xs sm:text-sm leading-6 text-slate-500;
+  }
+
+  /* -- "activities that may be recorded" grid -- */
+  .section-title {
+    @apply mb-4 text-sm sm:text-base font-semibold text-slate-900;
+  }
+
+  .activity-type-grid {
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4;
+  }
+
+  .activity-type-card {
+    @apply rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm;
+  }
+
+  .activity-type-icon-wrap {
+    @apply mb-4 flex h-11 w-11 items-center justify-center rounded-xl;
+  }
+
+  .activity-type-icon-wrap--emerald { @apply bg-emerald-50 text-emerald-600; }
+  .activity-type-icon-wrap--blue    { @apply bg-blue-50 text-blue-600; }
+  .activity-type-icon-wrap--amber   { @apply bg-amber-50 text-amber-600; }
+  .activity-type-icon-wrap--violet  { @apply bg-violet-50 text-violet-600; }
+
+  .activity-type-title {
+    @apply font-semibold text-slate-800;
+  }
+
+  .activity-type-text {
+    @apply mt-1 text-xs sm:text-sm leading-6 text-slate-500;
+  }
+
+  /* ===============================================================
+     13. POLICY & CERTIFICATES PAGE
+     -----------------------------------------------------------------
+     Reuses shared classes from earlier sections:
+       .account-page / .profile-header-title / .profile-header-subtitle
+       .card / .card-header / .card-title / .card-subtitle
+       .status-badge--active / --inactive / --suspended (color only)
+     =============================================================== */
+
+  /* -- card header variant with an action beside the title -- */
+  .card-header-row {
+    @apply flex flex-col items-start justify-between gap-4 border-b border-slate-200 bg-slate-50 px-4 sm:px-6 py-4 sm:py-5 sm:flex-row sm:items-center;
+  }
+
+  .card-header-action {
+    @apply w-full sm:w-auto;
+  }
+
+  /* -- buttons: outline (light action), dark (primary action), locked (disabled) -- */
+  .btn-outline {
+    @apply inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50;
+  }
+
+  .btn-dark {
+    @apply inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800;
+  }
+
+  .btn-locked {
+    @apply inline-flex w-full sm:w-auto cursor-not-allowed items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-400;
+  }
+
+  .btn-locked-lg {
+    @apply inline-flex w-full sm:w-auto cursor-not-allowed items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-100 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-slate-400;
+  }
+
+  .btn-icon-outline {
+    @apply h-4 w-4 shrink-0 text-slate-500;
+  }
+
+  .btn-icon-locked {
+    @apply h-4 w-4 shrink-0 text-slate-400;
+  }
+
+  .btn-icon-dark {
+    @apply h-4 w-4 shrink-0;
+  }
+
+  /* -- numbered policy list -- */
+  .policy-list {
+    @apply space-y-4 p-4 sm:p-6 text-xs sm:text-sm leading-relaxed text-slate-600;
+  }
+
+  .policy-item {
+    @apply flex items-start gap-3;
+  }
+
+  .policy-number {
+    @apply mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-700;
+  }
+
+  /* -- certificate download portal row -- */
+  .certificate-row {
+    @apply flex flex-col items-start justify-between gap-4 p-4 sm:p-6 sm:flex-row sm:items-center sm:gap-6;
+  }
+
+  .certificate-info {
+    @apply space-y-1;
+  }
+
+  .certificate-title-row {
+    @apply flex flex-wrap items-center gap-2;
+  }
+
+  .certificate-desc {
+    @apply text-xs sm:text-sm text-slate-500;
+  }
+
+  .status-badge-sm {
+    @apply inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+
+  /* ===============================================================
+     14. PROFILE TABS SHELL (parent tab-switching layout)
+     -----------------------------------------------------------------
+     This page's own classes — .dashboard-container, .dashboard-nav,
+     .dashboard-nav-title, .dashboard-layout, .dashboard-nav-menu,
+     .dashboard-main-card, .full-width-card, .active — already live
+     in your global layout stylesheet and are left untouched here.
+     Only the raw utility strings that were inline on this page are
+     promoted to semantic classes below; apply them ALONGSIDE the
+     existing global classes (see the blade file for usage), not
+     as a replacement for them.
+     =============================================================== */
+
+  .profile-tabs-shell {
+    @apply flex flex-col gap-4 px-4 sm:px-6 lg:px-12 pt-4;
+  }
+
+  .profile-tabs-bar {
+    @apply flex flex-col justify-between gap-4 md:flex-row md:items-center;
+  }
+
+  .profile-tabs-links {
+    @apply flex flex-wrap items-center gap-2;
+  }
+
+  .profile-tabs-links .id-tab {
+    @apply text-xs;
+  }
+
+  .profile-tabs-activation {
+    @apply flex shrink-0 items-center;
+  }
+
+}

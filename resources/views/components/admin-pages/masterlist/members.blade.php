@@ -19,32 +19,73 @@
         @endif
     </div>
 
-    <!-- SEARCH INPUT & REFRESH BUTTON CONTAINER -->
-    <div class="flex items-center justify-between gap-4 mb-6">
+    <!-- SEARCH INPUT, FILTERS & REFRESH BUTTON CONTAINER -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <!-- SEARCH INPUT -->
-        <div class="relative max-w-sm w-full">
+        <div class="relative max-w-sm w-full sm:w-auto flex-1">
             <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
                 🔍
             </span>
             <input
                 type="text"
                 wire:model.live.debounce.300ms="search"
-                placeholder="Search members..."
+                placeholder="Search by fullname or username..."
                 class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm"
             >
         </div>
 
-        <!-- REFRESH BUTTON -->
-        <button
-            wire:click="resetTable"
-            wire:loading.attr="disabled"
-            title="Refresh Table"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer"
-        >
-            <span wire:loading.remove wire:target="resetTable">🔄</span>
-            <span wire:loading wire:target="resetTable" class="animate-spin">⏳</span>
-            <span class="hidden sm:inline">Refresh</span>
-        </button>
+        <!-- FILTERS AND REFRESH GROUP -->
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+
+            <!-- YEAR FILTER -->
+            <div class="relative">
+                <select
+                    wire:model.live="selectedYear"
+                    class="px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white text-slate-700 shadow-sm cursor-pointer"
+                >
+                    @php
+                        $currentYear = now()->year;
+                    @endphp
+                    @for ($year = $currentYear; $year >= 2020; $year--)
+                        <option value="{{ $year }}">{{ $year }}</option>
+                    @endfor
+                </select>
+            </div>
+
+            <!-- MONTH FILTER -->
+            <div class="relative">
+                <select
+                    wire:model.live="selectedMonth"
+                    class="px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white text-slate-700 shadow-sm cursor-pointer"
+                >
+                    <option value="">All Months</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+
+            <!-- REFRESH BUTTON -->
+            <button
+                wire:click="resetTable"
+                wire:loading.attr="disabled"
+                title="Refresh Table"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer"
+            >
+                <span wire:loading.remove wire:target="resetTable">🔄</span>
+                <span wire:loading wire:target="resetTable" class="animate-spin">⏳</span>
+                <span class="hidden sm:inline">Refresh</span>
+            </button>
+        </div>
     </div>
 
     <!-- MEMBERS TABLE -->
