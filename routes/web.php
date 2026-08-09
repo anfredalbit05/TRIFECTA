@@ -37,7 +37,7 @@ Route::get('/register/{referralCode}', function ($referralCode) {
     return redirect()->route('home', ['ref' => $referralCode]);
 })->name('register.referral');
 
-
+Route::get('/login', Home::class)->defaults('autoLogin', true)->name('secret.login');
 
 /*
 |--------------------------------------------------------------------------
