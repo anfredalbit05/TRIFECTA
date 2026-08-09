@@ -595,6 +595,11 @@
                                 <option value="">Select Position</option>
                                 <option value="CEO">Chief Executive Officer (CEO)</option>
                                 <option value="COO">Chief Operating Officer (COO)</option>
+                                <option value="Auditor">Auditor</option>
+                                <option value="Board of Directors">Board of Directors</option>
+                                <option value="PIO">PIO</option>
+                                <option value="Secretary">Secretary</option>
+                                <option value="Treasurer">Treasurer</option>
                             </select>
                             @error('position') <span class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span> @enderror
                         </div>
