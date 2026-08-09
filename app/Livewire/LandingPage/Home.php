@@ -18,6 +18,7 @@ class Home extends Component
 
     public ?string $referralCode = null;
 
+    public bool $openLogin = false;
 
     // Restore $autoLogin = false here so Livewire receives it from the route defaults
     public function mount($autoLogin = false)

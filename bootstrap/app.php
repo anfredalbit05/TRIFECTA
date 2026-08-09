@@ -47,13 +47,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
     })
 
-     ->withMiddleware(function (Middleware $middleware) {
-        // Register your middleware alias here
-        $middleware->alias([
-            'maintenance' => CheckMaintenanceMode::class,
-        ]);
-    })
-
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
@@ -61,5 +54,10 @@ return Application::configure(basePath: dirname(__DIR__))
     })
 
 
-
+        ->withMiddleware(function (Middleware $middleware) {
+        // Register your middleware alias here
+        $middleware->alias([
+            'maintenance' => CheckMaintenanceMode::class,
+        ]);
+    })
     ->create();

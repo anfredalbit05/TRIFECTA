@@ -22,6 +22,12 @@
                     Overview
                 </a>
 
+                @if(auth()->user()->RoleID == 1)
+                <a href="#" @click.prevent="tab = 'admin-users'" :class="tab === 'admin-users' ? 'active' : ''">
+                    Admin Users
+                </a>
+                @endif
+
                 <a href="#" @click.prevent="tab = 'members'" :class="tab === 'members' ? 'active' : ''">
                     Members
                 </a>
@@ -47,6 +53,11 @@
             <!-- OVERVIEW -->
             <div x-show="tab === 'overview'" class="dashboard-main-card full-width-card">
                 <livewire:admin-pages.masterlist.dashboard />
+            </div>
+
+            <!-- MEMBERS -->
+            <div x-show="tab === 'admin-users'" x-cloak class="dashboard-main-card full-width-card">
+                <livewire:admin-pages.masterlist.admin-users />
             </div>
 
             <!-- MEMBERS -->

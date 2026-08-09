@@ -78,7 +78,7 @@
             </div>
 
             <!-- Right CTA & Auth Controls (Desktop) -->
-            <div  iv class="hidden lg:flex items-center gap-3">
+            <div class="hidden lg:flex items-center gap-3">
 
                 @guest
 

@@ -114,7 +114,7 @@ class NewsUpdates extends Component
         // Total Combined Earnings
         $totalEarnings = $totalAmount + $providentFundAmount;
 
-        return view('livewire.member-pages.dashboard.overview', [
+        return view('livewire.share-pages.dashboard.overview', [
             'newsUpdates' => $newsUpdates,
             'totalAmount' => $totalAmount,
             'providentFundAmount' => $providentFundAmount,

@@ -58,10 +58,7 @@ Route::middleware(['auth'])->group(function () {
         //     return view('livewire.landing-page.home');
         // }
 
-        if (Auth::user()->RoleID != 4) {
-            return view('pages.admin-pages.dashboard');
-        }
-        return view('pages.member-pages.dashboard');
+        return view('pages.share-pages.dashboard');
     })->name('dashboard');
 
     Route::get('/genealogy-tree', function () {
