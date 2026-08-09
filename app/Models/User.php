@@ -66,6 +66,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
     // Account Settings
     'RoleID',
+    'position',
     'branchCode',
     'status',
     'signature'
