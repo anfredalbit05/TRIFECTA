@@ -16,18 +16,12 @@
             <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
                 🔍
             </span>
-            <input
-                type="text"
-                wire:model.live="search"
-                placeholder="Search inquiries..."
+            <input type="text" wire:model.live="search" placeholder="Search inquiries..."
                 class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
         </div>
 
         <!-- REFRESH BUTTON -->
-        <button
-            wire:click="resetTable"
-            wire:loading.attr="disabled"
-            title="Refresh Table"
+        <button wire:click="resetTable" wire:loading.attr="disabled" title="Refresh Table"
             class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
             <span wire:loading.remove wire:target="resetTable">🔄</span>
             <span wire:loading wire:target="resetTable" class="animate-spin">⏳</span>
@@ -39,14 +33,17 @@
     <div class="member-table w-full overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-600">
+                <tr
+                    class="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-600">
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">Name</th>
                     <th class="py-3 px-4">Subject</th>
                     <th class="py-3 px-4">Category</th>
                     <th class="py-3 px-4">Date Read</th>
                     <th class="py-3 px-4">Status</th>
-                    <th class="py-3 px-4 text-center">Action</th>
+                    @if ($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
+                        <th class="py-3 px-4 text-center">Action</th>
+                    @endif
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
@@ -67,7 +64,8 @@
                             {{ $inquiry->subject }}
                         </td>
                         <td class="py-4 px-4">
-                            <span class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
+                            <span
+                                class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
                                 {{ $inquiry->category ?: 'General' }}
                             </span>
                         </td>
@@ -76,25 +74,27 @@
                         </td>
                         <td class="py-4 px-4">
                             @if (is_null($inquiry->date_read))
-                                <span class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-[#D79B10] text-white text-xs font-semibold">
+                                <span
+                                    class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-[#D79B10] text-white text-xs font-semibold">
                                     Unread
                                 </span>
                             @else
-                                <span class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-xs font-semibold">
+                                <span
+                                    class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-xs font-semibold">
                                     Read
                                 </span>
                             @endif
                         </td>
-                        <td class="py-4 px-4 text-center">
-                            <div class="flex justify-center">
-                                <button
-                                    wire:click="viewInquiry({{ $inquiry->ID }})"
-                                    class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-xs font-semibold shadow transition cursor-pointer"
-                                >
-                                    View
-                                </button>
-                            </div>
-                        </td>
+                        @if ($this->canCreate)
+                            <td class="py-4 px-4 text-center">
+                                <div class="flex justify-center">
+                                    <button wire:click="viewInquiry({{ $inquiry->ID }})"
+                                        class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] text-xs font-semibold shadow transition cursor-pointer">
+                                        View
+                                    </button>
+                                </div>
+                            </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
@@ -109,7 +109,8 @@
 
     <!-- VIEW INQUIRY MODAL -->
     @if ($showModal && $selectedInquiry)
-        <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm overflow-y-auto">
+        <div
+            class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm overflow-y-auto">
 
             <div class="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl my-8">
 
@@ -119,10 +120,8 @@
                         <h3 class="text-lg font-bold">Inquiry Details & Reply</h3>
                         <p class="text-xs text-blue-100">Review member inquiry and send a response.</p>
                     </div>
-                    <button
-                        wire:click="closeModal"
-                        class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition hover:bg-white/30 text-white font-bold cursor-pointer"
-                    >
+                    <button wire:click="closeModal"
+                        class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition hover:bg-white/30 text-white font-bold cursor-pointer">
                         ✕
                     </button>
                 </div>
@@ -132,7 +131,8 @@
 
                     <!-- SUCCESS MESSAGE -->
                     @if ($successMessage)
-                        <div class="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs font-semibold text-emerald-700">
+                        <div
+                            class="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs font-semibold text-emerald-700">
                             {{ $successMessage }}
                         </div>
                     @endif
@@ -146,7 +146,8 @@
 
                         <div class="rounded-xl border border-slate-200 p-3 bg-slate-50/50">
                             <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Email Address</p>
-                            <p class="mt-1 text-sm font-semibold text-slate-800 break-all">{{ $selectedInquiry->email }}</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-800 break-all">{{ $selectedInquiry->email }}
+                            </p>
                         </div>
 
                         <div class="rounded-xl border border-slate-200 p-3 bg-slate-50/50">
@@ -157,7 +158,8 @@
                         <div class="rounded-xl border border-slate-200 p-3 bg-slate-50/50">
                             <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Category</p>
                             <div class="mt-1">
-                                <span class="inline-flex rounded-md bg-[#0C2C6B] px-2.5 py-0.5 text-xs font-semibold text-white">
+                                <span
+                                    class="inline-flex rounded-md bg-[#0C2C6B] px-2.5 py-0.5 text-xs font-semibold text-white">
                                     {{ $selectedInquiry->category ?: 'General' }}
                                 </span>
                             </div>
@@ -165,16 +167,19 @@
                     </div>
 
                     <!-- STATUS & DATE BLOCK -->
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-xl bg-slate-100 p-4 gap-2">
+                    <div
+                        class="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-xl bg-slate-100 p-4 gap-2">
                         <div>
                             <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Status</p>
                             <div class="mt-1">
                                 @if ($selectedInquiry->date_read)
-                                    <span class="inline-flex rounded-md bg-[#0C2C6B] px-2.5 py-0.5 text-xs font-semibold text-white">
+                                    <span
+                                        class="inline-flex rounded-md bg-[#0C2C6B] px-2.5 py-0.5 text-xs font-semibold text-white">
                                         Read
                                     </span>
                                 @else
-                                    <span class="inline-flex rounded-md bg-[#D79B10] px-2.5 py-0.5 text-xs font-semibold text-white">
+                                    <span
+                                        class="inline-flex rounded-md bg-[#D79B10] px-2.5 py-0.5 text-xs font-semibold text-white">
                                         Unread
                                     </span>
                                 @endif
@@ -191,57 +196,54 @@
                     <!-- MESSAGE BLOCK -->
                     <div>
                         <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Original Message</h4>
-                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs sm:text-sm leading-relaxed text-slate-700 whitespace-pre-line max-h-36 overflow-y-auto">
+                        <div
+                            class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs sm:text-sm leading-relaxed text-slate-700 whitespace-pre-line max-h-36 overflow-y-auto">
                             {{ $selectedInquiry->details }}
                         </div>
                     </div>
 
-                    @if(auth()->user()->RoleID != 3)
-                    <!-- REPLY FORM SECTION -->
-                    <div class="border-t border-slate-200 pt-4 mt-4 space-y-3">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-[#0C2C6B]">Send Email Reply</h4>
+                    @if ($this->canCreate)
+                        <!-- REPLY FORM SECTION -->
+                        <div class="border-t border-slate-200 pt-4 mt-4 space-y-3">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-[#0C2C6B]">Send Email Reply</h4>
 
-                        <div>
-                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Reply Subject*</label>
-                            <input
-                                type="text"
-                                placeholder="Type your subject here..."
-                                wire:model="replySubject"
-                                class="w-full rounded-xl border border-slate-200 p-2.5 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
-                            >
-                            @error('replySubject') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                        </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Reply
+                                    Subject</label>
+                                <input type="text" readonly wire:model="replySubject"
+                                    class="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs sm:text-sm text-slate-800 focus:outline-none cursor-not-allowed">
+                                @error('replySubject')
+                                    <span class="text-xs text-red-500">{{ $message }}</span>
+                                @enderror
+                            </div>
 
-                        <div>
-                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Reply Message*</label>
-                            <textarea
-                                wire:model="replyMessage"
-                                rows="4"
-                                placeholder="Type your response here..."
-                                class="w-full rounded-xl border border-slate-200 p-3 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
-                            ></textarea>
-                            @error('replyMessage') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                        </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Reply
+                                    Message*</label>
+                                <textarea wire:model="replyMessage" rows="4" placeholder="Type your response here..."
+                                    class="w-full rounded-xl border border-slate-200 p-3 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"></textarea>
+                                @error('replyMessage')
+                                    <span class="text-xs text-red-500">{{ $message }}</span>
+                                @enderror
+                            </div>
 
-                        <div class="flex justify-end">
-                            <button
-                                wire:click="sendReply"
-                                class="rounded-lg bg-[#D79B10] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#b8820c] cursor-pointer"
-                            >
-                                Send Reply
-                            </button>
+                            <div class="flex justify-end">
+                                <button wire:click="sendReply"
+                                    class="rounded-lg bg-[#D79B10] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#b8820c] cursor-pointer">
+                                    Send Reply
+                                </button>
+                            </div>
                         </div>
-                    </div>
                     @endif
 
                 </div>
 
                 <!-- MODAL FOOTER -->
                 <div class="flex justify-end border-t border-slate-200 px-6 py-3 bg-slate-50">
-                    <button
-                        wire:click="closeModal"
-                        class="rounded-lg bg-[#0C2C6B] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#09204f] cursor-pointer"
-                    >
+                    <button wire:click="closeModal"
+                        class="rounded-lg bg-[#0C2C6B] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#09204f] cursor-pointer">
                         Close
                     </button>
                 </div>

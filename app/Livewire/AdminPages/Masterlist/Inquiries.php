@@ -7,6 +7,9 @@ use App\Models\Inquiry;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Livewire\WithPagination; // 1. Import the pagination trait
+use App\Models\Benefit;
+use App\Models\Privilege;
+use Illuminate\Support\Facades\Auth;
 
 class Inquiries extends Component
 {
@@ -32,7 +35,7 @@ class Inquiries extends Component
         }
 
         $this->selectedInquiry = $inquiry;
-        $this->replySubject = '';
+        $this->replySubject = 'Reply: '.$inquiry->subject;
         $this->replyMessage = '';
         $this->successMessage = '';
         $this->showModal = true;
@@ -63,6 +66,58 @@ class Inquiries extends Component
             $this->successMessage = '';
             session()->flash('error', 'Failed to send email. Check logs for details.');
         }
+    }
+
+    protected function hasPermission($action): bool
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return false;
+        }
+
+        // Super Admin override (RoleID 1)
+        if ((int) $user->RoleID === 1) {
+            return true;
+        }
+
+        $column = 'can_' . $action;
+
+        if ($user->role && method_exists($user->role, 'permissions')) {
+            $hasPerm = optional($user->role->permissions)
+                ->where('ModuleID', 5)
+                ->where($column, 1)
+                ->isNotEmpty();
+
+            if ($hasPerm) {
+                return true;
+            }
+        }
+
+        return Privilege::where('RoleID', $user->RoleID)
+            ->where('ModuleID', 5)
+            ->where($column, 1)
+            ->exists();
+    }
+
+    public function getCanCreateProperty(): bool
+    {
+        return $this->hasPermission('create');
+    }
+
+    public function getCanReadProperty(): bool
+    {
+        return $this->hasPermission('read');
+    }
+
+    public function getCanUpdateProperty(): bool
+    {
+        return $this->hasPermission('update');
+    }
+
+    public function getCanDeleteProperty(): bool
+    {
+        return $this->hasPermission('delete');
     }
 
     public function closeModal()

@@ -59,7 +59,9 @@
                     <th class="py-3 px-4">Gender</th>
                     <th class="py-3 px-4">Birthday</th>
                     <th class="py-3 px-4">Status</th>
+                     @if($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
                     <th class="py-3 px-4 text-center">Action</th>
+                    @endif
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
@@ -105,7 +107,9 @@
                         </td>
 
                         <!-- ACTIONS COLUMN -->
+                         @if($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
                         <td class="py-4 px-4 text-center">
+
                             <div class="flex gap-2 justify-center items-center">
 
                                 <!-- VIEW -->
@@ -149,6 +153,8 @@
 
                             </div>
                         </td>
+                        @endif
+
                     </tr>
                 @empty
                     <tr>

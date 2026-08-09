@@ -64,7 +64,7 @@
                     <th class="py-3 px-4">Question</th>
                     <th class="py-3 px-4">Answer</th>
                     <th class="py-3 px-4">Status</th>
-                    @if ($this->canUpdate || $this->canDelete)
+                     @if($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
                         <th class="py-3 px-4 text-center">Action</th>
                     @endif
                 </tr>
@@ -97,7 +97,7 @@
                             @endif
                         </td>
 
-                        @if ($this->canUpdate || $this->canDelete)
+                         @if($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
                             <td class="py-4 px-4 text-center">
                                 <div class="flex justify-center gap-2">
                                     @if ($this->canUpdate)

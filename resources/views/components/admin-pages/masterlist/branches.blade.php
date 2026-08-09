@@ -63,7 +63,7 @@
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">Branch Name</th>
                     <th class="py-3 px-4">Address</th>
-                    @if ($this->canUpdate || $this->canDelete)
+                   @if($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
                         <th class="py-3 px-4 text-center">Action</th>
                     @endif
                 </tr>
@@ -84,7 +84,7 @@
                         </td>
 
                         <!-- Actions Column -->
-                        @if ($this->canUpdate || $this->canDelete)
+                        @if($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
                             <td class="py-4 px-4 text-center">
                                 <div class="flex gap-2 justify-center">
                                     {{-- EDIT BUTTON --}}
