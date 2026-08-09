@@ -401,10 +401,10 @@
                         class="flex-1 rounded-xl bg-slate-200 py-3 text-xs font-semibold cursor-pointer">
                         📥 Download ID (PDF)
                     </button>
-                    <button type="button" wire:click="requestPhysicalId"
+                    {{-- <button type="button" wire:click="requestPhysicalId"
                         class="flex-1 rounded-xl bg-[#0C2C6B] py-3 text-xs font-semibold text-white shadow transition hover:bg-[#071a42] cursor-pointer">
                         Request Physical ID
-                    </button>
+                    </button> --}}
                 </div>
             </div>
         </div>

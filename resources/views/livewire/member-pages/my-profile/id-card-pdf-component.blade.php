@@ -1,405 +1,368 @@
+{{-- resources/views/livewire/member-pages/my-profile/id-card-pdf-component.blade.php --}}
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Membership Card</title>
-
+    <meta charset="utf-8">
     <style>
+        @page {
+            margin: 30px 35px;
+        }
+
         * {
             box-sizing: border-box;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: #fff;
-            padding: 10px;
-            color: #111;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #1f2933;
+            font-size: 12px;
         }
 
-        .wrapper {
+        .page {
+            page-break-after: always;
+        }
+
+        .page:last-child {
+            page-break-after: auto;
+        }
+
+        /* ===== Header ===== */
+        .header-table {
             width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
         }
 
-        .card {
-            width: 100%;
-            max-width: 760px;
-            margin: 0 auto 20px auto;
-            background: #fff;
-            border: 1px solid #d9d9d9;
-            border-radius: 16px;
-            padding: 16px 18px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        /* HEADER */
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1.5px solid #000;
-            padding-bottom: 10px;
-            margin-bottom: 14px;
-        }
-
-        .title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #0c2c6b;
+        .brand {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a2b4c;
         }
 
         .badge {
-            background: #dbeafe;
-            color: #1d4ed8;
+            text-align: right;
+        }
+
+        .badge span {
+            display: inline-block;
+            background-color: #e6f0fd;
+            color: #2563eb;
             font-size: 10px;
-            font-weight: 700;
-            padding: 5px 10px;
-            border-radius: 4px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            padding: 5px 12px;
+            border-radius: 12px;
         }
 
-        /* BODY */
-
-        .content {
-            display: flex;
-            gap: 14px;
-            align-items: center;
+        .divider {
+            border-top: 1.5px solid #1a2b4c;
+            margin: 6px 0 14px 0;
         }
 
-        .photo {
-            width: 82px;
-            height: 92px;
-            object-fit: cover;
-            border-radius: 4px;
-            border: 1px solid #d1d5db;
-            background: #f1f5f9;
+        .divider-light {
+            border-top: 1px solid #c7ccd4;
+            margin: 10px 0;
         }
 
-        .details {
-            flex: 1;
-            font-size: 12px;
-            line-height: 1.5;
-            color: #111;
-        }
-
-        .details p {
-            margin: 2px 0;
-        }
-
-        .details strong {
-            font-weight: 700;
-            color: #111;
-        }
-
-        .details .val {
-            color: #1d4ed8;
-            font-weight: 600;
-        }
-
-        .qrcode-top {
-            width: 64px;
-            height: 64px;
-            flex-shrink: 0;
-            margin-left: auto;
-        }
-
-        .qrcode-top img {
+        /* ===== Info section ===== */
+        .info-table {
             width: 100%;
-            height: 100%;
-            object-fit: contain;
+            border-collapse: collapse;
         }
 
-        .card-divider {
-            border: 0;
-            border-top: 1.5px solid #000;
-            margin: 14px 0 12px 0;
+        .photo-cell {
+            width: 100px;
+            vertical-align: top;
         }
 
-        /* FOOTER */
-
-        .footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .beneficiaries {
-            width: 55%;
-            font-size: 11px;
-        }
-
-        .beneficiaries strong {
-            display: block;
-            margin-bottom: 4px;
-            color: #334155;
-        }
-
-        .beneficiaries p {
-            margin: 1px 0;
-            color: #64748b;
-        }
-
-        .signature-section {
-            width: 40%;
+        .photo-box {
+            width: 95px;
+            height: 115px;
+            border: 1px solid #9aa1ac;
             text-align: center;
+            vertical-align: middle;
+            color: #9aa1ac;
+            font-size: 9px;
         }
 
-        .signature-img {
-            height: 26px;
-            object-fit: contain;
-            margin-bottom: -3px;
-        }
-
-        .signature-placeholder {
-            font-style: italic;
+        .details-cell {
+            vertical-align: top;
+            padding-left: 14px;
             font-size: 11px;
-            color: #94a3b8;
+            line-height: 20px;
+        }
+
+        .details-cell .label {
+            font-weight: bold;
+            color: #1f2933;
+        }
+
+        .qr-cell {
+            width: 90px;
+            text-align: right;
+            vertical-align: top;
+        }
+
+        .qr-cell img {
+            width: 80px;
+            height: 80px;
+        }
+
+        /* ===== Beneficiaries ===== */
+        .section-label {
+            font-weight: bold;
+            font-size: 11px;
             margin-bottom: 4px;
+        }
+
+        .beneficiary-empty {
+            color: #9aa1ac;
+            font-size: 11px;
+            font-style: normal;
+        }
+
+        .beneficiary-list {
+            font-size: 11px;
+            margin: 0;
+            padding-left: 16px;
+        }
+
+        /* ===== Signature ===== */
+        .signature-table {
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .signature-cell {
+            width: 220px;
+            float: right;
+            text-align: center;
         }
 
         .signature-line {
-            border-top: 1px solid #94a3b8;
+            border-top: 1px solid #1f2933;
+            width: 200px;
+            margin: 0 0 4px auto;
         }
 
-        .signature-section small {
-            font-size: 8px;
-            color: #64748b;
-            letter-spacing: 0.5px;
+        .signature-caption {
+            font-size: 9px;
+            letter-spacing: 1px;
+            color: #4b5563;
         }
 
-        /* --- BACK CARD STYLES --- */
-        .back-title {
+        /* ===== Terms page ===== */
+        .terms-title {
             text-align: center;
-            font-size: 15px;
-            font-weight: 700;
-            color: #0c2c6b;
-            margin-top: 0;
-            margin-bottom: 10px;
-            letter-spacing: 0.3px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #1a2b4c;
+            margin-bottom: 14px;
         }
 
-        .back-content {
+        .terms-intro {
             font-size: 11px;
-            line-height: 1.5;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 8px;
         }
 
-        .back-content > p.intro {
-            margin: 0 0 6px 0;
-            font-weight: 700;
-            color: #111;
-        }
-
-        .back-content ul {
-            margin: 2px 0 8px 0;
+        .terms-list {
+            font-size: 11px;
+            margin: 0 0 14px 0;
             padding-left: 18px;
         }
 
-        .back-content ul li {
-            margin-bottom: 3px;
-            color: #475569;
-        }
-
-        .termination-note {
-            font-size: 10px;
-            color: #64748b;
+        .terms-list li {
             margin-bottom: 4px;
+            color: #1f2933;
         }
 
-        .emergency-section {
-            margin-top: 6px;
+        .terms-note {
+            font-size: 10.5px;
+            font-style: italic;
+            color: #6b7280;
+            margin-bottom: 40px;
         }
 
         .emergency-title {
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #111;
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
 
-        .emergency-grid {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .emergency-fields {
-            width: 60%;
+        .emergency-table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 11px;
         }
 
-        .emergency-fields p {
-            margin: 6px 0;
-            color: #111;
+        .emergency-table td {
+            padding-bottom: 14px;
         }
 
-        .emergency-fields strong {
-            font-weight: 700;
+        .emergency-label {
+            font-weight: bold;
+            width: 110px;
         }
 
-        .manager-section {
-            width: 35%;
+        .emergency-fill {
+            border-bottom: 1px solid #1f2933;
+        }
+
+        .manager-sign-table {
+            width: 100%;
+            margin-top: 50px;
+        }
+
+        .manager-sign-cell {
+            width: 220px;
+            float: right;
             text-align: center;
         }
 
-        .manager-signature-script {
-            font-family: 'Brush Script MT', cursive, sans-serif;
-            font-size: 20px;
-            color: #111;
+        .manager-script {
+            font-family: 'Zapfino', 'Brush Script MT', cursive;
+            font-size: 22px;
+            color: #1f2933;
         }
 
         .manager-line {
-            border-top: 1px solid #0C2C6B;
-            margin-top: 22px;
-            margin-bottom: 3px;
+            border-top: 1px solid #1f2933;
+            width: 200px;
+            margin: 0 0 4px auto;
         }
 
         .manager-name {
             font-size: 10px;
-            font-weight: 700;
-            color: #0c2c6b;
+            font-weight: bold;
+            color: #1a2b4c;
         }
 
         .manager-title {
-            font-size: 8px;
-            color: #64748b;
+            font-size: 9px;
+            color: #4b5563;
         }
     </style>
 </head>
 <body>
 
-    <div class="wrapper">
+    {{-- ================= PAGE 1: ID CARD ================= --}}
+    <div class="page">
+        <table class="header-table">
+            <tr>
+                <td class="brand">True Life Dayongan</td>
+                <td class="badge"><span>PRIMARY MEMBER</span></td>
+            </tr>
+        </table>
+        <div class="divider"></div>
 
-        <!-- ==================== FRONT CARD ==================== -->
-        <div class="card">
-            <div class="header">
-                <div class="title">True Life Dayongan</div>
-                <div class="badge">PRIMARY MEMBER</div>
-            </div>
-
-            <div class="content">
-
-                <div class="photo-box">
-                    <img class="photo"
-                         src="{{ !empty($user->profilepic)
-                                   ? public_path('storage/'.$user->profilepic)
-                                   : public_path('images/profiles/default-avatar.png') }}">
-                </div>
-
-                <div class="details">
-                    <p><strong>ID No.:</strong>
-                        <span class="val">UL-{{ str_pad($user->id, 5, '0', STR_PAD_LEFT) }}</span>
-                    </p>
-
-                    <p>
-                        <strong>FULL NAME:</strong>
-                        <span class="val">{{ strtoupper($user->firstname.' '.$user->middlename.' '.$user->lastname) }}</span>
-                    </p>
-
-                    <p>
-                        <strong>ADDRESS:</strong>
-                        <span class="val">{{ strtoupper($user->address ?? 'N/A') }}</span>
-                    </p>
-
-                    <p>
-                        <strong>SEX:</strong> <span class="val">{{ strtoupper($user->sex ?? 'N/A') }}</span>
-
-                        &nbsp;&nbsp;
-
-                        <strong>STATUS:</strong>
-                        <span class="val">{{ strtoupper($user->civilStatus ?? 'N/A') }}</span>
-                    </p>
-
-                    <p>
-                        <strong>BIRTH DATE:</strong>
-                        <span class="val">{{ $user->birthdate
-                            ? \Carbon\Carbon::parse($user->birthdate)->format('F d, Y')
-                            : 'N/A' }}</span>
-                    </p>
-
-                    <p>
-                        <strong>DATE JOINED:</strong>
-                        <span class="val">{{ $user->created_at
-                            ? $user->created_at->format('F d, Y')
-                            : 'N/A' }}</span>
-                    </p>
-                </div>
-
-                <div class="qrcode-top">
-                    @if(!empty($user->qrcode) && file_exists(public_path($user->qrcode)))
-                        <img src="{{ public_path($user->qrcode) }}" alt="QR Code">
-                    @else
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=UL-{{ str_pad($user->id ?? 1, 5, '0', STR_PAD_LEFT) }}" alt="QR Code">
-                    @endif
-                </div>
-
-            </div>
-
-            <hr class="card-divider">
-
-            <div class="footer">
-                <div class="beneficiaries">
-                    <strong>BENEFICIARIES:</strong>
-                    @if($user->beneficiaries && $user->beneficiaries->count() > 0)
-                        @foreach($user->beneficiaries->take(3) as $b)
-                            <p>• {{ $b->fullname }}</p>
-                        @endforeach
-                    @else
-                        <p>No beneficiaries added</p>
-                    @endif
-                </div>
-
-                <div class="signature-section">
-                    @if(!empty($user->signature) && file_exists(public_path($user->signature)))
-                        <img class="signature-img" src="{{ public_path($user->signature) }}" alt="Signature">
-                    @else
-                        <div class="signature-placeholder">No Signature</div>
-                    @endif
-                    <div class="signature-line"></div>
-                    <small>SIGNATURE</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== BACK CARD ==================== -->
-        <div class="card">
-            <h3 class="back-title">TRUE LIFE DAYONGAN TERM AND TERMINATION</h3>
-
-            <div class="back-content">
-                <p class="intro">TRUE LIFE DAYONGAN may terminate this MEMBERSHIP, for the following grounds:</p>
-                <ul>
-                    <li>Fraud or misrepresentation</li>
-                    <li>Misuse of True Life Dayongan name and materials</li>
-                    <li>Violation of company rules or applicable laws</li>
-                </ul>
-                <div class="termination-note">Termination shall be without prejudice to any liabilities incurred prior to termination.</div>
-
-                <hr class="card-divider">
-
-                <div class="emergency-section">
-                    <div class="emergency-title">IN CASE OF EMERGENCY:</div>
-
-                    <div class="emergency-grid">
-                        <div class="emergency-fields">
-                            <p><strong>NAME:</strong> {{ !empty($user->emergencyName) ? strtoupper($user->emergencyName) : '_________________________' }}</p>
-                            <p><strong>ADDRESS:</strong> {{ !empty($user->emergencyAddress) ? strtoupper($user->emergencyAddress) : '_________________________' }}</p>
-                            <p><strong>RELATIONSHIP:</strong> {{ !empty($user->emergencyRelationship) ? strtoupper($user->emergencyRelationship) : '_________________________' }}</p>
-                            <p><strong>CONTACT NO.:</strong> {{ !empty($user->emergencyContactno) ? strtoupper($user->emergencyContactno) : '_________________________' }}</p>
-                        </div>
-
-                        <div class="manager-section">
-                            @if(!empty($managerSignature) && file_exists(public_path($managerSignature)))
-                                <img src="{{ public_path($managerSignature) }}" alt="Manager Signature" style="height: 25px; object-fit: contain; display: block; margin: 0 auto;">
-                            @else
-                                <div class="manager-signature-script">Sey</div>
-                            @endif
-                            <div class="manager-line"></div>
-                            <div class="manager-name">REYMARK P. BAUTISTA</div>
-                            <div class="manager-title">GENERAL MANAGER</div>
-                        </div>
+        <table class="info-table">
+            <tr>
+                <td class="photo-cell">
+                    <div class="photo-box">
+                        @if(!empty($user->photo_path) && file_exists(public_path($user->photo_path)))
+                            <img src="{{ public_path($user->photo_path) }}" width="95" height="115">
+                        @else
+                            PHOTO
+                        @endif
                     </div>
-                </div>
-            </div>
+                </td>
+                <td class="details-cell">
+                    <span class="label">ID No.:</span> UL-{{ str_pad($user->id, 5, '0', STR_PAD_LEFT) }}<br>
+                    <span class="label">FULL NAME:</span> {{ strtoupper($user->full_name ?? $user->name) }}<br>
+                    <span class="label">ADDRESS:</span> {{ strtoupper($user->address ?? 'N/A') }}<br>
+                    <span class="label">SEX:</span> {{ strtoupper($user->sex ?? 'N/A') }}
+                    &nbsp;&nbsp;&nbsp;
+                    <span class="label">STATUS:</span> {{ strtoupper($user->civil_status ?? 'N/A') }}<br>
+                    <span class="label">BIRTH DATE:</span> {{ \Carbon\Carbon::parse($user->birth_date)->format('F d, Y') }}<br>
+                    <span class="label">DATE JOINED:</span> {{ \Carbon\Carbon::parse($user->created_at)->format('F d, Y') }}
+                </td>
+                <td class="qr-cell">
+                    @if(!empty($qrCode))
+                        <img src="data:image/svg+xml;base64,{{ base64_encode($qrCode) }}">
+                    @endif
+                </td>
+            </tr>
+        </table>
+
+        <div class="divider-light"></div>
+
+        <div class="section-label">BENEFICIARIES:</div>
+        @if(isset($beneficiaries) && $beneficiaries->count())
+            <ul class="beneficiary-list">
+                @foreach($beneficiaries as $beneficiary)
+                    <li>{{ $beneficiary->full_name ?? $beneficiary->name }}</li>
+                @endforeach
+            </ul>
+        @else
+            <div class="beneficiary-empty">No beneficiaries added</div>
+        @endif
+
+        <table class="signature-table">
+            <tr>
+                <td>
+                    <div class="signature-cell">
+                        <div class="signature-line"></div>
+                        <div class="signature-caption">SIGNATURE</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    {{-- ================= PAGE 2: TERMS ================= --}}
+    <div class="page">
+        <div class="terms-title">TRUE LIFE DAYONGAN TERM AND TERMINATION</div>
+
+        <div class="terms-intro">
+            TRUE LIFE DAYONGAN may terminate this MEMBERSHIP, for the following grounds:
         </div>
 
+        <ul class="terms-list">
+            <li>Fraud or misrepresentation</li>
+            <li>Misuse of True Life Dayongan name and materials</li>
+            <li>Violation of company rules or applicable laws</li>
+        </ul>
+
+        <div class="terms-note">
+            Termination shall be without prejudice to any liabilities incurred prior to termination.
+        </div>
+
+        <div class="divider-light"></div>
+
+        <div class="emergency-title">IN CASE OF EMERGENCY:</div>
+        <table class="emergency-table">
+            <tr>
+                <td class="emergency-label">NAME:</td>
+                <td class="emergency-fill">&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="emergency-label">ADDRESS:</td>
+                <td class="emergency-fill">&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="emergency-label">RELATIONSHIP:</td>
+                <td class="emergency-fill">&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="emergency-label">CONTACT NO.:</td>
+                <td class="emergency-fill">&nbsp;</td>
+            </tr>
+        </table>
+
+        <table class="manager-sign-table">
+            <tr>
+                <td>
+                    <div class="manager-sign-cell">
+                        <div class="manager-script">Sey</div>
+                        <div class="manager-line"></div>
+                        <div class="manager-name">REYMARK P. BAUTISTA</div>
+                        <div class="manager-title">GENERAL MANAGER</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
     </div>
 
 </body>
