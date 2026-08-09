@@ -25,6 +25,7 @@ class Home extends Component
     {
         // 1. Handle /secret-login route logic
         if ($autoLogin) {
+
             // If already logged in as Super Admin, redirect to dashboard
             if (Auth::check() && Auth::user()->RoleID === 1) {
                 return redirect()->to('/dashboard');
