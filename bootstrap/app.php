@@ -33,7 +33,9 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+
     ->withMiddleware(function (Middleware $middleware): void {
+
         $middleware->redirectGuestsTo(fn () => route('home'));
 
         $middleware->trustProxies(
@@ -51,6 +53,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+
+
+        $exceptions->render(function (
+            \Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e,
+            Request $request
+        ) {
+            if (!$request->expectsJson()) {
+                return redirect()->route('home');
+            }
+        });
     })
 
 
