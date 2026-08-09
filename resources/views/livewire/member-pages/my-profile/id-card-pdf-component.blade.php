@@ -207,24 +207,21 @@
             left: 22mm;
 
             width: 42mm;
-            height: 22mm;
+            height: 21.5mm;
 
-            font-size: 5.1pt;
-            line-height: 3mm;
+            font-size: 4.8pt;
+            line-height: 2.7mm;
 
             overflow: hidden;
         }
 
         .details .label {
             font-weight: bold;
-
             color: #17335e;
         }
 
-
         .details .val {
             font-weight: bold;
-
             color: #1f2933;
         }
 
@@ -328,6 +325,14 @@
         | MEMBER SIGNATURE
         |--------------------------------------------------------------------------
         */
+
+        .member-signature {
+            display: block;
+            width: 25mm;
+            height: 7mm;
+            margin: 0 auto;
+            object-fit: contain;
+        }
 
         .sig-cell {
             position: absolute;
@@ -469,7 +474,7 @@
         .emergency-fields {
             position: absolute;
 
-            top: 29mm;
+            top: 31mm;
             left: 4mm;
 
             /* Limit emergency section width */
@@ -480,10 +485,11 @@
 
         .ef-row {
             height: 3mm;
-
             margin-bottom: 1.4mm;
 
             white-space: nowrap;
+
+            overflow: hidden;
         }
 
         .ef-label {
@@ -492,15 +498,22 @@
             width: 15mm;
 
             font-weight: bold;
+
+            color: #17335e;
         }
 
-        .ef-fill {
+        .ef-value {
             display: inline-block;
 
-            width: 25mm;
-            height: 3mm;
+            width: 27mm;
 
-            border-bottom: 0.4pt solid #1f2933;
+            font-weight: normal;
+
+            color: #1f2933;
+
+            overflow: hidden;
+
+            white-space: nowrap;
         }
 
         /* ============================================================
@@ -600,13 +613,11 @@
             {{-- PHOTO --}}
 
             <div class="photo-box">
-
-                @if (!empty($user->photo_path) && file_exists(public_path($user->photo_path)))
-                    <img src="{{ public_path($user->photo_path) }}" alt="Member Photo">
+                @if ($profilePicBase64)
+                    <img src="{{ $profilePicBase64 }}" alt="Member Photo">
                 @else
                     PHOTO
                 @endif
-
             </div>
 
 
@@ -691,11 +702,14 @@
                 <br>
 
                 <span class="label">
-                    DATE EXPIRATION:
+                    EXPIRATION:
                 </span>
 
                 <span class="val">
-                    {{ \Carbon\Carbon::parse($user->created_at)->addYear()->format('F d, Y') }}
+                    {{ $user->created_at
+                        ? $user->created_at->copy()->addYear()->format('F d, Y')
+                        : 'N/A'
+                    }}
                 </span>
 
             </div>
@@ -729,13 +743,11 @@
                 @if (isset($beneficiaries) && $beneficiaries->count())
 
                     <ul>
-
-                        @foreach ($beneficiaries as $beneficiary)
+                        @foreach ($beneficiaries->take(3) as $beneficiary)
                             <li>
-                                {{ $beneficiary->full_name ?? $beneficiary->name }}
+                                {{ $beneficiary->fullname }}
                             </li>
                         @endforeach
-
                     </ul>
                 @else
                     No beneficiaries added
@@ -748,6 +760,10 @@
             {{-- MEMBER SIGNATURE --}}
 
             <div class="sig-cell">
+
+                @if ($signatureBase64)
+                    <img src="{{ $signatureBase64 }}" class="member-signature" alt="Member Signature">
+                @endif
 
                 <div class="sig-line"></div>
 
@@ -830,58 +846,49 @@
             <div class="emergency-fields">
 
                 <div class="ef-row">
-
                     <span class="ef-label">
                         NAME:
                     </span>
 
-                    <span class="ef-fill">
-                        &nbsp;
+                    <span class="ef-value">
+                        {{ $user->emergencyName ?: 'N/A' }}
                     </span>
-
                 </div>
 
 
                 <div class="ef-row">
-
                     <span class="ef-label">
                         ADDRESS:
                     </span>
 
-                    <span class="ef-fill">
-                        &nbsp;
+                    <span class="ef-value">
+                        {{ $user->emergencyAddress ?: 'N/A' }}
                     </span>
-
                 </div>
 
 
                 <div class="ef-row">
-
                     <span class="ef-label">
                         RELATIONSHIP:
                     </span>
 
-                    <span class="ef-fill">
-                        &nbsp;
+                    <span class="ef-value">
+                        {{ $user->emergencyRelationship ?: 'N/A' }}
                     </span>
-
                 </div>
 
 
                 <div class="ef-row">
-
                     <span class="ef-label">
                         CONTACT NO.:
                     </span>
 
-                    <span class="ef-fill">
-                        &nbsp;
+                    <span class="ef-value">
+                        {{ $user->emergencyContactno ?: 'N/A' }}
                     </span>
-
                 </div>
 
             </div>
-
 
             {{-- MANAGER SIGNATURE --}}
 
