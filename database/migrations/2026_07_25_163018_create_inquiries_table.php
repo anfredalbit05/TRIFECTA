@@ -27,6 +27,10 @@ return new class extends Migration
 
             $table->timestamp('date_read')->nullable();
 
+            $table->boolean('isReplied')->default(false)->comment('0 for not replied, 1 for replied');
+
+            $table->longText('response')->nullable()->comment('Response to the inquiry');
+
             $table->timestamps();
 
             $table->foreignId('AssignedUserID')
