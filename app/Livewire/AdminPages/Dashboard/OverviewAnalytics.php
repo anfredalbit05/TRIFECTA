@@ -44,7 +44,7 @@ class OverviewAnalytics extends Component
 
     public $showInvitesModal = false;
     public $selectedReferrerName = '';
-    public array $referredUsers = [];
+    public $referredUsers; // Changed from array hint to support collection
 
     public function mount()
     {
@@ -120,25 +120,25 @@ class OverviewAnalytics extends Component
         };
 
         // Member Analytics
-        $this->totalMembers = User::where($applyFilter)->count();
-        $this->activeMembers = User::where($applyFilter)->where('status', 1)->count();
-        $this->inactiveMembers = User::where($applyFilter)->where('status', 0)->count();
+        $this->totalMembers = User::where(fn($q) => $applyFilter($q))->count();
+        $this->activeMembers = User::where(fn($q) => $applyFilter($q))->where('status', 1)->count();
+        $this->inactiveMembers = User::where(fn($q) => $applyFilter($q))->where('status', 0)->count();
 
         // System Counts
-        $this->totalBranches = Branch::where($applyFilter)->count();
-        $this->totalBenefits = Benefit::where($applyFilter)->count();
-        $this->totalBeneficiaries = Beneficiary::where($applyFilter)->count();
-        $this->totalNews = NewsUpdate::where($applyFilter)->count();
-        $this->totalFaq = Faq::where($applyFilter)->count();
-        $this->totalInquiry = Inquiry::where($applyFilter)->count();
+        $this->totalBranches = Branch::where(fn($q) => $applyFilter($q))->count();
+        $this->totalBenefits = Benefit::where(fn($q) => $applyFilter($q))->count();
+        $this->totalBeneficiaries = Beneficiary::where(fn($q) => $applyFilter($q))->count();
+        $this->totalNews = NewsUpdate::where(fn($q) => $applyFilter($q))->count();
+        $this->totalFaq = Faq::where(fn($q) => $applyFilter($q))->count();
+        $this->totalInquiry = Inquiry::where(fn($q) => $applyFilter($q))->count();
 
         // Inquiries
-        $this->unreadInquiry = Inquiry::where($applyFilter)->whereNull('date_read')->count();
-        $this->readInquiry = Inquiry::where($applyFilter)->whereNotNull('date_read')->count();
+        $this->unreadInquiry = Inquiry::where(fn($q) => $applyFilter($q))->whereNull('date_read')->count();
+        $this->readInquiry = Inquiry::where(fn($q) => $applyFilter($q))->whereNotNull('date_read')->count();
 
         // Recent Users & News
-        $this->recentMembers = User::where($applyFilter)->latest()->limit(5)->get();
-        $this->recentNews = NewsUpdate::where($applyFilter)->latest()->limit(5)->get();
+        $this->recentMembers = User::where(fn($q) => $applyFilter($q))->latest()->limit(5)->get();
+        $this->recentNews = NewsUpdate::where(fn($q) => $applyFilter($q))->latest()->limit(5)->get();
 
         // Branch Distribution
         $this->branchStats = Branch::withCount(['user' => function ($query) use ($applyFilter) {
@@ -203,14 +203,15 @@ class OverviewAnalytics extends Component
             $query->whereYear('activations.created_at', $year);
         }
 
-        $this->referredUsers = $query->get()->toArray();
+        // FIX: Removed ->toArray() so it stays a Collection of objects
+        $this->referredUsers = $query->get();
         $this->showInvitesModal = true;
     }
 
     public function closeInvitesModal()
     {
         $this->showInvitesModal = false;
-        $this->referredUsers = [];
+        $this->referredUsers = collect();
         $this->selectedReferrerName = '';
     }
 
