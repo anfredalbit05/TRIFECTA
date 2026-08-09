@@ -52,6 +52,8 @@ return new class extends Migration
             // Foreign Keys
             $table->unsignedBigInteger('RoleID');
 
+            $table->string('position')->default('client');
+
             $table->string('branchCode', 20)->nullable();
 
             // Status
@@ -81,7 +83,7 @@ return new class extends Migration
                 ->restrictOnDelete();
 
 
-            $table->string('position')->default('member');
+
         });
 
 

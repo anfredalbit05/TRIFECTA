@@ -9,6 +9,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Role; // Ensure Role model is imported
 
 class AdminUsers extends Component
 {
@@ -19,6 +20,7 @@ class AdminUsers extends Component
 
     // Modal States
     public bool $isViewModalOpen = false;
+    public bool $isAddModalOpen = false;
     public bool $isEditModalOpen = false;
     public bool $isAccessModalOpen = false;
     public bool $isDeleteModalOpen = false;
@@ -31,12 +33,16 @@ class AdminUsers extends Component
     public string $middlename = '';
     public string $lastname = '';
     public string $username = '';
+    public string $email = '';
+    public string $password = '';
     public string $contactno = '';
     public string $gender = '';
     public string $birthdate = '';
     public string $address = ''; // Added missing property
-    public string $status = '';
+    public string $status = 'Inactive';
     public string $RoleID = '';
+    public string $position = '';
+    public string $referralCode = '';
 
     public array $userAccess = [];
 
@@ -151,25 +157,157 @@ class AdminUsers extends Component
         $this->isViewModalOpen = true;
     }
 
-    public function editUser(User $user)
+    private function generateUplineCode(): string
     {
-        Log::info("Initiating edit for user ID: {$user->UserID}");
-
-        $this->selectedUserId = $user->UserID;
-
-        $this->firstname = $user->firstname ?? '';
-        $this->middlename = $user->middlename ?? '';
-        $this->lastname = $user->lastname ?? '';
-        $this->username = $user->username ?? '';
-        $this->contactno = $user->contactno ?? '';
-        $this->gender = $user->gender ?? '';
-        $this->birthdate = $user->birthdate ? $user->birthdate->format('Y-m-d') : '';
-        $this->address = $user->address ?? ''; // Added loading address
-        $this->status = $user->status ?? 'Active';
-        $this->RoleID = $user->RoleID ?? '';
-
-        $this->isEditModalOpen = true;
+        return strtoupper(
+            substr(
+                md5(
+                    uniqid(
+                        mt_rand(),
+                        true
+                    )
+                ),
+                0,
+                6
+            )
+        );
     }
+
+   public function openAddModal()
+{
+    Log::info("Opening add user modal");
+
+    // Reset fields for a clean form when adding a new user
+    $this->reset([
+        'firstname', 'middlename', 'lastname', 'email',
+        'username', 'password', 'contactno', 'gender',
+        'birthdate', 'address', 'status', 'RoleID', 'position', 'selectedUserId'
+    ]);
+
+    $this->status = 'Active';
+    $this->isAddModalOpen = true;
+}
+
+public function storeUser()
+{
+    $this->validate([
+        'firstname' => 'required|string|max:100',
+        'middlename' => 'nullable|string|max:100',
+        'lastname' => 'required|string|max:100',
+        'email' => 'required|email|unique:users,email|max:255',
+        'username' => 'required|string|unique:users,username|max:50',
+        'password' => 'required|min:6',
+        'contactno' => 'nullable|string|max:20',
+        'gender' => 'nullable|in:Male,Female,Other',
+        'birthdate' => 'nullable|date',
+        'address' => 'nullable|string',
+        'RoleID' => 'required|exists:roles,RoleID',
+        'position' => 'nullable|string|max:255',
+        'status' => 'required|in:Active,Inactive,Suspended',
+    ]);
+
+    User::create([
+        'firstname' => $this->firstname,
+        'middlename' => $this->middlename ?: null,
+        'lastname' => $this->lastname,
+        'email' => $this->email ?: null,
+        'username' => $this->username,
+        'password' => $this->password, // Handled by model hashing cast
+        'contactno' => $this->contactno ?: null,
+        'gender' => $this->gender ?: null,
+        'birthdate' => $this->birthdate ?: null,
+        'address' => $this->address ?: null,
+        'RoleID' => $this->RoleID,
+        'position' => $this->position ?: 'client',
+        'status' => $this->status,
+        'referralCode' => $this->generateUplineCode(),
+    ]);
+
+    session()->flash('success', 'User successfully created!');
+
+    $this->reset([
+        'firstname', 'middlename', 'lastname', 'email',
+        'username', 'password', 'contactno', 'gender',
+        'birthdate', 'address', 'status', 'RoleID', 'position'
+    ]);
+
+    $this->status = 'Active';
+    $this->isAddModalOpen = false;
+}
+
+public function editUser(User $user)
+{
+    Log::info("Initiating edit for user ID: {$user->UserID}");
+
+    $this->selectedUserId = $user->UserID;
+
+    $this->firstname = $user->firstname ?? '';
+    $this->middlename = $user->middlename ?? '';
+    $this->lastname = $user->lastname ?? '';
+    $this->username = $user->username ?? '';
+    $this->email = $user->email ?? ''; // Added if you display email in edit
+    $this->contactno = $user->contactno ?? '';
+    $this->gender = $user->gender ?? '';
+    $this->birthdate = $user->birthdate ? \Carbon\Carbon::parse($user->birthdate)->format('Y-m-d') : '';
+    $this->address = $user->address ?? '';
+    $this->status = $user->status ?? 'Inactive';
+    $this->RoleID = $user->RoleID ?? '';
+
+    $this->isEditModalOpen = true;
+}
+
+public function updateUser()
+{
+    Log::info("Attempting to update user ID: {$this->selectedUserId}");
+
+    $this->validate([
+        'firstname' => 'required|string|max:100',
+        'middlename' => 'nullable|string|max:100',
+        'lastname' => 'required|string|max:100',
+        'username' => 'required|string|max:50|unique:users,username,' . $this->selectedUserId . ',UserID',
+        'contactno' => 'nullable|string|max:20',
+        'gender' => 'nullable|in:Male,Female,Other',
+        'birthdate' => 'nullable|date',
+        'address' => 'nullable|string',
+        'RoleID' => 'required|exists:roles,RoleID',
+        'status' => 'required|in:Active,Inactive,Suspended',
+    ]);
+
+    $user = User::find($this->selectedUserId);
+
+    if ($user) {
+        $user->update([
+            'firstname' => $this->firstname,
+            'middlename' => $this->middlename !== '' ? $this->middlename : null,
+            'lastname' => $this->lastname,
+            'username' => $this->username,
+            'contactno' => $this->contactno !== '' ? $this->contactno : null,
+            'gender' => $this->gender !== '' ? $this->gender : null,
+            'birthdate' => $this->birthdate !== '' ? $this->birthdate : null,
+            'address' => $this->address !== '' ? $this->address : null,
+            'status' => $this->status,
+            'RoleID' => $this->RoleID,
+        ]);
+
+        Log::info("Successfully updated user ID: {$this->selectedUserId}");
+    }
+
+    $this->isEditModalOpen = false;
+    session()->flash('success', 'User updated successfully.');
+}
+
+public function closeModal()
+{
+    $this->reset([
+        'firstname', 'middlename', 'lastname', 'email',
+        'username', 'password', 'contactno', 'gender',
+        'birthdate', 'address', 'status', 'RoleID', 'position', 'selectedUserId'
+    ]);
+
+    $this->isAddModalOpen = false;
+    $this->isEditModalOpen = false;
+}
+
 
     public function openAccessModal(User $user)
     {
@@ -201,45 +339,6 @@ class AdminUsers extends Component
         $this->isAccessModalOpen = true;
     }
 
-    public function confirmDelete(User $user)
-    {
-        Log::info("Confirm deletion requested for user ID: {$user->UserID}");
-
-        $this->selectedUserId = $user->UserID;
-        $this->isDeleteModalOpen = true;
-    }
-
-    public function updateUser()
-    {
-        Log::info("Attempting to update user ID: {$this->selectedUserId}");
-
-        $this->validate([
-            'firstname' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
-            'username' => 'required|string|max:255',
-            'status' => 'required|string',
-        ]);
-
-        if ($this->selectedUser) {
-            $this->selectedUser->update([
-                'firstname' => $this->firstname,
-                'middlename' => $this->middlename !== '' ? $this->middlename : null,
-                'lastname' => $this->lastname,
-                'username' => $this->username,
-                'contactno' => $this->contactno !== '' ? $this->contactno : null,
-                'gender' => $this->gender !== '' ? $this->gender : null,
-                'birthdate' => $this->birthdate !== '' ? $this->birthdate : null,
-                'address' => $this->address !== '' ? $this->address : null,
-                'status' => $this->status,
-                'RoleID' => $this->RoleID,
-            ]);
-
-            Log::info("Successfully updated user ID: {$this->selectedUserId}");
-        }
-
-        $this->isEditModalOpen = false;
-        session()->flash('message', 'User updated successfully.');
-    }
 
     public function deleteUser()
     {
@@ -253,6 +352,14 @@ class AdminUsers extends Component
 
         $this->isDeleteModalOpen = false;
         session()->flash('message', 'User deleted successfully.');
+    }
+
+      public function confirmDelete(User $user)
+    {
+        Log::info("Confirm deletion requested for user ID: {$user->UserID}");
+
+        $this->selectedUserId = $user->UserID;
+        $this->isDeleteModalOpen = true;
     }
 
     public function saveAccess()
@@ -315,7 +422,7 @@ class AdminUsers extends Component
             ->latest('UserID')
             ->paginate(10);
 
-        return view('livewire.admin-pages.dashboard.admin-users', [
+        return view('livewire.admin-pages.masterlist.admin-users', [
             'users' => $users,
         ]);
     }

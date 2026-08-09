@@ -39,8 +39,6 @@ Route::get('/register/{referralCode}', function ($referralCode) {
     return redirect()->route('home', ['ref' => $referralCode]);
 })->name('register.referral');
 
-
-
 /*
 |--------------------------------------------------------------------------
 | Member Dashboard
