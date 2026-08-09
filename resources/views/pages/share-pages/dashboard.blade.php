@@ -33,14 +33,14 @@
                 My Dashboard
             </a>
 
-
+{{--
              @if(auth()->user()->RoleID == 1)
             <a href="#"
                @click.prevent="tab='admin-users'"
                :class="tab === 'admin-users' ? 'active' : ''">
                 All Users
             </a>
-            @endif
+            @endif --}}
 
 
             {{-- <a href="#"

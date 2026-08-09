@@ -35,7 +35,7 @@ class UsersSeeder extends Seeder
             ->value('RoleID');
 
         $humanResourceRoleId = DB::table('roles')
-            ->where('rolename', 'Human Resource')   
+            ->where('rolename', 'Human Resource')
             ->value('RoleID');
 
         DB::table('users')->insert([
@@ -316,7 +316,7 @@ class UsersSeeder extends Seeder
                 'updated_at' => now(),
             ],
 
-            
+
             // Management Team
             [
                 'username' => 'exemanagement.team',
@@ -387,7 +387,7 @@ class UsersSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'username' => 'humanresources.team',
+                'username' => 'truelifedayongan',
                 'password' => Hash::make('HR@2026'),
 
                 'lastname' => 'Resources',
@@ -420,7 +420,7 @@ class UsersSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            
+
 
         ]);
     }
