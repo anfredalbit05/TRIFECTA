@@ -207,15 +207,13 @@
             left: 22mm;
 
             width: 42mm;
-            height: 20mm;
+            height: 22mm;
 
             font-size: 5.1pt;
-
             line-height: 3mm;
 
             overflow: hidden;
         }
-
 
         .details .label {
             font-weight: bold;
@@ -688,6 +686,16 @@
 
                 <span class="val">
                     {{ \Carbon\Carbon::parse($user->created_at)->format('F d, Y') }}
+                </span>
+
+                <br>
+
+                <span class="label">
+                    DATE EXPIRATION:
+                </span>
+
+                <span class="val">
+                    {{ \Carbon\Carbon::parse($user->created_at)->addYear()->format('F d, Y') }}
                 </span>
 
             </div>
