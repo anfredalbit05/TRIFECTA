@@ -135,9 +135,52 @@
                 @endforelse
             </tbody>
         </table>
-        <div class="p-4">
-            {{ $users->links() }}
-        </div>
+         <!-- PAGINATION -->
+        @if ($users->hasPages())
+            <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
+
+                {{-- Previous Page Link --}}
+                @if ($users->onFirstPage())
+                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                        Previous
+                    </span>
+                @else
+                    <button
+                        wire:click="previousPage"
+                        wire:loading.attr="disabled"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer"
+                        style="background-color: #D79B10;"
+                        onmouseover="this.style.backgroundColor='#c58d0f'"
+                        onmouseout="this.style.backgroundColor='#D79B10'"
+                    >
+                        Previous
+                    </button>
+                @endif
+
+                <span class="text-sm text-gray-600">
+                    Page {{ $users->currentPage() }} of {{ $users->lastPage() }}
+                </span>
+
+                {{-- Next Page Link --}}
+                @if ($users->hasMorePages())
+                    <button
+                        wire:click="nextPage"
+                        wire:loading.attr="disabled"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer"
+                        style="background-color: #0C2C6B;"
+                        onmouseover="this.style.backgroundColor='#0a2559'"
+                        onmouseout="this.style.backgroundColor='#0C2C6B'"
+                    >
+                        Next
+                    </button>
+                @else
+                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                        Next
+                    </span>
+                @endif
+
+            </div>
+        @endif
     </div>
 
     <!-- VIEW USER MODAL -->
