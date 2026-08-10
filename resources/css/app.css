@@ -2,18 +2,28 @@
 @import 'flatpickr/dist/flatpickr.min.css';
 
 /* Define the custom utility first so component files can @apply it */
-  @utility btn-primary {
-    @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#0C2C6B] hover:bg-[#071a42] text-white;
-    }
+@import "tailwindcss";
+@import 'flatpickr/dist/flatpickr.min.css';
 
-    @utility btn-secondary {
-    @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#D79B10] hover:bg-[#B8830D] text-white;
-    }
+/* Define field-base globally so component files can @apply it */
+@utility field-base {
+  @apply w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-navy;
+}
 
-    @utility btn-warning {
-    @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#D79B10] hover:bg-[#B8830D] text-white;
-    }
+/* Your button utilities */
+@utility btn-primary {
+  @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#0C2C6B] hover:bg-[#071a42] text-white;
+}
 
+@utility btn-secondary {
+  @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#D79B10] hover:bg-[#B8830D] text-white;
+}
+
+@utility btn-warning {
+  @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#D79B10] hover:bg-[#B8830D] text-white;
+}
+
+/* Component imports follow below */
 /*Root Admin */
 @import "./components/home/hero.css";
 @import "./components/home/details.css";
