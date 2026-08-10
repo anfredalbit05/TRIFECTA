@@ -109,11 +109,33 @@ class MemberIdCardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | MANAGER SIGNATURE
+        | MANAGER SIGNATURE (CEO)
         |--------------------------------------------------------------------------
+        |
+        | Look up the user whose position is "CEO" and grab their signature.
+        | If no CEO is found, or the CEO has no signature file, this stays null.
+        |
         */
 
         $managerSignature = null;
+
+        $ceo = User::where('position', 'CEO')->first();
+
+        if (
+            $ceo &&
+            !empty($ceo->signature) &&
+            Storage::disk('public')->exists($ceo->signature)
+        ) {
+            $ceoSignaturePath = Storage::disk('public')->path($ceo->signature);
+
+            $mimeType = mime_content_type($ceoSignaturePath);
+
+            $managerSignature =
+                'data:' . $mimeType . ';base64,' .
+                base64_encode(
+                    file_get_contents($ceoSignaturePath)
+                );
+        }
 
 
         /*

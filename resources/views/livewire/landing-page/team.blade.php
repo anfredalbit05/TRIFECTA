@@ -362,13 +362,13 @@
 
         <div class="overflow-hidden rounded-[40px] bg-white shadow-2xl">
 
-            <div class="grid lg:grid-cols-12 min-h-[850px]">
+            <div class="grid lg:grid-cols-12 min-h-[950px]">
 
                    <!-- ========================= -->
                 <!-- RIGHT IMAGE -->
                 <!-- ========================= -->
 
-                <div class="relative lg:col-span-5 bg-gradient-to-b from-blue-950 to-slate-900">
+                <div class="relative lg:col-span-5 overflow-hidden bg-gradient-to-b from-blue-950 to-slate-900">
 
                     <!-- Decorations -->
 
@@ -387,10 +387,11 @@
                         <img
                             src="{{ asset('images/coo.png') }}"
                             alt="COO"
-                            class="h-[950px] object-contain object-bottom"
+                            class="relative z-10 h-[800px] object-contain object-bottom"
                         >
 
                     </div>
+
 
                 </div>
 

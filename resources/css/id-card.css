@@ -400,6 +400,14 @@ body {
     color: #1f2933;
 }
 
+.manager-signature {
+    display: block;
+    width: 25mm;
+    height: 7mm;
+    margin: 0 auto;
+    object-fit: contain;
+}
+
 .manager-line {
     width: 27mm;
     margin: 0 auto;

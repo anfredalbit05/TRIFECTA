@@ -183,7 +183,11 @@
 
             {{-- MANAGER SIGNATURE --}}
             <div class="manager-cell">
-                <div class="manager-script"></div>
+                 <div class="manager-script">
+        @if ($managerSignature)
+            <img src="{{ $managerSignature }}" class="manager-signature" alt="Manager Signature">
+        @endif
+    </div>
                 <div class="manager-line"></div>
                 <div class="manager-name">RENANTE SUAYBAGUIO-ROBLES, MPA, LFA</div>
                 <div class="manager-title">CEO</div>
