@@ -96,7 +96,7 @@
                     <div class="avatar-actions">
                         <div class="avatar-buttons-row">
                             <label for="profilepic" class="btn-primary">
-                                Choose New Picture
+                                Choose Profile Picture
                             </label>
                             <input id="profilepic" type="file" wire:model="profilepic" accept="image/*" class="hidden">
 
@@ -104,7 +104,7 @@
                                 <button type="button" wire:click="removeProfilePicture"
                                     wire:confirm="Are you sure you want to remove your profile picture?"
                                     class="btn-warning">
-                                    Remove Picture
+                                    Remove Profile Picture
                                 </button>
                             @endif
                         </div>

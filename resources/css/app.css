@@ -6,23 +6,14 @@
 @import 'flatpickr/dist/flatpickr.min.css';
 
 /* Define field-base globally so component files can @apply it */
+/* Define the custom utility so Tailwind v4 recognizes it */
+@utility btn-base {
+  @apply px-4 text-white py-2 font-semibold rounded-lg; /* Update these styles to match your design */
+}
+
 @utility field-base {
-  @apply w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-navy;
+  @apply w-full rounded-xl border border-slate-300 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-100;
 }
-
-/* Your button utilities */
-@utility btn-primary {
-  @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#0C2C6B] hover:bg-[#071a42] text-white;
-}
-
-@utility btn-secondary {
-  @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#D79B10] hover:bg-[#B8830D] text-white;
-}
-
-@utility btn-warning {
-  @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#D79B10] hover:bg-[#B8830D] text-white;
-}
-
 /* Component imports follow below */
 /*Root Admin */
 @import "./components/home/hero.css";

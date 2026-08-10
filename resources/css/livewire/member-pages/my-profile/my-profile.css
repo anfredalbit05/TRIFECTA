@@ -105,6 +105,17 @@
      matching how they're actually used in forms/cards on mobile.
      =============================================================== */
 
+  .btn-primary {
+    @apply btn-base bg-[#0C2C6B] hover:bg-[#071a42];
+  }
+
+  .btn-secondary {
+    @apply btn-base bg-[#D79B10] hover:bg-[#B8830D];
+  }
+
+  .btn-warning {
+    @apply btn-base bg-[#D79B10] hover:bg-[#B8830D];
+  }
 
   .btn-submit {
     @apply w-full sm:w-auto cursor-pointer rounded-xl bg-[#0C2C6B] px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-[#071a42] disabled:opacity-60;
@@ -142,9 +153,9 @@
     @apply flex w-full flex-1 flex-col items-center sm:items-start;
   }
 
-  .avatar-buttons-row {
-    @apply flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center;
-  }
+ .avatar-buttons-row {
+  @apply flex w-full flex-col items-stretch gap-2 sm:w-auto sm:items-start;
+}
 
   /* ===============================================================
      6. FORM FIELDS
