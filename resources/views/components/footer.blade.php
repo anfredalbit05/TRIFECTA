@@ -4,7 +4,7 @@
             <span class="font-black text-[#D4A017] tracking-wider">
                 <x-editable-text
                     key="footer_brand_name"
-                    :value="$contexts['footer_brand_name'] ?? 'DAYONGAN'"
+                    :value="$contexts['footer_brand_name'] ?? 'TRUELIFE'"
                     tag="span"
                     class="inline-block"
                 />
@@ -23,7 +23,7 @@
         <p class="text-slate-400">
             <x-editable-text
                 key="footer_copyright"
-                :value="$contexts['footer_copyright'] ?? '© ' . date('Y') . ' Dayongan. All rights reserved.'"
+                :value="$contexts['footer_copyright'] ?? '© ' . date('Y') . ' TRUELIFE. All rights reserved.'"
                 tag="span"
                 class="inline-block"
             />
