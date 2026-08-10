@@ -381,7 +381,7 @@
     <img
         src="{{ asset('images/coo.png') }}"
         alt="COO"
-        class="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 h-[1200px] mb-25 w-auto object-contain object-bottom"
+        class="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 h-[1500px] mb-25 w-auto object-contain object-bottom"
     >
 
 </div>

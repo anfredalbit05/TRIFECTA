@@ -21,6 +21,7 @@ class Account extends Component
     public string $qrCode = '';
     public string $referralUrl = '';
     public string $status = '';
+    public string $policy_number = '';
 
     public function mount(): void
     {
@@ -33,6 +34,7 @@ class Account extends Component
         $this->email = $user->email ?? '';
         $this->status = $user->status ?? '';
         $this->referralUrl = url('/?ref=' . $user->referralCode);
+        $this->policy_number = $user->policy_number ?? '';
 
         $renderer = new ImageRenderer(
             new RendererStyle(200),

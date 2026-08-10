@@ -70,35 +70,41 @@
             <p class="card-subtitle">Information managed by the system.</p>
         </div>
 
-        <div class="grid divide-y divide-slate-200 md:grid-cols-2 md:divide-x md:divide-y-0">
-            {{-- Status --}}
-            <div class="account-detail-cell">
-                <p class="account-detail-label">Account Status</p>
-                <div class="mt-3">
-                    @if (auth()->user()->RoleID != 4)
-                        <select wire:model="status" class="status-select">
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                    @else
-                        <span @class([
-                            'status-badge',
-                            'status-badge--active' => auth()->user()->status === 'Active',
-                            'status-badge--inactive' => auth()->user()->status === 'Inactive',
-                            'status-badge--suspended' => auth()->user()->status === 'Suspended',
-                        ])>
-                            {{ auth()->user()->status }}
-                        </span>
-                    @endif
-                </div>
-            </div>
-
-            {{-- Referral Code --}}
-            <div class="account-detail-cell">
-                <p class="account-detail-label">Referral Code</p>
-                <p class="account-detail-value">{{ auth()->user()->referralCode ?? 'Not available' }}</p>
-            </div>
+        <div class="grid divide-y divide-slate-200 md:grid-cols-3 md:divide-x md:divide-y-0">
+    {{-- Status --}}
+    <div class="account-detail-cell">
+        <p class="account-detail-label">Account Status</p>
+        <div class="mt-3">
+            @if (auth()->user()->RoleID != 4)
+                <select wire:model="status" class="status-select">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            @else
+                <span @class([
+                    'status-badge',
+                    'status-badge--active' => auth()->user()->status === 'Active',
+                    'status-badge--inactive' => auth()->user()->status === 'Inactive',
+                    'status-badge--suspended' => auth()->user()->status === 'Suspended',
+                ])>
+                    {{ auth()->user()->status }}
+                </span>
+            @endif
         </div>
+    </div>
+
+    {{-- Referral Code --}}
+    <div class="account-detail-cell">
+        <p class="account-detail-label">Referral Code</p>
+        <p class="account-detail-value">{{ auth()->user()->referralCode ?? 'Not available' }}</p>
+    </div>
+
+    {{-- Policy Number --}}
+    <div class="account-detail-cell">
+        <p class="account-detail-label">Policy Number</p>
+        <p class="account-detail-value">{{ auth()->user()->policy_number ?? 'Not available' }}</p>
+    </div>
+</div>
 
         {{-- ==================== 4. REFERRAL QR & LINK ==================== --}}
         <div class="referral-section">
