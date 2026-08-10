@@ -2,6 +2,17 @@
 @import 'flatpickr/dist/flatpickr.min.css';
 
 /* Define the custom utility first so component files can @apply it */
+  @utility btn-primary {
+    @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#0C2C6B] hover:bg-[#071a42] text-white;
+    }
+
+    @utility btn-secondary {
+    @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#D79B10] hover:bg-[#B8830D] text-white;
+    }
+
+    @utility btn-warning {
+    @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#D79B10] hover:bg-[#B8830D] text-white;
+    }
 
 /*Root Admin */
 @import "./components/home/hero.css";
