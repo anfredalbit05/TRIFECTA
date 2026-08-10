@@ -368,32 +368,23 @@
                 <!-- RIGHT IMAGE -->
                 <!-- ========================= -->
 
-                <div class="relative lg:col-span-5 overflow-hidden bg-gradient-to-b from-blue-950 to-slate-900">
+              <div class="relative lg:col-span-5 overflow-hidden bg-gradient-to-b from-blue-950 to-slate-900 min-h-[950px]">
 
-                    <!-- Decorations -->
+    <!-- Decorations -->
+    <div class="absolute top-10 right-10 h-40 w-40 rounded-full bg-yellow-400/20 blur-3xl"></div>
+    <div class="absolute bottom-10 left-10 h-40 w-40 rounded-full bg-blue-400/20 blur-3xl"></div>
 
-                    <div class="absolute top-10 right-10 h-40 w-40 rounded-full bg-yellow-400/20 blur-3xl"></div>
+    <!-- Gold line -->
+    <div class="absolute left-0 top-0 h-full w-1 bg-yellow-500"></div>
 
-                    <div class="absolute bottom-10 left-10 h-40 w-40 rounded-full bg-blue-400/20 blur-3xl"></div>
+    <!-- Image -->
+    <img
+        src="{{ asset('images/coo.png') }}"
+        alt="COO"
+        class="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 h-[1200px] mb-25 w-auto object-contain object-bottom"
+    >
 
-                    <!-- Gold line -->
-
-                    <div class="absolute left-0 top-0 h-full w-1 bg-yellow-500"></div>
-
-                    <!-- Image -->
-
-                    <div class="flex h-full items-end justify-center">
-
-                        <img
-                            src="{{ asset('images/coo.png') }}"
-                            alt="COO"
-                            class="relative z-10 h-[800px] object-contain object-bottom"
-                        >
-
-                    </div>
-
-
-                </div>
+</div>
 
                 <div class="lg:col-span-7 p-10 lg:p-14 flex flex-col justify-center">
 

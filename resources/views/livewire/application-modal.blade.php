@@ -104,6 +104,18 @@
                                     <option value="Separated">Separated</option>
                                 </select>
                             </div>
+
+                            {{-- POLICY NUMBER (Edit Mode Only) --}}
+                            @if ($isEditMode)
+                                <div>
+                                    <label class="mb-1 block text-xs font-bold text-slate-700">
+                                        Policy Number
+                                    </label>
+                                    <input wire:model="policy_number" type="text" placeholder="POL-000123"
+                                        class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                </div>
+                            @endif
+
                             {{-- BIRTHDATE WITH FULL YEAR, MONTH, & DAY PICKER --}}
                             <div wire:key="birthdate-picker-{{ $userId ?? 'new' }}" x-data="{
                                 openPicker: false,

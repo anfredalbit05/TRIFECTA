@@ -39,6 +39,7 @@ class ApplicationModal extends Component
     public bool $isEditMode = false;
 
     public ?int $userId = null;
+    public $policy_number = '';
 
 
     public $upline = '';
@@ -196,6 +197,7 @@ public function open($upline = null)
         'userId',
         'latitude',
         'longitude',
+        'policy_number'
     ]);
 
     $this->showMapModal = false;
@@ -456,6 +458,7 @@ public function open($upline = null)
             'mobile' => 'required|digits:11',
             'email' => 'nullable|email|unique:users,email,' . $this->userId . ',UserID',
             'username' => 'required|string|max:100|unique:users,username,' . $this->userId . ',UserID',
+            'policy_number' => 'nullable|string|max:100',
         ]);
 
         DB::beginTransaction();
@@ -476,6 +479,7 @@ public function open($upline = null)
                 'address' => $this->address,
                 'latitude' => $this->latitude,
                 'longitude' => $this->longitude,
+                'policy_number' => $this->policy_number, // <-- add this
             ]);
 
             Beneficiary::where('UserID', $user->UserID)->delete();
@@ -629,6 +633,7 @@ public function open($upline = null)
         $this->mobile = $user->contactno;
         $this->email = $user->email;
         $this->username = $user->username;
+        $this->policy_number = $user->policy_number; // <-- add this
 
         $this->beneficiaries = $user->beneficiaries
             ->map(fn ($beneficiary) => [
