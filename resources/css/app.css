@@ -2,21 +2,6 @@
 @import 'flatpickr/dist/flatpickr.min.css';
 
 /* Define the custom utility first so component files can @apply it */
-@utility btn-base {
-  @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors;
-}
-
-@utility btn-primary {
-  @apply bg-[#0C2C6B] hover:bg-[#071a42];
-}
-
-@utility btn-secondary {
-  @apply bg-[#D79B10] hover:bg-[#B8830D];
-}
-
-@utility btn-warning{
-    @apply btn-base bg-[#D79B10] hover:bg-[#B8830D];
-}
 
 /*Root Admin */
 @import "./components/home/hero.css";
