@@ -80,17 +80,22 @@ class Profile extends Component
     }
 
     // Save signature coming from canvas dataURL
-   public function saveSignature($dataUrl): void
+  public function saveSignature($dataUrl): void
 {
     $user = User::findOrFail(Auth::id());
 
-    // Remove "data:image/png;base64,"
-    $image = str_replace('data:image/png;base64,', '', $dataUrl);
-    $image = str_replace(' ', '+', $image);
+    // Strip whatever data URI prefix is present (now image/jpeg, previously image/png)
+    if (preg_match('/^data:image\/(\w+);base64,/', $dataUrl, $matches)) {
+        $extension = $matches[1] === 'jpeg' ? 'jpg' : $matches[1];
+        $dataUrl = substr($dataUrl, strpos($dataUrl, ',') + 1);
+    } else {
+        $extension = 'jpg'; // fallback
+    }
 
-    $imageData = base64_decode($image);
+    $dataUrl = str_replace(' ', '+', $dataUrl);
+    $imageData = base64_decode($dataUrl);
 
-   $filename = 'images/SIG_' . $user->UserID . '_' . time() . '.png';
+    $filename = 'images/SIG_' . $user->UserID . '_' . time() . '.' . $extension;
 
     // Delete old signature if exists
     if ($user->signature && Storage::disk('public')->exists($user->signature)) {
@@ -128,7 +133,7 @@ public function removeSignature(): void
     public function updatedProfilepic(): void
     {
         $this->validateOnly('profilepic', [
-            'profilepic' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'profilepic' => ['required', 'image', 'mimes:jpg,jpeg', 'max:2048'], // removed png, webp
         ]);
     }
 
@@ -174,7 +179,7 @@ public function removeSignature(): void
     public function updateProfilePicture(): void
     {
         $this->validate([
-            'profilepic' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'profilepic' => ['required', 'image', 'mimes:jpg,jpeg', 'max:2048'], // removed png, webp
         ]);
 
         /** @var User $user */

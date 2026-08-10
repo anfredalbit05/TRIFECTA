@@ -98,7 +98,7 @@
                             <label for="profilepic" class="btn-primary">
                                 Choose Profile Picture
                             </label>
-                            <input id="profilepic" type="file" wire:model="profilepic" accept="image/*" class="hidden">
+                            <input id="profilepic" type="file" wire:model="profilepic" accept="image/jpeg,image/jpg" class="hidden">
 
                             @if (!$profilepic && auth()->user()->profilepic && auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
                                 <button type="button" wire:click="removeProfilePicture"
@@ -582,7 +582,9 @@
                 const canvas = this.$refs.signatureCanvas;
                 canvas.width = canvas.offsetWidth;
                 canvas.height = canvas.offsetHeight;
-                this.pad = new SignaturePad(canvas);
+                this.pad = new SignaturePad(canvas, {
+                    backgroundColor: 'rgb(255, 255, 255)' // needed so JPEG export isn't transparent-black
+                });
 
                 @if ($signature)
                     this.pad.fromDataURL("{{ Storage::url($signature) }}");
@@ -592,34 +594,34 @@
                 this.pad.clear();
                 @this.call('removeSignature');
             },
-            savePad() {
-                if (this.pad.isEmpty()) {
-                    Swal.fire({
-                        title: 'No Signature',
-                        text: 'Please provide a signature first.',
-                        icon: 'warning',
-                        confirmButtonColor: '#0C2C6B'
-                    });
-                    return;
-                }
+savePad() {
+    if (this.pad.isEmpty()) {
+        Swal.fire({
+            title: 'No Signature',
+            text: 'Please provide a signature first.',
+            icon: 'warning',
+            confirmButtonColor: '#0C2C6B'
+        });
+        return;
+    }
 
-                const dataUrl = this.pad.toDataURL();
+    const dataUrl = this.pad.toDataURL('image/jpeg', 1.0); // was: this.pad.toDataURL()
 
-                Swal.fire({
-                    title: 'Save Signature?',
-                    text: 'Your signature will be saved to your profile.',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#0B2A5B',
-                    cancelButtonColor: '#D79B10',
-                    confirmButtonText: 'Yes, Save it',
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        @this.call('saveSignature', dataUrl);
-                    }
-                });
-            }
+    Swal.fire({
+        title: 'Save Signature?',
+        text: 'Your signature will be saved to your profile.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0B2A5B',
+        cancelButtonColor: '#D79B10',
+        confirmButtonText: 'Yes, Save it',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            @this.call('saveSignature', dataUrl);
+        }
+    });
+}
         }
     }
 
