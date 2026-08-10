@@ -412,7 +412,7 @@
 
                     <h2 class="mt-5 text-4xl lg:text-5xl font-black uppercase leading-tight text-slate-900">
 
-                        Marketing & Operations
+                        Marketing and Operations
 
                     </h2>
 
@@ -420,7 +420,7 @@
 
                     <h1 class="mt-6 text-5xl font-black uppercase text-blue-900">
 
-                        Bobby Paulo Dagala
+                        Bobby Paulo Dagala, LFA
 
                     </h1>
 
@@ -428,7 +428,7 @@
 
                     <p class="mt-4 text-2xl font-semibold text-yellow-600">
 
-                        Government Licensed Financial Advisor
+                        A Government Licensed Financial Advisor
 
                     </p>
 
@@ -472,7 +472,7 @@
 
                         </div>
 
-                        <!-- Manager -->
+                        <!-- Owner/Founder -->
 
                         <div class="rounded-3xl border border-slate-200 p-6 shadow-sm">
 
@@ -480,7 +480,7 @@
 
                                 <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-900 text-white text-2xl">
 
-                                    🏦
+                                    👥
 
                                 </div>
 
@@ -488,13 +488,14 @@
 
                                     <h3 class="text-2xl font-bold text-slate-900">
 
-                                        Manager
+                                        Owner/Founder
 
                                     </h3>
 
-                                    <p class="text-slate-500">
+                                    <p class="text-slate-500 leading-relaxed">
 
-                                        Allianz PNB Insurance Inc.
+                                        TRI-CARE Community Development
+                                        and Consultancy Services
 
                                     </p>
 
@@ -520,15 +521,14 @@
 
                                     <h3 class="text-2xl font-bold text-slate-900">
 
-                                        Businessman
+                                        Business Owner
 
                                     </h3>
 
                                     <p class="text-slate-500 leading-relaxed">
 
-                                        Owner of Ultrasound Clinics in
-                                        Davao del Norte, Davao City,
-                                        and Davao de Oro.
+                                        Ultrasound Clinics in Davao
+                                        Region
 
                                     </p>
 
@@ -541,8 +541,6 @@
                     </div>
 
                 </div>
-
-
 
             </div>
 
