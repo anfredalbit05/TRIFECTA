@@ -20,11 +20,9 @@
                 </div>
 
                 <div>
-                    <p class="text-xs tracking-[0.25em] uppercase text-[#E5B83B]">
-                        TrueLife
-                    </p>
+
                     <h1 class="text-xl font-black tracking-wide text-white">
-                        DAYONGAN
+                        TRUELIFE
                     </h1>
                 </div>
 
