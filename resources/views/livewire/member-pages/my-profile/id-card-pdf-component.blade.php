@@ -58,11 +58,11 @@
                 <br>
 
                 <span class="label">SEX:</span>
-                <span class="val">{{ strtoupper($user->sex ?? 'N/A') }}</span>
+                <span class="val">{{ strtoupper($user->gender ?? 'N/A') }}</span>
                 &nbsp;&nbsp;
 
                 <span class="label">STATUS:</span>
-                <span class="val">{{ strtoupper($user->civil_status ?? 'N/A') }}</span>
+                <span class="val">{{ strtoupper($user->civilstatus ?? 'N/A') }}</span>
                 <br>
 
                 <span class="label">BIRTH DATE:</span>
