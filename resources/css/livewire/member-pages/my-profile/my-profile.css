@@ -105,17 +105,17 @@
      matching how they're actually used in forms/cards on mobile.
      =============================================================== */
 
-  .btn-primary {
-    @apply btn-base bg-[#0C2C6B] hover:bg-[#071a42];
-  }
+    @utility btn-primary {
+    @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#0C2C6B] hover:bg-[#071a42] text-white;
+    }
 
-  .btn-secondary {
-    @apply btn-base bg-[#D79B10] hover:bg-[#B8830D];
-  }
+    @utility btn-secondary {
+    @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#D79B10] hover:bg-[#B8830D] text-white;
+    }
 
-  .btn-warning {
-    @apply btn-base bg-[#D79B10] hover:bg-[#B8830D];
-  }
+    @utility btn-warning {
+    @apply inline-flex w-full sm:w-auto cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2 font-semibold rounded-lg transition-colors bg-[#D79B10] hover:bg-[#B8830D] text-white;
+    }
 
   .btn-submit {
     @apply w-full sm:w-auto cursor-pointer rounded-xl bg-[#0C2C6B] px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-[#071a42] disabled:opacity-60;
