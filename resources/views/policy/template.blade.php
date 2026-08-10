@@ -42,23 +42,23 @@ body{
     <!-- Background -->
     <img
         class="bg"
-        src="{{ public_path('images/certificate/policy.png') }}">
+        src="{{ public_path('images/certificate/policy.jpeg') }}">
 
     <!-- PRIMARY OWNER -->
 
-    <div class="field" style="left:140px;top:168px;">
+    <div class="field" style="left:140px;top:188px;">
         {{ strtoupper($user->lastname) }}
     </div>
 
-    <div class="field" style="left:140px;top:185px;">
+    <div class="field" style="left:140px;top:205px;">
         {{ strtoupper($user->middlename) }}
     </div>
 
-    <div class="field" style="left:140px;top:202px;">
+    <div class="field" style="left:140px;top:222px;">
         {{ strtoupper($user->firstname) }}
     </div>
 
-    <div class="field" style="left:140px;top:219px;">
+    <div class="field" style="left:140px;top:239px;">
         {{ \Carbon\Carbon::parse($user->birthdate)->format('M d, Y') }}
     </div>
 
@@ -70,7 +70,7 @@ body{
     class="field"
     style="
         left:140px;
-        top:219px;
+        top:241px;
         width:310px;
         font-size:12px;
         line-height:14px;
@@ -80,28 +80,28 @@ body{
 </div>
 
     <!-- Effective Date -->
-    <div class="field" style="left:140px;top:282px;">
+    <div class="field" style="left:140px;top:298px;">
         {{ $effectiveDate->format('M d, Y') }}
     </div>
 
     <!-- Expiry Date -->
-    <div class="field" style="left:140px;top:298px;">
+    <div class="field" style="left:140px;top:316px;">
         {{ $expiryDate->format('M d, Y') }}
     </div>
 
     <!-- Policy Number -->
-    <div class="field" style="left:160px;top:322px;color:#fff;">
+    <div class="field" style="left:157px;top:339px;color:#fff;">
         {{ $policyNumber }}
     </div>
 
 
     <!-- BENEFICIARY #1 -->
 
-    <div class="field" style="left:450px;top:177px;">
+    <div class="field" style="left:445px;top:194px;">
         {{ $beneficiaries[0]->fullname ?? '' }}
     </div>
 
-    <div class="field" style="left:516px;top:195px;">
+    <div class="field" style="left:515px;top:210px;">
         {{ isset($beneficiaries[0])
             ? \Carbon\Carbon::parse($beneficiaries[0]->birthdate)->format('M d, Y')
             : '' }}
@@ -110,11 +110,11 @@ body{
 
      <!-- BENEFICIARY #2 -->
 
-    <div class="field" style="left:450px;top:231px;">
+    <div class="field" style="left:445px;top:250px;">
         {{ $beneficiaries[1]->fullname ?? '' }}
     </div>
 
-    <div class="field" style="left:516px;top:250px;">
+    <div class="field" style="left:515px;top:266px;">
         {{ isset($beneficiaries[1])
             ? \Carbon\Carbon::parse($beneficiaries[0]->birthdate)->format('M d, Y')
             : '' }}
@@ -122,11 +122,11 @@ body{
 
         <!-- BENEFICIARY #3 -->
 
-    <div class="field" style="left:450px;top:289px;">
+    <div class="field" style="left:445px;top:305px;">
         {{ $beneficiaries[2]->fullname ?? '' }}
     </div>
 
-    <div class="field" style="left:516px;top:308px;">
+    <div class="field" style="left:515px;top:321px;">
         {{ isset($beneficiaries[2])
             ? \Carbon\Carbon::parse($beneficiaries[0]->birthdate)->format('M d, Y')
             : '' }}

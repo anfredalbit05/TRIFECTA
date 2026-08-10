@@ -73,7 +73,7 @@
                 <span class="val">{{ \Carbon\Carbon::parse($user->created_at)->format('F d, Y') }}</span>
                 <br>
 
-                <span class="label">EXPIRATION:</span>
+                <span class="label">EXPIRATION DATE:</span>
                 <span class="val">
                     {{ $user->created_at ? $user->created_at->copy()->addYear()->format('F d, Y') : 'N/A' }}
                 </span>
@@ -185,8 +185,8 @@
             <div class="manager-cell">
                 <div class="manager-script"></div>
                 <div class="manager-line"></div>
-                <div class="manager-name">REYMARK P. BAUTISTA</div>
-                <div class="manager-title">CEO / COO</div>
+                <div class="manager-name">RENANTE SUAYBAGUIO-ROBLES, MPA, LFA</div>
+                <div class="manager-title">CEO</div>
             </div>
 
         </div>

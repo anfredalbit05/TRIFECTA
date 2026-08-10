@@ -320,7 +320,7 @@
                     {{-- FRONT SIDE --}}
                     <div id="id-card-front" class="id-card id-card-front">
                         <div class="id-card-top">
-                            <div class="id-org-name">True Life Dayongan</div>
+                            <div class="id-org-name">TRUELIFE</div>
                             <div class="id-badge">PRIMARY MEMBER</div>
                         </div>
 
@@ -347,6 +347,8 @@
                                     {{ $birthdate ? \Carbon\Carbon::parse($birthdate)->format('F d, Y') : 'N/A' }}</p>
                                 <p><strong>DATE JOINED:</strong>
                                     {{ auth()->user()->created_at?->format('F d, Y') ?? 'N/A' }}</p>
+                                 <p><strong>EXPIRATION DATE:</strong>
+                                     {{ auth()->user()->created_at ? auth()->user()->created_at->copy()->addYear()->format('F d, Y') : 'N/A' }}</p>
                             </div>
 
                             <div class="id-qr">
@@ -380,11 +382,11 @@
                     {{-- BACK SIDE --}}
                     <div id="id-card-back" class="id-card id-card-back hidden">
                         <div>
-                            <h5 class="id-back-title">TRUE LIFE DAYONGAN TERM AND TERMINATION</h5>
-                            <p class="id-back-text">TRUE LIFE DAYONGAN may terminate this MEMBERSHIP, for the following grounds:</p>
+                            <h5 class="id-back-title">TRUELIFE TERM AND TERMINATION</h5>
+                            <p class="id-back-text">TRUELIFE may terminate this MEMBERSHIP, for the following grounds:</p>
                             <ul class="id-back-list">
                                 <li>Fraud or misrepresentation</li>
-                                <li>Misuse of True Life Dayongan name and materials</li>
+                                <li>Misuse of TRUELIFE name and materials</li>
                                 <li>Violation of company rules or applicable laws</li>
                             </ul>
                             <p class="id-back-note">Termination shall be without prejudice to any liabilities incurred prior to termination.</p>
@@ -399,10 +401,10 @@
                                 <p class="id-ice-line"><strong>CONTACT NO.:</strong> {{ strtoupper($emergencyContactno ?: '____________________') }}</p>
                             </div>
                             <div class="id-signatory-block">
-                                <div class="id-signatory-script">Sey</div>
+                                <div class="id-signatory-script"></div>
                                 <div class="id-signatory-divider"></div>
-                                <p class="id-signatory-name">REYMARK P. BAUTISTA</p>
-                                <p class="id-signatory-role">GENERAL MANAGER</p>
+                                <p class="id-signatory-name">RENANTE SUAYBAGUIO-ROBLES, MPA, LFA</p>
+                                <p class="id-signatory-role">CEO</p>
                             </div>
                         </div>
                     </div>

@@ -383,11 +383,19 @@ public function open($upline = null)
                     $message->to($userData['email'])
                             ->subject('Your Application Details & Credentials');
 
-                    // Attach the benefits image from the public folder
-                    $photoPath = public_path('images/benefits.png');
+                     // Attach benefits image
+                    $benefitsPath = public_path('images/benefits.jpeg');
+                    if (file_exists($benefitsPath)) {
+                        $message->attach($benefitsPath, [
+                            'as' => 'benefits.png',
+                            'mime' => 'image/png',
+                        ]);
+                    }
 
-                    if (file_exists($photoPath)) {
-                        $message->attach($photoPath, [
+                    // Attach second image (e.g. profile photo or another asset)
+                    $secondPath = public_path('images/second-image.jpeg');
+                    if (file_exists($secondPath)) {
+                        $message->attach($secondPath, [
                             'as' => 'benefits.png',
                             'mime' => 'image/png',
                         ]);

@@ -92,7 +92,7 @@ body{
 <div class="page">
 
 <img
-    src="{{ public_path('images/certificate/certificate.png') }}"
+    src="{{ public_path('images/certificate/certificate.jpeg') }}"
     class="background">
 
 <div class="name">
