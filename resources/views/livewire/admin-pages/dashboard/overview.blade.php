@@ -293,14 +293,14 @@
                                         <div class="flex items-center gap-3">
                                             <div
                                                 class="w-11 h-11 rounded-full overflow-hidden bg-[#0C2C6B]/10 flex items-center justify-center shrink-0 border border-gray-200 shadow-2xs">
-                                                @if (!empty($refUser->profilepic))
-                                                    <img src="{{ asset('storage/' . $refUser->profilepic) }}"
-                                                        alt="{{ $refUser->firstname }}"
+                                                @if (empty($refUserPic) || $refUserPic === 'images/profiles/default-avatar.png')
+                                                    <img src="{{ asset('images/profiles/default-avatar.png') }}"
+                                                        alt="Default profile picture"
                                                         class="w-full h-full object-cover">
                                                 @else
-                                                    <span class="text-[#0C2C6B] font-bold text-xs tracking-wide">
-                                                        {{ strtoupper(substr($refUser->firstname, 0, 1)) }}{{ strtoupper(substr($refUser->lastname, 0, 1)) }}
-                                                    </span>
+                                                    <img src="{{ asset('storage/' . $refUserPic) }}"
+                                                        alt="{{ $refUser->firstname }}"
+                                                        class="w-full h-full object-cover">
                                                 @endif
                                             </div>
                                             <div>
@@ -384,53 +384,53 @@
     </div>
 
     <!-- CHART INITIALIZATION WITH ALPINE.JS -->
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('monthlyChart', () => ({
-            chartInstance: null,
-            init() {
-                this.renderChart(
-                    @json($monthlyUsers->pluck('month')),
-                    @json($monthlyUsers->pluck('total'))
-                );
-            },
-            renderChart(labels, data) {
-                const ctx = document.getElementById('monthlyChartCanvas');
-                if (!ctx) return;
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('monthlyChart', () => ({
+                chartInstance: null,
+                init() {
+                    this.renderChart(
+                        @json($monthlyUsers->pluck('month')),
+                        @json($monthlyUsers->pluck('total'))
+                    );
+                },
+                renderChart(labels, data) {
+                    const ctx = document.getElementById('monthlyChartCanvas');
+                    if (!ctx) return;
 
-                if (this.chartInstance) {
-                    this.chartInstance.destroy();
-                }
+                    if (this.chartInstance) {
+                        this.chartInstance.destroy();
+                    }
 
-                this.chartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'New Members',
-                            data: data,
-                            backgroundColor: '#0C2C6B',
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1,
-                                    precision: 0
+                    this.chartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'New Members',
+                                data: data,
+                                backgroundColor: '#0C2C6B',
+                                borderRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1,
+                                        precision: 0
+                                    }
                                 }
                             }
                         }
-                    }
-                });
-            },
-            updateChart(detail) {
-                this.renderChart(detail.labels, detail.data);
-            }
-        }));
-    });
-</script>
+                    });
+                },
+                updateChart(detail) {
+                    this.renderChart(detail.labels, detail.data);
+                }
+            }));
+        });
+    </script>

@@ -101,7 +101,8 @@ class OverviewAnalytics extends Component
 
     private function dispatchChartData()
     {
-        $this->dispatch('chart-data-updated',
+        $this->dispatch(
+            'chart-data-updated',
             labels: $this->monthlyUsers->pluck('month'),
             data: $this->monthlyUsers->pluck('total')
         );
@@ -111,7 +112,7 @@ class OverviewAnalytics extends Component
     {
         $year = $this->selectedYear;
 
-        $applyFilter = function($query, $column = 'created_at') use ($year) {
+        $applyFilter = function ($query, $column = 'created_at') use ($year) {
             if ($year === '2020-Present') {
                 $query->whereYear($column, '>=', 2020);
             } else {
@@ -191,8 +192,9 @@ class OverviewAnalytics extends Component
 
         $this->selectedReferrerName = $referrer->firstname . ' ' . $referrer->lastname;
 
+        // FIXED: Join users table using activations.user_id instead of referralCode
         $query = User::query()
-            ->join('activations', 'users.referralCode', '=', 'activations.upline_code')
+            ->join('activations', 'users.UserID', '=', 'activations.UserID')
             ->where('activations.upline_code', $referrer->referralCode)
             ->where('activations.status', 'Approved')
             ->select('users.*', 'activations.created_at as activation_date');
@@ -203,7 +205,6 @@ class OverviewAnalytics extends Component
             $query->whereYear('activations.created_at', $year);
         }
 
-        // FIX: Removed ->toArray() so it stays a Collection of objects
         $this->referredUsers = $query->get();
         $this->showInvitesModal = true;
     }
