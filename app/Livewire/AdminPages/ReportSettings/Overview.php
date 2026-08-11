@@ -12,19 +12,24 @@ use Livewire\Component;
 class Overview extends Component
 {
     public $selectedYear;
+
     public array $availableYears = [];
 
     // Date range filters for specific sections
     public $membershipFeeStart;
+
     public $membershipFeeEnd;
 
     public $sourceStart;
+
     public $sourceEnd;
 
     public $walletStart;
+
     public $walletEnd;
 
     public $monthlyStart;
+
     public $monthlyEnd;
 
     public function mount()
@@ -34,7 +39,7 @@ class Overview extends Component
         // Dynamically set years from current year down to 2020
         $this->availableYears = range(date('Y'), 2020);
 
-        if (!in_array($this->selectedYear, $this->availableYears)) {
+        if (! in_array($this->selectedYear, $this->availableYears)) {
             $this->selectedYear = $this->availableYears[0] ?? date('Y');
         }
 
@@ -68,13 +73,13 @@ class Overview extends Component
     public function refreshAnalytics()
     {
         $this->dispatchChartData();
-        $this->dispatch('swal:success', [
-            'title' => 'Refreshed!',
-            'text'  => 'Analytics data has been updated.'
-        ]);
+        // $this->dispatch('swal:success', [
+        //     'title' => 'Refreshed!',
+        //     'text'  => 'Analytics data has been updated.'
+        // ]);
     }
 
-   private function getMonthlyIncomeData($year)
+    private function getMonthlyIncomeData($year)
     {
         $rawMonthlyIncome = Ledger::selectRaw('MONTH(created_at) as month_num, SUM(amount) as total')
             ->whereYear('created_at', $year)
@@ -91,7 +96,7 @@ class Overview extends Component
         });
     }
 
- private function dispatchChartData()
+    private function dispatchChartData()
     {
         $monthlyIncome = $this->getMonthlyIncomeData($this->selectedYear);
 
@@ -129,9 +134,9 @@ class Overview extends Component
         $membershipFeeCollections = DB::table('membership_fees as m')
             ->leftJoin('ledgers as l', function ($join) {
                 $join->on('l.RefID', '=', 'm.FeeID')
-                     ->whereBetween('l.created_at', [$this->membershipFeeStart . ' 00:00:00', $this->membershipFeeEnd . ' 23:59:59'])
-                     ->where('l.Source', '=', 'MF')
-                     ->where('l.status', '=', 'Completed');
+                    ->whereBetween('l.created_at', [$this->membershipFeeStart.' 00:00:00', $this->membershipFeeEnd.' 23:59:59'])
+                    ->where('l.Source', '=', 'MF')
+                    ->where('l.status', '=', 'Completed');
             })
             ->select(
                 'm.FeeID',
@@ -152,20 +157,20 @@ class Overview extends Component
             UNION ALL SELECT 6, 'RF', 'Refund'
             UNION ALL SELECT 7, 'OT', 'Others'
         ) as s"))
-        ->leftJoin('ledgers as l', function ($join) {
-            $join->on('l.Source', '=', 's.Source')
-                 ->where('l.status', '=', 'Completed')
-                 ->whereBetween('l.created_at', [$this->sourceStart . ' 00:00:00', $this->sourceEnd . ' 23:59:59']);
-        })
-        ->select(
-            's.Source',
-            's.Collection_Type',
-            DB::raw('COALESCE(SUM(l.amount), 0) AS Total_Collection'),
-            DB::raw('COUNT(l.amount) AS count')
-        )
-        ->groupBy('s.SEQUENCE', 's.Source', 's.Collection_Type')
-        ->orderBy('s.SEQUENCE')
-        ->get();
+            ->leftJoin('ledgers as l', function ($join) {
+                $join->on('l.Source', '=', 's.Source')
+                    ->where('l.status', '=', 'Completed')
+                    ->whereBetween('l.created_at', [$this->sourceStart.' 00:00:00', $this->sourceEnd.' 23:59:59']);
+            })
+            ->select(
+                's.Source',
+                's.Collection_Type',
+                DB::raw('COALESCE(SUM(l.amount), 0) AS Total_Collection'),
+                DB::raw('COUNT(l.amount) AS count')
+            )
+            ->groupBy('s.SEQUENCE', 's.Source', 's.Collection_Type')
+            ->orderBy('s.SEQUENCE')
+            ->get();
 
         // Wallet Incentives Breakdown Query
         $walletCollections = DB::table(DB::raw("(
@@ -187,7 +192,7 @@ class Overview extends Component
             LEFT JOIN wallets w
                 ON w.UserID = u.UserID
                 AND w.Source = s.Source
-                AND w.created_at BETWEEN '" . $this->walletStart . " 00:00:00' AND '" . $this->walletEnd . " 23:59:59'
+                AND w.created_at BETWEEN '".$this->walletStart." 00:00:00' AND '".$this->walletEnd." 23:59:59'
             GROUP BY
                 u.UserID,
                 u.FirstName,
@@ -196,32 +201,32 @@ class Overview extends Component
                 s.Source,
                 s.Incentive_Type
         ) x"))
-        ->leftJoin(DB::raw("(
+            ->leftJoin(DB::raw("(
             SELECT
                 UserID,
                 SUM(Amount) AS User_Total
             FROM wallets
             WHERE Source IN ('DR', 'PF', 'OV')
-              AND created_at BETWEEN '" . $this->walletStart . " 00:00:00' AND '" . $this->walletEnd . " 23:59:59'
+              AND created_at BETWEEN '".$this->walletStart." 00:00:00' AND '".$this->walletEnd." 23:59:59'
             GROUP BY UserID
         ) t"), 'x.UserID', '=', 't.UserID')
-        ->select('x.*', DB::raw('COALESCE(t.User_Total, 0) as User_Total'))
-        ->where('x.Total_Collection', '>', 0)
-        ->orderByDesc('User_Total')
-        ->orderBy('x.Member_Name')
-        ->orderBy('x.Sequence')
-        ->get();
+            ->select('x.*', DB::raw('COALESCE(t.User_Total, 0) as User_Total'))
+            ->where('x.Total_Collection', '>', 0)
+            ->orderByDesc('User_Total')
+            ->orderBy('x.Member_Name')
+            ->orderBy('x.Sequence')
+            ->get();
 
         return view('livewire.admin-pages.report-settings.overview', [
-            'totalIncome'            => $totalIncome,
-            'totalReportsGenerated'    => $totalReportsGenerated,
-            'totalSettingsCount'       => $totalSettingsCount,
-            'totalUsers'               => $totalUsers,
-            'activeAccounts'           => $activeAccounts,
-            'monthlyIncome'            => $monthlyIncome,
+            'totalIncome' => $totalIncome,
+            'totalReportsGenerated' => $totalReportsGenerated,
+            'totalSettingsCount' => $totalSettingsCount,
+            'totalUsers' => $totalUsers,
+            'activeAccounts' => $activeAccounts,
+            'monthlyIncome' => $monthlyIncome,
             'membershipFeeCollections' => $membershipFeeCollections,
-            'incomeSources'            => $incomeSources,
-            'walletCollections'        => $walletCollections,
+            'incomeSources' => $incomeSources,
+            'walletCollections' => $walletCollections,
         ]);
     }
 }
