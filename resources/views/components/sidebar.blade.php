@@ -20,7 +20,7 @@ use Illuminate\Support\Str;
             </svg>
         </button>
 
-        <img src="{{ asset('images/dayongan-logo.png') }}" class="mobile-logo" alt="Logo">
+        <img src="{{ asset('images/truelife-logo.png') }}" class="mobile-logo" alt="Logo">
     </header>
 
     <!-- Overlay (Mobile Only) -->
@@ -32,7 +32,7 @@ use Illuminate\Support\Str;
 
         <!-- Fixed Sidebar Logo -->
         <a href="{{ route('home') }}" class="sidebar-logo">
-            <img src="{{ asset('images/dayongan-logo.png') }}" class="logo-image" alt="Logo">
+            <img src="{{ asset('images/truelife-logo.png') }}" class="logo-image" alt="Logo">
         </a>
 
         <!-- Scroll Area -->
