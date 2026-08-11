@@ -68,10 +68,10 @@ class OverviewAnalytics extends Component
         $this->dispatchChartData();
 
         $label = $this->selectedYear === '2020-Present' ? '2020 to Present' : $this->selectedYear;
-        $this->dispatch('swal:success', [
-            'title' => 'Refreshed!',
-            'text'  => 'Analytics data refreshed successfully for ' . $label . '.'
-        ]);
+        // $this->dispatch('swal:success', [
+        //     'title' => 'Refreshed!',
+        //     'text'  => 'Analytics data refreshed successfully for ' . $label . '.'
+        // ]);
     }
 
     private function getMonthlyUserData($year)
