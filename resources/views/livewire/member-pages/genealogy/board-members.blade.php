@@ -4,7 +4,7 @@
     <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-200">
         <div>
             <h2 class="text-lg font-bold text-slate-800">Board Members Structure</h2>
-            <p class="text-xs text-slate-500">Dayongan Leadership & Governance Hierarchy</p>
+            <p class="text-xs text-slate-500">True Life Leadership & Governance Hierarchy</p>
         </div>
     </div>
 

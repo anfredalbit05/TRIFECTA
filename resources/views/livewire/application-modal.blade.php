@@ -23,7 +23,7 @@
                             Membership Application
                         </h2>
                         <p class="text-xs text-slate-500">
-                            Dayongan Solidaritas • Vitae Auxilium
+                            True Life Solidaritas • Vitae Auxilium
                         </p>
                     </div>
 

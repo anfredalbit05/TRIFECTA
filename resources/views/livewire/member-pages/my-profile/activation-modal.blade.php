@@ -13,7 +13,7 @@
                             Account Activation
                         </h2>
                         <p class="mt-0.5 text-[11px] sm:text-xs text-slate-500">
-                            Dayongan Solidaritas • Membership Activation
+                            True Life Solidaritas • Membership Activation
                         </p>
                         <div class="mt-3 flex items-center gap-2.5 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2">
                             <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0B2A5B] text-xs font-bold text-[#E8B923]">
@@ -268,7 +268,7 @@
                 ====================================================== -->
                 <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <span class="text-xs text-slate-500 text-center sm:text-left">
-                        * Activation fee is fixed at ₱1,999
+                        * Activation fee is fixed at {{ $amount }}
                     </span>
 
                     <div class="flex flex-col-reverse sm:flex-row gap-2.5 w-full sm:w-auto">

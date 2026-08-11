@@ -14,8 +14,8 @@
 
                 <div class="rounded-full bg-white p-1 shadow-lg transition duration-300 group-hover:scale-105">
                     <img
-                        src="{{ asset('images/dayongan-logo.png') }}"
-                        alt="DAYONGAN Logo"
+                        src="{{ asset('images/truelife-logo.png') }}"
+                        alt="TRUELIFE Logo"
                         class="h-12 w-12 object-contain">
                 </div>
 

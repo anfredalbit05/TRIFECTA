@@ -115,7 +115,7 @@
 
                         <div class="hero-logo-box">
                             <img
-                                src="{{ asset('images/dayongan-logo.png') }}"
+                                src="{{ asset('images/truelife-logo.png') }}"
                                 alt="Dayongan Logo"
                                 class="hero-logo-img"
                             >
