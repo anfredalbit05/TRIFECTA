@@ -12,6 +12,9 @@ class ViewMemberModal extends Component
 {
     public bool $open = false;
 
+    public ?int $UserID = null;
+    public ?string $status = null;
+
     public $surname = '';
     public $first_name = '';
     public $middle_name = '';
@@ -42,6 +45,9 @@ class ViewMemberModal extends Component
     public function open($UserID): void
     {
         $user = User::with('beneficiaries')->findOrFail($UserID);
+
+        $this->UserID = $user->UserID;
+        $this->status = $user->status;
 
         $this->surname = $user->lastname;
         $this->first_name = $user->firstname;

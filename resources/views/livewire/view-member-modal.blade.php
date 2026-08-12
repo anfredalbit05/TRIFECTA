@@ -57,6 +57,31 @@
                 <!-- Body -->
                 <div class="max-h-[80vh] overflow-y-auto p-6">
 
+                    {{-- Footer: Certificate & Policy downloads --}}
+                @if ($status === 'Active')
+                    <div class="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:justify-end">
+
+                        <a href="{{ route('admin.member.policy.download', $UserID) }}"
+                           target="_blank"
+                           class="inline-flex items-center justify-center gap-2 rounded-lg border border-[#0C2C6B] px-4 py-2 text-sm font-semibold text-[#0C2C6B] transition hover:bg-[#0C2C6B]/5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Download Policy
+                        </a>
+
+                        <a href="{{ route('admin.member.certificate.download', $UserID) }}"
+                           target="_blank"
+                           class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#0C2C6B] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0C2C6B]/90">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download Certificate
+                        </a>
+
+                    </div>
+                @endif
+
                     <!-- Personal Information -->
                     <div class="mb-6 rounded-xl border border-slate-200 shadow-sm">
 
@@ -300,7 +325,11 @@
     </div>
 </div>
 
+
+
                 </div>
+
+
 
             </div>
 

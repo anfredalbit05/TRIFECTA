@@ -5,6 +5,7 @@ namespace App\Livewire\AdminPages\ReportSettings;
 use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Carbon\Carbon;
 
 class UserAccounts extends Component
 {
@@ -15,6 +16,7 @@ class UserAccounts extends Component
     public string $search = '';
     public string $roleFilter = '';
     public string $statusFilter = '';
+    public string $dateRange = ''; // e.g. "2026-08-01 to 2026-08-16"
     public ?int $selectedUserLedgerID = null;
     public bool $isLedgerModalOpen = false;
 
@@ -22,7 +24,13 @@ class UserAccounts extends Component
         'search' => ['except' => ''],
         'roleFilter' => ['except' => ''],
         'statusFilter' => ['except' => ''],
+        'dateRange' => ['except' => ''],
     ];
+
+    public function mount()
+    {
+        $this->dateRange = '';
+    }
 
     public function updatingSearch()
     {
@@ -39,12 +47,37 @@ class UserAccounts extends Component
         $this->resetPage();
     }
 
+    protected function parsedDateRange(): array
+    {
+        if (blank($this->dateRange) || !str_contains($this->dateRange, ' to ')) {
+            return [null, null];
+        }
+
+        [$from, $to] = explode(' to ', $this->dateRange, 2);
+
+        return [trim($from) ?: null, trim($to) ?: null];
+    }
+
+    public function updatedDateRange()
+    {
+        $this->resetPage();
+    }
+
+    public function clearDateFilter(): void
+    {
+        $this->dateRange = '';
+        $this->resetPage();
+        $this->dispatch('ranges-reset');
+    }
+
     public function resetTable(): void
     {
         $this->search = '';
         $this->roleFilter = '';
         $this->statusFilter = '';
+        $this->dateRange = '';
         $this->resetPage();
+        $this->dispatch('ranges-reset');
     }
 
     public function viewLedger(int $userId)
@@ -61,6 +94,8 @@ class UserAccounts extends Component
 
     public function render()
     {
+        [$dateFrom, $dateTo] = $this->parsedDateRange();
+
         $users = User::with(['role', 'wallets', 'ledgers'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
@@ -75,6 +110,12 @@ class UserAccounts extends Component
             })
             ->when($this->statusFilter, function ($query) {
                 $query->where('status', $this->statusFilter);
+            })
+            ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($dateFrom)->startOfDay(),
+                    Carbon::parse($dateTo)->endOfDay(),
+                ]);
             })
             ->latest('UserID')
             ->paginate(10);

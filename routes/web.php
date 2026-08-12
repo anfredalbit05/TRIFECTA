@@ -84,6 +84,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/policy/download', [PolicyController::class, 'download'])
         ->name('policy.download');
 
+     Route::get('/admin/members/{userId}/certificate/download', [CertificateController::class, 'adminDownload'])
+        ->name('admin.member.certificate.download');
+
+    Route::get('/admin/members/{userId}/policy/download', [PolicyController::class, 'adminDownload'])
+        ->name('admin.member.policy.download');
+
     Route::get('/my-profile', function () {
         $currentUserId = Auth::id();
         $activation = Activation::where('ProcessedBy', $currentUserId)
