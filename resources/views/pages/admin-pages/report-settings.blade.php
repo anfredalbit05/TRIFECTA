@@ -26,13 +26,14 @@
                 Overview
             </a>
 
+            @if(auth()->user()->RoleID == 1)
             <a
                 href="#"
                 @click.prevent="tab='general'"
                 :class="tab === 'general' ? 'active' : ''">
                 General
             </a>
-
+            @endif
             <a
                 href="#"
                 @click.prevent="tab='users'"
@@ -55,6 +56,7 @@
            <livewire:admin-pages.report-settings.overview />
         </div>
 
+        @if(auth()->user()->RoleID == 1)
         <!-- GENERAL -->
         <div
             x-show="tab === 'general'"
@@ -62,7 +64,7 @@
             class="dashboard-main-card full-width-card">
             <livewire:admin-pages.report-settings.general-settings />
         </div>
-
+        @endif
         <!-- USERS -->
         <div
             x-show="tab === 'users'"
