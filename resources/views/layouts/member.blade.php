@@ -10,6 +10,8 @@
     </title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 
     @livewireStyles
 </head>
@@ -40,7 +42,6 @@
             z-index: 99999 !important;
         }
     </style>
-
     @livewireScripts
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -48,6 +49,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script>
         document.addEventListener('livewire:init', () => {

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>
-        @yield('title', 'Dayongan')
+        @yield('title', 'TRUELIFE')
     </title>
 
 
@@ -14,7 +14,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
     @livewireStyles
 
     <!-- SweetAlert2 High Z-Index Fix -->
@@ -24,7 +23,6 @@
         }
     </style>
 </head>
-
 
 
 <body class="bg-gray-50 text-gray-900">

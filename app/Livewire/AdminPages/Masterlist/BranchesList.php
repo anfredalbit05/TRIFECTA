@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Carbon\Carbon;
 
 class BranchesList extends Component
 {
@@ -19,6 +20,7 @@ class BranchesList extends Component
     public $isOpen = false;
     public $branch_id;
     public string $search = ''; // Added search property
+    public string $dateRange = '';   // e.g. "2026-08-01 to 2026-08-16"
 
     // Form fields
     public $branchCode;
@@ -35,6 +37,10 @@ class BranchesList extends Component
         'UserID' => 'nullable|exists:users,UserID',
     ];
 
+       public function mount()
+    {
+        $this->dateRange = '';
+    }
     /*
     |--------------------------------------------------------------------------
     | Permission Checkers (ModuleID 3 assumed for Branches)
@@ -193,14 +199,41 @@ class BranchesList extends Component
         $this->resetPage();
     }
 
+     protected function parsedDateRange(): array
+    {
+        if (blank($this->dateRange) || !str_contains($this->dateRange, ' to ')) {
+            return [null, null];
+        }
+
+        [$from, $to] = explode(' to ', $this->dateRange, 2);
+
+        return [trim($from) ?: null, trim($to) ?: null];
+    }
+
+    public function updatedDateRange()
+    {
+        $this->resetPage();
+    }
+
+    public function clearDateFilter(): void
+    {
+        $this->dateRange = '';
+        $this->resetPage();
+        $this->dispatch('ranges-reset');
+    }
+
     public function resetTable(): void
     {
         $this->search = '';
+        $this->dateRange = '';
         $this->resetPage();
+        $this->dispatch('ranges-reset');
     }
 
     public function render()
     {
+        [$dateFrom, $dateTo] = $this->parsedDateRange();
+
         $branches = Branch::where('status', true)
             ->when(filled($this->search), function ($query) {
                 $search = trim($this->search);
@@ -209,6 +242,12 @@ class BranchesList extends Component
                         ->orWhere('branchname', 'like', "%{$search}%")
                         ->orWhere('address', 'like', "%{$search}%");
                 });
+            })
+            ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($dateFrom)->startOfDay(),
+                    Carbon::parse($dateTo)->endOfDay(),
+                ]);
             })
             ->latest('BranchID')
             ->paginate(10);

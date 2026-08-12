@@ -16,8 +16,7 @@ class Members extends Component
     use WithPagination;
 
     public string $search = '';
-    public $selectedYear;
-    public $selectedMonth; // Added month property
+    public string $dateRange = '';   // e.g. "2026-08-01 to 2026-08-16"
 
     public string $summaryFilter = 'all';
 
@@ -33,8 +32,7 @@ class Members extends Component
     public function mount()
     {
         // Sets the default filter display to the current year
-        $this->selectedYear = Carbon::now()->year;
-        $this->selectedMonth = '';
+        $this->dateRange = '';
     }
 
     /*
@@ -114,6 +112,8 @@ class Members extends Component
 
     public function render()
     {
+        [$dateFrom, $dateTo] = $this->parsedDateRange();
+
         $members = User::query()
             ->where('RoleID', 4)
             ->withExists([
@@ -130,12 +130,11 @@ class Members extends Component
                         ->orWhere('username', 'like', "%{$search}%");
                 });
             })
-            ->when($this->selectedYear, function ($query) {
-                $query->whereYear('created_at', $this->selectedYear);
-            })
-            ->when(filled($this->selectedMonth), function ($query) {
-                // Filters based on the month created
-                $query->whereMonth('created_at', $this->selectedMonth);
+            ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($dateFrom)->startOfDay(),
+                    Carbon::parse($dateTo)->endOfDay(),
+                ]);
             })
             ->latest()
             ->paginate(10);
@@ -145,15 +144,30 @@ class Members extends Component
         ]);
     }
 
-    public function updatedSelectedYear()
+
+    protected function parsedDateRange(): array
+    {
+        if (blank($this->dateRange) || !str_contains($this->dateRange, ' to ')) {
+            return [null, null];
+        }
+
+        [$from, $to] = explode(' to ', $this->dateRange, 2);
+
+        return [trim($from) ?: null, trim($to) ?: null];
+    }
+
+    public function updatedDateRange()
     {
         $this->resetPage();
     }
 
-    public function updatedSelectedMonth()
+    public function clearDateFilter(): void
     {
+        $this->dateRange = '';
         $this->resetPage();
+        $this->dispatch('ranges-reset');
     }
+
 
     public function updatingSearch()
     {
@@ -231,18 +245,18 @@ class Members extends Component
             return;
         }
 
-         $isActivating = strtolower($member->status) !== 'active';
+        $isActivating = strtolower($member->status) !== 'active';
 
         $member->status = strtolower($member->status) === 'active' ? 'Inactive' : 'Active';
         $member->save();
 
         Log::info('Member status updated successfully', ['UserID' => $member->UserID, 'new_status' => $member->status]);
 
-         $this->dispatch('swal:success', [
-        'title' => 'Success!',
-        'text' => $isActivating
-            ? 'Member has been activated successfully.'
-            : 'Member has been deactivated successfully.',
+        $this->dispatch('swal:success', [
+            'title' => 'Success!',
+            'text' => $isActivating
+                ? 'Member has been activated successfully.'
+                : 'Member has been deactivated successfully.',
         ]);
 
         $this->dispatch('members-refresh');
@@ -329,12 +343,12 @@ class Members extends Component
     {
         $this->search = '';
         $this->summaryFilter = 'all';
-        $this->selectedYear = Carbon::now()->year; // Reset to current year
-        $this->selectedMonth = '';                  // Clear month filter
+        $this->dateRange = '';           // Clear month filter
         $this->exportYear = '';
         $this->exportMonth = '';
         $this->exportStatus = '';
         $this->resetPage();
         $this->skipRender = false;
+        $this->dispatch('ranges-reset');
     }
 }

@@ -1,185 +1,263 @@
+{{--
+    Import the merged team stylesheet in your CSS entry point,
+    e.g. resources/css/app.css:
+
+        @import '../../team.css';
+
+    The detailed CEO/COO leadership cards below use
+    "team-leadership-ceo-*" / "team-leadership-coo-*" classes so they
+    don't collide with the original "team-ceo-*" hero-style block used
+    elsewhere on the site.
+--}}
 <div>
 
-<!-- =========================
+    <!-- =========================
      TEAM HERO SECTION
 ========================== -->
-<section class="team-hero">
+    <section class="team-hero">
 
-    <div class="team-hero-glow-top"></div>
-    <div class="team-hero-glow-bottom"></div>
+        <div class="team-hero-glow-top"></div>
+        <div class="team-hero-glow-bottom"></div>
 
-    <div class="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 text-center">
+        <div class="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 text-center">
 
-        <span class="team-hero-badge">
-            <x-editable-text
-                key="team_hero_badge"
-                :value="$contexts['team_hero_badge'] ?? 'TrueLife Dayongan Solidaritas Social Welfare Services, Inc.'"
-                tag="span"
-                class="inline-block"
-            />
-        </span>
-
-        <h1 class="team-hero-title">
-            <x-editable-text
-                key="team_hero_title_1"
-                :value="$contexts['team_hero_title_1'] ?? 'The Hearts & Minds Behind'"
-                tag="span"
-                class="inline-block"
-            />
-            <br class="hidden sm:block">
-
-            <span class="team-hero-title-highlight">
-                <x-editable-text
-                    key="team_hero_title_highlight"
-                    :value="$contexts['team_hero_title_highlight'] ?? 'DAYONGAN'"
-                    tag="span"
-                    class="inline-block"
-                />
+            <span class="team-hero-badge">
+                <x-editable-text key="team_hero_badge" :value="$contexts['team_hero_badge'] ??
+                    'TrueLife Dayongan Solidaritas Social Welfare Services, Inc.'" tag="span" class="inline-block" />
             </span>
-        </h1>
 
-       <p class="team-hero-description">
-            <x-editable-text
-                key="team_hero_description"
-                :value="$contexts['team_hero_description'] ?? 'Dedicated leaders, compassionate community officers, and insurance professionals working together to safeguard every family we serve. Together, we build stronger communities through trust, commitment, and reliable support. Our team is driven by a shared mission to provide meaningful assistance, protect what matters most, and create a safer future for everyone.'"
-                tag="span"
-                class="block"
-            />
-       </p>
+            <h1 class="team-hero-title">
+                <x-editable-text key="team_hero_title_1" :value="$contexts['team_hero_title_1'] ?? 'The Hearts & Minds Behind'" tag="span" class="inline-block" />
+                <br class="hidden sm:block">
 
-    </div>
+                <span class="team-hero-title-highlight">
+                    <x-editable-text key="team_hero_title_highlight" :value="$contexts['team_hero_title_highlight'] ?? 'DAYONGAN'" tag="span"
+                        class="inline-block" />
+                </span>
+            </h1>
 
-</section>
+            <p class="team-hero-description">
+                <x-editable-text key="team_hero_description" :value="$contexts['team_hero_description'] ??
+                    'Dedicated leaders, compassionate community officers, and insurance professionals working together to safeguard every family we serve. Together, we build stronger communities through trust, commitment, and reliable support. Our team is driven by a shared mission to provide meaningful assistance, protect what matters most, and create a safer future for everyone.'" tag="span" class="block" />
+            </p>
+
+        </div>
+
+    </section>
 
 
-<!-- =========================
+    <!-- =========================
      CEO SECTION
 ========================== -->
 
-<section class="relative overflow-hidden bg-slate-100 py-24">
+    <section class="team-leadership-ceo-section">
 
-    <!-- background decoration -->
+        <!-- background decoration -->
 
+        <div class="team-leadership-ceo-decor-blue"></div>
 
-    <div class="absolute top-0 left-0 h-96 w-96 rounded-full bg-blue-100 blur-3xl opacity-40"></div>
+        <div class="team-leadership-ceo-decor-yellow"></div>
 
-    <div class="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-yellow-100 blur-3xl opacity-40"></div>
+        <div class="team-leadership-ceo-container">
 
-    <div class="max-w-7xl mx-auto px-6">
+            <div class="team-leadership-ceo-card">
 
-        <div class="overflow-hidden rounded-[40px] bg-white shadow-2xl">
+                <div class="team-leadership-ceo-grid">
 
-            <div class="grid lg:grid-cols-12 min-h-[950px]">
+                    <!-- ========================= -->
+                    <!-- LEFT CONTENT -->
+                    <!-- ========================= -->
 
-                <!-- ========================= -->
-                <!-- LEFT CONTENT -->
-                <!-- ========================= -->
+                    <div class="team-leadership-ceo-left">
 
-                <div class="lg:col-span-7 p-8 lg:p-14 flex flex-col">
+                        <!-- Badge -->
 
-                    <!-- Badge -->
+                        <div>
 
-                    <div>
+                            <span class="team-leadership-ceo-badge">
 
-                        <span class="inline-flex items-center gap-2 rounded-full bg-blue-900 px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white">
+                                The Leadership Team
 
-                            The Leadership Team
+                            </span>
 
-                        </span>
+                        </div>
 
-                    </div>
+                        <!-- Heading -->
 
-                    <!-- Heading -->
+                        <h1 class="team-leadership-ceo-heading">
 
-                    <h1 class="mt-8 text-5xl lg:text-7xl font-black leading-[0.95] text-slate-900">
+                            STRONG
 
-                        STRONG
+                            <span class="team-leadership-ceo-heading-blue">
 
-                        <span class="text-blue-900">
+                                LEADERSHIP.
 
-                            LEADERSHIP.
+                            </span>
 
-                        </span>
+                            <br>
 
-                        <br>
+                            GREATER
 
-                        GREATER
+                            <span class="team-leadership-ceo-heading-yellow">
 
-                        <span class="text-yellow-500">
+                                IMPACT.
 
-                            IMPACT.
+                            </span>
 
-                        </span>
+                        </h1>
 
-                    </h1>
+                        <!-- Description -->
 
-                    <!-- Description -->
+                        <p class="team-leadership-ceo-description">
 
-                    <p class="mt-8 max-w-2xl text-lg leading-relaxed text-slate-600">
-
-                        <x-editable-text
-                            key="team_ceo_description"
-                            :value="$contexts['team_ceo_description'] ?? 'Driven by purpose and dedicated to service, our leadership continues to inspire communities through integrity, professionalism, and compassion.'"
-                            tag="span"
-                        />
-
-                    </p>
-
-                    <!-- CEO Card -->
-
-                    <div class="mt-10 rounded-[30px] border border-slate-200 bg-slate-50 p-8">
-
-                        <p class="text-sm font-bold uppercase tracking-[0.3em] text-blue-900">
-
-                             THE CEO
+                            <x-editable-text key="team_ceo_description" :value="$contexts['team_ceo_description'] ??
+                                'Driven by purpose and dedicated to service, our leadership continues to inspire communities through integrity, professionalism, and compassion.'" tag="span" />
 
                         </p>
 
-                        <h2 class="mt-3 text-4xl font-black text-slate-900">
+                        <!-- CEO Card -->
 
-                            <x-editable-text
-                                key="team_ceo_name"
-                                :value="$contexts['team_ceo_name'] ?? 'RENANTE SUAYBAGUIO-ROBLES, MPA, LFA'"
-                                tag="span"
-                            />
+                        <div class="team-leadership-ceo-info-card">
 
-                        </h2>
+                            <p class="team-leadership-ceo-info-label">
 
-                        <p class="mt-4 text-xl font-bold text-yellow-600">
+                                THE CEO
 
-                           Leader • Servant • Professional
+                            </p>
 
-                        </p>
+                            <h2 class="team-leadership-ceo-info-name">
 
-                    </div>
+                                <x-editable-text key="team_ceo_name" :value="$contexts['team_ceo_name'] ?? 'RENANTE SUAYBAGUIO-ROBLES, MPA, LFA'" tag="span" />
 
-                    <!-- Experience -->
+                            </h2>
 
-                    <div class="mt-10 grid gap-6 md:grid-cols-2">
+                            <p class="team-leadership-ceo-info-subtitle">
 
-                        <!-- Public -->
+                                Leader • Servant • Professional
 
-                        <div class="rounded-3xl border border-slate-200 p-6 shadow-sm">
+                            </p>
 
-                            <div class="mb-4 flex items-center gap-4">
+                        </div>
 
-                                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-900 text-2xl text-white">
+                        <!-- Experience -->
 
-                                    🏛️
+                        <div class="team-leadership-ceo-experience-grid">
+
+                            <!-- Public -->
+
+                            <div class="team-leadership-ceo-exp-card">
+
+                                <div class="team-leadership-ceo-exp-header">
+
+                                    <div class="team-leadership-ceo-exp-icon-box team-leadership-ceo-exp-icon-blue">
+
+                                        🏛️
+
+                                    </div>
+
+                                    <div>
+
+                                        <h3 class="team-leadership-ceo-exp-title">
+
+                                            Public Service
+
+                                        </h3>
+
+                                        <p class="team-leadership-ceo-exp-label">
+
+                                            Experience
+
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                                <ul class="team-leadership-ceo-exp-list">
+
+                                    <li>• Former SK Chairman</li>
+
+                                    <li>• Former Barangay Kagawad</li>
+
+                                    <li>• Former Barangay Captain</li>
+
+                                    <li>• Former City Councilor of Tagum City</li>
+
+
+                                </ul>
+
+                            </div>
+
+                            <!-- Professional -->
+
+                            <div class="team-leadership-ceo-exp-card">
+
+                                <div class="team-leadership-ceo-exp-header">
+
+                                    <div class="team-leadership-ceo-exp-icon-box team-leadership-ceo-exp-icon-yellow">
+
+                                        💼
+
+                                    </div>
+
+                                    <div>
+
+                                        <h3 class="team-leadership-ceo-exp-title">
+
+                                            Professional
+
+                                        </h3>
+
+                                        <p class="team-leadership-ceo-exp-label">
+
+                                            Experience
+
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                                <ul class="team-leadership-ceo-exp-list">
+
+                                    <li>• Government-Licensed Financial Advisor</li>
+
+                                    <li>• Unit Head, Manulife Philippines</li>
+
+                                    <li>• Marketing Director, IMG (International Marketing Group)</li>
+
+
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Academic -->
+
+                        <div class="team-leadership-ceo-academic-box">
+
+                            <div class="team-leadership-ceo-academic-header">
+
+                                <div class="team-leadership-ceo-academic-icon">
+
+                                    🎓
 
                                 </div>
 
                                 <div>
 
-                                    <h3 class="font-bold uppercase text-slate-900">
+                                    <h3 class="team-leadership-ceo-academic-title">
 
-                                        Public Service
+                                        Academic Background
 
                                     </h3>
 
-                                    <p class="text-sm text-slate-500">
+                                    <p class="team-leadership-ceo-academic-text">
 
-                                        Experience
+                                        College Professor specializing in
+
+                                        <strong>Business and Marketing</strong>
 
                                     </p>
 
@@ -187,126 +265,34 @@
 
                             </div>
 
-                            <ul class="space-y-2 text-slate-600">
+                        </div>
 
-                                <li>• Former SK Chairman</li>
+                        <!-- Leadership Profile -->
 
-                                <li>• Former Barangay Kagawad</li>
+                        <div class="team-leadership-ceo-profile-box">
 
-                                <li>• Former Barangay Captain</li>
+                            <h3 class="team-leadership-ceo-profile-title">
 
-                                <li>• Former City Councilor of Tagum City</li>
+                                Leadership Profile
 
+                            </h3>
 
-                            </ul>
+                            <div class="team-leadership-ceo-profile-divider"></div>
+
+                            <p class="team-leadership-ceo-profile-text">
+
+                                With extensive experience in public service,
+                                financial advisory, leadership development,
+                                and higher education, our leaders empower
+                                communities through service, financial literacy,
+                                and professional excellence.
+
+                            </p>
 
                         </div>
 
-                        <!-- Professional -->
-
-                        <div class="rounded-3xl border border-slate-200 p-6 shadow-sm">
-
-                            <div class="mb-4 flex items-center gap-4">
-
-                                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-yellow-500 text-2xl text-white">
-
-                                    💼
-
-                                </div>
-
-                                <div>
-
-                                    <h3 class="font-bold uppercase text-slate-900">
-
-                                        Professional
-
-                                    </h3>
-
-                                    <p class="text-sm text-slate-500">
-
-                                        Experience
-
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                            <ul class="space-y-2 text-slate-600">
-
-                                <li>• Government-Licensed Financial Advisor</li>
-
-                                <li>• Unit Head, Manulife Philippines</li>
-
-                                <li>• Marketing Director, IMG (International Marketing Group)</li>
-
-
-                            </ul>
-
-                        </div>
-
-                    </div>
-
-                    <!-- Academic -->
-
-                    <div class="mt-6 rounded-3xl bg-blue-900 p-8 text-white">
-
-                        <div class="flex items-center gap-4">
-
-                            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-white text-2xl">
-
-                                🎓
-
-                            </div>
-
-                            <div>
-
-                                <h3 class="text-2xl font-bold">
-
-                                    Academic Background
-
-                                </h3>
-
-                                <p class="text-blue-100">
-
-                                    College Professor specializing in
-
-                                    <strong>Business and Marketing</strong>
-
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <!-- Leadership Profile -->
-
-                    <div class="mt-6 rounded-[30px] bg-gradient-to-r from-slate-900 to-blue-950 p-8 text-white">
-
-                        <h3 class="text-2xl font-bold text-yellow-400">
-
-                            Leadership Profile
-
-                        </h3>
-
-                        <div class="mt-4 h-1 w-24 rounded bg-yellow-500"></div>
-
-                        <p class="mt-5 leading-relaxed text-slate-300">
-
-                            With extensive experience in public service,
-                            financial advisory, leadership development,
-                            and higher education, our leaders empower
-                            communities through service, financial literacy,
-                            and professional excellence.
-
-                        </p>
-
-                    </div>
-
-                    <!-- Button -->
-{{--
+                        <!-- Button -->
+                        {{--
                     <button
                         wire:click="openCeoModal"
                         class="mt-8 w-fit rounded-2xl bg-yellow-500 px-8 py-4 font-bold text-slate-900 transition hover:scale-105">
@@ -315,30 +301,29 @@
 
                     </button> --}}
 
-                </div>
+                    </div>
 
-                <!-- ========================= -->
-                <!-- RIGHT SIDE -->
-                <!-- ========================= -->
+                    <!-- ========================= -->
+                    <!-- RIGHT SIDE -->
+                    <!-- ========================= -->
 
-                <div class="relative lg:col-span-5 overflow-hidden bg-gradient-to-b from-blue-950 via-blue-900 to-slate-900">
+                    <div class="team-leadership-ceo-right">
 
-                    <!-- decorative -->
+                        <!-- decorative -->
 
-                    <div class="absolute top-0 right-0 h-96 w-96 rounded-full bg-yellow-400/20 blur-3xl"></div>
+                        <div class="team-leadership-ceo-right-decor-yellow"></div>
 
-                    <div class="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl"></div>
+                        <div class="team-leadership-ceo-right-decor-blue"></div>
 
 
-                    <!-- image -->
+                        <!-- image -->
 
-                    <div class="flex h-full items-end justify-center">
+                        <div class="team-leadership-ceo-image-wrap">
 
-                        <img
-                            src="{{ asset('images/ceo.png') }}"
-                            alt="CEO"
-                            class="relative z-10 h-[1200px] object-contain object-bottom"
-                        >
+                            <img src="{{ asset('images/ceo.png') }}" alt="CEO"
+                                class="team-leadership-ceo-image">
+
+                        </div>
 
                     </div>
 
@@ -348,181 +333,182 @@
 
         </div>
 
-    </div>
+    </section>
 
-</section>
 
-<!-- =========================
+
+    <!-- =========================
      COO SECTION
 ========================== -->
 
-<section class="py-24 bg-slate-100">
+    <section class="team-leadership-coo-section">
 
-    <div class="max-w-7xl mx-auto px-6">
+        <div class="team-leadership-coo-container">
 
-        <div class="overflow-hidden rounded-[40px] bg-white shadow-2xl">
+            <div class="team-leadership-coo-card">
 
-            <div class="grid lg:grid-cols-12 min-h-[950px]">
+                <div class="team-leadership-coo-grid">
 
-                   <!-- ========================= -->
-                <!-- RIGHT IMAGE -->
-                <!-- ========================= -->
+                    <!-- ========================= -->
+                    <!-- RIGHT IMAGE -->
+                    <!-- ========================= -->
 
-              <div class="relative lg:col-span-5 overflow-hidden bg-gradient-to-b from-blue-950 to-slate-900 min-h-[950px]">
+                    <div class="team-leadership-coo-image-col">
 
-    <!-- Decorations -->
-    <div class="absolute top-10 right-10 h-40 w-40 rounded-full bg-yellow-400/20 blur-3xl"></div>
-    <div class="absolute bottom-10 left-10 h-40 w-40 rounded-full bg-blue-400/20 blur-3xl"></div>
+                        <!-- Decorations -->
+                        <div class="team-leadership-coo-decor-yellow"></div>
+                        <div class="team-leadership-coo-decor-blue"></div>
 
-    <!-- Gold line -->
-    <div class="absolute left-0 top-0 h-full w-1 bg-yellow-500"></div>
+                        <!-- Gold line -->
+                        <div class="team-leadership-coo-gold-line"></div>
 
-    <!-- Image -->
-    <img
-        src="{{ asset('images/coo.png') }}"
-        alt="COO"
-        class="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 h-[1500px] mb-25 w-auto object-contain object-bottom"
-    >
-
-</div>
-
-                <div class="lg:col-span-7 p-10 lg:p-14 flex flex-col justify-center">
-
-                    <!-- Badge -->
-
-                    <div>
-
-                        <span class="inline-flex rounded-full bg-blue-900 px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white">
-
-                            Vice President for
-
-                        </span>
+                        <!-- Image -->
+                        <div class="team-leadership-coo-image-wrap">
+                            <img src="{{ asset('images/coo.png') }}" alt="COO"
+                                class="team-leadership-coo-image">
+                        </div>
 
                     </div>
 
-                    <!-- Position -->
+                    <div class="team-leadership-coo-content">
 
-                    <h2 class="mt-5 text-4xl lg:text-5xl font-black uppercase leading-tight text-slate-900">
+                        <!-- Badge -->
 
-                        Marketing and Operations
+                        <div>
 
-                    </h2>
+                            <span class="team-leadership-coo-badge">
 
-                    <!-- Name -->
+                                Vice President for
 
-                    <h1 class="mt-6 text-5xl font-black uppercase text-blue-900">
+                            </span>
 
-                        Bobby Paulo Dagala, LFA
+                        </div>
 
-                    </h1>
+                        <!-- Position -->
 
-                    <!-- Subtitle -->
+                        <h2 class="team-leadership-coo-position">
 
-                    <p class="mt-4 text-2xl font-semibold text-yellow-600">
+                            Marketing and Operations
 
-                        A Government Licensed Financial Advisor
+                        </h2>
 
-                    </p>
+                        <!-- Name -->
 
-                    <!-- Divider -->
+                        <h1 class="team-leadership-coo-name">
 
-                    <div class="mt-8 h-1 w-32 rounded-full bg-yellow-500"></div>
+                            Bobby Paulo Dagala, LFA
 
-                    <!-- Cards -->
+                        </h1>
 
-                    <div class="mt-10 grid gap-6">
+                        <!-- Subtitle -->
 
-                        <!-- Experience -->
+                        <p class="team-leadership-coo-subtitle">
 
-                        <div class="rounded-3xl border border-slate-200 p-6 shadow-sm">
+                            A Government Licensed Financial Advisor
 
-                            <div class="flex items-center gap-4">
+                        </p>
 
-                                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-900 text-white text-2xl">
+                        <!-- Divider -->
 
-                                    🛡️
+                        <div class="team-leadership-coo-divider"></div>
 
-                                </div>
+                        <!-- Cards -->
 
-                                <div>
+                        <div class="team-leadership-coo-cards">
 
-                                    <h3 class="text-2xl font-bold text-slate-900">
+                            <!-- Experience -->
 
-                                        20 Years
+                            <div class="team-leadership-coo-info-card">
 
-                                    </h3>
+                                <div class="team-leadership-coo-info-row">
 
-                                    <p class="text-slate-500">
+                                    <div class="team-leadership-coo-info-icon team-leadership-coo-info-icon-blue">
 
-                                        in Insurance Industry
+                                        🛡️
 
-                                    </p>
+                                    </div>
+
+                                    <div>
+
+                                        <h3 class="team-leadership-coo-info-title">
+
+                                            20 Years
+
+                                        </h3>
+
+                                        <p class="team-leadership-coo-info-text">
+
+                                            in Insurance Industry
+
+                                        </p>
+
+                                    </div>
 
                                 </div>
 
                             </div>
 
-                        </div>
+                            <!-- Owner/Founder -->
 
-                        <!-- Owner/Founder -->
+                            <div class="team-leadership-coo-info-card">
 
-                        <div class="rounded-3xl border border-slate-200 p-6 shadow-sm">
+                                <div class="team-leadership-coo-info-row">
 
-                            <div class="flex items-center gap-4">
+                                    <div class="team-leadership-coo-info-icon team-leadership-coo-info-icon-blue">
 
-                                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-900 text-white text-2xl">
+                                        👥
 
-                                    👥
+                                    </div>
 
-                                </div>
+                                    <div>
 
-                                <div>
+                                        <h3 class="team-leadership-coo-info-title">
 
-                                    <h3 class="text-2xl font-bold text-slate-900">
+                                            Owner/Founder
 
-                                        Owner/Founder
+                                        </h3>
 
-                                    </h3>
+                                        <p class="team-leadership-coo-info-text-tight">
 
-                                    <p class="text-slate-500 leading-relaxed">
+                                            TRI-CARE Community Development
+                                            and Consultancy Services
 
-                                        TRI-CARE Community Development
-                                        and Consultancy Services
+                                        </p>
 
-                                    </p>
+                                    </div>
 
                                 </div>
 
                             </div>
 
-                        </div>
+                            <!-- Business -->
 
-                        <!-- Business -->
+                            <div class="team-leadership-coo-info-card">
 
-                        <div class="rounded-3xl border border-slate-200 p-6 shadow-sm">
+                                <div class="team-leadership-coo-info-row">
 
-                            <div class="flex items-center gap-4">
+                                    <div class="team-leadership-coo-info-icon team-leadership-coo-info-icon-yellow">
 
-                                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-yellow-500 text-white text-2xl">
+                                        🏢
 
-                                    🏢
+                                    </div>
 
-                                </div>
+                                    <div>
 
-                                <div>
+                                        <h3 class="team-leadership-coo-info-title">
 
-                                    <h3 class="text-2xl font-bold text-slate-900">
+                                            Business Owner
 
-                                        Business Owner
+                                        </h3>
 
-                                    </h3>
+                                        <p class="team-leadership-coo-info-text-tight">
 
-                                    <p class="text-slate-500 leading-relaxed">
+                                            Ultrasound Clinics in Davao
+                                            Region
 
-                                        Ultrasound Clinics in Davao
-                                        Region
+                                        </p>
 
-                                    </p>
+                                    </div>
 
                                 </div>
 
@@ -538,11 +524,9 @@
 
         </div>
 
-    </div>
+    </section>
 
-</section>
-
-{{-- @if($showCeoModal)
+    {{-- @if ($showCeoModal)
 
 <div
     class="fixed inset-0 z-[9999] bg-black/70 backdrop-blur-sm p-4 flex items-center justify-center">
@@ -569,186 +553,145 @@
 @endif --}}
 
 
-<!-- =========================
+    <!-- =========================
      BOARD MEMBERS SECTION
 ========================== -->
-<section class="team-board-section">
-    <div class="max-w-7xl mx-auto px-6 lg:px-12">
+    <section class="team-board-section">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
 
-        <div class="team-board-header">
-            <span class="team-board-subtitle">
-                <x-editable-text
-                    key="team_board_subtitle"
-                    :value="$contexts['team_board_subtitle'] ?? 'Dayongan Leadership'"
-                    tag="span"
-                    class="inline-block"
-                />
-            </span>
+            <div class="team-board-header">
+                <span class="team-board-subtitle">
+                    <x-editable-text key="team_board_subtitle" :value="$contexts['team_board_subtitle'] ?? 'Dayongan Leadership'" tag="span"
+                        class="inline-block" />
+                </span>
 
-            <h2 class="team-board-title">
-                <x-editable-text
-                    key="team_board_title"
-                    :value="$contexts['team_board_title'] ?? 'Board Members'"
-                    tag="span"
-                    class="inline-block"
-                />
-            </h2>
+                <h2 class="team-board-title">
+                    <x-editable-text key="team_board_title" :value="$contexts['team_board_title'] ?? 'Board Members'" tag="span" class="inline-block" />
+                </h2>
 
-            <p class="team-board-description">
-                <x-editable-text
-                    key="team_board_description"
-                    :value="$contexts['team_board_description'] ?? 'Dedicated leaders committed to serving the organization with integrity, transparency, and excellence.'"
-                    tag="span"
-                    class="block"
-                />
-            </p>
-        </div>
-
-        <div class="team-board-grid">
-
-            @php
-            $boardMembers = [
-                ['name'=>'Princes Manliguez','position'=>'Secretary', 'contact' => '09266958032'],
-                ['name'=>'Dr. Maria Carmelita','position'=>'Auditor', 'contact' => '09565003849'],
-                ['name'=>'Dr. Cherry Lynn Nierras-Dagala','position'=>'Treasurer', 'contact' => '09055596558'],
-                ['name'=>'Mr. Alfe Duron','position'=>'Board of Directors', 'contact' => '09933668594'],
-            ];
-            @endphp
-
-            @foreach($boardMembers as $member)
-            <div class="team-board-card">
-                <div class="team-board-card-body">
-                    <img
-                        src="{{ asset('images/user.png') }}"
-                        alt="{{ $member['name'] }}"
-                        class="team-board-avatar">
-
-                    <h3 class="team-board-name">
-                        {{ $member['name'] }}
-                    </h3>
-
-                    @isset($member['contact'])
-                        <p>{{ $member['contact'] }}</p>
-                    @endisset
-
-                    <p class="team-board-position">
-                        {{ $member['position'] }}
-                    </p>
-                </div>
+                <p class="team-board-description">
+                    <x-editable-text key="team_board_description" :value="$contexts['team_board_description'] ??
+                        'Dedicated leaders committed to serving the organization with integrity, transparency, and excellence.'" tag="span" class="block" />
+                </p>
             </div>
-            @endforeach
+
+            <div class="team-board-grid">
+
+                @php
+                    $boardMembers = [
+                        ['name' => 'Princes Manliguez', 'position' => 'Secretary', 'contact' => '09266958032'],
+                        ['name' => 'Dr. Maria Carmelita', 'position' => 'Auditor', 'contact' => '09565003849'],
+                        [
+                            'name' => 'Dr. Cherry Lynn Nierras-Dagala',
+                            'position' => 'Treasurer',
+                            'contact' => '09055596558',
+                        ],
+                        ['name' => 'Mr. Alfe Duron', 'position' => 'Board of Directors', 'contact' => '09933668594'],
+                    ];
+                @endphp
+
+                @foreach ($boardMembers as $member)
+                    <div class="team-board-card">
+                        <div class="team-board-card-body">
+                            <img src="{{ asset('images/user.png') }}" alt="{{ $member['name'] }}"
+                                class="team-board-avatar">
+
+                            <h3 class="team-board-name">
+                                {{ $member['name'] }}
+                            </h3>
+
+                            @isset($member['contact'])
+                                <p>{{ $member['contact'] }}</p>
+                            @endisset
+
+                            <p class="team-board-position">
+                                {{ $member['position'] }}
+                            </p>
+                        </div>
+                    </div>
+                @endforeach
+
+            </div>
 
         </div>
-
-    </div>
-</section>
+    </section>
 
 
-<!-- =========================
+    <!-- =========================
      BRANCH & FIELD SUPPORT
 ========================== -->
-<section class="team-field-section">
-    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div class="team-field-header">
-            <span class="team-field-subtitle">
-                <x-editable-text
-                    key="team_field_subtitle"
-                    :value="$contexts['team_field_subtitle'] ?? 'On The Ground'"
-                    tag="span"
-                    class="inline-block"
-                />
-            </span>
-            <h2 class="team-field-title">
-                <x-editable-text
-                    key="team_field_title"
-                    :value="$contexts['team_field_title'] ?? 'Branch & Field Support'"
-                    tag="span"
-                    class="inline-block"
-                />
-            </h2>
-            <p class="team-field-description">
-                <x-editable-text
-                    key="team_field_description"
-                    :value="$contexts['team_field_description'] ?? 'Connecting directly with communities in Tagum City, Kapalong, and nearby municipalities.'"
-                    tag="span"
-                    class="block"
-                />
-            </p>
-        </div>
-
-        <div class="team-field-grid">
-
-            @foreach($branches as $branch)
-            <div class="team-field-card">
-                <div class="team-field-icon-box team-icon-blue">
-                    <span class="inline-block">
-                        📍
-                    </span>
-                </div>
-                <h3 class="team-field-card-title">
-                    <span class="inline-block">
-                        {{ $branch->branchname }}
-                    </span>
-                </h3>
-                <p class="team-field-card-text">
-                    <span class="block">
-                        {{ $branch->address }}
-                    </span>
+    <section class="team-field-section">
+        <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+            <div class="team-field-header">
+                <span class="team-field-subtitle">
+                    <x-editable-text key="team_field_subtitle" :value="$contexts['team_field_subtitle'] ?? 'On The Ground'" tag="span"
+                        class="inline-block" />
+                </span>
+                <h2 class="team-field-title">
+                    <x-editable-text key="team_field_title" :value="$contexts['team_field_title'] ?? 'Branch & Field Support'" tag="span" class="inline-block" />
+                </h2>
+                <p class="team-field-description">
+                    <x-editable-text key="team_field_description" :value="$contexts['team_field_description'] ??
+                        'Connecting directly with communities in Tagum City, Kapalong, and nearby municipalities.'" tag="span" class="block" />
                 </p>
             </div>
-            @endforeach
 
+            <div class="team-field-grid">
+
+                @foreach ($branches as $branch)
+                    <div class="team-field-card">
+                        <div class="team-field-icon-box team-icon-blue">
+                            <span class="inline-block">
+                                📍
+                            </span>
+                        </div>
+                        <h3 class="team-field-card-title">
+                            <span class="inline-block">
+                                {{ $branch->branchname }}
+                            </span>
+                        </h3>
+                        <p class="team-field-card-text">
+                            <span class="block">
+                                {{ $branch->address }}
+                            </span>
+                        </p>
+                    </div>
+                @endforeach
+
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
 
-<!-- =========================
+    <!-- =========================
      STRATEGIC ALLIANCE BANNER
 ========================== -->
-<section class="team-partner-section">
-    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div class="team-partner-card">
-            <div class="team-partner-content">
-                <span class="team-partner-subtitle">
-                    <x-editable-text
-                        key="team_partner_subtitle"
-                        :value="$contexts['team_partner_subtitle'] ?? 'Strategic Alliance'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </span>
-                <h3 class="team-partner-title">
-                    <x-editable-text
-                        key="team_partner_title"
-                        :value="$contexts['team_partner_title'] ?? 'Backed by COCOGEN Insurance'"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </h3>
-                <p class="team-partner-text">
-                    <x-editable-text
-                        key="team_partner_text"
-                        :value="$contexts['team_partner_text'] ?? 'Our team works hand-in-hand with licensed underwriters and advisors from COCOGEN to guarantee financial strength, underwriting accuracy, and prompt claim settlement.'"
-                        tag="span"
-                        class="block"
-                    />
-                </p>
+    <section class="team-partner-section">
+        <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+            <div class="team-partner-card">
+                <div class="team-partner-content">
+                    <span class="team-partner-subtitle">
+                        <x-editable-text key="team_partner_subtitle" :value="$contexts['team_partner_subtitle'] ?? 'Strategic Alliance'" tag="span"
+                            class="inline-block" />
+                    </span>
+                    <h3 class="team-partner-title">
+                        <x-editable-text key="team_partner_title" :value="$contexts['team_partner_title'] ?? 'Backed by COCOGEN Insurance'" tag="span"
+                            class="inline-block" />
+                    </h3>
+                    <p class="team-partner-text">
+                        <x-editable-text key="team_partner_text" :value="$contexts['team_partner_text'] ??
+                            'Our team works hand-in-hand with licensed underwriters and advisors from COCOGEN to guarantee financial strength, underwriting accuracy, and prompt claim settlement.'" tag="span" class="block" />
+                    </p>
+                </div>
+
+                <a href="{{ route('contact') }}" class="team-partner-btn">
+                    <x-editable-text key="team_partner_btn" :value="$contexts['team_partner_btn'] ?? 'Contact Partner Desk'" tag="span" class="inline-block" />
+                </a>
             </div>
-
-            <a href="{{ route('contact') }}" class="team-partner-btn">
-                <x-editable-text
-                    key="team_partner_btn"
-                    :value="$contexts['team_partner_btn'] ?? 'Contact Partner Desk'"
-                    tag="span"
-                    class="inline-block"
-                />
-            </a>
         </div>
-    </div>
-</section>
+    </section>
 
-{{--
+    {{--
 <!-- =========================
      CALL TO ACTION
 ========================== -->

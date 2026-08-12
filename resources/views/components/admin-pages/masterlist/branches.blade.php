@@ -1,6 +1,6 @@
 <div class="branches-container w-full px-4 sm:px-6 lg:px-8 py-6">
 
-  <!-- HEADER & BRANCH TOGGLE BUTTON -->
+    <!-- HEADER & BRANCH TOGGLE BUTTON -->
     <div class="members-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
             <h2 class="masterlist-title text-2xl font-bold text-slate-800">Branches</h2>
@@ -8,12 +8,11 @@
         </div>
 
         @if ($this->canCreate)
-            <button
-                type="button"
-                wire:click="openCreateModal"
-                class="masterlist-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer shadow bg-[#0C2C6B] text-white hover:bg-[#09204f] w-full sm:w-auto"
-            >
-                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <button type="button" wire:click="openCreateModal"
+                class="masterlist-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer shadow bg-[#0C2C6B] text-white hover:bg-[#09204f] w-full sm:w-auto">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
                 Add Branch
             </button>
         @endif
@@ -26,32 +25,45 @@
         </div>
     @endif
 
-    <!-- SEARCH INPUT & REFRESH BUTTON CONTAINER -->
-    <div class="flex items-center justify-between gap-4 mb-6">
+    <!-- SEARCH INPUT, DATE FILTER & REFRESH BUTTON CONTAINER -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <!-- SEARCH INPUT -->
-        <div class="relative max-w-sm w-full">
+        <div class="relative max-w-sm w-full sm:w-auto flex-1">
             <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
                 🔍
             </span>
-            <input
-                type="text"
-                wire:model.live.debounce.300ms="search"
-                placeholder="Search branches..."
-                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm"
-            >
+            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search branches..."
+                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
         </div>
 
-        <!-- REFRESH BUTTON -->
-        <button
-            wire:click="resetTable"
-            wire:loading.attr="disabled"
-            title="Refresh Table"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer"
-        >
-            <span wire:loading.remove wire:target="resetTable">🔄</span>
-            <span wire:loading wire:target="resetTable" class="animate-spin">⏳</span>
-            <span class="hidden sm:inline">Refresh</span>
-        </button>
+        <!-- FILTERS AND REFRESH GROUP -->
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+
+            <!-- DATE RANGE FILTER -->
+            <div wire:ignore class="relative w-72">
+                <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none z-10">
+                    📅
+                </span>
+                <input type="text" id="branchDateRange" readonly
+                    class="date-range-input pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white text-slate-700 shadow-sm cursor-pointer w-full text-center font-medium"
+                    placeholder="Select date range">
+            </div>
+
+            @if ($dateRange)
+                <button type="button" wire:click="clearDateFilter" title="Clear date filter"
+                    class="inline-flex items-center px-3 py-2 text-sm text-slate-500 hover:text-red-500 hover:border-red-200 hover:bg-red-50 rounded-xl border border-slate-200 bg-white shadow-sm cursor-pointer transition">
+                    ✕
+                </button>
+            @endif
+
+            <!-- REFRESH BUTTON -->
+            <button wire:click="resetTable" wire:loading.attr="disabled" title="Refresh Table"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
+                <span wire:loading.remove wire:target="resetTable">🔄</span>
+                <span wire:loading wire:target="resetTable" class="animate-spin">⏳</span>
+                <span class="hidden sm:inline">Refresh</span>
+            </button>
+        </div>
     </div>
 
     <!-- BRANCHES TABLE -->
@@ -63,7 +75,7 @@
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">Branch Name</th>
                     <th class="py-3 px-4">Address</th>
-                   @if($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
+                    @if ($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
                         <th class="py-3 px-4 text-center">Action</th>
                     @endif
                 </tr>
@@ -84,7 +96,7 @@
                         </td>
 
                         <!-- Actions Column -->
-                        @if($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
+                        @if ($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
                             <td class="py-4 px-4 text-center">
                                 <div class="flex gap-2 justify-center">
                                     {{-- EDIT BUTTON --}}
@@ -252,5 +264,66 @@
             });
         </script>
     @endscript
+
+    @script
+<script>
+    const dateInput = $wire.$el.querySelector('#branchDateRange');
+
+    const picker = flatpickr(dateInput, {
+        mode: 'range',
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'M d, Y',
+        maxDate: 'today',
+        defaultDate: @js($dateRange ? explode(' to ', $dateRange) : []),
+        onChange: (selectedDates, dateStr, instance) => {
+            if (selectedDates.length === 2) {
+                const start = instance.formatDate(selectedDates[0], 'Y-m-d');
+                const end = instance.formatDate(selectedDates[1], 'Y-m-d');
+                $wire.set('dateRange', `${start} to ${end}`);
+            } else if (selectedDates.length === 0) {
+                $wire.set('dateRange', '');
+            }
+        },
+        onClose: (selectedDates, dateStr, instance) => {
+            if (selectedDates.length === 1) {
+                const day = instance.formatDate(selectedDates[0], 'Y-m-d');
+                instance.setDate([selectedDates[0], selectedDates[0]], false);
+                $wire.set('dateRange', `${day} to ${day}`);
+            }
+        }
+    });
+
+    $wire.on('ranges-reset', () => {
+        picker.clear();
+    });
+
+    $wire.on('confirm-delete', (event) => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#E5B83B',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $wire.deleteBranch(event.id);
+            }
+        });
+    });
+
+    $wire.on('branch-deleted', () => {
+        Swal.fire({
+            title: 'Deleted!',
+            text: 'Branch has been successfully deleted.',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+        });
+    });
+</script>
+@endscript
 
 </div>

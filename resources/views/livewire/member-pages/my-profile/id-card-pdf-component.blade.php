@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <style>
-        {!! file_get_contents(resource_path('css/id-card.css')) !!}
+        {!! file_get_contents(resource_path('css/livewire/member-pages/my-profile/id-card.css')) !!}
     </style>
 </head>
 

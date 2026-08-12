@@ -10,6 +10,7 @@ use Livewire\WithPagination; // 1. Import the pagination trait
 use App\Models\Benefit;
 use App\Models\Privilege;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class Inquiries extends Component
 {
@@ -19,11 +20,17 @@ class Inquiries extends Component
     public $selectedInquiry = null;
     public $showModal = false;
     public string $search = '';
+    public string $dateRange = '';   // e.g. "2026-08-01 to 2026-08-16"
 
     // Reply fields
     public $replySubject = '';
     public $replyMessage = '';
     public $successMessage = '';
+
+     public function mount()
+    {
+        $this->dateRange = '';
+    }
 
     public function viewInquiry($id)
     {
@@ -134,23 +141,57 @@ class Inquiries extends Component
         $this->resetPage();
     }
 
+     protected function parsedDateRange(): array
+    {
+        if (blank($this->dateRange) || !str_contains($this->dateRange, ' to ')) {
+            return [null, null];
+        }
+
+        [$from, $to] = explode(' to ', $this->dateRange, 2);
+
+        return [trim($from) ?: null, trim($to) ?: null];
+    }
+
+    public function updatedDateRange()
+    {
+        $this->resetPage();
+    }
+
+
+     public function clearDateFilter(): void
+    {
+        $this->dateRange = '';
+        $this->resetPage();
+        $this->dispatch('ranges-reset');
+    }
+
     public function resetTable(): void
     {
         $this->search = '';
+        $this->dateRange = '';
         $this->resetPage();
+        $this->dispatch('ranges-reset');
     }
 
     public function render()
     {
+        [$dateFrom, $dateTo] = $this->parsedDateRange();
+
         $inquiries = Inquiry::when(filled($this->search), function ($query) {
-            $search = trim($this->search);
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('subject', 'like', "%{$search}%")
-                    ->orWhere('category', 'like', "%{$search}%");
-            });
-        })
+                $search = trim($this->search);
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('subject', 'like', "%{$search}%")
+                        ->orWhere('category', 'like', "%{$search}%");
+                });
+            })
+            ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($dateFrom)->startOfDay(),
+                    Carbon::parse($dateTo)->endOfDay(),
+                ]);
+            })
             ->latest()
             ->paginate(10);
 

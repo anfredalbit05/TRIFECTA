@@ -68,7 +68,7 @@
                 <h3 class="font-bold text-[#0C2C6B] text-lg mb-2">
                     Membership Fee Breakdown
                 </h3>
-                <div x-data="{
+                <div wire:ignore x-data="{
                     startDate: @entangle('membershipFeeStart'),
                     endDate: @entangle('membershipFeeEnd'),
                     picker: null,
@@ -87,8 +87,14 @@
                             }
                         });
 
-                        this.$watch('startDate', () => this.updatePicker());
-                        this.$watch('endDate', () => this.updatePicker());
+                        // Defer so both startDate and endDate have landed before reading them
+                        this.$watch('startDate', () => this.$nextTick(() => this.updatePicker()));
+                        this.$watch('endDate', () => this.$nextTick(() => this.updatePicker()));
+
+                        // Fallback: explicit resync fired by the server whenever the year changes
+                        window.addEventListener('ranges-reset', () => {
+                            this.$nextTick(() => this.updatePicker());
+                        });
                     },
                     updatePicker() {
                         if (this.picker && this.startDate && this.endDate) {
@@ -134,7 +140,7 @@
                 <h3 class="font-bold text-[#0C2C6B] text-lg mb-2">
                     Collection Summary by Source
                 </h3>
-                <div x-data="{
+                <div wire:ignore x-data="{
                     startDate: @entangle('sourceStart'),
                     endDate: @entangle('sourceEnd'),
                     picker: null,
@@ -153,8 +159,14 @@
                             }
                         });
 
-                        this.$watch('startDate', () => this.updatePicker());
-                        this.$watch('endDate', () => this.updatePicker());
+                        // Defer so both startDate and endDate have landed before reading them
+                        this.$watch('startDate', () => this.$nextTick(() => this.updatePicker()));
+                        this.$watch('endDate', () => this.$nextTick(() => this.updatePicker()));
+
+                        // Fallback: explicit resync fired by the server whenever the year changes
+                        window.addEventListener('ranges-reset', () => {
+                            this.$nextTick(() => this.updatePicker());
+                        });
                     },
                     updatePicker() {
                         if (this.picker && this.startDate && this.endDate) {
@@ -195,7 +207,7 @@
                 <h3 class="font-bold text-[#0C2C6B] text-lg mb-2">
                     Wallet Incentives Breakdown
                 </h3>
-                <div x-data="{
+                <div wire:ignore x-data="{
                     startDate: @entangle('walletStart'),
                     endDate: @entangle('walletEnd'),
                     picker: null,
@@ -214,8 +226,14 @@
                             }
                         });
 
-                        this.$watch('startDate', () => this.updatePicker());
-                        this.$watch('endDate', () => this.updatePicker());
+                        // Defer so both startDate and endDate have landed before reading them
+                        this.$watch('startDate', () => this.$nextTick(() => this.updatePicker()));
+                        this.$watch('endDate', () => this.$nextTick(() => this.updatePicker()));
+
+                        // Fallback: explicit resync fired by the server whenever the year changes
+                        window.addEventListener('ranges-reset', () => {
+                            this.$nextTick(() => this.updatePicker());
+                        });
                     },
                     updatePicker() {
                         if (this.picker && this.startDate && this.endDate) {
