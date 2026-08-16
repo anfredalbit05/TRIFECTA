@@ -26,16 +26,16 @@
             <!-- LEVEL 0-1: COO (TOP NODE) -->
             <div class="board-level">
                 <div class="board-card board-card--ceo">
-                    <img src="{{ asset('images/user.png') }}" alt="CEO Name" class="board-avatar board-avatar--lg board-avatar--purple">
+                    <img src="{{ asset('images/user.png') }}" alt="COO Name" class="board-avatar board-avatar--lg board-avatar--purple">
                     <h3 class="board-name">Bobby Paulo Dagala</h3>
-                    <span class="board-role-badge board-role-badge--purple">Chief Executive Officer</span>
+                    <span class="board-role-badge board-role-badge--purple">Chief Operating Officer</span>
                 </div>
                 <!-- Connector down to officers -->
                 <div class="board-connector"></div>
             </div>
 
             <!-- LEVEL 1: OFFICERS -->
-            <div class="board-officers-row">
+            {{-- <div class="board-officers-row">
 
                 <!-- Secretary -->
                 <div class="board-card board-card--officer board-card--secretary">
@@ -64,7 +64,7 @@
                     <span class="board-role-badge board-role-badge--emerald">Board of Directors</span>
                 </div>
 
-            </div>
+            </div> --}}
 
             {{-- <!-- CONNECTOR LINE TO BOARD MEMBERS -->
             <div class="board-connector-line">
