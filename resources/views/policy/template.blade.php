@@ -116,7 +116,7 @@ body{
 
     <div class="field" style="left:515px;top:266px;">
         {{ isset($beneficiaries[1])
-            ? \Carbon\Carbon::parse($beneficiaries[0]->birthdate)->format('M d, Y')
+            ? \Carbon\Carbon::parse($beneficiaries[1]->birthdate)->format('M d, Y')
             : '' }}
     </div>
 
@@ -128,7 +128,7 @@ body{
 
     <div class="field" style="left:515px;top:321px;">
         {{ isset($beneficiaries[2])
-            ? \Carbon\Carbon::parse($beneficiaries[0]->birthdate)->format('M d, Y')
+            ? \Carbon\Carbon::parse($beneficiaries[2]->birthdate)->format('M d, Y')
             : '' }}
     </div>
 

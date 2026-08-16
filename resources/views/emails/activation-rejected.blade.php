@@ -23,7 +23,7 @@
                             <table role="presentation" cellspacing="0" cellpadding="0">
                                 <tr>
                                     <td align="center" style="background-color: rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 12px; backdrop-filter: blur(8px);">
-                                        <img src="{{ asset('images/dayongan-logo.png') }}" alt="Dayongan Logo" width="64" height="64" style="display: block; width: 64px; height: 64px; object-fit: contain;">
+                                        <img src="{{ asset('images/truelife-logo.png') }}" alt="True Life Logo" width="64" height="64" style="display: block; width: 64px; height: 64px; object-fit: contain;">
                                     </td>
                                 </tr>
                             </table>
