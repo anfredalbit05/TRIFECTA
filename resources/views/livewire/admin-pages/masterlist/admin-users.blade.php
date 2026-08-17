@@ -205,13 +205,19 @@
 
                     <div class="flex items-center space-x-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
                         @if (!empty($this->selectedUser->profilepic))
+                            <img src="{{ Str::startsWith($this->selectedUser->profilepic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic) }}"
+                                class="profile-image" alt="Profile picture">
                             <img src="{{ asset($this->selectedUser->profilepic) }}" alt="Profile Picture"
                                 class="w-14 h-14 rounded-full object-cover border border-slate-200 shadow-sm shrink-0">
                         @else
                             <div class="w-14 h-14 rounded-full bg-[#0C2C6B] text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
                                 {{ strtoupper(substr($this->selectedUser->firstname, 0, 1) . substr($this->selectedUser->lastname, 0, 1)) }}
                             </div>
+                            
+                            <img src="{{ asset('images/profiles/default-avatar.png') }}" class="profile-image"
+                                alt="Default profile picture">
                         @endif
+
                         <div class="overflow-hidden">
                             <h4 class="text-base font-bold text-slate-800 truncate">
                                 {{ $this->selectedUser->firstname }} {{ $this->selectedUser->middlename }} {{ $this->selectedUser->lastname }}
