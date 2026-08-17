@@ -205,7 +205,7 @@
 
                     <div class="flex items-center space-x-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
                         @if (!empty($this->selectedUser->profilepic))
-                            <img src="{{ Str::startsWith($this->selectedUser->profilepic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic) }}"
+                            <img src="{{ Str::startsWith($this->selectedUser->profilepic, 'storage/') ? asset($this->selectedUser->profilepic) : asset('storage/' . $this->selectedUser->profilepic) }}"
                                 class="profile-image" alt="Profile picture">
                             <img src="{{ asset($this->selectedUser->profilepic) }}" alt="Profile Picture"
                                 class="w-14 h-14 rounded-full object-cover border border-slate-200 shadow-sm shrink-0">
