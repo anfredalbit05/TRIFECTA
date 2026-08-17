@@ -55,7 +55,7 @@
                 <livewire:admin-pages.masterlist.dashboard />
             </div>
 
-            <!-- MEMBERS -->
+            <!-- USERS -->
             <div x-show="tab === 'admin-users'" x-cloak class="dashboard-main-card full-width-card">
                 <livewire:admin-pages.masterlist.admin-users />
             </div>

@@ -95,15 +95,15 @@ class MembershipFeeSeeder extends Seeder
             ],
             [
                 'FeeID' => 'FEE012',
-                'FeeName' => 'Investor',
-                'Cost' => 200.00,
+                'FeeName' => 'Business Partners Wallet',
+                'Cost' => 100.00,
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
             [
                 'FeeID' => 'FEE013',
                 'FeeName' => 'Admin',
-                'Cost' => 200.00,
+                'Cost' => 300.00,
                 'created_at' => $now,
                 'updated_at' => $now,
             ],

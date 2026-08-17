@@ -40,9 +40,26 @@
 
                         <div class="flex items-center gap-4">
                             {{-- Avatar --}}
-                            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-2xl font-bold">
+                            {{-- <div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-2xl font-bold">
                                 {{ strtoupper(substr($first_name, 0, 1)) }}
-                            </div>
+                            </div> --}}
+
+                            @if (!empty($this->selectedUser->profilepic))
+                                <img
+                                    src="{{ Str::startsWith($this->selectedUser->profilepic, 'storage/')
+                                        ? asset($this->selectedUser->profilepic)
+                                        : asset('storage/' . $this->selectedUser->profilepic) }}"
+                                    alt="profile-image"
+                                    class="w-14 h-14 rounded-full object-cover border border-slate-200 shadow-sm shrink-0"
+                                >
+                            @else
+                                <div class="w-14 h-14 rounded-full bg-[#0C2C6B] text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+                                    {{ strtoupper(
+                                        substr($this->selectedUser->firstname, 0, 1) .
+                                        substr($this->selectedUser->lastname, 0, 1)
+                                    ) }}
+                                </div>
+                            @endif
 
                             <div>
                                 <h2 class="text-2xl font-bold">
