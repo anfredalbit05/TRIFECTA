@@ -320,8 +320,7 @@
 
                         <div class="team-leadership-ceo-image-wrap">
 
-                            <img src="{{ asset('images/ceo.png') }}" alt="CEO"
-                                class="team-leadership-ceo-image">
+                            <img src="{{ asset('images/ceo.png') }}" alt="CEO" class="team-leadership-ceo-image">
 
                         </div>
 
@@ -364,8 +363,7 @@
 
                         <!-- Image -->
                         <div class="team-leadership-coo-image-wrap">
-                            <img src="{{ asset('images/coo.png') }}" alt="COO"
-                                class="team-leadership-coo-image">
+                            <img src="{{ asset('images/coo.png') }}" alt="COO" class="team-leadership-coo-image">
                         </div>
 
                     </div>
@@ -579,34 +577,76 @@
 
                 @php
                     $boardMembers = [
-                        ['name' => 'Princes Manliguez', 'position' => 'Secretary', 'contact' => '09266958032'],
-                        ['name' => 'Dr. Maria Carmelita', 'position' => 'Auditor', 'contact' => '09565003849'],
                         [
-                            'name' => 'Dr. Cherry Lynn Nierras-Dagala',
-                            'position' => 'Treasurer',
-                            'contact' => '09055596558',
+                            'name' => 'Jeorge Leemart Alfeche',
+                            'position' => 'Position 1',
+                            'contact' => '',
+                            'image' => 'images/BOD/Member1.png',
                         ],
-                        ['name' => 'Mr. Alfe Duron', 'position' => 'Board of Directors', 'contact' => '09933668594'],
+                        [
+                            'name' => 'Benito Igadna',
+                            'position' => 'Position 2',
+                            'contact' => '',
+                            'image' => 'images/BOD/Member2.jpg',
+                        ],
+                        [
+                            'name' => 'Pierre Hordista',
+                            'position' => 'Position 3',
+                            'contact' => '',
+                            'image' => 'images/BOD/Member3.png',
+                        ],
+                        [
+                            'name' => 'Daisy Maghuyop Colegado',
+                            'position' => 'Position 4',
+                            'contact' => '',
+                            'image' => 'images/BOD/Member4.png',
+                        ],
+                        [
+                            'name' => 'Mrs. Cheryl Eliot, RN',
+                            'position' => 'Position 5',
+                            'contact' => '',
+                            'image' => 'images/BOD/Member5.png',
+                        ],
+                        [
+                            'name' => 'Bernard Laurente',
+                            'position' => 'Position 6',
+                            'contact' => '',
+                            'image' => 'images/BOD/Member6.png',
+                        ],
+                        [
+                            'name' => 'Alfe Duron',
+                            'position' => 'Position 7',
+                            'contact' => '',
+                            'image' => 'images/BOD/Member7.png',
+                        ],
+                        [
+                            'name' => 'Cherry Lynn Nierras-Dagala, MD',
+                            'position' => 'Position 8',
+                            'contact' => '',
+                            'image' => 'images/BOD/Member8.png',
+                        ],
                     ];
                 @endphp
 
                 @foreach ($boardMembers as $member)
                     <div class="team-board-card">
                         <div class="team-board-card-body">
-                            <img src="{{ asset('images/user.png') }}" alt="{{ $member['name'] }}"
-                                class="team-board-avatar">
+                            <img src="{{ asset($member['image'] ?? 'images/user.png') }}" alt="{{ $member['name'] }}"
+                                class="team-board-avatar"
+                                {{-- onclick="openBoardModal('{{ asset($member['image'] ?? 'images/user.png') }}', '{{ $member['name'] }}', '{{ $member['position'] }}')" --}}
+                                >
 
                             <h3 class="team-board-name">
                                 {{ $member['name'] }}
                             </h3>
 
-                            @isset($member['contact'])
+                            {{-- @isset($member['contact'])
                                 <p>{{ $member['contact'] }}</p>
-                            @endisset
+                            @endisset --}}
 
-                            <p class="team-board-position">
+                            {{-- <p class="team-board-position">
                                 {{ $member['position'] }}
-                            </p>
+                            </p> --}}
                         </div>
                     </div>
                 @endforeach
@@ -615,6 +655,21 @@
 
         </div>
     </section>
+
+    <!-- =========================
+     BOARD MEMBER PREVIEW MODAL
+========================== -->
+    <div id="boardModalOverlay" class="board-modal-overlay" onclick="closeBoardModal(event)">
+        <div class="board-modal-inner">
+            <div class="board-modal-content">
+                <img id="boardModalImage" src="" alt="" class="board-modal-image">
+
+                <button type="button" class="board-modal-close-btn" onclick="closeBoardModal(event)">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 
 
     <!-- =========================
@@ -734,5 +789,32 @@
         </div>
     </div>
 </section> --}}
+
+
+    <script>
+        function openBoardModal(imageSrc, name, position) {
+            document.getElementById('boardModalImage').src = imageSrc;
+            document.getElementById('boardModalImage').alt = name;
+            // document.getElementById('boardModalName').textContent = name;
+            // document.getElementById('boardModalPosition').textContent = position;
+            document.getElementById('boardModalOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeBoardModal(event) {
+            if (event.target.id === 'boardModalOverlay' || event.target.classList.contains('board-modal-close-btn')) {
+                document.getElementById('boardModalOverlay').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('boardModalOverlay').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
 
 </div>

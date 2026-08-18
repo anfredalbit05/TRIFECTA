@@ -501,7 +501,7 @@
 }
 
 .team-board-avatar {
-    @apply w-36 h-36 rounded-full object-cover mx-auto border-4 border-[#D4A017] shadow-sm;
+    @apply w-36 h-36 rounded-full object-cover mx-auto border-4 border-[#D4A017] shadow-sm transition-transform duration-300 hover:scale-105;
 }
 
 .team-board-name {
@@ -510,6 +510,46 @@
 
 .team-board-position {
     @apply mt-2 text-[#D4A017] font-semibold uppercase tracking-wide text-sm;
+}
+
+/* --- Board Member Preview Modal --- */
+
+.board-modal-overlay {
+    @apply fixed inset-0 z-[9999] hidden items-center justify-center bg-black/75 p-5;
+}
+
+.board-modal-overlay.active {
+    @apply flex;
+}
+
+.board-modal-inner {
+    @apply relative w-full max-w-md;
+}
+
+.board-modal-content {
+    @apply w-full rounded-3xl bg-white p-6 text-center shadow-2xl;
+    animation: boardModalFadeIn 0.2s ease;
+}
+
+@keyframes boardModalFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.board-modal-image {
+    @apply w-full max-h-[420px] object-contain rounded-2xl mb-5 border-4 border-[#D4A017];
+}
+
+.board-modal-close-btn {
+    @apply w-full py-3.5 rounded-full bg-[#0B2A5B] text-white font-bold shadow-lg hover:bg-blue-900 transition-colors duration-200;
+}
+
+.board-modal-name {
+    @apply text-xl font-bold text-[#0B2A5B];
+}
+
+.board-modal-position {
+    @apply mt-1 text-[#D4A017] font-semibold uppercase tracking-wide text-sm;
 }
 
 /* ===================================================
