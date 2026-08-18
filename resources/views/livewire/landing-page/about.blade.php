@@ -142,7 +142,7 @@
                         Business Name
                     </p>
                     <p class="mt-2 font-bold text-[#0B2A5B]">
-                        TRUELIFE DAYONGAN
+                        TRUELIFE
                     </p>
                 </div>
 
@@ -151,7 +151,7 @@
                         Registration No.
                     </p>
                     <p class="mt-2 font-bold text-[#0B2A5B]">
-                        8368575
+                        8404829
                     </p>
                 </div>
 
@@ -160,7 +160,7 @@
                         Valid Until
                     </p>
                     <p class="mt-2 font-bold text-[#0B2A5B]">
-                        July 22, 2031
+                        August 06, 2026 to August 06, 2031
                     </p>
                 </div>
 
@@ -177,7 +177,7 @@
             <!-- Download Button -->
             <div class="mt-8 flex justify-center">
                 <a
-                    href="{{ asset('images/dti-certificate.pdf') }}"
+                    href="{{ asset('images/dti-certificate.jpg') }}"
                     download
                     class="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-[#0B2A5B] hover:bg-[#123B78] text-white font-semibold shadow-lg transition">
 
