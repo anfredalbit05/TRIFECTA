@@ -41,6 +41,13 @@ class ActivationModal extends Component
     public string $upline_code = ''; // User-entered referral/upline code
     public string $reference_code = '';// GCash, Maya, or Bank transaction reference
 
+    // Display-only: pulled from settings when GCash/Bank is selected
+    public string $gcashName = '';
+    public string $gcashNumber = '';
+    public string $bankName = '';
+    public string $bankAccountName = '';
+    public string $bankAccountNumber = '';
+
     /*
     |--------------------------------------------------------------------------
     | Modal State Variables
@@ -117,6 +124,8 @@ class ActivationModal extends Component
             $this->upline_code = $activation->upline_code ?? '';
             $this->reference_code = $activation->payment_reference ?? '';
             $this->rejectionRemarks = $history?->remarks;
+
+            $this->loadPaymentDetails(); // <-- add this
         }
 
         $this->amount = $this->getMembershipFee();
@@ -216,8 +225,35 @@ class ActivationModal extends Component
             $this->reference_code = '';
         }
 
+        $this->loadPaymentDetails();
+
         $this->resetValidation('payment_method');
         $this->resetValidation('reference_code');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Load GCash / Bank Details from Settings
+    |--------------------------------------------------------------------------
+    */
+    private function loadPaymentDetails(): void
+    {
+        // reset first so switching methods doesn't leak old values
+        $this->gcashName = '';
+        $this->gcashNumber = '';
+        $this->bankName = '';
+        $this->bankAccountName = '';
+        $this->bankAccountNumber = '';
+
+        if ($this->payment_method === 'GCash') {
+            $this->gcashNumber = Setting::where('name', 'gcash_number1')->value('value') ?? '';
+            $this->gcashName = Setting::where('name', 'gcash_number1_name')->value('value') ?? '';
+
+        } elseif ($this->payment_method === 'Bank Transfer') {
+            $this->bankName = 'BPI'; // hardcoded since settings only has bpi_* keys right now
+            $this->bankAccountName = Setting::where('name', 'bpi_account_name')->value('value') ?? '';
+            $this->bankAccountNumber = Setting::where('name', 'bpi_account_number')->value('value') ?? '';
+        }
     }
 
     /*
@@ -234,6 +270,11 @@ class ActivationModal extends Component
             'reference_code',
             'activationData',
             'rejectionRemarks',
+            'gcashName',
+            'gcashNumber',
+            'bankName',
+            'bankAccountName',
+            'bankAccountNumber',
         ]);
 
         $this->isReactivation = false;

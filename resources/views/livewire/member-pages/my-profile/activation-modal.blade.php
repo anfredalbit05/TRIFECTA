@@ -13,7 +13,7 @@
                             Account Activation
                         </h2>
                         <p class="mt-0.5 text-[11px] sm:text-xs text-slate-500">
-                            True Life Solidaritas • Membership Activation
+                            TRUELIFE • Membership Activation
                         </p>
                         <div class="mt-3 flex items-center gap-2.5 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2">
                             <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0B2A5B] text-xs font-bold text-[#E8B923]">
@@ -33,7 +33,7 @@
                     <button
                         wire:click="closeModal"
                         type="button"
-                        class="absolute top-4 right-4 sm:relative sm:top-0 sm:right-0 w-9 h-9 shrink-0 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-rose-100 hover:text-rose-600 font-bold transition">
+                        class="absolute top-4 right-4 sm:relative sm:top-0 sm:right-0 w-9 h-9 shrink-0 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-rose-100 hover:text-rose-600 font-bold transition cursor-pointer">
                         ✕
                     </button>
                 </div>
@@ -230,6 +230,23 @@
                                     <p class="text-sm font-bold text-blue-800">Online Payment</p>
                                     <p class="mt-1 text-xs text-blue-700">Complete your payment first, then enter the transaction reference number below.</p>
                                 </div>
+
+                                {{-- GCASH DETAILS --}}
+                                @if($payment_method === 'GCash')
+                                    <div class="rounded-lg border border-blue-200 bg-white p-3 text-sm">
+                                        <p class="mb-1"><span class="font-bold text-slate-700">Send to (GCash Name):</span> {{ $gcashName }}</p>
+                                        <p><span class="font-bold text-slate-700">GCash Number:</span> {{ $gcashNumber }}</p>
+                                    </div>
+                                @endif
+
+                                {{-- BANK DETAILS --}}
+                                @if($payment_method === 'Bank Transfer')
+                                    <div class="rounded-lg border border-blue-200 bg-white p-3 text-sm">
+                                        <p class="mb-1"><span class="font-bold text-slate-700">Bank:</span> {{ $bankName }}</p>
+                                        <p class="mb-1"><span class="font-bold text-slate-700">Account Name:</span> {{ $bankAccountName }}</p>
+                                        <p><span class="font-bold text-slate-700">Account Number:</span> {{ $bankAccountNumber }}</p>
+                                    </div>
+                                @endif
 
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">
