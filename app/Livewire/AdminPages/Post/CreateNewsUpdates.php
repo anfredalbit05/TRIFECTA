@@ -20,6 +20,7 @@ class CreateNewsUpdates extends Component
     public $title = '';
     public $details = '';
     public $category = 'General';
+    public $status = 'Published';
     public $image = null;
     public $existingImage = null;
 
@@ -28,6 +29,7 @@ class CreateNewsUpdates extends Component
     public $postIdBeingEdited = null;
 
     public string $search = ''; // Added search property
+    public string $statusFilter = 'All';
 
     // Helper to check permissions dynamically
     protected function hasPermission($action)
@@ -96,8 +98,18 @@ class CreateNewsUpdates extends Component
         }
 
         $this->resetValidation();
-        $this->reset(['title', 'details', 'image', 'existingImage', 'postIdBeingEdited']);
+
+        $this->reset([
+            'title',
+            'details',
+            'image',
+            'existingImage',
+            'postIdBeingEdited',
+        ]);
+
         $this->category = 'General';
+        $this->status = 'Published';
+
         $this->showCreateModal = true;
     }
 
@@ -115,13 +127,14 @@ class CreateNewsUpdates extends Component
         $this->title = $news->title;
         $this->details = $news->details;
         $this->category = $news->category ?? 'General';
+        $this->status = $news->status ?? 'Published';
         $this->existingImage = $news->image;
         $this->image = null;
 
         $this->showCreateModal = true;
     }
 
-   public function savePost(): void
+    public function savePost(): void
     {
         // Check permissions based on whether it's an update or create
         if ($this->postIdBeingEdited && !$this->canUpdate) {
@@ -138,6 +151,7 @@ class CreateNewsUpdates extends Component
             'title'    => ['required', 'string', 'max:255'],
             'details'  => ['required', 'string'],
             'category' => ['required', 'string', 'max:100'],
+            'status'   => ['required', 'in:Published,Draft,Archived'],
             'image'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
@@ -165,6 +179,7 @@ class CreateNewsUpdates extends Component
                 'details'  => $this->details,
                 'image'    => $imagePath,
                 'category' => $this->category,
+                'status'    => $this->status,
             ]);
 
             $message = 'News update updated successfully.';
@@ -183,15 +198,23 @@ class CreateNewsUpdates extends Component
                 'details'  => $this->details,
                 'image'    => $imagePath,
                 'category' => $this->category,
-                'status'   => 'Published',
+                'status'   => $this->status,
                 'UserID'   => $user->UserID ?? null,
             ]);
 
             $message = 'News update published successfully.';
         }
 
-        $this->reset(['title', 'details', 'image', 'existingImage', 'postIdBeingEdited']);
+        $this->reset([
+            'title',
+            'details',
+            'image',
+            'existingImage',
+            'postIdBeingEdited',
+        ]);
+
         $this->category = 'General';
+        $this->status = 'Published';
         $this->showCreateModal = false;
 
         session()->flash('success', $message);
@@ -212,35 +235,40 @@ class CreateNewsUpdates extends Component
         $this->selectedPost = null;
     }
 
-   public function deletePost($id): void
-{
-    if (!$this->canDelete) {
-        return;
+    public function deletePost($id): void
+    {
+        if (!$this->canDelete) {
+            return;
+        }
+
+        $news = NewsUpdate::where('ID', $id)->first();
+
+        if (!$news) {
+            return;
+        }
+
+        // Delete the image using Laravel's Storage facade
+        if ($news->image && Storage::disk('public')->exists($news->image)) {
+            Storage::disk('public')->delete($news->image);
+        }
+
+        NewsUpdate::where('ID', $id)->delete();
+
+        if ($this->selectedPost && $this->selectedPost->ID == $id) {
+            $this->selectedPost = null;
+        }
+
+        $this->resetPage();
+
+        session()->flash('success', 'News update deleted successfully.');
     }
-
-    $news = NewsUpdate::where('ID', $id)->first();
-
-    if (!$news) {
-        return;
-    }
-
-    // Delete the image using Laravel's Storage facade
-    if ($news->image && Storage::disk('public')->exists($news->image)) {
-        Storage::disk('public')->delete($news->image);
-    }
-
-    NewsUpdate::where('ID', $id)->delete();
-
-    if ($this->selectedPost && $this->selectedPost->ID == $id) {
-        $this->selectedPost = null;
-    }
-
-    $this->resetPage();
-
-    session()->flash('success', 'News update deleted successfully.');
-}
 
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter(): void
     {
         $this->resetPage();
     }
@@ -248,15 +276,22 @@ class CreateNewsUpdates extends Component
     public function resetTable(): void
     {
         $this->search = '';
+        $this->statusFilter = 'All';
         $this->resetPage();
     }
 
     public function render()
     {
         $newsUpdates = NewsUpdate::with('user')
-            ->where('status', 'Published')
+            ->when(
+                $this->statusFilter !== 'All',
+                function ($query) {
+                    $query->where('status', $this->statusFilter);
+                }
+            )
             ->when(filled($this->search), function ($query) {
                 $search = trim($this->search);
+
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
                         ->orWhere('details', 'like', "%{$search}%")
