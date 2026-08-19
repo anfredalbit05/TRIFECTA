@@ -57,11 +57,15 @@ class Reports extends Component
         $this->dispatch('ranges-reset');
     }
 
-    public function render()
+    /**
+     * Shared query builder for both the paginated table and the print export,
+     * so both always reflect the same search + date filters.
+     */
+    protected function baseQuery()
     {
         [$dateFrom, $dateTo] = $this->parsedDateRange();
 
-        $ledgers = Ledger::query()
+        return Ledger::query()
             ->when(filled($this->search), function ($query) {
                 $search = trim($this->search);
                 $query->where(function ($q) use ($search) {
@@ -76,12 +80,28 @@ class Reports extends Component
                     Carbon::parse($dateFrom)->startOfDay(),
                     Carbon::parse($dateTo)->endOfDay(),
                 ]);
-            })
+            });
+    }
+
+    public function render()
+    {
+        [$dateFrom, $dateTo] = $this->parsedDateRange();
+
+        $ledgers = (clone $this->baseQuery())
             ->latest('TransactionID')
             ->paginate(10);
 
+        // Unpaginated set for the printable report, matching the same filters
+        $printLedgers = (clone $this->baseQuery())
+            ->latest('TransactionID')
+            ->get();
+
         return view('livewire.admin-pages.report-settings.reports', [
             'ledgers' => $ledgers,
+            'printLedgers' => $printLedgers,
+            'dateRangeLabel' => $dateFrom && $dateTo
+                ? Carbon::parse($dateFrom)->format('M d, Y').' — '.Carbon::parse($dateTo)->format('M d, Y')
+                : 'All Time',
         ]);
     }
 }

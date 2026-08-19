@@ -92,11 +92,15 @@ class UserAccounts extends Component
         $this->selectedUserLedgerID = null;
     }
 
-    public function render()
+    /**
+     * Shared filtered query so the paginated table and the print export
+     * always reflect identical search/role/status/date filters.
+     */
+    protected function baseQuery()
     {
         [$dateFrom, $dateTo] = $this->parsedDateRange();
 
-        $users = User::with(['role', 'wallets', 'ledgers'])
+        return User::with(['role', 'wallets', 'ledgers'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('firstname', 'like', '%' . $this->search . '%')
@@ -116,9 +120,21 @@ class UserAccounts extends Component
                     Carbon::parse($dateFrom)->startOfDay(),
                     Carbon::parse($dateTo)->endOfDay(),
                 ]);
-            })
+            });
+    }
+
+    public function render()
+    {
+        [$dateFrom, $dateTo] = $this->parsedDateRange();
+
+        $users = (clone $this->baseQuery())
             ->latest('UserID')
             ->paginate(10);
+
+        // Unpaginated set for the printable report, same filters as the table
+        $printUsers = (clone $this->baseQuery())
+            ->latest('UserID')
+            ->get();
 
         $selectedUser = $this->selectedUserLedgerID
             ? User::with(['wallets', 'ledgers'])->find($this->selectedUserLedgerID)
@@ -126,7 +142,11 @@ class UserAccounts extends Component
 
         return view('livewire.admin-pages.report-settings.users-accounts', [
             'users' => $users,
+            'printUsers' => $printUsers,
             'selectedUser' => $selectedUser,
+            'dateRangeLabel' => $dateFrom && $dateTo
+                ? Carbon::parse($dateFrom)->format('M d, Y').' — '.Carbon::parse($dateTo)->format('M d, Y')
+                : 'All Time',
         ]);
     }
 }

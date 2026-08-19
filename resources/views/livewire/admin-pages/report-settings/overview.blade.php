@@ -58,238 +58,388 @@
         @endforeach
     </div>
 
-   <!-- SECOND ROW: BREAKDOWN CARDS (3 COLUMNS) -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- SECOND ROW: BREAKDOWN CARDS (3 COLUMNS) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <!-- 1. MEMBERSHIP FEE COLLECTION BREAKDOWN -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
-        <div>
-            <div class="mb-4">
-                <h3 class="font-bold text-[#0C2C6B] text-lg mb-2">
-                    Membership Fee Breakdown
-                </h3>
-                <div wire:ignore x-data="{
-                    startDate: @entangle('membershipFeeStart'),
-                    endDate: @entangle('membershipFeeEnd'),
-                    picker: null,
-                    init() {
-                        this.picker = flatpickr(this.$refs.input, {
-                            mode: 'range',
-                            dateFormat: 'Y-m-d',
-                            altInput: true,
-                            altFormat: 'm/d/Y',
-                            defaultDate: [this.startDate, this.endDate],
-                            onChange: (selectedDates, dateStr, instance) => {
-                                if (selectedDates.length === 2) {
-                                    this.startDate = instance.formatDate(selectedDates[0], 'Y-m-d');
-                                    this.endDate = instance.formatDate(selectedDates[1], 'Y-m-d');
+        <!-- 1. MEMBERSHIP FEE COLLECTION BREAKDOWN -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
+            <div>
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-bold text-[#0C2C6B] text-lg">
+                            Membership Fee Breakdown
+                        </h3>
+                        <button onclick="printCard('membership-fee')" title="Print this section"
+                            class="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition text-xs cursor-pointer shrink-0">
+                            🖨️
+                        </button>
+                    </div>
+                    <div wire:ignore x-data="{
+                        startDate: @entangle('membershipFeeStart').live,
+                        endDate: @entangle('membershipFeeEnd').live,
+                        picker: null,
+                        init() {
+                            this.picker = flatpickr(this.$refs.input, {
+                                mode: 'range',
+                                dateFormat: 'Y-m-d',
+                                altInput: true,
+                                altFormat: 'm/d/Y',
+                                defaultDate: [this.startDate, this.endDate],
+                                onChange: (selectedDates, dateStr, instance) => {
+                                    if (selectedDates.length === 2) {
+                                        this.startDate = instance.formatDate(selectedDates[0], 'Y-m-d');
+                                        this.endDate = instance.formatDate(selectedDates[1], 'Y-m-d');
+                                    }
                                 }
+                            });
+
+                            this.$watch('startDate', () => this.$nextTick(() => this.updatePicker()));
+                            this.$watch('endDate', () => this.$nextTick(() => this.updatePicker()));
+
+                            window.addEventListener('ranges-reset', () => {
+                                this.$nextTick(() => this.updatePicker());
+                            });
+                        },
+                        updatePicker() {
+                            if (this.picker && this.startDate && this.endDate) {
+                                this.picker.setDate([this.startDate, this.endDate], false);
                             }
-                        });
-
-                        // Defer so both startDate and endDate have landed before reading them
-                        this.$watch('startDate', () => this.$nextTick(() => this.updatePicker()));
-                        this.$watch('endDate', () => this.$nextTick(() => this.updatePicker()));
-
-                        // Fallback: explicit resync fired by the server whenever the year changes
-                        window.addEventListener('ranges-reset', () => {
-                            this.$nextTick(() => this.updatePicker());
-                        });
-                    },
-                    updatePicker() {
-                        if (this.picker && this.startDate && this.endDate) {
-                            this.picker.setDate([this.startDate, this.endDate], false);
                         }
-                    }
-                }">
-                    <input type="text"
-                        x-ref="input"
-                        class="bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg px-3 py-1.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-[#0C2C6B] cursor-pointer w-full text-center"
-                        placeholder="Select date range">
+                    }">
+                        <input type="text"
+                            x-ref="input"
+                            class="bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg px-3 py-1.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-[#0C2C6B] cursor-pointer w-full text-center"
+                            placeholder="Select date range">
+                    </div>
+                </div>
+
+                <div class="divide-y divide-gray-100 max-h-[250px] overflow-y-auto pr-1">
+                    @forelse($membershipFeeCollections as $fee)
+                        <div class="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">
+                                    {{ $fee->FeeName }}
+                                </p>
+                                <p class="text-xs text-gray-400 mt-0.5">
+                                    Fee ID: {{ $fee->FeeID }}
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <span class="block font-bold text-sm text-green-600">
+                                    ₱{{ number_format($fee->Total_Collection, 2) }}
+                                </span>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-400 py-4 text-center">No membership fees found for this period.</p>
+                    @endforelse
                 </div>
             </div>
 
-            <div class="divide-y divide-gray-100 max-h-[250px] overflow-y-auto pr-1">
-                @forelse($membershipFeeCollections as $fee)
-                    <div class="flex items-center justify-between py-3 first:pt-0 last:pb-0">
-                        <div>
-                            <p class="font-semibold text-gray-800 text-sm">
-                                {{ $fee->FeeName }}
-                            </p>
-                            <p class="text-xs text-gray-400 mt-0.5">
-                                Fee ID: {{ $fee->FeeID }}
-                            </p>
-                        </div>
-                        <div class="text-right">
-                            <span class="block font-bold text-sm text-green-600">
-                                ₱{{ number_format($fee->Total_Collection, 2) }}
+            <!-- PRINT-ONLY TABLE -->
+            <div data-print-section="membership-fee" class="hidden">
+                <div class="text-center font-sans mb-4 pb-3 border-b-2 border-[#1b365d]">
+                    <h1 class="m-0 text-2xl font-bold text-[#1b365d] font-serif">TRUELIFE</h1>
+                    <p class="my-1 text-[11px] font-bold text-[#c5a059] uppercase tracking-wider">&mdash; S O L I D A R I T A S &mdash;</p>
+                    <h2 class="mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold">MEMBERSHIP FEE COLLECTION BREAKDOWN</h2>
+                    <p class="text-xs text-slate-600">
+                        Period: {{ $membershipFeeStartLabel }} &mdash; {{ $membershipFeeEndLabel }}
+                    </p>
+                </div>
+                <table class="w-full border-collapse font-sans text-[11px]">
+                    <thead>
+                        <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[24px]">
+                            <th class="border border-slate-900 p-1">#</th>
+                            <th class="border border-slate-900 p-1">Fee ID</th>
+                            <th class="border border-slate-900 p-1">Fee Name</th>
+                            <th class="border border-slate-900 p-1">Total Collection</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($membershipFeeCollections as $index => $fee)
+                            <tr>
+                                <td class="border border-slate-900 p-1 text-center">{{ $index + 1 }}</td>
+                                <td class="border border-slate-900 p-1 text-center">{{ $fee->FeeID }}</td>
+                                <td class="border border-slate-900 p-1">{{ $fee->FeeName }}</td>
+                                <td class="border border-slate-900 p-1 text-right">₱{{ number_format($fee->Total_Collection, 2) }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4" class="border border-slate-900 p-2 text-center">No data for the selected period.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2. COLLECTION SUMMARY BY SOURCE -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
+            <div>
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-bold text-[#0C2C6B] text-lg">
+                            Collection Summary by Source
+                        </h3>
+                        <button onclick="printCard('source')" title="Print this section"
+                            class="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition text-xs cursor-pointer shrink-0">
+                            🖨️
+                        </button>
+                    </div>
+                    <div wire:ignore x-data="{
+                        startDate: @entangle('sourceStart').live,
+                        endDate: @entangle('sourceEnd').live,
+                        picker: null,
+                        init() {
+                            this.picker = flatpickr(this.$refs.input, {
+                                mode: 'range',
+                                dateFormat: 'Y-m-d',
+                                altInput: true,
+                                altFormat: 'm/d/Y',
+                                defaultDate: [this.startDate, this.endDate],
+                                onChange: (selectedDates, dateStr, instance) => {
+                                    if (selectedDates.length === 2) {
+                                        this.startDate = instance.formatDate(selectedDates[0], 'Y-m-d');
+                                        this.endDate = instance.formatDate(selectedDates[1], 'Y-m-d');
+                                    }
+                                }
+                            });
+
+                            this.$watch('startDate', () => this.$nextTick(() => this.updatePicker()));
+                            this.$watch('endDate', () => this.$nextTick(() => this.updatePicker()));
+
+                            window.addEventListener('ranges-reset', () => {
+                                this.$nextTick(() => this.updatePicker());
+                            });
+                        },
+                        updatePicker() {
+                            if (this.picker && this.startDate && this.endDate) {
+                                this.picker.setDate([this.startDate, this.endDate], false);
+                            }
+                        }
+                    }">
+                        <input type="text"
+                            x-ref="input"
+                            class="bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg px-3 py-1.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-[#0C2C6B] cursor-pointer w-full text-center"
+                            placeholder="Select date range">
+                    </div>
+                </div>
+
+                <div class="divide-y divide-gray-100 max-h-[250px] overflow-y-auto pr-1">
+                    @forelse($incomeSources as $source)
+                        <div class="flex justify-between items-center py-2.5 text-sm">
+                            <div>
+                                <span class="font-semibold text-gray-800">{{ $source->Collection_Type }}</span>
+                                <span class="text-xs text-gray-400 ml-1">({{ $source->Source }})</span>
+                                <span class="text-xs text-gray-400 ml-1">({{ $source->count }} entries)</span>
+                            </div>
+                            <span class="font-bold text-[#0C2C6B] bg-blue-50 px-3 py-1 rounded-lg text-xs">
+                                ₱{{ number_format($source->Total_Collection, 2) }}
                             </span>
                         </div>
-                    </div>
-                @empty
-                    <p class="text-sm text-gray-400 py-4 text-center">No membership fees found for this period.</p>
-                @endforelse
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. COLLECTION SUMMARY BY SOURCE -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
-        <div>
-            <div class="mb-4">
-                <h3 class="font-bold text-[#0C2C6B] text-lg mb-2">
-                    Collection Summary by Source
-                </h3>
-                <div wire:ignore x-data="{
-                    startDate: @entangle('sourceStart'),
-                    endDate: @entangle('sourceEnd'),
-                    picker: null,
-                    init() {
-                        this.picker = flatpickr(this.$refs.input, {
-                            mode: 'range',
-                            dateFormat: 'Y-m-d',
-                            altInput: true,
-                            altFormat: 'm/d/Y',
-                            defaultDate: [this.startDate, this.endDate],
-                            onChange: (selectedDates, dateStr, instance) => {
-                                if (selectedDates.length === 2) {
-                                    this.startDate = instance.formatDate(selectedDates[0], 'Y-m-d');
-                                    this.endDate = instance.formatDate(selectedDates[1], 'Y-m-d');
-                                }
-                            }
-                        });
-
-                        // Defer so both startDate and endDate have landed before reading them
-                        this.$watch('startDate', () => this.$nextTick(() => this.updatePicker()));
-                        this.$watch('endDate', () => this.$nextTick(() => this.updatePicker()));
-
-                        // Fallback: explicit resync fired by the server whenever the year changes
-                        window.addEventListener('ranges-reset', () => {
-                            this.$nextTick(() => this.updatePicker());
-                        });
-                    },
-                    updatePicker() {
-                        if (this.picker && this.startDate && this.endDate) {
-                            this.picker.setDate([this.startDate, this.endDate], false);
-                        }
-                    }
-                }">
-                    <input type="text"
-                        x-ref="input"
-                        class="bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg px-3 py-1.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-[#0C2C6B] cursor-pointer w-full text-center"
-                        placeholder="Select date range">
+                    @empty
+                        <p class="text-sm text-gray-400 py-4 text-center">No collection summary available for this period.</p>
+                    @endforelse
                 </div>
             </div>
 
-            <div class="divide-y divide-gray-100 max-h-[250px] overflow-y-auto pr-1">
-                @forelse($incomeSources as $source)
-                    <div class="flex justify-between items-center py-2.5 text-sm">
-                        <div>
-                            <span class="font-semibold text-gray-800">{{ $source->Collection_Type }}</span>
-                            <span class="text-xs text-gray-400 ml-1">({{ $source->Source }})</span>
-                            <span class="text-xs text-gray-400 ml-1">({{ $source->count }} entries)</span>
-                        </div>
-                        <span class="font-bold text-[#0C2C6B] bg-blue-50 px-3 py-1 rounded-lg text-xs">
-                            ₱{{ number_format($source->Total_Collection, 2) }}
-                        </span>
-                    </div>
-                @empty
-                    <p class="text-sm text-gray-400 py-4 text-center">No collection summary available for this period.</p>
-                @endforelse
+            <!-- PRINT-ONLY TABLE -->
+            <div data-print-section="source" class="hidden">
+                <div class="text-center font-sans mb-4 pb-3 border-b-2 border-[#1b365d]">
+                    <h1 class="m-0 text-2xl font-bold text-[#1b365d] font-serif">TRUELIFE</h1>
+                    <p class="my-1 text-[11px] font-bold text-[#c5a059] uppercase tracking-wider">&mdash; S O L I D A R I T A S &mdash;</p>
+                    <h2 class="mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold">COLLECTION SUMMARY BY SOURCE</h2>
+                    <p class="text-xs text-slate-600">
+                        Period: {{ $sourceStartLabel }} &mdash; {{ $sourceEndLabel }}
+                    </p>
+                </div>
+                <table class="w-full border-collapse font-sans text-[11px]">
+                    <thead>
+                        <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[24px]">
+                            <th class="border border-slate-900 p-1">#</th>
+                            <th class="border border-slate-900 p-1">Collection Type</th>
+                            <th class="border border-slate-900 p-1">Source</th>
+                            <th class="border border-slate-900 p-1">Entries</th>
+                            <th class="border border-slate-900 p-1">Total Collection</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($incomeSources as $index => $source)
+                            <tr>
+                                <td class="border border-slate-900 p-1 text-center">{{ $index + 1 }}</td>
+                                <td class="border border-slate-900 p-1">{{ $source->Collection_Type }}</td>
+                                <td class="border border-slate-900 p-1 text-center">{{ $source->Source }}</td>
+                                <td class="border border-slate-900 p-1 text-center">{{ $source->count }}</td>
+                                <td class="border border-slate-900 p-1 text-right">₱{{ number_format($source->Total_Collection, 2) }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="5" class="border border-slate-900 p-2 text-center">No data for the selected period.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
 
-    <!-- 3. WALLET INCENTIVES BREAKDOWN -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
-        <div>
-            <div class="mb-4">
-                <h3 class="font-bold text-[#0C2C6B] text-lg mb-2">
-                    Wallet Incentives Breakdown
-                </h3>
-                <div wire:ignore x-data="{
-                    startDate: @entangle('walletStart'),
-                    endDate: @entangle('walletEnd'),
-                    picker: null,
-                    init() {
-                        this.picker = flatpickr(this.$refs.input, {
-                            mode: 'range',
-                            dateFormat: 'Y-m-d',
-                            altInput: true,
-                            altFormat: 'm/d/Y',
-                            defaultDate: [this.startDate, this.endDate],
-                            onChange: (selectedDates, dateStr, instance) => {
-                                if (selectedDates.length === 2) {
-                                    this.startDate = instance.formatDate(selectedDates[0], 'Y-m-d');
-                                    this.endDate = instance.formatDate(selectedDates[1], 'Y-m-d');
+        <!-- 3. WALLET INCENTIVES BREAKDOWN -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
+            <div>
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-bold text-[#0C2C6B] text-lg">
+                            Wallet Incentives Breakdown
+                        </h3>
+                        <button onclick="printCard('wallet')" title="Print this section"
+                            class="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition text-xs cursor-pointer shrink-0">
+                            🖨️
+                        </button>
+                    </div>
+                    <div wire:ignore x-data="{
+                        startDate: @entangle('walletStart').live,
+                        endDate: @entangle('walletEnd').live,
+                        picker: null,
+                        init() {
+                            this.picker = flatpickr(this.$refs.input, {
+                                mode: 'range',
+                                dateFormat: 'Y-m-d',
+                                altInput: true,
+                                altFormat: 'm/d/Y',
+                                defaultDate: [this.startDate, this.endDate],
+                                onChange: (selectedDates, dateStr, instance) => {
+                                    if (selectedDates.length === 2) {
+                                        this.startDate = instance.formatDate(selectedDates[0], 'Y-m-d');
+                                        this.endDate = instance.formatDate(selectedDates[1], 'Y-m-d');
+                                    }
                                 }
+                            });
+
+                            this.$watch('startDate', () => this.$nextTick(() => this.updatePicker()));
+                            this.$watch('endDate', () => this.$nextTick(() => this.updatePicker()));
+
+                            window.addEventListener('ranges-reset', () => {
+                                this.$nextTick(() => this.updatePicker());
+                            });
+                        },
+                        updatePicker() {
+                            if (this.picker && this.startDate && this.endDate) {
+                                this.picker.setDate([this.startDate, this.endDate], false);
                             }
-                        });
-
-                        // Defer so both startDate and endDate have landed before reading them
-                        this.$watch('startDate', () => this.$nextTick(() => this.updatePicker()));
-                        this.$watch('endDate', () => this.$nextTick(() => this.updatePicker()));
-
-                        // Fallback: explicit resync fired by the server whenever the year changes
-                        window.addEventListener('ranges-reset', () => {
-                            this.$nextTick(() => this.updatePicker());
-                        });
-                    },
-                    updatePicker() {
-                        if (this.picker && this.startDate && this.endDate) {
-                            this.picker.setDate([this.startDate, this.endDate], false);
                         }
-                    }
-                }">
-                    <input type="text"
-                        x-ref="input"
-                        class="bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg px-3 py-1.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-[#0C2C6B] cursor-pointer w-full text-center"
-                        placeholder="Select date range">
+                    }">
+                        <input type="text"
+                            x-ref="input"
+                            class="bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg px-3 py-1.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-[#0C2C6B] cursor-pointer w-full text-center"
+                            placeholder="Select date range">
+                    </div>
+                </div>
+
+                <div class="divide-y divide-gray-100 max-h-[250px] overflow-y-auto pr-1">
+                    @forelse($walletCollections as $item)
+                        <div class="flex items-center justify-between py-3 first:pt-0 last:pb-0 text-sm">
+                            <div>
+                                <p class="font-semibold text-gray-800">
+                                    {{ $item->Member_Name }}
+                                </p>
+                                <p class="text-xs text-gray-400 mt-0.5">
+                                    {{ $item->Incentive_Type }} ({{ $item->Source }})
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <span class="block font-bold text-sm text-green-600">
+                                    ₱{{ number_format($item->Total_Collection, 2) }}
+                                </span>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-400 py-4 text-center">No wallet incentives found for this period.</p>
+                    @endforelse
                 </div>
             </div>
 
-            <div class="divide-y divide-gray-100 max-h-[250px] overflow-y-auto pr-1">
-                @forelse($walletCollections as $item)
-                    <div class="flex items-center justify-between py-3 first:pt-0 last:pb-0 text-sm">
-                        <div>
-                            <p class="font-semibold text-gray-800">
-                                {{ $item->Member_Name }}
-                            </p>
-                            <p class="text-xs text-gray-400 mt-0.5">
-                                {{ $item->Incentive_Type }} ({{ $item->Source }})
-                            </p>
-                        </div>
-                        <div class="text-right">
-                            <span class="block font-bold text-sm text-green-600">
-                                ₱{{ number_format($item->Total_Collection, 2) }}
-                            </span>
-                        </div>
-                    </div>
-                @empty
-                    <p class="text-sm text-gray-400 py-4 text-center">No wallet incentives found for this period.</p>
-                @endforelse
+            <!-- PRINT-ONLY TABLE -->
+            <div data-print-section="wallet" class="hidden">
+                <div class="text-center font-sans mb-4 pb-3 border-b-2 border-[#1b365d]">
+                    <h1 class="m-0 text-2xl font-bold text-[#1b365d] font-serif">TRUELIFE</h1>
+                    <p class="my-1 text-[11px] font-bold text-[#c5a059] uppercase tracking-wider">&mdash; S O L I D A R I T A S &mdash;</p>
+                    <h2 class="mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold">WALLET INCENTIVES BREAKDOWN</h2>
+                    <p class="text-xs text-slate-600">
+                        Period: {{ $walletStartLabel }} &mdash; {{ $walletEndLabel }}
+                    </p>
+                </div>
+                <table class="w-full border-collapse font-sans text-[11px]">
+                    <thead>
+                        <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[24px]">
+                            <th class="border border-slate-900 p-1">#</th>
+                            <th class="border border-slate-900 p-1">Member Name</th>
+                            <th class="border border-slate-900 p-1">Incentive Type</th>
+                            <th class="border border-slate-900 p-1">Source</th>
+                            <th class="border border-slate-900 p-1">Total Collection</th>
+                            <th class="border border-slate-900 p-1">Member Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($walletCollections as $index => $item)
+                            <tr>
+                                <td class="border border-slate-900 p-1 text-center">{{ $index + 1 }}</td>
+                                <td class="border border-slate-900 p-1">{{ $item->Member_Name }}</td>
+                                <td class="border border-slate-900 p-1">{{ $item->Incentive_Type }}</td>
+                                <td class="border border-slate-900 p-1 text-center">{{ $item->Source }}</td>
+                                <td class="border border-slate-900 p-1 text-right">₱{{ number_format($item->Total_Collection, 2) }}</td>
+                                <td class="border border-slate-900 p-1 text-right">₱{{ number_format($item->User_Total, 2) }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="6" class="border border-slate-900 p-2 text-center">No data for the selected period.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CHARTS SECTION: MONTHLY INCOME -->
+    <div class="grid grid-cols-1 gap-6">
+        <div class="bg-white shadow-sm border border-gray-100 rounded-2xl p-6"
+             x-data="monthlyChart()"
+             @chart-data-updated.window="updateChart($event.detail)">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                <h3 class="font-bold text-[#0C2C6B] text-lg">
+                    Monthly Income Analytics (₱)
+                </h3>
+                <button onclick="printCard('monthly')" title="Print this section"
+                    class="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition text-xs cursor-pointer shrink-0 self-start sm:self-auto">
+                    🖨️
+                </button>
+            </div>
+
+            <div class="relative h-64 sm:h-80 w-full">
+                <canvas id="monthlyIncomeChart"></canvas>
+            </div>
+
+            <!-- PRINT-ONLY TABLE -->
+            <div data-print-section="monthly" class="hidden">
+                <div class="text-center font-sans mb-4 pb-3 border-b-2 border-[#1b365d]">
+                    <h1 class="m-0 text-2xl font-bold text-[#1b365d] font-serif">TRUELIFE</h1>
+                    <p class="my-1 text-[11px] font-bold text-[#c5a059] uppercase tracking-wider">&mdash; S O L I D A R I T A S &mdash;</p>
+                    <h2 class="mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold">MONTHLY INCOME ANALYTICS</h2>
+                    <p class="text-xs text-slate-600">Year: {{ $selectedYear }}</p>
+                </div>
+                <table class="w-full border-collapse font-sans text-[11px]">
+                    <thead>
+                        <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[24px]">
+                            <th class="border border-slate-900 p-1">Month</th>
+                            <th class="border border-slate-900 p-1">Total Income</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($monthlyIncome as $row)
+                            <tr>
+                                <td class="border border-slate-900 p-1 text-center">{{ $row['month'] }}</td>
+                                <td class="border border-slate-900 p-1 text-right">₱{{ number_format($row['total'], 2) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-
-</div>
-
-<!-- CHARTS SECTION: MONTHLY INCOME -->
-<div class="grid grid-cols-1 gap-6">
-    <div class="bg-white shadow-sm border border-gray-100 rounded-2xl p-6"
-         x-data="monthlyChart()"
-         @chart-data-updated.window="updateChart($event.detail)">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-            <h3 class="font-bold text-[#0C2C6B] text-lg">
-                Monthly Income Analytics (₱)
-            </h3>
-        </div>
-
-        <div class="relative h-64 sm:h-80 w-full">
-            <canvas id="monthlyIncomeChart"></canvas>
-        </div>
-    </div>
-</div>
 
 </div>
 
@@ -339,9 +489,55 @@
                 });
             },
             updateChart(detail) {
-                // detail.labels and detail.data match the named arguments from Livewire
                 this.renderChart(detail.labels, detail.data);
             }
         }));
     });
+
+    // ---- PER-CARD PRINT ----
+    function printCard(section) {
+        document.body.setAttribute('data-print-target', section);
+        window.print();
+    }
+    window.addEventListener('afterprint', () => {
+        document.body.removeAttribute('data-print-target');
+    });
 </script>
+
+<style>
+@media print {
+    @page { size: landscape; margin: 8mm; }
+
+    body[data-print-target] * { visibility: hidden !important; }
+
+    [data-print-section] { display: none !important; }
+
+    body[data-print-target="membership-fee"] [data-print-section="membership-fee"],
+    body[data-print-target="source"] [data-print-section="source"],
+    body[data-print-target="wallet"] [data-print-section="wallet"],
+    body[data-print-target="monthly"] [data-print-section="monthly"] {
+        display: block !important;
+        visibility: visible !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    body[data-print-target="membership-fee"] [data-print-section="membership-fee"] *,
+    body[data-print-target="source"] [data-print-section="source"] *,
+    body[data-print-target="wallet"] [data-print-section="wallet"] *,
+    body[data-print-target="monthly"] [data-print-section="monthly"] * {
+        visibility: visible !important;
+    }
+
+    table { border-collapse: collapse !important; width: 100%; }
+    th, td { border: 1px solid #000 !important; padding: 4px !important; }
+    th {
+        background-color: #0C2C6B !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
+</style>

@@ -227,6 +227,14 @@ class Overview extends Component
             'membershipFeeCollections' => $membershipFeeCollections,
             'incomeSources' => $incomeSources,
             'walletCollections' => $walletCollections,
+
+            // Formatted labels for the per-card print headers
+            'membershipFeeStartLabel' => Carbon::parse($this->membershipFeeStart)->format('M d, Y'),
+            'membershipFeeEndLabel' => Carbon::parse($this->membershipFeeEnd)->format('M d, Y'),
+            'sourceStartLabel' => Carbon::parse($this->sourceStart)->format('M d, Y'),
+            'sourceEndLabel' => Carbon::parse($this->sourceEnd)->format('M d, Y'),
+            'walletStartLabel' => Carbon::parse($this->walletStart)->format('M d, Y'),
+            'walletEndLabel' => Carbon::parse($this->walletEnd)->format('M d, Y'),
         ]);
     }
 }

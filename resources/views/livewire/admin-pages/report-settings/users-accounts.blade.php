@@ -33,7 +33,6 @@
         <!-- FILTERS & REFRESH CONTAINER -->
         <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
 
-
             <!-- DATE RANGE FILTER -->
             <div wire:ignore class="relative w-72">
                 <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none z-10">
@@ -53,13 +52,19 @@
                 <option value="Pending">Pending</option>
             </select>
 
-
             @if ($dateRange)
                 <button type="button" wire:click="clearDateFilter" title="Clear date filter"
                     class="inline-flex items-center px-3 py-2 text-sm text-slate-500 hover:text-red-500 hover:border-red-200 hover:bg-red-50 rounded-xl border border-slate-200 bg-white shadow-sm cursor-pointer transition">
                     ✕
                 </button>
             @endif
+
+            <!-- PRINT BUTTON (prints the full filtered table) -->
+            <button type="button" onclick="window.print()" title="Print Report"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
+                <span>🖨️</span>
+                <span class="hidden sm:inline">Print</span>
+            </button>
 
             <!-- REFRESH / CLEAR BUTTON -->
             <button wire:click="resetTable" wire:loading.attr="disabled" title="Refresh Table"
@@ -71,8 +76,8 @@
         </div>
     </div>
 
-    <!-- USERS TABLE -->
-    <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
+    <!-- USERS TABLE (screen only) -->
+    <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm print:hidden">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr
@@ -90,55 +95,45 @@
             <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
                 @forelse($users as $index => $user)
                     @php
-                        // Wallet Fund includes OV and DR sources
                         $walletFund = $user->wallets
                             ->where('status', 'Active')
                             ->whereIn('source', ['OV', 'DR'])
                             ->sum('amount');
-                        // Provident Fund includes PF source
                         $providentFund = $user->wallets
                             ->where('status', 'Active')
                             ->where('source', 'PF')
                             ->sum('amount');
-                        // Ledger Fund total amount
                         $ledgerFund = $user->ledgers->sum('amount');
                     @endphp
                     <tr class="hover:bg-slate-50 transition-colors">
-                        <!-- Index Column -->
                         <td class="py-4 px-4 font-medium text-slate-500">
                             {{ $users->firstItem() + $index }}
                         </td>
 
-                        <!-- Name & Email -->
                         <td class="py-4 px-4">
                             <div class="font-semibold text-slate-900">
                                 {{ trim(($user->firstname ?? '') . ' ' . ($user->lastname ?? '')) ?: 'Unnamed User' }}
                             </div>
                         </td>
 
-                        <!-- Role & Referral Code -->
                         <td class="py-4 px-4">
                             <span class="font-medium text-slate-700 block">
                                 {{ $user->role->rolename ?? 'Member' }}
                             </span>
                         </td>
 
-                        <!-- Wallet Fund (OV & DR) -->
                         <td class="py-4 px-4 font-bold text-emerald-600">
                             ₱{{ number_format($walletFund, 2) }}
                         </td>
 
-                        <!-- Provident Fund (PF) -->
                         <td class="py-4 px-4 font-bold text-purple-600">
                             ₱{{ number_format($providentFund, 2) }}
                         </td>
 
-                        <!-- Ledger Fund -->
                         <td class="py-4 px-4 font-bold text-indigo-600">
                             ₱{{ number_format($ledgerFund, 2) }}
                         </td>
 
-                        <!-- Status Badge -->
                         <td class="py-4 px-4">
                             @php
                                 $statusClasses = match ($user->status) {
@@ -153,7 +148,6 @@
                             </span>
                         </td>
 
-                        <!-- Actions -->
                         <td class="py-4 px-4 text-right">
                             <button wire:click="viewLedger({{ $user->UserID }})" title="View Financials"
                                 class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-slate-600 text-white hover:bg-slate-700 transition cursor-pointer text-xs font-semibold shadow">
@@ -207,10 +201,74 @@
         @endif
     </div>
 
+    <!-- PRINTABLE FULL-TABLE REPORT (hidden on screen, shown only when printing) -->
+    <div id="printable-users" class="hidden print:block font-sans">
+        <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#1b365d]">
+            <h1 class="m-0 text-2xl font-bold text-[#1b365d] font-serif">TRUE LIFE DAYONGAN</h1>
+            <p class="my-1 text-[11px] font-bold text-[#c5a059] uppercase tracking-wider">&mdash; S O L I D A R I T A S &mdash;</p>
+            <h2 class="mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold">USER ACCOUNTS & FINANCIAL OVERVIEW</h2>
+            <p class="text-xs text-slate-600">
+                Period: {{ $dateRangeLabel }}
+                @if($statusFilter)
+                    &nbsp;|&nbsp; Status: {{ $statusFilter }}
+                @endif
+                @if($search)
+                    &nbsp;|&nbsp; Search: "{{ $search }}"
+                @endif
+            </p>
+        </div>
+
+        <table class="w-full border-collapse font-sans text-[10px]">
+            <thead>
+                <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[22px]">
+                    <th class="border border-slate-900 p-1">#</th>
+                    <th class="border border-slate-900 p-1">Name</th>
+                    <th class="border border-slate-900 p-1">Role</th>
+                    <th class="border border-slate-900 p-1">Wallet Fund</th>
+                    <th class="border border-slate-900 p-1">Provident Fund</th>
+                    <th class="border border-slate-900 p-1">Ledger Fund</th>
+                    <th class="border border-slate-900 p-1">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($printUsers as $index => $user)
+                    @php
+                        $pWalletFund = $user->wallets
+                            ->where('status', 'Active')
+                            ->whereIn('source', ['OV', 'DR'])
+                            ->sum('amount');
+                        $pProvidentFund = $user->wallets
+                            ->where('status', 'Active')
+                            ->where('source', 'PF')
+                            ->sum('amount');
+                        $pLedgerFund = $user->ledgers->sum('amount');
+                    @endphp
+                    <tr>
+                        <td class="border border-slate-900 p-1 text-center">{{ $index + 1 }}</td>
+                        <td class="border border-slate-900 p-1 font-bold">
+                            {{ trim(($user->firstname ?? '') . ' ' . ($user->lastname ?? '')) ?: 'Unnamed User' }}
+                        </td>
+                        <td class="border border-slate-900 p-1 text-center">{{ $user->role->rolename ?? 'Member' }}</td>
+                        <td class="border border-slate-900 p-1 text-right">₱{{ number_format($pWalletFund, 2) }}</td>
+                        <td class="border border-slate-900 p-1 text-right">₱{{ number_format($pProvidentFund, 2) }}</td>
+                        <td class="border border-slate-900 p-1 text-right">₱{{ number_format($pLedgerFund, 2) }}</td>
+                        <td class="border border-slate-900 p-1 text-center">{{ $user->status }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="border border-slate-900 p-2.5 text-center">
+                            No user accounts found for the selected filters.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
     <!-- VIEW FINANCIALS / LEDGER MODAL -->
     @if ($isLedgerModalOpen && $selectedUser)
         <div
-            class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm overflow-y-auto">
+            class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm overflow-y-auto print:hidden">
             <div class="w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl my-8">
 
                 <!-- MODAL HEADER -->
@@ -223,10 +281,16 @@
                         <p class="text-xs text-blue-100">Reviewing wallets, provident funds, and individual ledger
                             records.</p>
                     </div>
-                    <button wire:click="closeLedgerModal"
-                        class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition hover:bg-white/30 text-white font-bold cursor-pointer">
-                        ✕
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="printUserFinancials()" title="Print this user's financial overview"
+                            class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition hover:bg-white/30 text-white cursor-pointer text-sm">
+                            🖨️
+                        </button>
+                        <button wire:click="closeLedgerModal"
+                            class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition hover:bg-white/30 text-white font-bold cursor-pointer">
+                            ✕
+                        </button>
+                    </div>
                 </div>
 
                 <!-- MODAL BODY -->
@@ -353,7 +417,142 @@
 
             </div>
         </div>
+
+        <!-- PRINTABLE SINGLE-USER FINANCIAL REPORT -->
+        <div id="printable-user-financials" class="hidden font-sans">
+            <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#1b365d]">
+                <h1 class="m-0 text-2xl font-bold text-[#1b365d] font-serif">TRUE LIFE DAYONGAN</h1>
+                <p class="my-1 text-[11px] font-bold text-[#c5a059] uppercase tracking-wider">&mdash; S O L I D A R I T A S &mdash;</p>
+                <h2 class="mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold">USER FINANCIAL OVERVIEW</h2>
+                <p class="text-xs text-slate-600">
+                    {{ trim(($selectedUser->firstname ?? '') . ' ' . ($selectedUser->lastname ?? '')) }}
+                    &nbsp;|&nbsp; {{ $selectedUser->email }}
+                    &nbsp;|&nbsp; Status: {{ $selectedUser->status }}
+                </p>
+            </div>
+
+            <h3 class="text-xs font-bold uppercase text-slate-700 mb-1">Wallets & Provident Funds</h3>
+            <table class="w-full border-collapse font-sans text-[10px] mb-4">
+                <thead>
+                    <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[22px]">
+                        <th class="border border-slate-900 p-1">Wallet ID</th>
+                        <th class="border border-slate-900 p-1">Source Type</th>
+                        <th class="border border-slate-900 p-1">Amount</th>
+                        <th class="border border-slate-900 p-1">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($selectedUser->wallets as $wallet)
+                        <tr>
+                            <td class="border border-slate-900 p-1 text-center">{{ $wallet->WalletID ?? $wallet->id }}</td>
+                            <td class="border border-slate-900 p-1 text-center">{{ $wallet->source }}</td>
+                            <td class="border border-slate-900 p-1 text-right">₱{{ number_format($wallet->amount, 2) }}</td>
+                            <td class="border border-slate-900 p-1 text-center">{{ $wallet->status }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="4" class="border border-slate-900 p-2 text-center">No records found.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+
+            <h3 class="text-xs font-bold uppercase text-slate-700 mb-1">Ledger Entries</h3>
+            <table class="w-full border-collapse font-sans text-[10px]">
+                <thead>
+                    <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[22px]">
+                        <th class="border border-slate-900 p-1">ID</th>
+                        <th class="border border-slate-900 p-1">Ref ID</th>
+                        <th class="border border-slate-900 p-1">Source</th>
+                        <th class="border border-slate-900 p-1">Amount</th>
+                        <th class="border border-slate-900 p-1">Status</th>
+                        <th class="border border-slate-900 p-1">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($selectedUser->ledgers as $ledger)
+                        <tr>
+                            <td class="border border-slate-900 p-1 text-center">{{ $ledger->TransactionID }}</td>
+                            <td class="border border-slate-900 p-1 text-center">{{ $ledger->RefID }}</td>
+                            <td class="border border-slate-900 p-1 text-center">{{ $ledger->Source }}</td>
+                            <td class="border border-slate-900 p-1 text-right">₱{{ number_format($ledger->amount ?? 0, 2) }}</td>
+                            <td class="border border-slate-900 p-1 text-center">{{ $ledger->status }}</td>
+                            <td class="border border-slate-900 p-1 text-center">{{ $ledger->created_at?->format('M d, Y h:i A') }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="6" class="border border-slate-900 p-2 text-center">No ledger entries found.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     @endif
+
+    <style>
+        @media print {
+            @page {
+                size: landscape;
+                margin: 8mm;
+            }
+
+            /* Default state (no button clicked): hide everything except the full table */
+            body:not([data-print-target]) * {
+                visibility: hidden !important;
+            }
+            body:not([data-print-target]) #printable-users,
+            body:not([data-print-target]) #printable-users * {
+                visibility: visible !important;
+            }
+            body:not([data-print-target]) #printable-users {
+                display: block !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+            }
+
+            /* Single-user print target: hide everything except that user's report */
+            body[data-print-target="user-financials"] * {
+                visibility: hidden !important;
+            }
+            body[data-print-target="user-financials"] #printable-user-financials,
+            body[data-print-target="user-financials"] #printable-user-financials * {
+                visibility: visible !important;
+            }
+            body[data-print-target="user-financials"] #printable-user-financials {
+                display: block !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+            }
+
+            table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+            }
+
+            th,
+            td {
+                border: 1px solid #000 !important;
+                padding: 4px !important;
+            }
+
+            th {
+                background-color: #0C2C6B !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+
+    <script>
+        function printUserFinancials() {
+            document.body.setAttribute('data-print-target', 'user-financials');
+            window.print();
+        }
+        window.addEventListener('afterprint', () => {
+            document.body.removeAttribute('data-print-target');
+        });
+    </script>
 
     @script
 <script>

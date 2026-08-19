@@ -11,52 +11,62 @@
         View and monitor system financial ledger entries.
     </p>
 
-   <!-- SEARCH INPUT, DATE FILTER & REFRESH BUTTON CONTAINER -->
-<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-    <!-- SEARCH INPUT -->
-    <div class="relative max-w-sm w-full sm:w-auto flex-1">
-        <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
-            🔍
-        </span>
-        <input type="text" wire:model.live="search" placeholder="Search ledgers..."
-            class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
-    </div>
-
-    <!-- FILTERS AND REFRESH GROUP -->
-    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-
-        <!-- DATE RANGE FILTER -->
-        <div wire:ignore class="relative w-72">
-            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none z-10">
-                📅
+    <!-- SEARCH INPUT, DATE FILTER & REFRESH BUTTON CONTAINER -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <!-- SEARCH INPUT -->
+        <div class="relative max-w-sm w-full sm:w-auto flex-1">
+            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
+                🔍
             </span>
-            <input type="text" id="ledgerDateRange" readonly
-                class="date-range-input pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white text-slate-700 shadow-sm cursor-pointer w-full text-center font-medium"
-                placeholder="Select date range">
+            <input type="text" wire:model.live="search" placeholder="Search ledgers..."
+                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
         </div>
 
-        @if ($dateRange)
-            <button type="button" wire:click="clearDateFilter" title="Clear date filter"
-                class="inline-flex items-center px-3 py-2 text-sm text-slate-500 hover:text-red-500 hover:border-red-200 hover:bg-red-50 rounded-xl border border-slate-200 bg-white shadow-sm cursor-pointer transition">
-                ✕
+        <!-- FILTERS AND REFRESH GROUP -->
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+
+            <!-- DATE RANGE FILTER -->
+            <div wire:ignore class="relative w-72">
+                <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none z-10">
+                    📅
+                </span>
+                <input type="text" id="ledgerDateRange" readonly
+                    class="date-range-input pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white text-slate-700 shadow-sm cursor-pointer w-full text-center font-medium"
+                    placeholder="Select date range">
+            </div>
+
+            @if ($dateRange)
+                <button type="button" wire:click="clearDateFilter" title="Clear date filter"
+                    class="inline-flex items-center px-3 py-2 text-sm text-slate-500 hover:text-red-500 hover:border-red-200 hover:bg-red-50 rounded-xl border border-slate-200 bg-white shadow-sm cursor-pointer transition">
+                    ✕
+                </button>
+            @endif
+
+             <!-- PRINT BUTTON -->
+            <button type="button" onclick="window.print()" title="Print Report"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
+                <span>🖨️</span>
+                <span class="hidden sm:inline">Print</span>
             </button>
-        @endif
 
-        <!-- REFRESH BUTTON -->
-        <button wire:click="resetTable" wire:loading.attr="disabled" title="Refresh Table"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
-            <span wire:loading.remove wire:target="resetTable">🔄</span>
-            <span wire:loading wire:target="resetTable" class="animate-spin">⏳</span>
-            <span class="hidden sm:inline">Refresh</span>
-        </button>
+            <!-- REFRESH BUTTON -->
+            <button wire:click="resetTable" wire:loading.attr="disabled" title="Refresh Table"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
+                <span wire:loading.remove wire:target="resetTable">🔄</span>
+                <span wire:loading wire:target="resetTable" class="animate-spin">⏳</span>
+                <span class="hidden sm:inline">Refresh</span>
+            </button>
+
+
+        </div>
     </div>
-</div>
 
-    <!-- LEDGERS TABLE -->
-    <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
+    <!-- LEDGERS TABLE (screen only) -->
+    <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm print:hidden">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
+                <tr
+                    class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">Source</th>
                     <th class="py-3 px-4">Activation ID</th>
@@ -74,7 +84,8 @@
                         </td>
 
                         <td class="py-4 px-4 font-semibold text-slate-900">
-                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-[#0C2C6B]/10 text-[#0C2C6B] border border-[#0C2C6B]/30">
+                            <span
+                                class="px-2.5 py-1 text-xs font-semibold rounded-full bg-[#0C2C6B]/10 text-[#0C2C6B] border border-[#0C2C6B]/30">
                                 {{ $ledger->Source }}
                             </span>
                         </td>
@@ -87,12 +98,14 @@
                             {{ $ledger->RefID ?? 'N/A' }}
                         </td>
 
-                        <td class="py-4 px-4 font-semibold {{ $ledger->amount < 0 ? 'text-[#D79B10]' : 'text-emerald-600' }}">
+                        <td
+                            class="py-4 px-4 font-semibold {{ $ledger->amount < 0 ? 'text-[#D79B10]' : 'text-emerald-600' }}">
                             {{ number_format($ledger->amount, 2) }}
                         </td>
 
                         <td class="py-4 px-4">
-                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full
+                            <span
+                                class="px-2.5 py-1 text-xs font-semibold rounded-full
                                 {{ $ledger->status === 'Completed' ? 'bg-[#0C2C6B]/10 text-[#0C2C6B] border border-[#0C2C6B]/30' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
                                 {{ $ledger->status }}
                             </span>
@@ -148,39 +161,133 @@
         @endif
     </div>
 
-    @script
-<script>
-    const dateInput = $wire.$el.querySelector('#ledgerDateRange');
+    <!-- PRINTABLE REPORT (hidden on screen, visible only when printing) -->
+    <div id="printable-ledgers" class="hidden print:block font-sans">
+        <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#1b365d]">
+            <h1 class="m-0 text-2xl font-bold text-[#1b365d] font-serif">TRUE LIFE DAYONGAN</h1>
+            <p class="my-1 text-[11px] font-bold text-[#c5a059] uppercase tracking-wider">&mdash; S O L I D A R I T A S
+                &mdash;</p>
+            <h2 class="mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold">LEDGER REPORT</h2>
+            <p class="text-xs text-slate-600">
+                Period: {{ $dateRangeLabel }}
+                @if ($search)
+                    &nbsp;|&nbsp; Search: "{{ $search }}"
+                @endif
+            </p>
+        </div>
 
-    const picker = flatpickr(dateInput, {
-        mode: 'range',
-        dateFormat: 'Y-m-d',
-        altInput: true,
-        altFormat: 'M d, Y',
-        maxDate: 'today',
-        defaultDate: @js($dateRange ? explode(' to ', $dateRange) : []),
-        onChange: (selectedDates, dateStr, instance) => {
-            if (selectedDates.length === 2) {
-                const start = instance.formatDate(selectedDates[0], 'Y-m-d');
-                const end = instance.formatDate(selectedDates[1], 'Y-m-d');
-                $wire.set('dateRange', `${start} to ${end}`);
-            } else if (selectedDates.length === 0) {
-                $wire.set('dateRange', '');
+        <table class="w-full border-collapse font-sans text-[10px]">
+            <thead>
+                <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[22px]">
+                    <th class="border border-slate-900 p-1">#</th>
+                    <th class="border border-slate-900 p-1">Source</th>
+                    <th class="border border-slate-900 p-1">Activation ID</th>
+                    <th class="border border-slate-900 p-1">Ref ID</th>
+                    <th class="border border-slate-900 p-1">Amount</th>
+                    <th class="border border-slate-900 p-1">Status</th>
+                    <th class="border border-slate-900 p-1">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($printLedgers as $index => $ledger)
+                    <tr>
+                        <td class="border border-slate-900 p-1 text-center">{{ $index + 1 }}</td>
+                        <td class="border border-slate-900 p-1 text-center font-bold">{{ $ledger->Source }}</td>
+                        <td class="border border-slate-900 p-1 text-center">{{ $ledger->ActivationID ?? 'N/A' }}</td>
+                        <td class="border border-slate-900 p-1 text-center">{{ $ledger->RefID ?? 'N/A' }}</td>
+                        <td class="border border-slate-900 p-1 text-right">{{ number_format($ledger->amount, 2) }}</td>
+                        <td class="border border-slate-900 p-1 text-center">{{ $ledger->status }}</td>
+                        <td class="border border-slate-900 p-1 text-center">
+                            {{ $ledger->created_at?->format('M d, Y h:i A') }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="border border-slate-900 p-2.5 text-center">
+                            No ledger entries found for the selected filters.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <style>
+        @media print {
+            @page {
+                size: landscape;
+                margin: 8mm;
             }
-        },
-        onClose: (selectedDates, dateStr, instance) => {
-            if (selectedDates.length === 1) {
-                const day = instance.formatDate(selectedDates[0], 'Y-m-d');
-                instance.setDate([selectedDates[0], selectedDates[0]], false);
-                $wire.set('dateRange', `${day} to ${day}`);
+
+            body * {
+                visibility: hidden !important;
+            }
+
+            #printable-ledgers,
+            #printable-ledgers * {
+                visibility: visible !important;
+            }
+
+            #printable-ledgers {
+                display: block !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+            }
+
+            table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+            }
+
+            th,
+            td {
+                border: 1px solid #000 !important;
+                padding: 4px !important;
+            }
+
+            th {
+                background-color: #0C2C6B !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
         }
-    });
+    </style>
 
-    $wire.on('ranges-reset', () => {
-        picker.clear();
-    });
-</script>
-@endscript
+    @script
+        <script>
+            const dateInput = $wire.$el.querySelector('#ledgerDateRange');
+
+            const picker = flatpickr(dateInput, {
+                mode: 'range',
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: 'M d, Y',
+                maxDate: 'today',
+                defaultDate: @js($dateRange ? explode(' to ', $dateRange) : []),
+                onChange: (selectedDates, dateStr, instance) => {
+                    if (selectedDates.length === 2) {
+                        const start = instance.formatDate(selectedDates[0], 'Y-m-d');
+                        const end = instance.formatDate(selectedDates[1], 'Y-m-d');
+                        $wire.set('dateRange', `${start} to ${end}`);
+                    } else if (selectedDates.length === 0) {
+                        $wire.set('dateRange', '');
+                    }
+                },
+                onClose: (selectedDates, dateStr, instance) => {
+                    if (selectedDates.length === 1) {
+                        const day = instance.formatDate(selectedDates[0], 'Y-m-d');
+                        instance.setDate([selectedDates[0], selectedDates[0]], false);
+                        $wire.set('dateRange', `${day} to ${day}`);
+                    }
+                }
+            });
+
+            $wire.on('ranges-reset', () => {
+                picker.clear();
+            });
+        </script>
+    @endscript
 
 </div>
