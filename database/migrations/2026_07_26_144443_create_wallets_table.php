@@ -24,9 +24,14 @@ return new class extends Migration
 
             $table->enum('source', [
                 'DR', // Direct Referral
-                'OV',
-                'PF', // Overrides
+                'OV', // Overrides
+                'PF', // Provident Fund
+                'WD', // Withdrawal
             ])->nullable();
+
+            $table->boolean('isWithdrawable')
+                ->default(true)
+                ->after('source');
 
             $table->foreignId('ActivationID')
                 ->nullable()

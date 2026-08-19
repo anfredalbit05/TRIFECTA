@@ -26,8 +26,9 @@ return new class extends Migration
                 'OV', // Overrides
                 'CL', // Claim
                 'RF', // Refund
+                'PF', // Provident Fund
+                'WT', // Withdrawal
                 'OT', // Others
-                'PF',
             ])->default('OT');
 
 
