@@ -36,6 +36,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
     ->withMiddleware(function (Middleware $middleware): void {
 
+        // Redirect unauthenticated / expired-session users to the home route
+        // instead of Laravel's default route('login') (which doesn't exist here).
         $middleware->redirectGuestsTo(fn () => route('home'));
 
         $middleware->trustProxies(
@@ -46,6 +48,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 | Request::HEADER_X_FORWARDED_PROTO
         );
 
+        // Register your middleware alias here
+        $middleware->alias([
+            'maintenance' => CheckMaintenanceMode::class,
+        ]);
 
     })
 
@@ -54,23 +60,23 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
 
-
-
+        // Safety net: if a guest/expired session ever triggers a route-not-found
+        // (e.g. a stale route('login') reference) or an auth exception slips through,
+        // send them to home instead of showing an error page.
         $exceptions->render(function (
-            \Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e,
+            \Symfony\Component\HttpKernel\Exception\NotFoundHttpException|
+            \Symfony\Component\Routing\Exception\RouteNotFoundException|
+            \Illuminate\Auth\AuthenticationException $e,
             Request $request
         ) {
             if (!$request->expectsJson()) {
+                \Illuminate\Support\Facades\Log::info('Redirected to home after caught exception: ' . get_class($e), [
+                    'message' => $e->getMessage(),
+                    'url' => $request->fullUrl(),
+                ]);
+
                 return redirect()->route('home');
             }
         });
-    })
-
-
-        ->withMiddleware(function (Middleware $middleware) {
-        // Register your middleware alias here
-        $middleware->alias([
-            'maintenance' => CheckMaintenanceMode::class,
-        ]);
     })
     ->create();
