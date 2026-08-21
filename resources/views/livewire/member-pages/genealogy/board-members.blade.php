@@ -14,10 +14,10 @@
 
             <!-- LEVEL 0: CEO (TOP NODE) -->
             <div class="board-level">
-                <div class="board-card board-card--ceo">
-                    <img src="{{ asset('images/user.png') }}" alt="CEO Name" class="board-avatar board-avatar--lg board-avatar--purple">
+                <div class="board-card board-card--ceo" style="border-top-color: #0C2C6B; border-color: #0C2C6B;">
+                    <img src="{{ asset('images/user.png') }}" alt="CEO Name" class="board-avatar board-avatar--lg">
                     <h3 class="board-name">Renante Suaybaguio Robles, MPA, LFA</h3>
-                    <span class="board-role-badge board-role-badge--purple">Chief Executive Officer</span>
+                    <span class="board-role-badge" style="background-color: rgba(12, 44, 107, 0.1); color: #0C2C6B;">Chief Executive Officer</span>
                 </div>
                 <!-- Connector down to officers -->
                 <div class="board-connector"></div>
@@ -25,10 +25,10 @@
 
             <!-- LEVEL 0-1: COO (TOP NODE) -->
             <div class="board-level">
-                <div class="board-card board-card--ceo">
-                    <img src="{{ asset('images/user.png') }}" alt="COO Name" class="board-avatar board-avatar--lg board-avatar--purple">
+                <div class="board-card board-card--ceo" style="border-top-color: #0C2C6B; border-color: #0C2C6B;">
+                    <img src="{{ asset('images/user.png') }}" alt="COO Name" class="board-avatar board-avatar--lg">
                     <h3 class="board-name">Bobby Paulo Dagala</h3>
-                    <span class="board-role-badge board-role-badge--purple">Chief Operating Officer</span>
+                    <span class="board-role-badge" style="background-color: rgba(12, 44, 107, 0.1); color: #0C2C6B;">Chief Operating Officer</span>
                 </div>
                 <!-- Connector down to board members -->
                 <div class="board-connector"></div>

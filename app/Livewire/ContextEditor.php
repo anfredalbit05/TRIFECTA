@@ -33,8 +33,8 @@ class ContextEditor extends Component
     public function save()
     {
         abort_unless(
-            Auth::check() &&
-            Auth::user()->RoleID == 1,
+            Auth::check() && 
+            in_array(Auth::user()->RoleID, [1, 2]),
             403
         );
 
