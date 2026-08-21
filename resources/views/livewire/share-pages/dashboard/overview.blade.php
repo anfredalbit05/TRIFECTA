@@ -26,7 +26,7 @@
                 <span class="wallet-label">Cash Wallet</span>
                 <h2 class="wallet-value">₱{{ number_format($totalAmount, 2) }}</h2>
                 <!-- Withdraw button triggers the modal -->
-                <button type="button" @click="showWithdrawModal = true" class="wallet-btn-withdraw cursor-pointer">Withdraw Cash Wallets</button>
+                {{-- <button type="button" @click="showWithdrawModal = true" class="wallet-btn-withdraw cursor-pointer">Withdraw Cash Wallets</button> --}}
             </div>
 
             <hr>
