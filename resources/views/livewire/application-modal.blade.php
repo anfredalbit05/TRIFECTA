@@ -123,7 +123,7 @@
                                 selectedYear: '2000',
                                 selectedMonth: '01',
                                 selectedDay: '01',
-                                years: Array.from({ length: 80 }, (_, i) => 2026 - i),
+                                years: Array.from({ length: 100 }, (_, i) => 2026 - i),
                                 months: [
                                     { name: 'January', val: '01' }, { name: 'February', val: '02' }, { name: 'March', val: '03' },
                                     { name: 'April', val: '04' }, { name: 'May', val: '05' }, { name: 'June', val: '06' },
@@ -385,7 +385,7 @@
                                             selectedMonth: '01',
                                             selectedDay: '01',
 
-                                            years: Array.from({ length: 90 }, (_, i) => 2026 - i),
+                                            years: Array.from({ length: 100 }, (_, i) => 2026 - i),
 
                                             months: [
                                                 { name: 'January', val: '01' },
