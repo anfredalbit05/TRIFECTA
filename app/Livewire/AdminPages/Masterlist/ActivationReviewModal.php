@@ -2,32 +2,39 @@
 
 namespace App\Livewire\AdminPages\Masterlist;
 
+use App\Mail\ActivationApprovedMail;
+use App\Mail\ActivationRejectedMail;
+use App\Mail\InviteeApprovedMail;
 use App\Models\Activation;
+use App\Models\ActivationHistory;
 use App\Models\Beneficiary;
-use App\Models\User;
-use App\Models\Wallet;
 use App\Models\Ledger;
 use App\Models\MembershipFee;
+use App\Models\User;
+use App\Models\Wallet;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use App\Models\ActivationHistory;
-use Illuminate\Support\Facades\Auth;
-use App\Mail\ActivationRejectedMail;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\InviteeApprovedMail;
-use App\Mail\ActivationApprovedMail;
 
 class ActivationReviewModal extends Component
 {
     public bool $open = false;
+
     public ?int $selectedUserID = null;
+
     public ?User $member = null;
+
     public ?Activation $activation = null;
+
     public ?User $referralUser = null;
+
     public array $beneficiaries = [];
+
     public string $remarks = '';
+
     public bool $isRejecting = false;
 
     /*
@@ -89,6 +96,7 @@ class ActivationReviewModal extends Component
     |--------------------------------------------------------------------------
     */
 
+    /*
     public function approve(): void
     {
         if (!$this->activation || !$this->selectedUserID) {
@@ -137,11 +145,11 @@ class ActivationReviewModal extends Component
 
             $activatedUser = User::find($this->selectedUserID);
 
-            /*
-            |--------------------------------------------------------------------------
-            | Record Membership Fees (MF) breakdown into Ledger for the Activated User
-            |--------------------------------------------------------------------------
-            */
+
+            // |--------------------------------------------------------------------------
+            // | Record Membership Fees (MF) breakdown into Ledger for the Activated User
+            // |--------------------------------------------------------------------------
+
             $membershipFees = MembershipFee::all();
 
             foreach ($membershipFees as $fee) {
@@ -156,11 +164,11 @@ class ActivationReviewModal extends Component
                 Log::info("Membership Fee ledger entry [{$fee->FeeName}] written with RefID: {$fee->FeeID} and amount: {$fee->Cost}");
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Add PF (50.00) to the Direct Upline / Referral User Wallet & Ledger
-            |--------------------------------------------------------------------------
-            */
+
+            // |--------------------------------------------------------------------------
+            // | Add PF (50.00) to the Direct Upline / Referral User Wallet & Ledger
+            // |--------------------------------------------------------------------------
+
             if ($this->referralUser) {
                 Wallet::create([
                     'UserID'       => $this->referralUser->UserID,
@@ -181,11 +189,11 @@ class ActivationReviewModal extends Component
                 Log::info("PF entry (50.00) written for referral UserID: {$this->referralUser->UserID}");
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Multi-Tier Referral Commission Structure with Dynamic Sponsoring Count
-            |--------------------------------------------------------------------------
-            */
+
+            // |--------------------------------------------------------------------------
+            // | Multi-Tier Referral Commission Structure with Dynamic Sponsoring Count
+            // |--------------------------------------------------------------------------
+
             $currentUplineCode = $this->activation->upline_code;
             $level = 1;
             $maxLevels = 6;
@@ -315,6 +323,198 @@ class ActivationReviewModal extends Component
         $this->dispatch('swal:success', title: 'Success!', message: 'Activation approved successfully.');
         $this->closeModal();
     }
+    */
+
+    public function approve(): void
+    {
+        // 1. Guard Clauses (Check missing properties & prevent double-approval)
+        if (! $this->activation || ! $this->selectedUserID) {
+            Log::warning('Approval failed: Activation or selected user ID is missing.');
+
+            return;
+        }
+
+        if ($this->activation->status === 'Approved') {
+            Log::warning('Approval aborted: Activation is already approved.', [
+                'activation_id' => $this->activation->ActivationID,
+            ]);
+
+            return;
+        }
+
+        $activatedUser = null;
+
+        // 2. Atomic Database Operations (Database Changes Only)
+        DB::transaction(function () use (&$activatedUser) {
+
+            Log::info('Starting approval transaction for ActivationID: '.$this->activation->ActivationID);
+
+            // Update Activation Status
+            $this->activation->update([
+                'status' => 'Approved',
+            ]);
+
+            // Build Admin Name for Log History
+            $admin = Auth::user();
+            $adminName = trim(implode(' ', array_filter([
+                $admin->firstname ?? '',
+                $admin->middlename ?? '',
+                $admin->lastname ?? '',
+            ])));
+
+            // Log Approval History
+            ActivationHistory::create([
+                'ActivationID' => $this->activation->ActivationID,
+                'AdminID' => Auth::id(),
+                'status' => 'Approved',
+                'remarks' => "Activation approved by {$adminName}.",
+            ]);
+
+            // Activate User Account
+            User::where('UserID', $this->selectedUserID)->update([
+                'status' => 'Active',
+            ]);
+
+            $activatedUser = User::find($this->selectedUserID);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Membership Fees (MF) Ledger Breakdown
+            |--------------------------------------------------------------------------
+            */
+            $membershipFees = MembershipFee::all();
+
+            foreach ($membershipFees as $fee) {
+                Ledger::create([
+                    'RefID' => $fee->FeeID,
+                    'amount' => $fee->Cost,
+                    'Source' => 'MF',
+                    'ActivationID' => $this->activation->ActivationID,
+                    'status' => 'Completed',
+                ]);
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Provident Fund (PF: 50.00) to Direct Recruiter / Upline
+            |--------------------------------------------------------------------------
+            */
+            if ($this->referralUser) {
+                Wallet::create([
+                    'UserID' => $this->referralUser->UserID,
+                    'ActivationID' => $this->activation->ActivationID,
+                    'amount' => 50.00,
+                    'source' => 'PF',
+                    'status' => 'Active',
+                ]);
+
+                Ledger::create([
+                    'RefID' => $this->referralUser->UserID,
+                    'amount' => -50.00,
+                    'Source' => 'PF',
+                    'ActivationID' => $this->activation->ActivationID,
+                    'status' => 'Completed',
+                ]);
+
+                Log::info("PF entry (50.00) written for referral UserID: {$this->referralUser->UserID}");
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Multi-Tier Commission Hierarchy (Strictly Matched to Diagram Flow)
+            |--------------------------------------------------------------------------
+            | Level 1: Direct Referral (400)
+            | Level 2: 1st Level Override (50)
+            | Level 3: 2nd Level Override (40)
+            | Level 4: 3rd Level Override (30)
+            | Level 5: 4th Level Override (20)
+            | Level 6: 5th Level Override (10)
+            |--------------------------------------------------------------------------
+            */
+            $drFee = MembershipFee::where('FeeName', 'Direct Referral')->value('Cost') ?? 400.00;
+
+            $levelCommissionRates = [
+                1 => (float) $drFee, // Level 1 - Direct Referral
+                2 => 50.00,          // Level 2 - 1st Level Override
+                3 => 40.00,          // Level 3 - 2nd Level Override
+                4 => 30.00,          // Level 4 - 3rd Level Override
+                5 => 20.00,          // Level 5 - 4th Level Override
+                6 => 10.00,          // Level 6 - 5th Level Override
+            ];
+
+            $currentUplineCode = $this->activation->upline_code;
+            $level = 1;
+            $maxLevels = 6;
+
+            while ($currentUplineCode && $level <= $maxLevels) {
+                $uplineUser = User::where('referralCode', $currentUplineCode)->first();
+
+                if (! $uplineUser) {
+                    Log::warning("Upline user not found for code: {$currentUplineCode} at Level {$level}");
+                    break;
+                }
+
+                $sourceType = ($level === 1) ? 'DR' : 'OV';
+                $commissionAmount = $levelCommissionRates[$level] ?? 0.00;
+
+                if ($commissionAmount > 0) {
+                    Wallet::create([
+                        'UserID' => $uplineUser->UserID,
+                        'ActivationID' => $this->activation->ActivationID,
+                        'amount' => $commissionAmount,
+                        'source' => $sourceType,
+                        'status' => 'Active',
+                    ]);
+
+                    Ledger::create([
+                        'RefID' => $uplineUser->UserID,
+                        'amount' => -$commissionAmount,
+                        'Source' => $sourceType,
+                        'ActivationID' => $this->activation->ActivationID,
+                        'status' => 'Completed',
+                    ]);
+
+                    Log::info("Commission written for UserID: {$uplineUser->UserID} at Level {$level} [{$sourceType}]: {$commissionAmount}");
+                }
+
+                // Traverse up to next upline level
+                $currentUplineCode = $uplineUser->uplineCode ?? null;
+                $level++;
+            }
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Send Emails OUTSIDE Database Transaction (Prevents SMTP Latency Delays)
+        |--------------------------------------------------------------------------
+        */
+        // Send email to the newly activated user
+        if ($activatedUser && filled($activatedUser->email)) {
+            try {
+                $totalAmount = (float) MembershipFee::sum('Cost');
+
+                Mail::to($activatedUser->email)
+                    ->send(new ActivationApprovedMail($activatedUser, $this->activation, $totalAmount));
+            } catch (\Throwable $e) {
+                Log::error('Failed to send approval email to user.', ['error' => $e->getMessage()]);
+            }
+        }
+
+        // Send email to direct recruiter/upline
+        if ($this->referralUser && filled($this->referralUser->email)) {
+            try {
+                Mail::to($this->referralUser->email)
+                    ->send(new InviteeApprovedMail($this->referralUser, $activatedUser, $this->activation));
+            } catch (\Throwable $e) {
+                Log::error('Failed to send approval email to upline.', ['error' => $e->getMessage()]);
+            }
+        }
+
+        // 4. UI Events
+        $this->dispatch('members-refresh');
+        $this->dispatch('swal:success', title: 'Success!', message: 'Activation approved successfully.');
+        $this->closeModal();
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -354,7 +554,7 @@ class ActivationReviewModal extends Component
                 ->latest()
                 ->first();
 
-            if (!$activation) {
+            if (! $activation) {
                 return;
             }
 
