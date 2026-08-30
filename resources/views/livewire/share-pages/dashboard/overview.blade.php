@@ -1,4 +1,61 @@
-<div class="dashboard-grid flex flex-col lg:flex-row" x-data="{ showWithdrawModal: false }">
+<div
+    class="dashboard-grid flex flex-col lg:flex-row"
+    x-data="{
+        showWithdrawModal: false,
+        balance: {{ (float) $totalAmount }},
+        minimumWithdrawalAmount: {{ (float) $minimumWithdrawalAmount }},
+        withdrawAmount: @entangle('withdrawAmount').live,
+
+        get amount() {
+            let value = parseFloat(this.withdrawAmount);
+            return isNaN(value) ? 0 : value;
+        },
+
+        get remainingBalance() {
+            return Math.max(0, this.balance - this.amount);
+        },
+
+        get isBelowMinimum() {
+            return this.withdrawAmount !== ''
+                && this.amount > 0
+                && this.amount < this.minimumWithdrawalAmount;
+        },
+
+        get exceedsBalance() {
+            return this.amount > this.balance;
+        },
+
+        formatMoney(value) {
+            return new Intl.NumberFormat('en-PH', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        },
+
+        sanitizeAmount() {
+            let value = this.withdrawAmount ?? '';
+
+            // Remove everything except numbers and decimal point
+            value = value.replace(/[^0-9.]/g, '');
+
+            // Allow only one decimal point
+            let parts = value.split('.');
+
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+
+            // Limit to 2 decimal places
+            if (value.includes('.')) {
+                let decimalParts = value.split('.');
+                value = decimalParts[0] + '.' + decimalParts[1].slice(0, 2);
+            }
+
+            this.withdrawAmount = value;
+        }
+    }"
+    x-on:open-withdraw-modal.window="showWithdrawModal = true"
+    x-on:close-withdraw-modal.window="showWithdrawModal = false">
 
     <!-- RIGHT COLUMN (REFRESH HEADER + STICKY WALLET) -->
     <!-- order-1 makes this appear FIRST (at the top) on mobile -->
@@ -26,7 +83,29 @@
                 <span class="wallet-label">Cash Wallet</span>
                 <h2 class="wallet-value">₱{{ number_format($totalAmount, 2) }}</h2>
                 <!-- Withdraw button triggers the modal -->
-                {{-- <button type="button" @click="showWithdrawModal = true" class="wallet-btn-withdraw cursor-pointer">Withdraw Cash Wallets</button> --}}
+                @if ($isWithdrawalActive)
+
+                <button
+                    type="button"
+                    wire:click="checkPendingWithdrawal"
+                    class="wallet-btn-withdraw cursor-pointer"
+                >
+                    Withdraw Cash Wallets
+                </button>
+
+            @else
+
+                <div
+                    class="w-full px-4 py-2.5 rounded-lg
+                        bg-gray-100 border border-gray-200
+                        text-gray-500 text-sm font-semibold
+                        mt-2
+                        text-center cursor-not-allowed"
+                >
+                    🔒 Withdrawals are currently unavailable
+                </div>
+
+            @endif
             </div>
 
             <hr>
@@ -136,62 +215,152 @@
 
     </div>
 
-    <!-- WITHDRAWAL MODAL -->
-    <div x-show="showWithdrawModal"
-         style="display: none;"
-         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-         x-transition.opacity>
+   <x-withdrawal-modal
+    :total-amount="$totalAmount"
+    :minimum-withdrawal-amount="$minimumWithdrawalAmount"
+/>
 
-        <div @click.away="showWithdrawModal = false" class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-gray-100">
-            <!-- Modal Header -->
-            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-slate-50">
-                <h3 class="font-bold text-gray-800 text-lg">Cash Wallet Withdrawal</h3>
-                <button @click="showWithdrawModal = false" class="text-gray-400 hover:text-gray-600 font-bold text-xl cursor-pointer">&times;</button>
-            </div>
+    <script>
+        document.addEventListener('livewire:init', () => {
 
-            <!-- Modal Body -->
-            <div class="p-6 space-y-4">
-                <!-- Available Balance Highlight Box -->
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between">
-                    <div>
-                        <span class="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Available Cash Wallet</span>
-                        <span class="text-lg font-bold text-[#0C2C6B]">₱{{ number_format($totalAmount, 2) }}</span>
+            Livewire.on('pending-withdrawal', (event) => {
+                const data = event[0] ?? event;
+
+                let details = `
+                    <div style="text-align: left; line-height: 1.8;">
+                        <p>
+                            <strong>Amount:</strong>
+                            ₱${data.amount}
+                        </p>
+
+                        <p>
+                            <strong>Method:</strong>
+                            ${data.method}
+                        </p>
+                `;
+
+                // Show online account details only
+                if (data.method !== 'Cash') {
+                    details += `
+                        <p>
+                            <strong>Account Name:</strong>
+                            ${data.accountName}
+                        </p>
+
+                        <p>
+                            <strong>Account Number:</strong>
+                            ${data.accountNumber}
+                        </p>
+
+                        <p>
+                            <strong>Reference:</strong>
+                            ${data.reference}
+                        </p>
+                    `;
+                }
+
+                details += `
+                        <p>
+                            <strong>Submitted:</strong>
+                            ${data.date}
+                        </p>
+
+                        <hr style="margin: 12px 0;">
+
+                        <p style="color: #dc2626;">
+                            You cannot submit another withdrawal until this
+                            request has been processed.
+                        </p>
                     </div>
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-900 text-base font-bold">
-                        💳
-                    </div>
-                </div>
+                `;
 
-                <!-- Schedule Info Box -->
-                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-900 space-y-2">
-                    <div class="font-bold flex items-center gap-1.5 text-blue-950 text-sm">
-                        <span>ℹ️</span> Payout Schedule &amp; Cut-off Rules
-                    </div>
-                    <p>• <strong>Monday 12:00 AM to Friday 5:59 PM:</strong> Requests processed and released on the upcoming Monday.</p>
-                    <p>• <strong>Friday 6:00 PM to Sunday 11:59 PM:</strong> Requests processed and released on the following Monday (1 week interval).</p>
-                </div>
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'You Have a Pending Withdrawal',
+                    html: details,
+                    confirmButtonText: 'Okay'
+                });
+            });
 
-                <!-- Amount Input -->
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-semibold text-gray-700">Enter Withdrawal Amount</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">₱</span>
-                        <input type="number" placeholder="0.00" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm font-semibold" />
-                    </div>
-                    <p class="text-[11px] text-gray-500">Minimum withdrawal amount is <strong>₱500.00</strong></p>
-                </div>
-            </div>
 
-            <!-- Modal Footer -->
-            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50">
-                <button @click="showWithdrawModal = false" type="button" class="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-100 text-xs font-semibold rounded-xl transition cursor-pointer">
-                    Cancel
-                </button>
-                <button type="button" class="px-4 py-2 bg-[#0C2C6B] hover:bg-[#09204f] text-white text-xs font-semibold rounded-xl shadow-sm transition cursor-pointer">
-                    Submit Request
-                </button>
-            </div>
-        </div>
-    </div>
+            // SUCCESS ALERT
+            Livewire.on('withdrawal-submitted', (event) => {
+                const data = event[0] ?? event;
+
+                // Close modal
+                window.dispatchEvent(
+                    new CustomEvent('close-withdraw-modal')
+                );
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Withdrawal Submitted!',
+                    html: `
+                        <div style="line-height: 1.7;">
+                            <p>
+                                Your withdrawal request has been submitted successfully.
+                            </p>
+
+                            <p>
+                                <strong>Amount:</strong>
+                                ₱${data.amount}
+                            </p>
+
+                            <p style="font-size: 13px; color: #64748b;">
+                                Your request is now pending for processing.
+                            </p>
+                        </div>
+                    `,
+                    confirmButtonText: 'Okay',
+                    confirmButtonColor: '#0C2C6B'
+                });
+            });
+
+
+            // ERROR ALERT
+            Livewire.on('withdrawal-error', (event) => {
+                const data = event[0] ?? event;
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Withdrawal Failed',
+                    text: data.message ?? 'Something went wrong.'
+                });
+            });
+
+        });
+
+
+        // CONFIRM WITHDRAWAL
+        window.confirmWithdrawal = function () {
+
+            Swal.fire({
+                icon: 'question',
+                title: 'Confirm Withdrawal?',
+                text: 'Are you sure you want to submit this withdrawal request?',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Submit Request',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#0C2C6B',
+                cancelButtonColor: '#6b7280',
+                reverseButtons: true,
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    // Only submit if user clicks YES
+                    @this.call('submitWithdrawal');
+
+                }
+
+                // If user clicks Cancel, do nothing.
+                // SweetAlert closes but withdrawal modal remains open.
+            });
+        };
+    </script>
 
 </div>
+
+

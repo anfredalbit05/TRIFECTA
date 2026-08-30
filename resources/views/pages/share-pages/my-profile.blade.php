@@ -53,9 +53,9 @@
                 </a>
 
                 {{-- @if(auth()->user()->RoleID == 4) --}}
-                    <a href="#" @click.prevent="tab = 'activity'" :class="tab === 'activity' ? 'active' : ''">
+                    {{-- <a href="#" @click.prevent="tab = 'activity'" :class="tab === 'activity' ? 'active' : ''">
                         Activity
-                    </a>
+                    </a> --}}
 
                     <a href="#" @click.prevent="tab = 'certificate'" :class="tab === 'certificate' ? 'active' : ''">
                         Certificate

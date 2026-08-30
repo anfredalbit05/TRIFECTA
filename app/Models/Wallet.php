@@ -11,6 +11,7 @@ class Wallet extends Model
     protected $fillable = [
         'UserID',
         'ActivationID',
+        'withdrawID',
         'amount',
         'source', // <--- ADD THIS LINE HERE
         'status',

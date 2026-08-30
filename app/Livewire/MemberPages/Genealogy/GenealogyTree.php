@@ -10,88 +10,168 @@ use Livewire\Component;
 class GenealogyTree extends Component
 {
     public int $rootUserId;
-    public string $activeTab = 'invitee';
 
+    public string $activeTab = 'invitee';
+    public string $viewMode = 'generation'; // Default view mode
+
+
+    /**
+     * Initialize genealogy root.
+     */
     public function mount(?int $userId = null)
     {
         $this->rootUserId = $userId ?? Auth::id();
     }
 
+    public function setViewMode(string $mode)
+    {
+        if (in_array($mode, ['generation', 'tree'])) {
+            $this->viewMode = $mode;
+        }
+    }
+
+    /**
+     * Change active tab.
+     */
     public function setTab(string $tab)
     {
         $this->activeTab = $tab;
     }
 
-    public function buildTree($userId, int $depth = 1, int $maxDepth = 3, array $ancestors = []): ?array
-    {
-        // Prevent infinite loops and exceeding max depth
-        if ($depth > $maxDepth || in_array($userId, $ancestors)) {
+
+    /**
+     * Build the complete genealogy tree recursively.
+     */
+    public function buildTree(
+        int $userId,
+        array $ancestors = [],
+        int $level = 1
+    ): ?array {
+
+        /**
+         * Prevent circular / infinite loops.
+         */
+        if (in_array($userId, $ancestors, true)) {
             return null;
         }
 
+
+        /**
+         * Get current user.
+         */
         $user = User::find($userId);
 
         if (!$user || empty($user->referralCode)) {
             return null;
         }
 
-        // Add current user to tracking array to prevent circular references
+
+        /**
+         * Add current user to visited ancestors.
+         */
         $ancestors[] = $user->UserID;
 
+
+        /**
+         * Store child nodes.
+         */
         $children = [];
 
-        // Fetch all downlines whose upline_code matches this user's referral code
+
+        /**
+         * Get all direct downlines.
+         */
         $downlines = Activation::query()
             ->where('upline_code', $user->referralCode)
             ->whereIn('status', ['Approved', 'Pending'])
             ->with('user')
             ->get();
 
+
+        /**
+         * Build each child's subtree.
+         */
         foreach ($downlines as $activation) {
+
             $childUser = $activation->user;
 
-            if (!$childUser || in_array($childUser->UserID, $ancestors)) {
+            if (!$childUser) {
                 continue;
             }
 
-            // Recursively build the subtree for each downline user
+
             $subTree = $this->buildTree(
                 $childUser->UserID,
-                $depth + 1,
-                $maxDepth,
-                $ancestors
+                $ancestors,
+                $level + 1
             );
+
 
             if ($subTree) {
                 $children[] = $subTree;
             }
         }
 
+
+        /**
+         * Return genealogy node.
+         */
         return [
             'id' => $user->UserID,
-            'name' => trim($user->firstname . ' ' . $user->lastname),
+
+            'name' => trim(
+                $user->firstname . ' ' . $user->lastname
+            ),
+
             'referral_code' => $user->referralCode,
+
             'status' => $user->status,
+
+            // Generation level
+            'level' => $level,
+
+            // Number of direct downlines
+            'direct_count' => count($children),
+
+            // Child nodes
             'downlines' => $children,
         ];
     }
 
-    public function focusUser($userId)
+
+    /**
+     * Focus / explore a specific member's genealogy.
+     */
+    public function focusUser(int $userId)
     {
         $this->rootUserId = $userId;
     }
 
+
+    /**
+     * Render component.
+     */
     public function render()
     {
-        // You can adjust maxDepth here (e.g., 3 or 5 levels deep)
-        $treeData = $this->buildTree($this->rootUserId, 1, 3);
+        $treeData = $this->buildTree(
+            $this->rootUserId
+        );
+
 
         if ($this->activeTab === 'board-member') {
-            return view('livewire.member-pages.genealogy.board-members');
+
+            return view(
+                'livewire.member-pages.genealogy.board-members'
+            );
+
         }
 
-        return view('livewire.member-pages.genealogy.invitee', [
-            'tree' => $treeData,
-        ]);
+
+        return view(
+            'livewire.member-pages.genealogy.invitee',
+            [
+                'tree' => $treeData,
+            ]
+        );
     }
 }

@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use App\Models\Ledger;
+use App\Models\Withdrawal;
+use Illuminate\Support\Facades\DB;
 
 class NewsUpdates extends Component
 {
@@ -18,6 +21,8 @@ class NewsUpdates extends Component
     public $details = '';
     public $category = 'General';
     public $image = null;
+
+    public $withdrawAmount = '';
 
     public function refreshDashboard(): void
     {
@@ -121,4 +126,6 @@ class NewsUpdates extends Component
             'totalEarnings' => $totalEarnings,
         ]);
     }
+
+
 }

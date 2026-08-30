@@ -29,6 +29,9 @@ class Members extends Component
 
     protected $paginationTheme = 'tailwind';
 
+    public bool $isWithdrawalModalOpen = false;
+    public ?int $selectedWithdrawalUserId = null;
+
     public function mount()
     {
         // Sets the default filter display to the current year
@@ -116,6 +119,14 @@ class Members extends Component
 
         $members = User::query()
             ->where('RoleID', 4)
+            ->withExists([
+                'activations as has_pending_activation' => function ($query) {
+                    $query->where('status', 'Pending');
+                },
+                'withdrawals as has_pending_withdrawal' => function ($query) {
+                    $query->where('status', 'Pending');
+                }
+            ])
             ->withExists([
                 'activations as has_pending_activation' => function ($query) {
                     $query->where('status', 'Pending');
@@ -333,6 +344,22 @@ class Members extends Component
         // You can optionally target or just refresh the component:
         $this->skipRender = false;
     }
+
+    public function openWithdrawalApproval($id): void
+{
+    if (!$this->canUpdate) {
+        return;
+    }
+
+    $member = User::find($id);
+
+    if (!$member) {
+        return;
+    }
+
+    // Dispatch an event to open your withdrawal approval modal (or handle it directly)
+    $this->dispatch('open-withdrawal-modal', UserID: $member->UserID);
+}
 
     /*
     |--------------------------------------------------------------------------

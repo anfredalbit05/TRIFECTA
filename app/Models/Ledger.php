@@ -16,6 +16,7 @@ class Ledger extends Model
 
     protected $fillable = [
         'RefID',
+        'WithdrawID',
         'amount',
         'Source',
         'ActivationID', // <--- Add this line

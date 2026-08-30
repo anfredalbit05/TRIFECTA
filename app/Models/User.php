@@ -227,4 +227,9 @@ public function directDownlines(): HasManyThrough
         'ActivationID'  // Local key on activations table
     );
 }
+
+public function withdrawals()
+{
+    return $this->hasMany(Withdrawal::class, 'UserID', 'UserID');
+}
 }

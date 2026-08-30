@@ -1,6 +1,8 @@
 <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
 
-    <!-- HEADER -->
+    {{-- =====================================================
+         HEADER
+    ===================================================== --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
             <h2 class="text-2xl font-bold text-slate-800">All Users</h2>
@@ -18,14 +20,30 @@
         @endif
     </div>
 
-    <!-- FLASH MESSAGE -->
+    {{-- =====================================================
+         FLASH MESSAGES
+    ===================================================== --}}
     @if (session()->has('message'))
         <div class="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-xl border border-green-200">
             {{ session('message') }}
         </div>
     @endif
 
-    <!-- SEARCH INPUT & REFRESH BUTTON -->
+    @if (session()->has('success'))
+        <div class="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-xl border border-green-200">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session()->has('error'))
+        <div class="mb-4 p-4 text-sm text-rose-700 bg-rose-100 rounded-xl border border-rose-200">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    {{-- =====================================================
+         SEARCH + REFRESH
+    ===================================================== --}}
     <div class="flex items-center justify-between gap-4 mb-6">
         <div class="relative max-w-sm w-full">
             <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">🔍</span>
@@ -41,7 +59,9 @@
         </button>
     </div>
 
-    <!-- TABLE -->
+    {{-- =====================================================
+         USERS TABLE
+    ===================================================== --}}
     <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
         <table class="w-full text-left border-collapse">
             <thead>
@@ -130,6 +150,36 @@
                                             </svg>
                                         </button>
                                     @endif
+
+                                    {{-- WITHDRAWAL ACTION --}}
+                                    @if ($user->has_pending_withdrawal)
+                                        {{-- Pending Withdrawal --}}
+                                        @if ($this->canUpdate)
+                                            <button type="button"
+                                                wire:click="openWithdrawalApproval({{ $user->UserID }})"
+                                                title="Approve Withdrawal Request"
+                                                class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow">
+                                                Pending
+                                            </button>
+                                        @endif
+                                    @elseif ($user->has_approved_withdrawal)
+                                        {{-- Approved = Released. No further action needed. --}}
+                                        <span
+                                            title="Withdrawal Released"
+                                            class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+                                            Released
+                                        </span>
+                                    @else
+                                        {{-- No Withdrawal --}}
+                                        @if ($this->canCreate)
+                                            <button type="button"
+                                                wire:click="openWithdrawalModal({{ $user->UserID }})"
+                                                title="Withdraw"
+                                                class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
+                                                Withdraw
+                                            </button>
+                                        @endif
+                                    @endif
                                 </div>
                             </td>
                         @endif
@@ -141,11 +191,11 @@
                 @endforelse
             </tbody>
         </table>
-        <!-- PAGINATION -->
+
+        {{-- PAGINATION --}}
         @if ($users->hasPages())
             <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
 
-                {{-- Previous Page Link --}}
                 @if ($users->onFirstPage())
                     <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
                         Previous
@@ -163,7 +213,6 @@
                     Page {{ $users->currentPage() }} of {{ $users->lastPage() }}
                 </span>
 
-                {{-- Next Page Link --}}
                 @if ($users->hasMorePages())
                     <button wire:click="nextPage" wire:loading.attr="disabled"
                         class="px-4 py-2 text-white rounded transition cursor-pointer"
@@ -181,7 +230,226 @@
         @endif
     </div>
 
-    <!-- VIEW USER MODAL -->
+    {{-- =====================================================
+         WITHDRAWAL MODAL  (create / approval)
+         Note: 'Approved' is the final/released state — there is
+         no separate release step (matches the DB status enum:
+         Pending / Approved / Rejected).
+    ===================================================== --}}
+    @if ($isWithdrawalModalOpen && $selectedWithdrawalUser)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div
+                class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative border border-slate-100">
+
+                {{-- Header --}}
+                <div class="bg-[#0C2C6B] px-6 py-4 flex items-center justify-between text-white">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 9V7a4 4 0 00-8 0v2m-2 0h12a2 2 0 012 2v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7a2 2 0 012-2z" />
+                        </svg>
+                        <h3 class="text-base font-bold uppercase tracking-wider">
+                            @if ($withdrawalModalMode === 'approval')
+                                Approve &amp; Release Withdrawal
+                            @else
+                                Withdraw Funds
+                            @endif
+                        </h3>
+                    </div>
+                    <button type="button" wire:click="closeWithdrawalModal"
+                        class="cursor-pointer text-white/80 hover:text-white text-xl font-bold transition">&times;</button>
+                </div>
+
+                {{-- Body --}}
+                <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+
+                    {{-- Selected User --}}
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5">
+                        <span class="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                            Withdrawal User
+                        </span>
+                        <p class="mt-1 font-bold text-slate-800">
+                            {{ $selectedWithdrawalUser->firstname }}
+                            {{ $selectedWithdrawalUser->middlename }}
+                            {{ $selectedWithdrawalUser->lastname }}
+                        </p>
+                    </div>
+
+                    {{-- ===================== CREATE ===================== --}}
+                    @if ($withdrawalModalMode === 'create')
+
+                        {{-- Available Balance --}}
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between">
+                            <div>
+                                <span class="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                                    Available Cash Wallet
+                                </span>
+                                <span class="text-lg font-bold text-[#0C2C6B]">
+                                    ₱{{ number_format($selectedWithdrawalBalance, 2) }}
+                                </span>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                                💳
+                            </div>
+                        </div>
+
+                        {{-- Schedule Info --}}
+                        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-900 space-y-2">
+                            <div class="font-bold flex items-center gap-1.5 text-blue-950 text-sm">
+                                <span>ℹ️</span>
+                                Payout Schedule &amp; Cut-off Rules
+                            </div>
+                            <p>
+                                • <strong>Friday 6:01 PM to Friday 6:00 PM:</strong>
+                                Requests processed and released on the upcoming Monday.
+                            </p>
+                        </div>
+
+                        {{-- Withdrawal Amount --}}
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold text-gray-700">
+                                Enter Withdrawal Amount
+                            </label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">
+                                    ₱
+                                </span>
+                                <input type="number" step="0.01" min="500" wire:model="withdrawAmount"
+                                    placeholder="0.00"
+                                    class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm font-semibold">
+                            </div>
+                            @error('withdrawAmount')
+                                <p class="text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                            <p class="text-[11px] text-gray-500">
+                                Minimum withdrawal amount is <strong>₱500.00</strong>
+                            </p>
+                        </div>
+
+                        {{-- Withdrawal Method --}}
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold text-gray-700">
+                                Withdrawal Method
+                            </label>
+                            <select wire:model.live="withdrawalMethod"
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm">
+                                <option value="">Select withdrawal method</option>
+                                <option value="Cash">Cash</option>
+                                <option value="GCash">GCash</option>
+                                <option value="Maya">Maya</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                            </select>
+                            @error('withdrawalMethod')
+                                <p class="text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Online Account Details --}}
+                        @if ($withdrawalMethod && $withdrawalMethod !== 'Cash')
+                            <div class="space-y-1.5">
+                                <label class="block text-xs font-semibold text-gray-700">Account Name</label>
+                                <input type="text" wire:model="accountName" placeholder="Enter account holder name"
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm">
+                                @error('accountName')
+                                    <p class="text-xs text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label class="block text-xs font-semibold text-gray-700">Account Number</label>
+                                <input type="text" wire:model="accountNumber" placeholder="Enter account number"
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm">
+                                @error('accountNumber')
+                                    <p class="text-xs text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        @endif
+
+                        {{-- Payment Reference (optional, online methods) --}}
+                        @if ($withdrawalMethod && $withdrawalMethod !== 'Cash')
+                            <div class="space-y-1.5">
+                                <label class="block text-xs font-semibold text-gray-700">Payment Reference (optional)</label>
+                                <input type="text" wire:model="paymentReference" placeholder="Enter reference number"
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm">
+                                @error('paymentReference')
+                                    <p class="text-xs text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        @endif
+
+                    {{-- ===================== APPROVAL ===================== --}}
+                    @elseif ($withdrawalModalMode === 'approval')
+
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-xl">⏳</span>
+                                <h4 class="font-bold text-amber-800">Pending Withdrawal Request</h4>
+                            </div>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Amount</span>
+                                    <span class="font-bold text-slate-800">
+                                        ₱{{ number_format($selectedWithdrawal->amount ?? 0, 2) }}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Method</span>
+                                    <span class="font-semibold text-slate-800">
+                                        {{ $selectedWithdrawal->withdrawal_method ?? '-' }}
+                                    </span>
+                                </div>
+                                @if ($selectedWithdrawal->account_name)
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">Account Name</span>
+                                        <span class="font-semibold text-slate-800">
+                                            {{ $selectedWithdrawal->account_name }}
+                                        </span>
+                                    </div>
+                                @endif
+                                @if ($selectedWithdrawal->account_number)
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">Account Number</span>
+                                        <span class="font-semibold text-slate-800">
+                                            {{ $selectedWithdrawal->account_number }}
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-900">
+                            <p>Approving this request marks it as released. Are you sure you want to approve and release these funds?</p>
+                        </div>
+
+                    @endif
+                </div>
+
+                {{-- Footer: action button changes per mode --}}
+                <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end space-x-2">
+                    <button type="button" wire:click="closeWithdrawalModal"
+                        class="cursor-pointer px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-300 transition">
+                        Cancel
+                    </button>
+
+                    @if ($withdrawalModalMode === 'create')
+                        <button type="button" wire:click="submitWithdrawal" wire:loading.attr="disabled"
+                            class="cursor-pointer px-4 py-2 bg-[#0C2C6B] text-white rounded-xl text-sm font-semibold hover:bg-[#092254] transition shadow-sm">
+                            Submit Request
+                        </button>
+                    @elseif ($withdrawalModalMode === 'approval')
+                        <button type="button" wire:click="processWithdrawalApproval" wire:loading.attr="disabled"
+                            class="cursor-pointer px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition shadow-sm">
+                            Approve &amp; Release
+                        </button>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- =====================================================
+         VIEW USER MODAL
+    ===================================================== --}}
     @if ($isViewModalOpen && $this->selectedUser)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div
@@ -206,14 +474,12 @@
                     <div class="flex items-center space-x-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
                         @if (!empty($this->selectedUser->profilepic))
                             <img src="{{ Str::startsWith($this->selectedUser->profilepic, 'storage/') ? asset($this->selectedUser->profilepic) : asset('storage/' . $this->selectedUser->profilepic) }}"
-                                class="w-14 h-14 rounded-full object-cover border border-slate-200 shadow-sm shrink-0" alt="profile-image">
+                                class="w-14 h-14 rounded-full object-cover border border-slate-200 shadow-sm shrink-0"
+                                alt="profile-image">
                         @else
-                            {{-- <div
-                                class="w-14 h-14 rounded-full bg-[#0C2C6B] text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
-                                {{ strtoupper(substr($this->selectedUser->firstname, 0, 1) . substr($this->selectedUser->lastname, 0, 1)) }}
-                            </div> --}}
-                            <img src="{{ asset('images/profiles/default-avatar.png') }}" 
-                            class="w-14 h-14 rounded-full object-cover border border-slate-200 shadow-sm shrink-0" alt="default-profile-image">
+                            <img src="{{ asset('images/profiles/default-avatar.png') }}"
+                                class="w-14 h-14 rounded-full object-cover border border-slate-200 shadow-sm shrink-0"
+                                alt="default-profile-image">
                         @endif
 
                         <div class="overflow-hidden">
@@ -226,7 +492,7 @@
                         </div>
                     </div>
 
-                    <!-- Personal Details -->
+                    {{-- Personal Details --}}
                     <div>
                         <h4
                             class="text-xs font-bold text-[#0C2C6B] uppercase tracking-wider mb-3 pb-1 border-b border-slate-100 flex items-center space-x-1.5">
@@ -238,35 +504,27 @@
                         </h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                             <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
-                                <span
-                                    class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Contact
-                                    No</span>
-                                <span
-                                    class="font-medium text-slate-700">{{ $this->selectedUser->contactno ?? '-' }}</span>
+                                <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Contact No</span>
+                                <span class="font-medium text-slate-700">{{ $this->selectedUser->contactno ?? '-' }}</span>
                             </div>
                             <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
-                                <span
-                                    class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Gender</span>
-                                <span
-                                    class="font-medium text-slate-700">{{ $this->selectedUser->gender ?? '-' }}</span>
+                                <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Gender</span>
+                                <span class="font-medium text-slate-700">{{ $this->selectedUser->gender ?? '-' }}</span>
                             </div>
                             <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
-                                <span
-                                    class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Birthdate</span>
+                                <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Birthdate</span>
                                 <span class="font-medium text-slate-700">
                                     {{ $this->selectedUser->birthdate ? \Carbon\Carbon::parse($this->selectedUser->birthdate)->format('F d, Y') : '-' }}
                                 </span>
                             </div>
                             <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-100 sm:col-span-2">
-                                <span
-                                    class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Address</span>
-                                <span
-                                    class="font-medium text-slate-700">{{ $this->selectedUser->address ?? '-' }}</span>
+                                <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Address</span>
+                                <span class="font-medium text-slate-700">{{ $this->selectedUser->address ?? '-' }}</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Account & Security Details -->
+                    {{-- Account & Security Details --}}
                     <div>
                         <h4
                             class="text-xs font-bold text-[#0C2C6B] uppercase tracking-wider mb-3 pb-1 border-b border-slate-100 flex items-center space-x-1.5">
@@ -278,44 +536,31 @@
                         </h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                             <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Role
-                                    Name</span>
+                                <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Role Name</span>
                                 <span class="font-medium text-slate-700">
                                     {{ optional($this->selectedUser->role)->rolename ?? (\App\Models\Role::where('RoleID', $this->selectedUser->RoleID)->value('rolename') ?? 'N/A') }}
                                 </span>
                             </div>
                             <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
-                                <span
-                                    class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Position</span>
-                                <span
-                                    class="font-medium text-slate-700">{{ $this->selectedUser->position ?? '-' }}</span>
+                                <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Position</span>
+                                <span class="font-medium text-slate-700">{{ $this->selectedUser->position ?? '-' }}</span>
                             </div>
                             <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
-                                <span
-                                    class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Referral
-                                    Code</span>
-                                <span
-                                    class="font-medium font-mono text-slate-700">{{ $this->selectedUser->referralCode ?? '-' }}</span>
+                                <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Referral Code</span>
+                                <span class="font-medium font-mono text-slate-700">{{ $this->selectedUser->referralCode ?? '-' }}</span>
                             </div>
                             <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Upline
-                                    Code</span>
-                                <span
-                                    class="font-medium font-mono text-slate-700">{{ $this->selectedUser->uplineCode ?? '-' }}</span>
+                                <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Upline Code</span>
+                                <span class="font-medium font-mono text-slate-700">{{ $this->selectedUser->uplineCode ?? '-' }}</span>
                             </div>
-                            <div
-                                class="bg-slate-50/50 p-3 rounded-xl border border-slate-100 sm:col-span-2 flex items-center justify-between">
-                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Account
-                                    Status</span>
+                            <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-100 sm:col-span-2 flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Account Status</span>
                                 @if (strtolower($this->selectedUser->status) === 'active')
-                                    <span
-                                        class="px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-xs font-semibold">Active</span>
+                                    <span class="px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-xs font-semibold">Active</span>
                                 @elseif (strtolower($this->selectedUser->status) === 'inactive')
-                                    <span
-                                        class="px-3 py-1 rounded-md border border-amber-400 bg-amber-500 text-white text-xs font-semibold">Inactive</span>
+                                    <span class="px-3 py-1 rounded-md border border-amber-400 bg-amber-500 text-white text-xs font-semibold">Inactive</span>
                                 @else
-                                    <span
-                                        class="px-3 py-1 rounded-md border border-red-400 bg-red-500 text-white text-xs font-semibold">{{ ucfirst($this->selectedUser->status) }}</span>
+                                    <span class="px-3 py-1 rounded-md border border-red-400 bg-red-500 text-white text-xs font-semibold">{{ ucfirst($this->selectedUser->status) }}</span>
                                 @endif
                             </div>
                         </div>
@@ -331,7 +576,9 @@
         </div>
     @endif
 
-    <!-- ADD / EDIT USER MODAL -->
+    {{-- =====================================================
+         ADD / EDIT USER MODAL
+    ===================================================== --}}
     @if ($isAddModalOpen || $isEditModalOpen)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div
@@ -353,7 +600,7 @@
 
                 <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
 
-                    <!-- SECTION 1: Personal Details -->
+                    {{-- SECTION 1: Personal Details --}}
                     <div>
                         <h4
                             class="text-xs font-bold text-[#0C2C6B] uppercase tracking-wider mb-3 pb-1 border-b border-slate-100 flex items-center space-x-1.5">
@@ -365,54 +612,38 @@
                         </h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                            <!-- First Name -->
                             <div>
-                                <label
-                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">First
-                                    Name</label>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">First Name</label>
                                 <input type="text" wire:model="firstname"
                                     class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
                                 @error('firstname')
-                                    <span
-                                        class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
+                                    <span class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <!-- Middle Name -->
                             <div>
-                                <label
-                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Middle
-                                    Name</label>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Middle Name</label>
                                 <input type="text" wire:model="middlename"
                                     class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
                             </div>
 
-                            <!-- Last Name -->
                             <div>
-                                <label
-                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Last
-                                    Name</label>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Last Name</label>
                                 <input type="text" wire:model="lastname"
                                     class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
                                 @error('lastname')
-                                    <span
-                                        class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
+                                    <span class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <!-- Contact No -->
                             <div>
-                                <label
-                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Contact
-                                    No</label>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Contact No</label>
                                 <input type="text" wire:model="contactno"
                                     class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
                             </div>
 
-                            <!-- Gender -->
                             <div>
-                                <label
-                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Gender</label>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Gender</label>
                                 <select wire:model="gender"
                                     class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm cursor-pointer">
                                     <option value="">Select Gender</option>
@@ -422,7 +653,7 @@
                                 </select>
                             </div>
 
-                            <!-- Birthdate (Custom Alpine Picker) -->
+                            {{-- Birthdate (Custom Alpine Picker) --}}
                             <div wire:key="birthdate-picker" x-data="{
                                 openPicker: false,
                                 step: 'year',
@@ -465,14 +696,12 @@
                                     this.step = 'year';
                                 }
                             }" class="relative">
-                                <label
-                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Birthdate</label>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Birthdate</label>
 
                                 <div @click="openPicker = !openPicker"
                                     class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm cursor-pointer flex items-center justify-between">
                                     <span x-text="$wire.birthdate || 'Select birthdate'"></span>
-                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
@@ -480,22 +709,18 @@
 
                                 <div x-show="openPicker" @click.away="openPicker = false" style="display: none;"
                                     class="absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg p-3">
-                                    <div
-                                        class="flex justify-between items-center mb-2 pb-2 border-b border-slate-100 text-xs font-bold text-[#0C2C6B]">
-                                        <span
-                                            x-text="step === 'year' ? 'Select Year' : (step === 'month' ? 'Select Month' : 'Select Day')"></span>
+                                    <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-100 text-xs font-bold text-[#0C2C6B]">
+                                        <span x-text="step === 'year' ? 'Select Year' : (step === 'month' ? 'Select Month' : 'Select Day')"></span>
                                         <button type="button" x-show="step !== 'year'"
                                             @click="step = step === 'day' ? 'month' : 'year'"
                                             class="text-slate-400 hover:text-slate-600">&larr; Back</button>
                                     </div>
 
-                                    <div x-show="step === 'year'"
-                                        class="grid grid-cols-4 gap-1 max-h-40 overflow-y-auto">
+                                    <div x-show="step === 'year'" class="grid grid-cols-4 gap-1 max-h-40 overflow-y-auto">
                                         <template x-for="yr in years">
                                             <button type="button" @click="selectedYear = yr; step = 'month'"
                                                 class="py-1 text-xs rounded hover:bg-slate-100 font-medium"
-                                                :class="selectedYear == yr ? 'bg-[#0C2C6B] text-white hover:bg-[#0C2C6B]' :
-                                                    'text-slate-700'"
+                                                :class="selectedYear == yr ? 'bg-[#0C2C6B] text-white hover:bg-[#0C2C6B]' : 'text-slate-700'"
                                                 x-text="yr"></button>
                                         </template>
                                     </div>
@@ -504,36 +729,31 @@
                                         <template x-for="m in months">
                                             <button type="button" @click="selectedMonth = m.val; step = 'day'"
                                                 class="py-2 text-xs rounded hover:bg-slate-100 font-medium"
-                                                :class="selectedMonth == m.val ? 'bg-[#0C2C6B] text-white hover:bg-[#0C2C6B]' :
-                                                    'text-slate-700'"
+                                                :class="selectedMonth == m.val ? 'bg-[#0C2C6B] text-white hover:bg-[#0C2C6B]' : 'text-slate-700'"
                                                 x-text="m.name.substring(0,3)"></button>
                                         </template>
                                     </div>
 
-                                    <div x-show="step === 'day'"
-                                        class="grid grid-cols-7 gap-1 max-h-40 overflow-y-auto">
+                                    <div x-show="step === 'day'" class="grid grid-cols-7 gap-1 max-h-40 overflow-y-auto">
                                         <template x-for="d in daysInMonth">
                                             <button type="button" @click="selectedDay = d; confirmDate()"
                                                 class="py-1 text-xs rounded hover:bg-slate-100 font-medium"
-                                                :class="selectedDay == d ? 'bg-[#0C2C6B] text-white hover:bg-[#0C2C6B]' :
-                                                    'text-slate-700'"
+                                                :class="selectedDay == d ? 'bg-[#0C2C6B] text-white hover:bg-[#0C2C6B]' : 'text-slate-700'"
                                                 x-text="d"></button>
                                         </template>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Address -->
                             <div class="sm:col-span-2">
-                                <label
-                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Address</label>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Address</label>
                                 <input type="text" wire:model="address"
                                     class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
                             </div>
                         </div>
                     </div>
 
-                    <!-- SECTION 2: Account & Security -->
+                    {{-- SECTION 2: Account & Security --}}
                     <div>
                         <h4
                             class="text-xs font-bold text-[#0C2C6B] uppercase tracking-wider mb-3 pb-1 border-b border-slate-100 flex items-center space-x-1.5">
@@ -545,34 +765,26 @@
                         </h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                            <!-- Email -->
                             <div>
-                                <label
-                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Email</label>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Email</label>
                                 <input type="email" wire:model="email"
                                     class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
                                 @error('email')
-                                    <span
-                                        class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
+                                    <span class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <!-- Username -->
                             <div>
-                                <label
-                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Username</label>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Username</label>
                                 <input type="text" wire:model="username"
                                     class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
                                 @error('username')
-                                    <span
-                                        class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
+                                    <span class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <!-- Password Input with Toggle -->
                             <div x-data="{ showPassword: false }">
-                                <label
-                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Password</label>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Password</label>
                                 <div class="relative">
                                     <input wire:model="password" :type="showPassword ? 'text' : 'password'"
                                         placeholder="••••••••"
@@ -581,146 +793,126 @@
                                     <button type="button" @click="showPassword = !showPassword"
                                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer">
                                         <svg x-show="!showPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                            class="w-5 h-5">
+                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
                                         <svg x-show="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                            class="w-5 h-5" style="display: none;">
+                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"
+                                            style="display: none;">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L9.88 9.88" />
                                         </svg>
                                     </button>
                                 </div>
                                 @error('password')
-                                    <span
-                                        class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
+                                    <span class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <!-- Role Name (excluding RoleID 4) -->
                             <div>
-                                <label
-                                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Role
-                                    Name</label>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Role Name</label>
                                 <select wire:model="RoleID"
                                     class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm cursor-pointer">
                                     <option value="">Select Role</option>
                                     @foreach (\App\Models\Role::where('RoleID', '!=', 4)->get() as $role)
-<option value="{{ $role->RoleID }}">{{ $role->rolename }}</option>
-@endforeach
+                                        <option value="{{ $role->RoleID }}">{{ $role->rolename }}</option>
+                                    @endforeach
                                 </select>
                                 @error('RoleID')
-<span class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
-@enderror
-                        </div>
+                                    <span class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
+                                @enderror
+                            </div>
 
-                        <!-- Position -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Position</label>
+                                <select wire:model="position"
+                                    class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm cursor-pointer">
+                                    <option value="">Select Position</option>
+                                    <option value="CEO">Chief Executive Officer (CEO)</option>
+                                    <option value="COO">Chief Operating Officer (COO)</option>
+                                    <option value="Auditor">Auditor</option>
+                                    <option value="Board of Directors">Board of Directors</option>
+                                    <option value="PIO">PIO</option>
+                                    <option value="Secretary">Secretary</option>
+                                    <option value="Treasurer">Treasurer</option>
+                                </select>
+                                @error('position')
+                                    <span class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Status</label>
+                                <select wire:model="status"
+                                    class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm cursor-pointer">
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end space-x-2">
+                    <button type="button" wire:click="closeModal"
+                        class="cursor-pointer px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-300 transition">Cancel</button>
+                    <button type="button" wire:click="{{ $selectedUserId ? 'updateUser' : 'storeUser' }}"
+                        class="cursor-pointer px-4 py-2 bg-[#0C2C6B] text-white rounded-xl text-sm font-semibold hover:bg-[#092254] transition shadow-sm">
+                        {{ $selectedUserId ? 'Update User' : 'Save User' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- =====================================================
+         USER ACCESS MODAL
+    ===================================================== --}}
+    @if ($isAccessModalOpen && $this->selectedUser)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div
+                class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden relative border border-slate-100 max-h-[90vh] flex flex-col">
+
+                <div class="bg-[#0C2C6B] px-6 py-4 flex items-center justify-between text-white shrink-0">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <h3 class="text-base font-bold uppercase tracking-wider">User Access Control</h3>
+                    </div>
+                    <button wire:click="$set('isAccessModalOpen', false)"
+                        class="cursor-pointer text-white/80 hover:text-white text-xl font-bold transition">&times;</button>
+                </div>
+
+                <div class="bg-slate-50 px-6 py-3 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shrink-0">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-[#0C2C6B] text-white flex items-center justify-center font-bold text-sm shadow-sm shrink-0">
+                            {{ strtoupper(substr($this->selectedUser->firstname, 0, 1) . substr($this->selectedUser->lastname, 0, 1)) }}
+                        </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Position</label>
-                            <select wire:model="position"
-                                class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm cursor-pointer">
-                                <option value="">Select Position</option>
-                                <option value="CEO">Chief Executive Officer (CEO)</option>
-                                <option value="COO">Chief Operating Officer (COO)</option>
-                                <option value="Auditor">Auditor</option>
-                                <option value="Board of Directors">Board of Directors</option>
-                                <option value="PIO">PIO</option>
-                                <option value="Secretary">Secretary</option>
-                                <option value="Treasurer">Treasurer</option>
-                            </select>
-                            @error('position')
-<span class="text-xs text-rose-500 font-semibold mt-1 block">{{ $message }}</span>
-@enderror
+                            <h4 class="text-sm font-bold text-slate-800">
+                                {{ $this->selectedUser->firstname }} {{ $this->selectedUser->middlename }}
+                                {{ $this->selectedUser->lastname }}
+                            </h4>
+                            <p class="text-xs text-slate-500">@<span>{{ $this->selectedUser->username }}</span></p>
                         </div>
-
-                        <!-- Status -->
-                        <div class="sm:col-span-2">
-                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Status</label>
-                            <select wire:model="status"
-                                class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm cursor-pointer">
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                            </select>
-                        </div>
+                    </div>
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 shadow-sm self-start sm:self-auto">
+                        <span class="text-slate-400 uppercase tracking-wide text-[10px]">Role ID:</span>
+                        <span>{{ $this->selectedUser->RoleID }}</span>
                     </div>
                 </div>
 
-            </div>
-
-            <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end space-x-2">
-                <button type="button" wire:click="closeModal"
-                    class="cursor-pointer px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-300 transition">Cancel</button>
-                <button type="button" wire:click="{{ $selectedUserId ? 'updateUser' : 'storeUser' }}"
-                    class="cursor-pointer px-4 py-2 bg-[#0C2C6B] text-white rounded-xl text-sm font-semibold hover:bg-[#092254] transition shadow-sm">
-                    {{ $selectedUserId ? 'Update User' : 'Save User' }}
-                </button>
-            </div>
-        </div>
-    </div>
- @endif
-
-                                    <!-- USER ACCESS MODAL -->
-                                    @if ($isAccessModalOpen && $this->selectedUser)
-                                    <div
-                                    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                                    <div
-                                    class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden relative border border-slate-100 max-h-[90vh] flex flex-col">
-
-                                    <div
-                                    class="bg-[#0C2C6B] px-6 py-4 flex items-center justify-between text-white shrink-0">
-                                    <div class="flex items-center space-x-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10
-                                    0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7
-                                    20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3
-                                    3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                                    />
-                                    </svg>
-                                    <h3 class="text-base font-bold uppercase tracking-wider">User Access
-                                    Control</h3>
-                                    </div>
-                                    <button wire:click="$set('isAccessModalOpen', false)"
-                                    class="cursor-pointer text-white/80 hover:text-white text-xl font-bold transition">&times;</button>
-                                    </div>
-
-                                    <div
-                                    class="bg-slate-50 px-6 py-3 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shrink-0">
-                                    <div class="flex items-center space-x-3">
-                                    <div
-                                    class="w-10 h-10 rounded-full bg-[#0C2C6B] text-white flex items-center justify-center font-bold text-sm shadow-sm shrink-0">
-                                    {{ strtoupper(substr($this->selectedUser->firstname, 0, 1) . substr($this->selectedUser->lastname, 0, 1)) }}
-                                    </div>
-                                    <div>
-                                    <h4 class="text-sm font-bold text-slate-800">
-                                    {{ $this->selectedUser->firstname }} {{ $this->selectedUser->middlename }}
-                                    {{ $this->selectedUser->lastname }}
-                                    </h4>
-                                    <p
-                                    class="text-xs text-slate-500">@<span>{{ $this->selectedUser->username }}</span></p>
-                                    </div>
-                                    </div>
-                                    <div
-                                    class="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 shadow-sm self-start sm:self-auto">
-                                    <span class="text-slate-400 uppercase tracking-wide text-[10px]">Role
-                                    ID:</span>
-                                    <span>{{ $this->selectedUser->RoleID }}</span>
-                                    </div>
-                                    </div>
-
-                                    <div class="overflow-y-auto flex-1 p-6">
-                                    <div
-                                    class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                                    <table class="w-full text-left border-collapse text-sm">
-                                    <thead>
-                                    <tr
-                                    class="bg-slate-100 text-xs text-slate-600 uppercase border-b border-slate-200 font-semibold tracking-wider">
+                <div class="overflow-y-auto flex-1 p-6">
+                    <div class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-100 text-xs text-slate-600 uppercase border-b border-slate-200 font-semibold tracking-wider">
                                     <th class="py-3 px-4">Module</th>
                                     <th class="py-3 px-3 text-center">⊕ Create</th>
                                     <th class="py-3 px-3 text-center">📥 Retrieve</th>
@@ -728,99 +920,92 @@
                                     <th class="py-3 px-3 text-center">🗑️ Delete</th>
                                     <th class="py-3 px-3 text-center">🏷️ Status</th>
                                     <th class="py-3 px-3 text-center">🖨️ PrintAll</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-100">
-                                    @foreach ($userAccess as $moduleName => $permissions)
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                @foreach ($userAccess as $moduleName => $permissions)
                                     <tr class="hover:bg-slate-50/80 transition">
-                                    <td
-                                    class="py-3.5 px-4 font-medium text-slate-700 flex items-center space-x-2.5">
-                                    <input type="checkbox"
-                                    class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
-                                    <span>{{ $moduleName }}</span>
-                                    </td>
-                                    <td class="py-3.5 px-3 text-center">
-                                    <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.create"
-                                    class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
-                                    </td>
-                                    <td class="py-3.5 px-3 text-center">
-                                    <input type="checkbox"
-                                    wire:model="userAccess.{{ $moduleName }}.retrieve"
-                                    class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
-                                    </td>
-                                    <td class="py-3.5 px-3 text-center">
-                                    <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.update"
-                                    class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
-                                    </td>
-                                    <td class="py-3.5 px-3 text-center">
-                                    <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.delete"
-                                    class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
-                                    </td>
-                                    <td class="py-3.5 px-3 text-center">
-                                    <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.status"
-                                    class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
-                                    </td>
-                                    <td class="py-3.5 px-3 text-center">
-                                    <input type="checkbox"
-                                    wire:model="userAccess.{{ $moduleName }}.printall"
-                                    class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
-                                    </td>
+                                        <td class="py-3.5 px-4 font-medium text-slate-700 flex items-center space-x-2.5">
+                                            <input type="checkbox"
+                                                class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
+                                            <span>{{ $moduleName }}</span>
+                                        </td>
+                                        <td class="py-3.5 px-3 text-center">
+                                            <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.create"
+                                                class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
+                                        </td>
+                                        <td class="py-3.5 px-3 text-center">
+                                            <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.retrieve"
+                                                class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
+                                        </td>
+                                        <td class="py-3.5 px-3 text-center">
+                                            <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.update"
+                                                class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
+                                        </td>
+                                        <td class="py-3.5 px-3 text-center">
+                                            <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.delete"
+                                                class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
+                                        </td>
+                                        <td class="py-3.5 px-3 text-center">
+                                            <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.status"
+                                                class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
+                                        </td>
+                                        <td class="py-3.5 px-3 text-center">
+                                            <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.printall"
+                                                class="cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4">
+                                        </td>
                                     </tr>
                                 @endforeach
-                                </tbody>
-                                </table>
-                                </div>
-                                </div>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-                                <div
-                                class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end space-x-2 shrink-0">
-                                <button wire:click="$set('isAccessModalOpen', false)"
-                                class="cursor-pointer px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-300 transition">Close</button>
-                                <button wire:click="saveAccess"
-                                class="cursor-pointer px-4 py-2 bg-[#0C2C6B] text-white rounded-xl text-sm font-semibold transition shadow-sm">Save
-                                Changes</button>
-                                </div>
-                                </div>
-                                </div>
-@endif
+                <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end space-x-2 shrink-0">
+                    <button wire:click="$set('isAccessModalOpen', false)"
+                        class="cursor-pointer px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-300 transition">Close</button>
+                    <button wire:click="saveAccess"
+                        class="cursor-pointer px-4 py-2 bg-[#0C2C6B] text-white rounded-xl text-sm font-semibold transition shadow-sm">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    @endif
 
-<!-- DELETE CONFIRMATION MODAL -->
-@if ($isDeleteModalOpen && $this->selectedUser)
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-<div
-class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative border border-slate-100">
-<button wire:click="$set('isDeleteModalOpen', false)"
-class="absolute top-4 right-4 cursor-pointer text-slate-400 hover:text-slate-600 text-xl font-bold transition z-10">&times;</button>
+    {{-- =====================================================
+         DELETE CONFIRMATION MODAL
+    ===================================================== --}}
+    @if ($isDeleteModalOpen && $this->selectedUser)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative border border-slate-100">
+                <button wire:click="$set('isDeleteModalOpen', false)"
+                    class="absolute top-4 right-4 cursor-pointer text-slate-400 hover:text-slate-600 text-xl font-bold transition z-10">&times;</button>
 
-<div class="p-6 pt-8 text-center space-y-4">
-<div
-class="w-16 h-16 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm border border-rose-100 rotate-3">
-<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0
-00-1 1v3M4 7h16" />
-</svg>
-</div>
-<div class="space-y-1">
-<h3 class="text-lg font-bold text-slate-800">Delete User Account</h3>
-<p class="text-sm text-slate-500 leading-relaxed px-2">
-Are you sure you want to delete
-<strong class="text-slate-700 font-semibold">{{ $this->selectedUser->firstname }}
-{{ $this->selectedUser->lastname }}</strong>?
-This action cannot be undone.
-</p>
-</div>
-</div>
+                <div class="p-6 pt-8 text-center space-y-4">
+                    <div class="w-16 h-16 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm border border-rose-100 rotate-3">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </div>
+                    <div class="space-y-1">
+                        <h3 class="text-lg font-bold text-slate-800">Delete User Account</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed px-2">
+                            Are you sure you want to delete
+                            <strong class="text-slate-700 font-semibold">{{ $this->selectedUser->firstname }}
+                                {{ $this->selectedUser->lastname }}</strong>?
+                            This action cannot be undone.
+                        </p>
+                    </div>
+                </div>
 
-<div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-end space-x-2">
-<button wire:click="$set('isDeleteModalOpen', false)"
-class="cursor-pointer px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-300 transition">Cancel</button>
-<button wire:click="deleteUser"
-class="cursor-pointer px-4 py-2 bg-rose-600 text-white rounded-xl text-sm font-semibold hover:bg-rose-700 transition shadow-sm">Yes,
-Delete</button>
-</div>
-</div>
-</div>
-@endif
+                <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-end space-x-2">
+                    <button wire:click="$set('isDeleteModalOpen', false)"
+                        class="cursor-pointer px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-300 transition">Cancel</button>
+                    <button wire:click="deleteUser"
+                        class="cursor-pointer px-4 py-2 bg-rose-600 text-white rounded-xl text-sm font-semibold hover:bg-rose-700 transition shadow-sm">Yes, Delete</button>
+                </div>
+            </div>
+        </div>
+    @endif
 
-</div>)
+</div>
