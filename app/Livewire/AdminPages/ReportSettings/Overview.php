@@ -177,6 +177,7 @@ class Overview extends Component
             SELECT
                 u.UserID,
                 CONCAT(u.FirstName, ' ', u.LastName) AS Member_Name,
+                u.referralCode,
                 s.Sequence,
                 s.Source,
                 s.Incentive_Type,
@@ -197,6 +198,7 @@ class Overview extends Component
                 u.UserID,
                 u.FirstName,
                 u.LastName,
+                u.referralCode,
                 s.Sequence,
                 s.Source,
                 s.Incentive_Type
