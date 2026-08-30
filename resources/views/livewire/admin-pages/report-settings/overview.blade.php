@@ -336,6 +336,9 @@
                             <div>
                                 <p class="font-semibold text-gray-800">
                                     {{ $item->Member_Name }}
+                                    <span class="text-xs font-medium text-blue-600">
+                                        ({{ $item->referralCode }})
+                                    </span>
                                 </p>
                                 <p class="text-xs text-gray-400 mt-0.5">
                                     {{ $item->Incentive_Type }} ({{ $item->Source }})
