@@ -164,13 +164,36 @@
                                         @endif
                                     @endif
 
-                                    <!-- WITHDRAWAL APPROVAL ACTION -->
+                                    <!-- WITHDRAWAL ACTION -->
                                     @if ($member->has_pending_withdrawal)
+
                                         <button wire:click="openWithdrawalApproval({{ $member->UserID }})"
                                             title="Approve Withdrawal Request"
-                                            class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition cursor-pointer text-xs font-semibold shadow">
-                                            Approve WD
+                                            class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow">
+                                            Pending
                                         </button>
+
+                                    @elseif ($isWithdrawalActive)
+
+                                        @if ($this->canCreate)
+                                            <button wire:click="openWithdrawalModal({{ $member->UserID }})"
+                                                title="Create Withdrawal Request"
+                                                class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
+                                                Withdraw
+                                            </button>
+                                        @endif
+
+                                    @else
+
+                                        @if ($this->canCreate)
+                                            <span
+                                                title="Withdrawals are currently unavailable"
+                                                class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-gray-400 text-xs font-semibold cursor-not-allowed"
+                                            >
+                                                🔒 Off
+                                            </span>
+                                        @endif
+
                                     @endif
 
                                 </div>
@@ -187,39 +210,147 @@
                 @endforelse
             </tbody>
         </table>
+
         <!-- Withdrawal Approval Modal -->
-        @if ($isWithdrawalModalOpen)
-            <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4">
-                    <div class="flex justify-between items-center border-b pb-3">
-                        <h3 class="text-lg font-semibold text-slate-800">Approve Withdrawal Request</h3>
-                        <button wire:click="closeWithdrawalModal" class="text-slate-400 hover:text-slate-600">
+        @if ($isWithdrawalModalOpen && $selectedWithdrawalUser && $selectedWithdrawal)
+            <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative border border-slate-100">
+
+                    {{-- Header --}}
+                    <div class="bg-[#0C2C6B] px-6 py-4 flex items-center justify-between text-white">
+                        <h3 class="text-base font-bold uppercase tracking-wider">
+                            Approve &amp; Release Withdrawal
+                        </h3>
+
+                        <button
+                            type="button"
+                            wire:click="closeWithdrawalModal"
+                            class="cursor-pointer text-white/80 hover:text-white text-xl font-bold transition">
                             &times;
                         </button>
                     </div>
 
-                    <div>
-                        <p class="text-sm text-slate-600">
-                            Are you sure you want to approve the pending withdrawal for <span
-                                class="font-semibold text-slate-800">{{ $selectedWithdrawalUser?->firstname }}
-                                {{ $selectedWithdrawalUser?->lastname }}</span>?
-                        </p>
-                        <!-- Add custom withdrawal approval form inputs here if needed -->
+                    {{-- Body --}}
+                    <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+
+                        {{-- Selected Member --}}
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5">
+                            <span class="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                                Withdrawal Member
+                            </span>
+
+                            <p class="mt-1 font-bold text-slate-800">
+                                {{ $selectedWithdrawalUser->firstname }}
+                                {{ $selectedWithdrawalUser->middlename }}
+                                {{ $selectedWithdrawalUser->lastname }}
+                            </p>
+                        </div>
+
+                        {{-- Pending Withdrawal Details --}}
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-xl">⏳</span>
+                                <h4 class="font-bold text-amber-800">
+                                    Pending Withdrawal Request
+                                </h4>
+                            </div>
+
+                            <div class="space-y-2 text-sm">
+
+                                <div class="flex justify-between gap-4">
+                                    <span class="text-gray-500">Amount</span>
+                                    <span class="font-bold text-slate-800 text-right">
+                                        ₱{{ number_format($selectedWithdrawal->amount ?? 0, 2) }}
+                                    </span>
+                                </div>
+
+                                <div class="flex justify-between gap-4">
+                                    <span class="text-gray-500">Method</span>
+                                    <span class="font-semibold text-slate-800 text-right">
+                                        {{ $selectedWithdrawal->withdrawal_method ?? '-' }}
+                                    </span>
+                                </div>
+
+                                @if ($selectedWithdrawal->account_name)
+                                    <div class="flex justify-between gap-4">
+                                        <span class="text-gray-500">Account Name</span>
+                                        <span class="font-semibold text-slate-800 text-right">
+                                            {{ $selectedWithdrawal->account_name }}
+                                        </span>
+                                    </div>
+                                @endif
+
+                                @if ($selectedWithdrawal->account_number)
+                                    <div class="flex justify-between gap-4">
+                                        <span class="text-gray-500">Account Number</span>
+                                        <span class="font-semibold text-slate-800 text-right">
+                                            {{ $selectedWithdrawal->account_number }}
+                                        </span>
+                                    </div>
+                                @endif
+
+                                @if ($selectedWithdrawal->payment_reference)
+                                    <div class="flex justify-between gap-4">
+                                        <span class="text-gray-500">Payment Reference</span>
+                                        <span class="font-semibold text-slate-800 text-right">
+                                            {{ $selectedWithdrawal->payment_reference }}
+                                        </span>
+                                    </div>
+                                @endif
+
+                            </div>
+                        </div>
+
+                        {{-- Confirmation Warning --}}
+                        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-900">
+                            <div class="flex items-start gap-2">
+                                <span>ℹ️</span>
+
+                                <p>
+                                    Approving this request will mark the withdrawal as
+                                    <strong>Approved</strong> and deduct
+                                    <strong>
+                                        ₱{{ number_format($selectedWithdrawal->amount ?? 0, 2) }}
+                                    </strong>
+                                    from the member's wallet.
+                                </p>
+                            </div>
+                        </div>
+
                     </div>
 
-                    <div class="flex justify-end space-x-3 pt-3 border-t">
-                        <button wire:click="closeWithdrawalModal"
-                            class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm hover:bg-slate-300 transition">
+                    {{-- Footer --}}
+                    <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end space-x-2">
+
+                        <button
+                            type="button"
+                            wire:click="closeWithdrawalModal"
+                            wire:loading.attr="disabled"
+                            class="cursor-pointer px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-300 transition">
                             Cancel
                         </button>
-                        <button wire:click="processWithdrawalApproval"
-                            class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 transition">
-                            Confirm Approval
+
+                        <button
+                            type="button"
+                            wire:click="processWithdrawalApproval"
+                            wire:loading.attr="disabled"
+                            class="cursor-pointer px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition shadow-sm">
+
+                            <span wire:loading.remove wire:target="processWithdrawalApproval">
+                                Approve &amp; Release
+                            </span>
+
+                            <span wire:loading wire:target="processWithdrawalApproval">
+                                Processing...
+                            </span>
                         </button>
+
                     </div>
                 </div>
             </div>
         @endif
+
+
         <!-- PAGINATION -->
         @if ($members->hasPages())
             <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
@@ -262,10 +393,21 @@
 
     <!-- LIVEWIRE MODAL COMPONENT -->
     <livewire:member-pages.my-profile.activation-modal />
+    <livewire:components.withdrawal-modal />
 
     <!-- SWEETALERT SCRIPTS -->
     @script
         <script>
+
+            $wire.on('swal:error', (data) => {
+            Swal.fire({
+                icon: 'error',
+                title: data.title ?? 'Error',
+                text: data.text ?? 'Something went wrong.',
+                confirmButtonColor: '#0C2C6B',
+            });
+        });
+
             $wire.on('confirm-status', (data) => {
                 const actionText = data.action === 'deactivate' ?
                     "I'm sure to deactivate" :

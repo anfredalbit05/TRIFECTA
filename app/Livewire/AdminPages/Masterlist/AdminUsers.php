@@ -5,13 +5,14 @@ namespace App\Livewire\AdminPages\Masterlist;
 use App\Models\User;
 use App\Models\Module;
 use App\Models\Privilege;
-use App\Models\Role;
 use App\Models\Withdrawal;
 use App\Models\Wallet;
 use App\Models\Ledger;
+use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -24,11 +25,13 @@ class AdminUsers extends Component
     // =====================================================
     // Table state
     // =====================================================
+
     public string $search = '';
 
     // =====================================================
     // Modal visibility flags
     // =====================================================
+
     public bool $isViewModalOpen = false;
     public bool $isAddModalOpen = false;
     public bool $isEditModalOpen = false;
@@ -36,12 +39,16 @@ class AdminUsers extends Component
     public bool $isDeleteModalOpen = false;
     public bool $isWithdrawalModalOpen = false;
 
-    // Active record for Add/Edit/View/Delete/Access modals
+    // =====================================================
+    // Active record
+    // =====================================================
+
     public ?int $selectedUserId = null;
 
     // =====================================================
     // Add / Edit form fields
     // =====================================================
+
     public string $firstname = '';
     public string $middlename = '';
     public string $lastname = '';
@@ -57,32 +64,22 @@ class AdminUsers extends Component
     public string $position = '';
     public string $referralCode = '';
 
-    // Access-control matrix: [moduleName => [create, retrieve, update, delete, status, printall]]
+    // =====================================================
+    // Access-control matrix
+    // =====================================================
+
     public array $userAccess = [];
 
     // =====================================================
-    // Withdrawal modal state
+    // Withdrawal Approval State
     //
-    // NOTE: the `withdrawals.status` column only supports
-    // 'Pending', 'Approved', 'Rejected' — there is no separate
-    // "Released" status. Approving a withdrawal IS the release:
-    // once a request is Approved, funds are considered released
-    // and no further action is needed. So the modal only ever
-    // needs two modes: 'create' (new request) and 'approval'
-    // (approve a pending request).
+    // The actual withdrawal form is handled by:
+    // App\Livewire\Components\WithdrawalModal
     // =====================================================
-    public string $withdrawalModalMode = 'create'; // create | approval
 
     public ?int $selectedWithdrawalUserId = null;
     public ?User $selectedWithdrawalUser = null;
     public ?Withdrawal $selectedWithdrawal = null;
-    public float $selectedWithdrawalBalance = 0;
-
-    public string $withdrawAmount = '';
-    public string $withdrawalMethod = '';
-    public string $accountName = '';
-    public string $accountNumber = '';
-    public string $paymentReference = '';
 
     public function mount(): void
     {
@@ -90,9 +87,9 @@ class AdminUsers extends Component
     }
 
     /*
-    |--------------------------------------------------------------------------
+    |----------------------------------------------------------------------
     | Permissions
-    |--------------------------------------------------------------------------
+    |----------------------------------------------------------------------
     */
 
     protected function hasPermission(string $action): bool
@@ -103,7 +100,7 @@ class AdminUsers extends Component
             return false;
         }
 
-        // Super Admin override (RoleID 1)
+        // Super Admin override
         if ((int) $user->RoleID === 1) {
             return true;
         }
@@ -111,12 +108,12 @@ class AdminUsers extends Component
         $column = 'can_' . $action;
 
         if ($user->role && method_exists($user->role, 'permissions')) {
-            $hasPerm = optional($user->role->permissions)
+            $hasPermission = optional($user->role->permissions)
                 ->where('ModuleID', 1)
                 ->where($column, 1)
                 ->isNotEmpty();
 
-            if ($hasPerm) {
+            if ($hasPermission) {
                 return true;
             }
         }
@@ -147,13 +144,33 @@ class AdminUsers extends Component
         return $this->hasPermission('delete');
     }
 
+        // ==========================================
+    // WITHDRAWAL GLOBAL STATUS
+    //
+    // Mirrors WithdrawalModal::isWithdrawalActive()
+    // and Dashboard's own check. Used here to hide
+    // the "Withdraw" creation button in the table
+    // when withdrawals are turned off system-wide —
+    // matching the dashboard's behavior instead of
+    // only blocking it deeper inside the modal.
+    // ==========================================
+
+    public function isWithdrawalActive(): bool
+    {
+        return filter_var(
+            Setting::where('name', 'activate_withdrawal')
+                ->value('value'),
+            FILTER_VALIDATE_BOOLEAN
+        );
+    }
+
     /*
-    |--------------------------------------------------------------------------
-    | Computed properties
-    |--------------------------------------------------------------------------
+    |----------------------------------------------------------------------
+    | Computed Properties
+    |----------------------------------------------------------------------
     */
 
-    public function getSelectedUserProperty()
+    public function getSelectedUserProperty(): ?User
     {
         return $this->selectedUserId
             ? User::where('UserID', $this->selectedUserId)->first()
@@ -161,9 +178,9 @@ class AdminUsers extends Component
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | Search / table
-    |--------------------------------------------------------------------------
+    |----------------------------------------------------------------------
+    | Search / Table
+    |----------------------------------------------------------------------
     */
 
     public function updatingSearch(): void
@@ -178,9 +195,9 @@ class AdminUsers extends Component
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | View user
-    |--------------------------------------------------------------------------
+    |----------------------------------------------------------------------
+    | View User
+    |----------------------------------------------------------------------
     */
 
     public function viewUser(User $user): void
@@ -192,14 +209,20 @@ class AdminUsers extends Component
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | Add / Edit user
-    |--------------------------------------------------------------------------
+    |----------------------------------------------------------------------
+    | Add / Edit User
+    |----------------------------------------------------------------------
     */
 
     private function generateUplineCode(): string
     {
-        return strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 6));
+        return strtoupper(
+            substr(
+                md5(uniqid(mt_rand(), true)),
+                0,
+                6
+            )
+        );
     }
 
     private function resetUserForm(): void
@@ -227,6 +250,7 @@ class AdminUsers extends Component
         Log::info('Opening add user modal');
 
         $this->resetUserForm();
+
         $this->status = 'Active';
         $this->isAddModalOpen = true;
     }
@@ -255,7 +279,7 @@ class AdminUsers extends Component
             'lastname' => $this->lastname,
             'email' => $this->email ?: null,
             'username' => $this->username,
-            'password' => $this->password, // hashed via model cast
+            'password' => $this->password,
             'contactno' => $this->contactno ?: null,
             'gender' => $this->gender ?: null,
             'birthdate' => $this->birthdate ?: null,
@@ -266,9 +290,13 @@ class AdminUsers extends Component
             'referralCode' => $this->generateUplineCode(),
         ]);
 
-        session()->flash('success', 'User successfully created!');
+        session()->flash(
+            'success',
+            'User successfully created!'
+        );
 
         $this->resetUserForm();
+
         $this->status = 'Active';
         $this->isAddModalOpen = false;
     }
@@ -285,7 +313,12 @@ class AdminUsers extends Component
         $this->email = $user->email ?? '';
         $this->contactno = $user->contactno ?? '';
         $this->gender = $user->gender ?? '';
-        $this->birthdate = $user->birthdate ? \Carbon\Carbon::parse($user->birthdate)->format('Y-m-d') : '';
+
+        $this->birthdate = $user->birthdate
+            ? \Carbon\Carbon::parse($user->birthdate)
+                ->format('Y-m-d')
+            : '';
+
         $this->address = $user->address ?? '';
         $this->status = $user->status ?? 'Inactive';
         $this->RoleID = $user->RoleID ?? '';
@@ -296,68 +329,118 @@ class AdminUsers extends Component
 
     public function updateUser(): void
     {
-        Log::info("Attempting to update user ID: {$this->selectedUserId}");
+        Log::info(
+            "Attempting to update user ID: {$this->selectedUserId}"
+        );
 
         $this->validate([
             'firstname' => 'required|string|max:100',
             'middlename' => 'nullable|string|max:100',
             'lastname' => 'required|string|max:100',
-            'username' => 'required|string|max:50|unique:users,username,' . $this->selectedUserId . ',UserID',
+
+            'username' =>
+                'required|string|max:50|unique:users,username,'
+                . $this->selectedUserId
+                . ',UserID',
+
             'contactno' => 'nullable|string|max:20',
             'gender' => 'nullable|in:Male,Female,Other',
             'birthdate' => 'nullable|date',
             'address' => 'nullable|string',
+
             'RoleID' => 'required|exists:roles,RoleID',
+
             'position' => 'nullable|string|max:255',
-            'status' => 'required|in:Active,Inactive,Suspended',
+
+            'status' =>
+                'required|in:Active,Inactive,Suspended',
         ]);
 
         $user = User::find($this->selectedUserId);
 
         if (!$user) {
-            Log::warning("updateUser: no user found for ID {$this->selectedUserId}");
+            Log::warning(
+                "updateUser: no user found for ID {$this->selectedUserId}"
+            );
+
             $this->isEditModalOpen = false;
+
             return;
         }
 
-        $positionToSave = $this->position !== '' ? $this->position : null;
-
         $user->update([
             'firstname' => $this->firstname,
-            'middlename' => $this->middlename !== '' ? $this->middlename : null,
+
+            'middlename' =>
+                $this->middlename !== ''
+                    ? $this->middlename
+                    : null,
+
             'lastname' => $this->lastname,
+
             'username' => $this->username,
-            'contactno' => $this->contactno !== '' ? $this->contactno : null,
-            'gender' => $this->gender !== '' ? $this->gender : null,
-            'birthdate' => $this->birthdate !== '' ? $this->birthdate : null,
-            'address' => $this->address !== '' ? $this->address : null,
+
+            'contactno' =>
+                $this->contactno !== ''
+                    ? $this->contactno
+                    : null,
+
+            'gender' =>
+                $this->gender !== ''
+                    ? $this->gender
+                    : null,
+
+            'birthdate' =>
+                $this->birthdate !== ''
+                    ? $this->birthdate
+                    : null,
+
+            'address' =>
+                $this->address !== ''
+                    ? $this->address
+                    : null,
+
             'status' => $this->status,
+
             'RoleID' => $this->RoleID,
-            'position' => $positionToSave,
+
+            'position' =>
+                $this->position !== ''
+                    ? $this->position
+                    : null,
         ]);
 
-        Log::info("Successfully updated user ID: {$this->selectedUserId}");
+        Log::info(
+            "Successfully updated user ID: {$this->selectedUserId}"
+        );
 
         $this->isEditModalOpen = false;
-        session()->flash('success', 'User updated successfully.');
+
+        session()->flash(
+            'success',
+            'User updated successfully.'
+        );
     }
 
     public function closeModal(): void
     {
         $this->resetUserForm();
+
         $this->isAddModalOpen = false;
         $this->isEditModalOpen = false;
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | Delete user
-    |--------------------------------------------------------------------------
+    |----------------------------------------------------------------------
+    | Delete User
+    |----------------------------------------------------------------------
     */
 
     public function confirmDelete(User $user): void
     {
-        Log::info("Confirm deletion requested for user ID: {$user->UserID}");
+        Log::info(
+            "Confirm deletion requested for user ID: {$user->UserID}"
+        );
 
         $this->selectedUserId = $user->UserID;
         $this->isDeleteModalOpen = true;
@@ -365,22 +448,33 @@ class AdminUsers extends Component
 
     public function deleteUser(): void
     {
-        Log::info("Attempting deletion for user ID: {$this->selectedUserId}");
+        Log::info(
+            "Attempting deletion for user ID: {$this->selectedUserId}"
+        );
 
         if ($this->selectedUser) {
+
             $userId = $this->selectedUserId;
+
             $this->selectedUser->delete();
-            Log::info("Successfully deleted user ID: {$userId}");
+
+            Log::info(
+                "Successfully deleted user ID: {$userId}"
+            );
         }
 
         $this->isDeleteModalOpen = false;
-        session()->flash('message', 'User deleted successfully.');
+
+        session()->flash(
+            'message',
+            'User deleted successfully.'
+        );
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | Access control matrix
-    |--------------------------------------------------------------------------
+    |----------------------------------------------------------------------
+    | Access Control Matrix
+    |----------------------------------------------------------------------
     */
 
     private function initializeAccessMatrix(): void
@@ -402,6 +496,7 @@ class AdminUsers extends Component
         }
 
         foreach ($modules as $module) {
+
             $this->userAccess[$module] = [
                 'create' => false,
                 'retrieve' => false,
@@ -415,28 +510,54 @@ class AdminUsers extends Component
 
     public function openAccessModal(User $user): void
     {
-        Log::info("Opening access modal for user ID: {$user->UserID}");
+        Log::info(
+            "Opening access modal for user ID: {$user->UserID}"
+        );
 
         $this->selectedUserId = $user->UserID;
+
         $this->initializeAccessMatrix();
 
         if ($user->RoleID) {
-            $privileges = Privilege::where('RoleID', $user->RoleID)->with('module')->get();
+
+            $privileges = Privilege::where(
+                'RoleID',
+                $user->RoleID
+            )
+                ->with('module')
+                ->get();
 
             foreach ($privileges as $privilege) {
-                if ($privilege->module) {
-                    $moduleName = $privilege->module->modulename;
 
-                    if (isset($this->userAccess[$moduleName])) {
-                        $this->userAccess[$moduleName] = [
-                            'create' => (bool) $privilege->can_create,
-                            'retrieve' => (bool) $privilege->can_read,
-                            'update' => (bool) $privilege->can_update,
-                            'delete' => (bool) $privilege->can_delete,
-                            'status' => (bool) $privilege->can_change_status,
-                            'printall' => (bool) $privilege->can_print,
-                        ];
-                    }
+                if (!$privilege->module) {
+                    continue;
+                }
+
+                $moduleName =
+                    $privilege->module->modulename;
+
+                if (isset($this->userAccess[$moduleName])) {
+
+                    $this->userAccess[$moduleName] = [
+
+                        'create' =>
+                            (bool) $privilege->can_create,
+
+                        'retrieve' =>
+                            (bool) $privilege->can_read,
+
+                        'update' =>
+                            (bool) $privilege->can_update,
+
+                        'delete' =>
+                            (bool) $privilege->can_delete,
+
+                        'status' =>
+                            (bool) $privilege->can_change_status,
+
+                        'printall' =>
+                            (bool) $privilege->can_print,
+                    ];
                 }
             }
         }
@@ -446,239 +567,220 @@ class AdminUsers extends Component
 
     public function saveAccess(): void
     {
-        Log::info("Saving access permissions matrix for user ID: {$this->selectedUserId}");
+        Log::info(
+            "Saving access permissions matrix for user ID: {$this->selectedUserId}"
+        );
 
         $user = $this->selectedUser;
 
         if (!$user || !$user->RoleID) {
-            Log::warning('saveAccess: User or RoleID not found.');
+
+            Log::warning(
+                'saveAccess: User or RoleID not found.'
+            );
+
             return;
         }
 
-        foreach ($this->userAccess as $moduleName => $permissions) {
-            $module = Module::where('modulename', $moduleName)->first();
+        foreach (
+            $this->userAccess
+            as $moduleName => $permissions
+        ) {
 
-            if ($module) {
-                Privilege::updateOrCreate(
-                    [
-                        'RoleID' => $user->RoleID,
-                        'ModuleID' => $module->ModuleID,
-                    ],
-                    [
-                        'can_create' => $permissions['create'],
-                        'can_read' => $permissions['retrieve'],
-                        'can_update' => $permissions['update'],
-                        'can_delete' => $permissions['delete'],
-                        'can_print' => $permissions['printall'],
-                        'can_change_status' => $permissions['status'],
-                    ]
-                );
+            $module = Module::where(
+                'modulename',
+                $moduleName
+            )->first();
+
+            if (!$module) {
+                continue;
             }
+
+            Privilege::updateOrCreate(
+
+                [
+                    'RoleID' => $user->RoleID,
+
+                    'ModuleID' => $module->ModuleID,
+                ],
+
+                [
+                    'can_create' =>
+                        $permissions['create'],
+
+                    'can_read' =>
+                        $permissions['retrieve'],
+
+                    'can_update' =>
+                        $permissions['update'],
+
+                    'can_delete' =>
+                        $permissions['delete'],
+
+                    'can_print' =>
+                        $permissions['printall'],
+
+                    'can_change_status' =>
+                        $permissions['status'],
+                ]
+            );
         }
 
         $this->isAccessModalOpen = false;
-        session()->flash('message', 'User access permissions updated successfully.');
+
+        session()->flash(
+            'message',
+            'User access permissions updated successfully.'
+        );
     }
 
     /*
-    |--------------------------------------------------------------------------
+    |----------------------------------------------------------------------
     | Withdrawals
     |
-    | Lifecycle (matches the DB enum: Pending / Approved / Rejected):
-    |   1. Admin clicks "Withdraw"  -> creates a Pending request.
-    |   2. Admin clicks "Pending"   -> approval modal -> Approve.
-    |   3. Status becomes Approved -> this IS the released state.
-    |      No further action is available once Approved.
-    |--------------------------------------------------------------------------
+    | Withdrawal creation:
+    | Handled by the reusable WithdrawalModal component.
+    |
+    | Withdrawal approval/release:
+    | Handled here by AdminUsers.
+    |----------------------------------------------------------------------
     */
-
-    private function resetWithdrawalForm(): void
-    {
-        $this->reset([
-            'withdrawAmount',
-            'withdrawalMethod',
-            'accountName',
-            'accountNumber',
-            'paymentReference',
-        ]);
-    }
-
-    /**
-     * Cash wallet balance for a specific user (excludes PF-sourced funds).
-     * Used for both the modal display and the withdrawal validation cap,
-     * so the two always agree.
-     */
-    private function getWalletBalance(int $userId): float
-    {
-        return (float) Wallet::where('UserID', $userId)
-            ->where('status', 'Active')
-            ->where('source', '!=', 'PF')
-            ->sum('amount');
-    }
 
     public function openWithdrawalModal(int $userId): void
     {
         if (!$this->canCreate) {
-            session()->flash('error', 'You do not have permission to create a withdrawal request.');
+
+            session()->flash(
+                'error',
+                'You do not have permission to create a withdrawal request.'
+            );
+
             return;
         }
 
         $user = User::find($userId);
 
         if (!$user) {
-            session()->flash('error', 'User not found.');
+
+            session()->flash(
+                'error',
+                'User not found.'
+            );
+
             return;
         }
 
-        $this->selectedWithdrawalUserId = $user->UserID;
-        $this->selectedWithdrawalUser = $user;
-        $this->selectedWithdrawal = null;
-        $this->selectedWithdrawalBalance = $this->getWalletBalance($user->UserID);
-
-        $this->resetWithdrawalForm();
-
-        $this->withdrawalModalMode = 'create';
-        $this->isWithdrawalModalOpen = true;
+        // Tell the reusable WithdrawalModal
+        // to use this selected user's wallet.
+        $this->dispatch(
+            'open-admin-withdrawal-modal',
+            userID: $user->UserID
+        );
     }
+
+    /*
+    |----------------------------------------------------------------------
+    | Refresh table after a withdrawal is created
+    |
+    | WithdrawalModal is a separate Livewire component
+    | (used here in admin mode, and on the member
+    | dashboard on its own). When it dispatches
+    | 'withdrawal-submitted', this listener re-renders
+    | AdminUsers so the Pending/Withdraw badge for the
+    | affected row updates without a manual refresh.
+    |----------------------------------------------------------------------
+    */
+
+    #[On('withdrawal-submitted')]
+    public function onWithdrawalSubmittedElsewhere(): void
+    {
+        Log::info('AdminUsers: withdrawal-submitted event received, refreshing table.');
+
+        // No state to update here — render() re-queries
+        // has_pending_withdrawal on every request, so
+        // simply being triggered by this event is enough
+        // to reflect the new badge on next paint.
+    }
+
+    /*
+    |----------------------------------------------------------------------
+    | Open Pending Withdrawal Approval
+    |----------------------------------------------------------------------
+    */
 
     public function openWithdrawalApproval(int $userId): void
     {
         if (!$this->canUpdate) {
-            session()->flash('error', 'You do not have permission to approve withdrawals.');
+
+            session()->flash(
+                'error',
+                'You do not have permission to approve withdrawals.'
+            );
+
             return;
         }
 
         $user = User::find($userId);
 
         if (!$user) {
-            session()->flash('error', 'User not found.');
+
+            session()->flash(
+                'error',
+                'User not found.'
+            );
+
             return;
         }
 
         $withdrawal = $user->withdrawals()
             ->where('status', 'Pending')
-            ->latest()
+            ->latest('WithdrawID')
             ->first();
 
         if (!$withdrawal) {
-            session()->flash('message', 'No pending withdrawal request found.');
+
+            session()->flash(
+                'message',
+                'No pending withdrawal request found.'
+            );
+
             return;
         }
 
-        $this->selectedWithdrawalUserId = $user->UserID;
-        $this->selectedWithdrawalUser = $user;
-        $this->selectedWithdrawal = $withdrawal;
+        $this->selectedWithdrawalUserId =
+            $user->UserID;
 
-        $this->withdrawalModalMode = 'approval';
-        $this->isWithdrawalModalOpen = true;
+        $this->selectedWithdrawalUser =
+            $user;
+
+        $this->selectedWithdrawal =
+            $withdrawal;
+
+        $this->isWithdrawalModalOpen =
+            true;
     }
+
+    /*
+    |----------------------------------------------------------------------
+    | Close Approval Modal
+    |----------------------------------------------------------------------
+    */
 
     public function closeWithdrawalModal(): void
     {
         $this->isWithdrawalModalOpen = false;
+
         $this->selectedWithdrawalUserId = null;
         $this->selectedWithdrawalUser = null;
         $this->selectedWithdrawal = null;
-        $this->selectedWithdrawalBalance = 0;
-        $this->withdrawalModalMode = 'create';
-        $this->resetWithdrawalForm();
     }
 
-    public function submitWithdrawal(): void
-    {
-        if (!$this->selectedWithdrawalUserId) {
-            session()->flash('error', 'No withdrawal user selected.');
-            return;
-        }
+    /*
+    |----------------------------------------------------------------------
+    | Approve / Release Withdrawal
+    |----------------------------------------------------------------------
+    */
 
-        $userID = $this->selectedWithdrawalUserId;
-
-        $availableBalance = $this->getWalletBalance($userID);
-
-        $rules = [
-            'withdrawAmount' => [
-                'required',
-                'numeric',
-                'min:500',
-                'max:' . max(0, $availableBalance),
-            ],
-            'withdrawalMethod' => [
-                'required',
-                'in:Cash,GCash,Maya,Bank Transfer',
-            ],
-            'paymentReference' => [
-                'nullable',
-                'string',
-                'max:100',
-            ],
-        ];
-
-        if ($this->withdrawalMethod !== 'Cash') {
-            $rules['accountName'] = ['required', 'string', 'max:255'];
-            $rules['accountNumber'] = ['required', 'string', 'max:255'];
-        } else {
-            $rules['accountName'] = ['nullable', 'string', 'max:255'];
-            $rules['accountNumber'] = ['nullable', 'string', 'max:255'];
-        }
-
-        $this->validate($rules, [
-            'withdrawAmount.required' => 'Please enter a withdrawal amount.',
-            'withdrawAmount.numeric' => 'Withdrawal amount must be a valid number.',
-            'withdrawAmount.min' => 'Minimum withdrawal amount is ₱500.00.',
-            'withdrawAmount.max' => 'Withdrawal amount exceeds the user\'s available balance.',
-            'withdrawalMethod.required' => 'Please select a withdrawal method.',
-            'accountName.required' => 'Please enter the account name.',
-            'accountNumber.required' => 'Please enter the account number.',
-        ]);
-
-        try {
-            DB::transaction(function () use ($userID) {
-                $type = $this->withdrawalMethod === 'Cash' ? 'W' : 'O';
-
-                $withdrawal = Withdrawal::create([
-                    'UserID' => $userID,
-                    'amount' => $this->withdrawAmount,
-                    'type' => $type,
-                    'withdrawal_method' => $this->withdrawalMethod,
-                    'account_name' => $this->withdrawalMethod === 'Cash' ? null : $this->accountName,
-                    'account_number' => $this->withdrawalMethod === 'Cash' ? null : $this->accountNumber,
-                    'payment_reference' => $this->paymentReference ?: null,
-                    'ProcessedBy' => Auth::user()->UserID,
-                    'status' => 'Pending',
-                ]);
-
-                Ledger::create([
-                    'RefID' => $userID,
-                    'WithdrawID' => $withdrawal->WithdrawID,
-                    'amount' => -$this->withdrawAmount,
-                    'Source' => 'WD',
-                    'ActivationID' => null,
-                    'status' => 'Pending',
-                ]);
-            });
-
-            $this->closeWithdrawalModal();
-
-            session()->flash('success', 'Withdrawal request submitted successfully.');
-        } catch (\Exception $e) {
-            report($e);
-            session()->flash('error', 'Something went wrong while submitting the withdrawal.');
-        }
-    }
-
-    /**
-     * Approve a pending withdrawal. Approved is the terminal / released
-     * state for this workflow — there is no separate "release" step.
-     *
-     * On approval we:
-     *   1. Flip the withdrawal to 'Approved'.
-     *   2. Debit the user's cash wallet by inserting a negative-amount
-     *      wallet row (the wallet balance is an append-only sum, same
-     *      pattern as the existing Ledger entries — so we never mutate
-     *      an existing wallet row, we add an offsetting one).
-     *   3. Flip the matching Ledger row from 'Pending' to 'Approved' so
-     *      the ledger and the withdrawal status stay in sync.
-     */
     public function processWithdrawalApproval(): void
     {
         if (!$this->selectedWithdrawal) {
@@ -686,76 +788,188 @@ class AdminUsers extends Component
         }
 
         try {
+
             DB::transaction(function () {
-                $withdrawal = $this->selectedWithdrawal;
+
+                $withdrawal =
+                    Withdrawal::where(
+                        'WithdrawID',
+                        $this->selectedWithdrawal->WithdrawID
+                    )
+                        ->lockForUpdate()
+                        ->first();
+
+                if (
+                    !$withdrawal
+                    || $withdrawal->status !== 'Pending'
+                ) {
+                    throw new \Exception(
+                        'Withdrawal is no longer pending.'
+                    );
+                }
+
+                // ==========================================
+                // APPROVE / RELEASE WITHDRAWAL
+                // ==========================================
 
                 $withdrawal->update([
                     'status' => 'Approved',
-                    'ProcessedBy' => Auth::user()?->UserID,
+
+                    'ProcessedBy' =>
+                        Auth::user()?->UserID,
                 ]);
 
-                // Debit the wallet: negative entry so the running sum drops.
+                // ==========================================
+                // DEDUCT FROM WALLET
+                //
+                // Negative wallet entry keeps the wallet
+                // history intact.
+                // ==========================================
+
                 Wallet::create([
-                    'UserID' => $withdrawal->UserID,
-                    'withdrawID' => $withdrawal->WithdrawID,
-                    'amount' => -$withdrawal->amount,
-                    'source' => 'WD',
-                    'status' => 'Active',
+                    'UserID' =>
+                        $withdrawal->UserID,
+
+                    'withdrawID' =>
+                        $withdrawal->WithdrawID,
+
+                    'amount' =>
+                        -abs((float) $withdrawal->amount),
+
+                    'source' =>
+                        'WD',
+
+                    'status' =>
+                        'Active',
                 ]);
 
+                // ==========================================
+                // COMPLETE LEDGER ENTRY
+                // ==========================================
 
-
-                // Keep the ledger entry for this withdrawal in sync.
-                Ledger::where('WithdrawID', $withdrawal->WithdrawID)
-                    ->update(['status' => 'Completed']);
+                Ledger::where(
+                    'WithdrawID',
+                    $withdrawal->WithdrawID
+                )->update([
+                    'status' => 'Completed',
+                ]);
             });
 
-            session()->flash('message', 'Withdrawal approved, released, and deducted from the wallet successfully.');
+            session()->flash(
+                'success',
+                'Withdrawal approved, released, and deducted from the wallet successfully.'
+            );
+
         } catch (\Exception $e) {
+
             report($e);
-            session()->flash('error', 'Something went wrong while approving the withdrawal.');
+
+            session()->flash(
+                'error',
+                'Something went wrong while approving the withdrawal.'
+            );
         }
 
         $this->closeWithdrawalModal();
     }
 
     /*
-    |--------------------------------------------------------------------------
+    |----------------------------------------------------------------------
     | Render
-    |--------------------------------------------------------------------------
+    |----------------------------------------------------------------------
     */
 
     public function render()
     {
         $users = User::query()
+
             ->where('RoleID', '!=', 4)
+
             ->withExists([
-                'activations as has_pending_activation' => function ($query) {
-                    $query->where('status', 'Pending');
+
+                'activations as has_pending_activation'
+                    => function ($query) {
+
+                    $query->where(
+                        'status',
+                        'Pending'
+                    );
                 },
-                'withdrawals as has_pending_withdrawal' => function ($query) {
-                    $query->where('status', 'Pending');
+
+                'withdrawals as has_pending_withdrawal'
+                    => function ($query) {
+
+                    $query->where(
+                        'status',
+                        'Pending'
+                    );
                 },
-                'withdrawals as has_approved_withdrawal' => function ($query) {
-                    $query->where('status', 'Approved');
+
+                'withdrawals as has_approved_withdrawal'
+                    => function ($query) {
+
+                    $query->where(
+                        'status',
+                        'Approved'
+                    );
                 },
             ])
-            ->when(filled($this->search), function ($query) {
-                $search = trim($this->search);
 
-                $query->where(function ($q) use ($search) {
-                    $q->where('firstname', 'like', "%{$search}%")
-                        ->orWhere('middlename', 'like', "%{$search}%")
-                        ->orWhere('lastname', 'like', "%{$search}%")
-                        ->orWhere('username', 'like', "%{$search}%")
-                        ->orWhere('contactno', 'like', "%{$search}%");
-                });
-            })
+            ->when(
+                filled($this->search),
+                function ($query) {
+
+                    $search =
+                        trim($this->search);
+
+                    $query->where(
+                        function ($q) use ($search) {
+
+                            $q->where(
+                                'firstname',
+                                'like',
+                                "%{$search}%"
+                            )
+
+                            ->orWhere(
+                                'middlename',
+                                'like',
+                                "%{$search}%"
+                            )
+
+                            ->orWhere(
+                                'lastname',
+                                'like',
+                                "%{$search}%"
+                            )
+
+                            ->orWhere(
+                                'username',
+                                'like',
+                                "%{$search}%"
+                            )
+
+                            ->orWhere(
+                                'contactno',
+                                'like',
+                                "%{$search}%"
+                            );
+                        }
+                    );
+                }
+            )
+
             ->latest('UserID')
+
             ->paginate(10);
 
-        return view('livewire.admin-pages.masterlist.admin-users', [
-            'users' => $users,
-        ]);
+        return view(
+            'livewire.admin-pages.masterlist.admin-users',
+            [
+                'users' => $users,
+
+                'isWithdrawalActive' => $this->isWithdrawalActive(),
+            ]
+        );
     }
 }

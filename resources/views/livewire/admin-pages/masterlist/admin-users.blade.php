@@ -100,93 +100,150 @@
                                     class="px-3 py-1 rounded-md border border-amber-400 bg-amber-500 text-white text-xs">Inactive</span>
                             @endif
                         </td>
-                        <td class="py-4 px-4">{{ $user->RoleID }}</td>
+                       <td class="py-4 px-4">{{ $user->RoleID }}</td>
 
                         @if ($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
                             <td class="py-4 px-4">
                                 <div class="flex items-center justify-center space-x-2">
+
                                     @if ($this->canCreate)
-                                        <button wire:click="openAccessModal({{ $user->UserID }})" title="User Access"
+                                        <button wire:click="openAccessModal({{ $user->UserID }})"
+                                            title="User Access"
                                             class="cursor-pointer p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                <path stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
                                                     d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                             </svg>
                                         </button>
                                     @endif
 
                                     @if ($this->canRead)
-                                        <button wire:click="viewUser({{ $user->UserID }})" title="View"
+                                        <button wire:click="viewUser({{ $user->UserID }})"
+                                            title="View"
                                             class="cursor-pointer p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                <path stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
                                                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                <path stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                         </button>
                                     @endif
 
                                     @if ($this->canUpdate)
-                                        <button wire:click="editUser({{ $user->UserID }})" title="Edit"
+                                        <button wire:click="editUser({{ $user->UserID }})"
+                                            title="Edit"
                                             class="cursor-pointer p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                <path stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
                                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
                                     @endif
 
                                     @if ($this->canDelete)
-                                        <button wire:click="confirmDelete({{ $user->UserID }})" title="Delete"
+                                        <button wire:click="confirmDelete({{ $user->UserID }})"
+                                            title="Delete"
                                             class="cursor-pointer p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                <path stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
                                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
                                         </button>
                                     @endif
 
-                                    {{-- WITHDRAWAL ACTION --}}
+
+                                    {{-- ===============================
+                                        WITHDRAWAL ACTION
+                                    ================================ --}}
+
                                     @if ($user->has_pending_withdrawal)
-                                        {{-- Pending Withdrawal --}}
+
+                                        {{-- Pending: Admin can approve.
+                                            Approval always stays available even
+                                            when new withdrawals are disabled — this
+                                            just processes a request that already
+                                            exists, it isn't creating a new one. --}}
                                         @if ($this->canUpdate)
-                                            <button type="button"
+                                            <button
+                                                type="button"
                                                 wire:click="openWithdrawalApproval({{ $user->UserID }})"
                                                 title="Approve Withdrawal Request"
-                                                class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow">
+                                                class="inline-flex items-center justify-center w-24 px-3 py-2
+                                                    rounded-lg bg-amber-500 text-white
+                                                    hover:bg-amber-600 transition
+                                                    cursor-pointer text-xs font-semibold shadow"
+                                            >
                                                 Pending
                                             </button>
                                         @endif
-                                    @elseif ($user->has_approved_withdrawal)
-                                        {{-- Approved = Released. No further action needed. --}}
-                                        <span
-                                            title="Withdrawal Released"
-                                            class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold">
-                                            Released
-                                        </span>
-                                    @else
-                                        {{-- No Withdrawal --}}
+
+                                    @elseif ($isWithdrawalActive)
+
+                                        {{-- No pending withdrawal, and withdrawals
+                                            are currently enabled:
+                                            Approved withdrawal will also return here
+                                            and show Withdraw again --}}
                                         @if ($this->canCreate)
-                                            <button type="button"
+                                            <button
+                                                type="button"
                                                 wire:click="openWithdrawalModal({{ $user->UserID }})"
-                                                title="Withdraw"
-                                                class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
+                                                title="Create Withdrawal Request"
+                                                class="inline-flex items-center justify-center w-24 px-3 py-2
+                                                    rounded-lg bg-[#0C2C6B] text-white
+                                                    hover:bg-[#09204f]
+                                                    transition cursor-pointer text-xs
+                                                    font-semibold shadow"
+                                            >
                                                 Withdraw
                                             </button>
                                         @endif
+
+                                    @else
+
+                                        {{-- No pending withdrawal, but withdrawals
+                                            are globally disabled: show a locked
+                                            state instead of a clickable button,
+                                            matching the dashboard's own disabled
+                                            message. --}}
+                                        @if ($this->canCreate)
+                                            <span
+                                                title="Withdrawals are currently unavailable"
+                                                class="inline-flex items-center justify-center w-24 px-3 py-2
+                                                    rounded-lg bg-gray-100 border border-gray-200
+                                                    text-gray-400 text-xs font-semibold
+                                                    cursor-not-allowed"
+                                            >
+                                                🔒 Off
+                                            </span>
+                                        @endif
+
                                     @endif
+
                                 </div>
                             </td>
                         @endif
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="text-center py-8 text-slate-500">No users found.</td>
+                        <td colspan="{{ ($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate) ? 9 : 8 }}"
+                            class="text-center py-8 text-slate-500">
+                            No users found.
+                        </td>
                     </tr>
                 @endforelse
             </tbody>
@@ -230,222 +287,170 @@
         @endif
     </div>
 
-    {{-- =====================================================
-         WITHDRAWAL MODAL  (create / approval)
-         Note: 'Approved' is the final/released state — there is
-         no separate release step (matches the DB status enum:
-         Pending / Approved / Rejected).
-    ===================================================== --}}
-    @if ($isWithdrawalModalOpen && $selectedWithdrawalUser)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div
-                class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative border border-slate-100">
+    <livewire:components.withdrawal-modal />
 
-                {{-- Header --}}
-                <div class="bg-[#0C2C6B] px-6 py-4 flex items-center justify-between text-white">
-                    <div class="flex items-center space-x-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 9V7a4 4 0 00-8 0v2m-2 0h12a2 2 0 012 2v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7a2 2 0 012-2z" />
-                        </svg>
-                        <h3 class="text-base font-bold uppercase tracking-wider">
-                            @if ($withdrawalModalMode === 'approval')
-                                Approve &amp; Release Withdrawal
-                            @else
-                                Withdraw Funds
-                            @endif
-                        </h3>
-                    </div>
-                    <button type="button" wire:click="closeWithdrawalModal"
-                        class="cursor-pointer text-white/80 hover:text-white text-xl font-bold transition">&times;</button>
+{{-- =====================================================
+WITHDRAWAL APPROVAL MODAL
+===================================================== --}}
+@if ($isWithdrawalModalOpen && $selectedWithdrawalUser && $selectedWithdrawal) <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"> <div
+         class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative border border-slate-100">
+
+
+        {{-- Header --}}
+        <div class="bg-[#0C2C6B] px-6 py-4 flex items-center justify-between text-white">
+            <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 9V7a4 4 0 00-8 0v2m-2 0h12a2 2 0 012 2v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7a2 2 0 012-2z" />
+                </svg>
+
+                <h3 class="text-base font-bold uppercase tracking-wider">
+                    Approve &amp; Release Withdrawal
+                </h3>
+            </div>
+
+            <button
+                type="button"
+                wire:click="closeWithdrawalModal"
+                class="cursor-pointer text-white/80 hover:text-white text-xl font-bold transition">
+                &times;
+            </button>
+        </div>
+
+        {{-- Body --}}
+        <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+
+            {{-- Selected User --}}
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5">
+                <span class="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                    Withdrawal User
+                </span>
+
+                <p class="mt-1 font-bold text-slate-800">
+                    {{ $selectedWithdrawalUser->firstname }}
+                    {{ $selectedWithdrawalUser->middlename }}
+                    {{ $selectedWithdrawalUser->lastname }}
+                </p>
+            </div>
+
+            {{-- Pending Withdrawal Details --}}
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-xl">⏳</span>
+                    <h4 class="font-bold text-amber-800">
+                        Pending Withdrawal Request
+                    </h4>
                 </div>
 
-                {{-- Body --}}
-                <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                <div class="space-y-2 text-sm">
 
-                    {{-- Selected User --}}
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5">
-                        <span class="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
-                            Withdrawal User
+                    {{-- Amount --}}
+                    <div class="flex justify-between gap-4">
+                        <span class="text-gray-500">Amount</span>
+                        <span class="font-bold text-slate-800 text-right">
+                            ₱{{ number_format($selectedWithdrawal->amount ?? 0, 2) }}
                         </span>
-                        <p class="mt-1 font-bold text-slate-800">
-                            {{ $selectedWithdrawalUser->firstname }}
-                            {{ $selectedWithdrawalUser->middlename }}
-                            {{ $selectedWithdrawalUser->lastname }}
-                        </p>
                     </div>
 
-                    {{-- ===================== CREATE ===================== --}}
-                    @if ($withdrawalModalMode === 'create')
+                    {{-- Withdrawal Method --}}
+                    <div class="flex justify-between gap-4">
+                        <span class="text-gray-500">Method</span>
+                        <span class="font-semibold text-slate-800 text-right">
+                            {{ $selectedWithdrawal->withdrawal_method ?? '-' }}
+                        </span>
+                    </div>
 
-                        {{-- Available Balance --}}
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between">
-                            <div>
-                                <span class="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
-                                    Available Cash Wallet
-                                </span>
-                                <span class="text-lg font-bold text-[#0C2C6B]">
-                                    ₱{{ number_format($selectedWithdrawalBalance, 2) }}
-                                </span>
-                            </div>
-                            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                                💳
-                            </div>
+                    {{-- Account Name --}}
+                    @if ($selectedWithdrawal->account_name)
+                        <div class="flex justify-between gap-4">
+                            <span class="text-gray-500">Account Name</span>
+                            <span class="font-semibold text-slate-800 text-right">
+                                {{ $selectedWithdrawal->account_name }}
+                            </span>
                         </div>
-
-                        {{-- Schedule Info --}}
-                        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-900 space-y-2">
-                            <div class="font-bold flex items-center gap-1.5 text-blue-950 text-sm">
-                                <span>ℹ️</span>
-                                Payout Schedule &amp; Cut-off Rules
-                            </div>
-                            <p>
-                                • <strong>Friday 6:01 PM to Friday 6:00 PM:</strong>
-                                Requests processed and released on the upcoming Monday.
-                            </p>
-                        </div>
-
-                        {{-- Withdrawal Amount --}}
-                        <div class="space-y-1.5">
-                            <label class="block text-xs font-semibold text-gray-700">
-                                Enter Withdrawal Amount
-                            </label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">
-                                    ₱
-                                </span>
-                                <input type="number" step="0.01" min="500" wire:model="withdrawAmount"
-                                    placeholder="0.00"
-                                    class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm font-semibold">
-                            </div>
-                            @error('withdrawAmount')
-                                <p class="text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                            <p class="text-[11px] text-gray-500">
-                                Minimum withdrawal amount is <strong>₱500.00</strong>
-                            </p>
-                        </div>
-
-                        {{-- Withdrawal Method --}}
-                        <div class="space-y-1.5">
-                            <label class="block text-xs font-semibold text-gray-700">
-                                Withdrawal Method
-                            </label>
-                            <select wire:model.live="withdrawalMethod"
-                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm">
-                                <option value="">Select withdrawal method</option>
-                                <option value="Cash">Cash</option>
-                                <option value="GCash">GCash</option>
-                                <option value="Maya">Maya</option>
-                                <option value="Bank Transfer">Bank Transfer</option>
-                            </select>
-                            @error('withdrawalMethod')
-                                <p class="text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        {{-- Online Account Details --}}
-                        @if ($withdrawalMethod && $withdrawalMethod !== 'Cash')
-                            <div class="space-y-1.5">
-                                <label class="block text-xs font-semibold text-gray-700">Account Name</label>
-                                <input type="text" wire:model="accountName" placeholder="Enter account holder name"
-                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm">
-                                @error('accountName')
-                                    <p class="text-xs text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="space-y-1.5">
-                                <label class="block text-xs font-semibold text-gray-700">Account Number</label>
-                                <input type="text" wire:model="accountNumber" placeholder="Enter account number"
-                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm">
-                                @error('accountNumber')
-                                    <p class="text-xs text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        @endif
-
-                        {{-- Payment Reference (optional, online methods) --}}
-                        @if ($withdrawalMethod && $withdrawalMethod !== 'Cash')
-                            <div class="space-y-1.5">
-                                <label class="block text-xs font-semibold text-gray-700">Payment Reference (optional)</label>
-                                <input type="text" wire:model="paymentReference" placeholder="Enter reference number"
-                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm">
-                                @error('paymentReference')
-                                    <p class="text-xs text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        @endif
-
-                    {{-- ===================== APPROVAL ===================== --}}
-                    @elseif ($withdrawalModalMode === 'approval')
-
-                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                            <div class="flex items-center gap-2 mb-3">
-                                <span class="text-xl">⏳</span>
-                                <h4 class="font-bold text-amber-800">Pending Withdrawal Request</h4>
-                            </div>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">Amount</span>
-                                    <span class="font-bold text-slate-800">
-                                        ₱{{ number_format($selectedWithdrawal->amount ?? 0, 2) }}
-                                    </span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">Method</span>
-                                    <span class="font-semibold text-slate-800">
-                                        {{ $selectedWithdrawal->withdrawal_method ?? '-' }}
-                                    </span>
-                                </div>
-                                @if ($selectedWithdrawal->account_name)
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-500">Account Name</span>
-                                        <span class="font-semibold text-slate-800">
-                                            {{ $selectedWithdrawal->account_name }}
-                                        </span>
-                                    </div>
-                                @endif
-                                @if ($selectedWithdrawal->account_number)
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-500">Account Number</span>
-                                        <span class="font-semibold text-slate-800">
-                                            {{ $selectedWithdrawal->account_number }}
-                                        </span>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-900">
-                            <p>Approving this request marks it as released. Are you sure you want to approve and release these funds?</p>
-                        </div>
-
                     @endif
-                </div>
 
-                {{-- Footer: action button changes per mode --}}
-                <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end space-x-2">
-                    <button type="button" wire:click="closeWithdrawalModal"
-                        class="cursor-pointer px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-300 transition">
-                        Cancel
-                    </button>
-
-                    @if ($withdrawalModalMode === 'create')
-                        <button type="button" wire:click="submitWithdrawal" wire:loading.attr="disabled"
-                            class="cursor-pointer px-4 py-2 bg-[#0C2C6B] text-white rounded-xl text-sm font-semibold hover:bg-[#092254] transition shadow-sm">
-                            Submit Request
-                        </button>
-                    @elseif ($withdrawalModalMode === 'approval')
-                        <button type="button" wire:click="processWithdrawalApproval" wire:loading.attr="disabled"
-                            class="cursor-pointer px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition shadow-sm">
-                            Approve &amp; Release
-                        </button>
+                    {{-- Account Number --}}
+                    @if ($selectedWithdrawal->account_number)
+                        <div class="flex justify-between gap-4">
+                            <span class="text-gray-500">Account Number</span>
+                            <span class="font-semibold text-slate-800 text-right">
+                                {{ $selectedWithdrawal->account_number }}
+                            </span>
+                        </div>
                     @endif
+
+                    {{-- Payment Reference --}}
+                    @if ($selectedWithdrawal->payment_reference)
+                        <div class="flex justify-between gap-4">
+                            <span class="text-gray-500">
+                                Payment Reference
+                            </span>
+
+                            <span class="font-semibold text-slate-800 text-right">
+                                {{ $selectedWithdrawal->payment_reference }}
+                            </span>
+                        </div>
+                    @endif
+
                 </div>
             </div>
+
+            {{-- Confirmation Warning --}}
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-900">
+                <div class="flex items-start gap-2">
+                    <span>ℹ️</span>
+
+                    <p>
+                        Approving this request will mark the withdrawal as
+                        <strong>Approved</strong> and deduct
+                        <strong>
+                            ₱{{ number_format($selectedWithdrawal->amount ?? 0, 2) }}
+                        </strong>
+                        from the user's wallet.
+                    </p>
+                </div>
+            </div>
+
         </div>
-    @endif
+
+        {{-- Footer --}}
+        <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end space-x-2">
+
+            {{-- Cancel --}}
+            <button
+                type="button"
+                wire:click="closeWithdrawalModal"
+                wire:loading.attr="disabled"
+                class="cursor-pointer px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-300 transition">
+
+                Cancel
+            </button>
+
+            {{-- Approve --}}
+            <button
+                type="button"
+                wire:click="processWithdrawalApproval"
+                wire:loading.attr="disabled"
+                class="cursor-pointer px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition shadow-sm">
+
+                <span wire:loading.remove wire:target="processWithdrawalApproval">
+                    Approve &amp; Release
+                </span>
+
+                <span wire:loading wire:target="processWithdrawalApproval">
+                    Processing...
+                </span>
+
+            </button>
+
+        </div>
+    </div>
+</div>
+
+
+@endif
+
 
     {{-- =====================================================
          VIEW USER MODAL

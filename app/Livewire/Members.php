@@ -2,8 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Models\Ledger;
+use App\Models\Setting;
 use App\Models\User;
+use App\Models\Wallet;
+use App\Models\Withdrawal;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -29,8 +34,20 @@ class Members extends Component
 
     protected $paginationTheme = 'tailwind';
 
+    // =====================================================
+    // Withdrawal Approval State
+    //
+    // Withdrawal creation is handled by the reusable
+    // App\Livewire\Components\WithdrawalModal, the same
+    // way AdminUsers uses it — see openWithdrawalModal()
+    // below. Approval/release stays local to this
+    // component, same pattern as AdminUsers.
+    // =====================================================
+
     public bool $isWithdrawalModalOpen = false;
     public ?int $selectedWithdrawalUserId = null;
+    public ?User $selectedWithdrawalUser = null;
+    public ?Withdrawal $selectedWithdrawal = null;
 
     public function mount()
     {
@@ -109,6 +126,46 @@ class Members extends Component
 
     /*
     |--------------------------------------------------------------------------
+    | Refresh table after a withdrawal is created
+    |
+    | WithdrawalModal is a separate Livewire component,
+    | reused here in admin mode. When it dispatches
+    | 'withdrawal-submitted', this listener re-renders
+    | Members so the Pending/Withdraw state for the
+    | affected row updates without a manual refresh.
+    |--------------------------------------------------------------------------
+    */
+
+    #[On('withdrawal-submitted')]
+    public function onWithdrawalSubmittedElsewhere(): void
+    {
+        Log::info('Members: withdrawal-submitted event received, refreshing table.');
+
+        $this->skipRender = false;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Withdrawal Global Status
+    |
+    | Mirrors WithdrawalModal::isWithdrawalActive() and
+    | AdminUsers::isWithdrawalActive(). Used by the view
+    | to hide/disable the "Withdraw" creation action when
+    | withdrawals are turned off system-wide.
+    |--------------------------------------------------------------------------
+    */
+
+    public function isWithdrawalActive(): bool
+    {
+        return filter_var(
+            Setting::where('name', 'activate_withdrawal')
+                ->value('value'),
+            FILTER_VALIDATE_BOOLEAN
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Render Members
     |--------------------------------------------------------------------------
     */
@@ -152,6 +209,8 @@ class Members extends Component
 
         return view('components.admin-pages.masterlist.members', [
             'members' => $members,
+
+            'isWithdrawalActive' => $this->isWithdrawalActive(),
         ]);
     }
 
@@ -345,21 +404,178 @@ class Members extends Component
         $this->skipRender = false;
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Withdrawals
+    |
+    | Withdrawal creation:
+    | Handled by the reusable WithdrawalModal component,
+    | the same way AdminUsers uses it.
+    |
+    | Withdrawal approval/release:
+    | Handled here directly, same pattern as AdminUsers.
+    |--------------------------------------------------------------------------
+    */
+
+    public function openWithdrawalModal(int $userId): void
+    {
+        if (!$this->canCreate) {
+
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to create a withdrawal request.',
+            ]);
+
+            return;
+        }
+
+        $member = User::find($userId);
+
+        if (!$member) {
+
+            $this->dispatch('swal:error', [
+                'title' => 'Not Found',
+                'text' => 'Member not found.',
+            ]);
+
+            return;
+        }
+
+        // Tell the reusable WithdrawalModal
+        // to use this selected member's wallet.
+        $this->dispatch(
+            'open-admin-withdrawal-modal',
+            userID: $member->UserID
+        );
+    }
+
     public function openWithdrawalApproval($id): void
-{
-    if (!$this->canUpdate) {
-        return;
+    {
+        if (!$this->canUpdate) {
+            return;
+        }
+
+        Log::info('Withdrawal approval clicked', ['UserID' => $id, 'reviewed_by' => Auth::id()]);
+
+        $member = User::find($id);
+
+        if (!$member) {
+            Log::warning('Withdrawal approval failed: member not found.', ['UserID' => $id]);
+            return;
+        }
+
+        $withdrawal = $member->withdrawals()
+            ->where('status', 'Pending')
+            ->latest('WithdrawID')
+            ->first();
+
+        if (!$withdrawal) {
+
+            $this->dispatch('swal:error', [
+                'title' => 'No Pending Request',
+                'text' => 'No pending withdrawal request found for this member.',
+            ]);
+
+            return;
+        }
+
+        $this->selectedWithdrawalUserId = $member->UserID;
+        $this->selectedWithdrawalUser = $member;
+        $this->selectedWithdrawal = $withdrawal;
+
+        $this->isWithdrawalModalOpen = true;
     }
 
-    $member = User::find($id);
+    public function closeWithdrawalModal(): void
+    {
+        $this->isWithdrawalModalOpen = false;
 
-    if (!$member) {
-        return;
+        $this->selectedWithdrawalUserId = null;
+        $this->selectedWithdrawalUser = null;
+        $this->selectedWithdrawal = null;
     }
 
-    // Dispatch an event to open your withdrawal approval modal (or handle it directly)
-    $this->dispatch('open-withdrawal-modal', UserID: $member->UserID);
-}
+    public function processWithdrawalApproval(): void
+    {
+        if (!$this->selectedWithdrawal) {
+            return;
+        }
+
+        try {
+
+            DB::transaction(function () {
+
+                $withdrawal = Withdrawal::where(
+                    'WithdrawID',
+                    $this->selectedWithdrawal->WithdrawID
+                )
+                    ->lockForUpdate()
+                    ->first();
+
+                if (
+                    !$withdrawal
+                    || $withdrawal->status !== 'Pending'
+                ) {
+                    throw new \Exception(
+                        'Withdrawal is no longer pending.'
+                    );
+                }
+
+                // ==========================================
+                // APPROVE / RELEASE WITHDRAWAL
+                // ==========================================
+
+                $withdrawal->update([
+                    'status' => 'Approved',
+                    'ProcessedBy' => Auth::user()?->UserID,
+                ]);
+
+                // ==========================================
+                // DEDUCT FROM WALLET
+                //
+                // Negative wallet entry keeps the wallet
+                // history intact.
+                // ==========================================
+
+                Wallet::create([
+                    'UserID' => $withdrawal->UserID,
+                    'withdrawID' => $withdrawal->WithdrawID,
+                    'amount' => -abs((float) $withdrawal->amount),
+                    'source' => 'WD',
+                    'status' => 'Active',
+                ]);
+
+                // ==========================================
+                // COMPLETE LEDGER ENTRY
+                // ==========================================
+
+                Ledger::where(
+                    'WithdrawID',
+                    $withdrawal->WithdrawID
+                )->update([
+                    'status' => 'Completed',
+                ]);
+            });
+
+            $this->dispatch('swal:success', [
+                'title' => 'Success!',
+                'text' => 'Withdrawal approved, released, and deducted from the wallet successfully.',
+            ]);
+
+        } catch (\Exception $e) {
+
+            report($e);
+
+            $this->dispatch('swal:error', [
+                'title' => 'Error',
+                'text' => 'Something went wrong while approving the withdrawal.',
+            ]);
+        }
+
+        $this->closeWithdrawalModal();
+
+        $this->skipRender = false;
+    }
 
     /*
     |--------------------------------------------------------------------------

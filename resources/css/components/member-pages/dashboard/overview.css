@@ -3,13 +3,39 @@
 ====================================== */
 
 .dashboard-grid {
-    /* items-start is required for sticky to work correctly inside CSS Grid */
-    @apply mt-0 grid min-w-0 grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px];
+    @apply mt-0 flex flex-col gap-6 min-w-0;
 }
 
-/* Container for feed posts */
+/* Desktop layout */
+@media (min-width: 1024px) {
+    .dashboard-grid {
+        @apply flex-row items-start;
+    }
+}
+
+
+/* ======================================
+   FEED COLUMN - LEFT SIDE
+====================================== */
+
 .feed-column {
-    @apply flex flex-col gap-6 w-full min-w-0;
+    @apply flex flex-col gap-6 w-full min-w-0 flex-1;
+}
+
+
+/* ======================================
+   RIGHT SIDEBAR
+====================================== */
+
+/* The right column from your Blade */
+.dashboard-grid > div:first-child {
+    @apply w-full shrink-0;
+}
+
+@media (min-width: 1024px) {
+    .dashboard-grid > div:first-child {
+        width: 340px;
+    }
 }
 
 
@@ -112,12 +138,12 @@
 }
 
 .news-post-image {
-    @apply block max-h-[650px] w-full
-    object-contain;
+    @apply block max-h-[650px] w-full object-contain;
 }
 
+
 /* ======================================
-   MEMBER / FEED CARD (INDIVIDUAL POST BOX)
+   MEMBER / FEED CARD
 ====================================== */
 
 .member-card {
@@ -189,8 +215,9 @@
     @apply flex items-center gap-1;
 }
 
+
 /* ======================================
-   EMPTY STATE STYLING
+   EMPTY STATE
 ====================================== */
 
 .empty-news {
@@ -211,11 +238,18 @@
 
 
 /* ======================================
-   ALWAYS STICKY WALLET CARD
+   STICKY WALLET CARD
 ====================================== */
 
 .wallet-card {
-    @apply sticky top-6 self-start flex flex-col w-full rounded-3xl bg-white p-6 shadow-md border border-gray-100;
+    @apply w-full flex flex-col rounded-3xl bg-white p-6 shadow-md border border-gray-100 mt-5;
+}
+
+@media (min-width: 1024px) {
+    .wallet-card {
+        position: sticky;
+        top: 1.5rem;
+    }
 }
 
 .wallet-card hr {
@@ -266,6 +300,11 @@
     @apply mt-1 text-sm text-gray-500;
 }
 
+
+/* ======================================
+   WITHDRAW BUTTON
+====================================== */
+
 .wallet-btn-withdraw {
     @apply mt-6 w-full rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2;
     background-color: #D79B10;
@@ -284,8 +323,10 @@
    RESPONSIVE
 ====================================== */
 
-@media (max-width: 1279px) {
+@media (max-width: 1023px) {
+
     .wallet-card {
-        @apply static;
+        position: static;
     }
+
 }
