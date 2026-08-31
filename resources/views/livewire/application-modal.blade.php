@@ -350,14 +350,29 @@
                                     {{-- ========================================= --}}
                                     {{-- DELETE BENEFICIARY --}}
                                     {{-- ========================================= --}}
-                                    <button type="button" wire:click="confirmDeleteBeneficiary({{ $i }})"
-                                        class="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg border border-rose-200 bg-white text-rose-500 shadow-sm transition hover:bg-rose-50 hover:text-rose-700"
-                                        title="Delete Beneficiary">
-                                        {{-- Trash Icon --}}
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-4 w-4">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673A2.25 2.25 0 0115.916 21H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0A48.108 48.108 0 0016.5 5.608m-1.5 0V4.875c0-1.125-.875-2.04-2-2.04h-2c-1.125 0-2 .915-2 2.04v.733m-1.5 0A48.11 48.11 0 004.772 5.79" />
+                                    {{-- CLEAR / REMOVE BENEFICIARY --}}
+                                    <button
+                                        type="button"
+                                        wire:click="confirmDeleteBeneficiary({{ $i }})"
+                                        class="absolute right-3 top-3 flex items-center gap-1.5 rounded-lg border border-amber-200 bg-white px-3 py-1.5 text-xs font-bold text-amber-600 shadow-sm transition hover:bg-amber-50 hover:text-amber-700"
+                                        title="Clear Beneficiary">
+
+                                        {{-- Clear / Remove Icon --}}
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="2"
+                                            stroke="currentColor"
+                                            class="h-4 w-4">
+
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
                                         </svg>
+
+                                        <span>Clear</span>
                                     </button>
 
                                     {{-- ========================================= --}}
@@ -948,107 +963,175 @@
 
             });
 
-        /* =========================================================
-           CONFIRM DELETE BENEFICIARY
-        ========================================================= */
+            /* =========================================================
+            CONFIRM CLEAR / REMOVE BENEFICIARY
+            ========================================================= */
 
-        Livewire.on('confirm-delete-beneficiary', (data) => {
+            Livewire.on('confirm-delete-beneficiary', (data) => {
 
-            const beneficiaryNumber = Number(data.index ?? 1);
+                const beneficiaryNumber = Number(data.index ?? 1);
 
-            Swal.fire({
-                icon: 'warning',
+                Swal.fire({
 
-                title: `Delete Beneficiary ${beneficiaryNumber}?`,
+                    icon: 'warning',
 
-                html: `
-                    <div style="text-align:center; color:#475569; font-size:14px;">
-                        <p>
-                            Are you sure you want to remove
-                            <b>Beneficiary ${beneficiaryNumber}</b>?
-                        </p>
+                    title: `Remove Beneficiary ${beneficiaryNumber}?`,
 
-                        <br>
-
-                        <p>This will clear the beneficiary's:</p>
-
-                        <ul style="
-                            text-align:left;
-                            display:inline-block;
-                            margin-top:10px;
+                    html: `
+                        <div style="
+                            text-align:center;
+                            color:#475569;
+                            font-size:14px;
                             line-height:1.6;
                         ">
-                            <li>• Full Name</li>
-                            <li>• Birthdate</li>
-                            <li>• Relationship</li>
-                        </ul>
-                    </div>
-                `,
 
-                showCancelButton: true,
+                            <p style="margin-bottom:12px;">
+                                Are you sure you want to remove
+                                <b style="color:#0B2A5B;">
+                                    Beneficiary ${beneficiaryNumber}
+                                </b>?
+                            </p>
 
-                confirmButtonText: 'Yes, Delete',
+                            <div style="
+                                background:#fff7ed;
+                                border:1px solid #fed7aa;
+                                border-radius:10px;
+                                padding:12px;
+                                margin-bottom:15px;
+                            ">
 
-                cancelButtonText: 'Cancel',
+                                <p style="
+                                    margin:0;
+                                    font-size:13px;
+                                    color:#9a3412;
+                                ">
+                                    This will clear the beneficiary's:
+                                </p>
 
-                confirmButtonColor: '#dc2626',
+                                <ul style="
+                                    text-align:left;
+                                    display:inline-block;
+                                    margin:8px 0 0;
+                                    padding-left:15px;
+                                    line-height:1.8;
+                                    color:#475569;
+                                ">
+                                    <li>Full Name</li>
+                                    <li>Birthdate</li>
+                                    <li>Relationship</li>
+                                </ul>
 
-                cancelButtonColor: '#64748b',
+                            </div>
 
-                reverseButtons: true,
+                            <p style="
+                                font-size:13px;
+                                margin-bottom:8px;
+                                color:#475569;
+                            ">
+                                To confirm, type
+                                <b style="
+                                    color:#dc2626;
+                                    letter-spacing:1px;
+                                ">
+                                    REMOVE
+                                </b>
+                                below:
+                            </p>
 
-                allowOutsideClick: false,
+                        </div>
+                    `,
 
-                allowEscapeKey: false
+                    input: 'text',
 
-            }).then((result) => {
+                    inputPlaceholder: 'Type REMOVE here',
 
-                if (result.isConfirmed) {
+                    inputAttributes: {
+                        autocapitalize: 'characters',
+                        autocomplete: 'off'
+                    },
 
-                    console.log(
-                        'Deleting beneficiary index:',
-                        beneficiaryNumber - 1
-                    );
+                    showCancelButton: true,
 
-                    Livewire.dispatch('delete-beneficiary', {
-                        index: beneficiaryNumber - 1
-                    });
+                    confirmButtonText: 'Remove Beneficiary',
 
-                }
+                    cancelButtonText: 'Cancel',
+
+                    confirmButtonColor: '#dc2626',
+
+                    cancelButtonColor: '#64748b',
+
+                    reverseButtons: true,
+
+                    allowOutsideClick: false,
+
+                    allowEscapeKey: false,
+
+                    preConfirm: (value) => {
+
+                        if (value !== 'REMOVE') {
+
+                            Swal.showValidationMessage(
+                                'Please type REMOVE exactly to confirm.'
+                            );
+
+                            return false;
+                        }
+
+                        return true;
+                    }
+
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        const beneficiaryIndex = beneficiaryNumber - 1;
+
+                        console.log(
+                            'Removing beneficiary index:',
+                            beneficiaryIndex
+                        );
+
+                        Livewire.dispatch('delete-beneficiary', {
+                            index: beneficiaryIndex
+                        });
+
+                    }
+
+                });
 
             });
 
-        });
 
+            /* =========================================================
+            BENEFICIARY REMOVED SUCCESS
+            ========================================================= */
 
-        /* =========================================================
-           BENEFICIARY DELETED SUCCESS
-        ========================================================= */
+            Livewire.on('beneficiary-deleted', (data) => {
 
-        Livewire.on('beneficiary-deleted', (data) => {
+                console.log(
+                    'Beneficiary removed:',
+                    data.index
+                );
 
-            console.log(
-                'Beneficiary deleted:',
-                data.index
-            );
+                Swal.fire({
 
-            Swal.fire({
-                icon: 'success',
+                    icon: 'success',
 
-                title: 'Beneficiary Deleted',
+                    title: 'Beneficiary Removed',
 
-                text: `Beneficiary ${data.index} has been cleared.`,
+                    text: `Beneficiary ${data.index} information has been cleared.`,
 
-                confirmButtonColor: '#0B2A5B',
+                    confirmButtonColor: '#0B2A5B',
 
-                timer: 1800,
+                    timer: 1800,
 
-                timerProgressBar: true,
+                    timerProgressBar: true,
 
-                showConfirmButton: false
+                    showConfirmButton: false
+
+                });
+
             });
-
-        });
 
 
         /* =========================================================
