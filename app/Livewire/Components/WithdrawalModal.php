@@ -225,6 +225,10 @@ class WithdrawalModal extends Component
 
     public function submitWithdrawal(): void
     {
+        // ==========================================
+        // CHECK IF WITHDRAWALS ARE ACTIVE
+        // ==========================================
+
         if (!$this->isWithdrawalActive()) {
             $this->dispatch(
                 'withdrawal-error',
@@ -234,10 +238,10 @@ class WithdrawalModal extends Component
             return;
         }
 
-        // Re-check admin permission on every submit,
-        // not just when the modal was opened — the
-        // component's state can outlive the original
-        // check across requests.
+        // ==========================================
+        // RE-CHECK ADMIN PERMISSION
+        // ==========================================
+
         if ($this->isAdminMode) {
 
             $admin = Auth::user();
@@ -253,9 +257,14 @@ class WithdrawalModal extends Component
             }
         }
 
+        // ==========================================
+        // RESOLVE ACTING USER
+        // ==========================================
+
         $user = $this->resolveActingUser();
 
         if (!$user) {
+
             $this->dispatch(
                 'withdrawal-error',
                 message: 'You must be logged in.'
@@ -266,11 +275,16 @@ class WithdrawalModal extends Component
 
         $userID = $user->UserID;
 
+        // ==========================================
+        // CHECK EXISTING PENDING WITHDRAWAL
+        // ==========================================
+
         $pendingWithdrawal = Withdrawal::where('UserID', $userID)
             ->where('status', 'Pending')
             ->exists();
 
         if ($pendingWithdrawal) {
+
             $this->dispatch(
                 'withdrawal-error',
                 message: 'This user already has a pending withdrawal request.'
@@ -279,26 +293,41 @@ class WithdrawalModal extends Component
             return;
         }
 
-        // Always re-check the balance right before
-        // validating — never trust whatever is sitting
-        // in $this->totalAmount from an earlier render.
+        // ==========================================
+        // REFRESH CURRENT BALANCE
+        // ==========================================
+
         $this->refreshBalance();
 
         $availableBalance = $this->totalAmount;
 
         $minimumWithdrawal = $this->getMinimumWithdrawalAmount();
 
+        // ==========================================
+        // VALIDATION RULES
+        //
+        // withdrawAmount = REQUESTED AMOUNT
+        //
+        // Example:
+        // User enters ₱1,000
+        // Tax = ₱100
+        // Net = ₱900
+        // ==========================================
+
         $rules = [
+
             'withdrawAmount' => [
                 'required',
                 'numeric',
                 'min:' . $minimumWithdrawal,
                 'max:' . max(0, $availableBalance),
             ],
+
             'withdrawalMethod' => [
                 'required',
                 'in:Cash,GCash,Maya,Bank Transfer',
             ],
+
             'paymentReference' => [
                 'nullable',
                 'string',
@@ -306,7 +335,12 @@ class WithdrawalModal extends Component
             ],
         ];
 
+        // ==========================================
+        // BANK TRANSFER VALIDATION
+        // ==========================================
+
         if ($this->withdrawalMethod === 'Bank Transfer') {
+
             $rules['bankName'] = [
                 'required',
                 'string',
@@ -314,7 +348,14 @@ class WithdrawalModal extends Component
             ];
         }
 
+        // ==========================================
+        // ACCOUNT DETAILS VALIDATION
+        //
+        // Cash does not require account details.
+        // ==========================================
+
         if ($this->withdrawalMethod !== 'Cash') {
+
             $rules['accountName'] = [
                 'required',
                 'string',
@@ -328,57 +369,225 @@ class WithdrawalModal extends Component
             ];
         }
 
-        $this->validate($rules, [
-            'withdrawAmount.required' => 'Please enter a withdrawal amount.',
-            'withdrawAmount.numeric' => 'Withdrawal amount must be a valid number.',
-            'withdrawAmount.min' => "Minimum withdrawal amount is ₱{$minimumWithdrawal}.",
-            'withdrawAmount.max' => 'Withdrawal amount exceeds the available balance.',
-            'withdrawalMethod.required' => 'Please select a withdrawal method.',
-            'bankName.required' => 'Please select a bank.', // <--- Added custom message
-            'accountName.required' => 'Please enter the account name.',
-            'accountNumber.required' => 'Please enter the account number.',
-        ]);
+        // ==========================================
+        // VALIDATE
+        // ==========================================
+
+        $this->validate(
+            $rules,
+            [
+                'withdrawAmount.required' =>
+                    'Please enter a withdrawal amount.',
+
+                'withdrawAmount.numeric' =>
+                    'Withdrawal amount must be a valid number.',
+
+                'withdrawAmount.min' =>
+                    "Minimum withdrawal amount is ₱{$minimumWithdrawal}.",
+
+                'withdrawAmount.max' =>
+                    'Withdrawal amount exceeds the available balance.',
+
+                'withdrawalMethod.required' =>
+                    'Please select a withdrawal method.',
+
+                'bankName.required' =>
+                    'Please select a bank.',
+
+                'accountName.required' =>
+                    'Please enter the account name.',
+
+                'accountNumber.required' =>
+                    'Please enter the account number.',
+            ]
+        );
+
+        // ==========================================
+        // CALCULATE AMOUNTS
+        // ==========================================
+
         try {
 
-            $submittedAmount = (float) $this->withdrawAmount;
+            /*
+            |--------------------------------------------------------------------------
+            | REQUESTED AMOUNT
+            |--------------------------------------------------------------------------
+            |
+            | This is exactly what the user entered.
+            |
+            | Example:
+            |
+            | User enters ₱1,000
+            |
+            */
+
+            $requestedAmount = round(
+                (float) $this->withdrawAmount,
+                2
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | TAX RATE
+            |--------------------------------------------------------------------------
+            |
+            | 10%
+            |
+            */
+
+            $taxRate = 0.10;
+
+            /*
+            |--------------------------------------------------------------------------
+            | TAX AMOUNT
+            |--------------------------------------------------------------------------
+            |
+            | ₱1,000 × 10% = ₱100
+            |
+            */
+
+            $taxAmount = round(
+                $requestedAmount * $taxRate,
+                2
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | NET AMOUNT
+            |--------------------------------------------------------------------------
+            |
+            | ₱1,000 - ₱100 = ₱900
+            |
+            */
+
+            $netAmount = round(
+                $requestedAmount - $taxAmount,
+                2
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | WHO CREATED THE WITHDRAWAL
+            |--------------------------------------------------------------------------
+            */
+
             $processedBy = Auth::id();
 
-            DB::transaction(function () use ($userID, $processedBy) {
+            // ==========================================
+            // DATABASE TRANSACTION
+            // ==========================================
+
+            DB::transaction(function () use (
+                $userID,
+                $processedBy,
+                $requestedAmount,
+                $taxAmount,
+                $netAmount
+            ) {
+
+                // ==========================================
+                // DETERMINE WITHDRAWAL TYPE
+                // ==========================================
 
                 $type = $this->withdrawalMethod === 'Cash'
                     ? 'W'
                     : 'O';
 
                 // ==========================================
-                // CREATE WITHDRAWAL REQUEST ONLY
-                // Ledger entries will be created upon approval
+                // CREATE WITHDRAWAL
                 // ==========================================
 
                 Withdrawal::create([
+
+                    // ======================================
+                    // USER
+                    // ======================================
+
                     'UserID' => $userID,
-                    'amount' => (float) $this->withdrawAmount,
+
+                    // ======================================
+                    // REQUESTED AMOUNT
+                    //
+                    // Example: 1000.00
+                    // ======================================
+
+                    'requested_amount' => $requestedAmount,
+
+                    // ======================================
+                    // NET AMOUNT
+                    //
+                    // Example: 900.00
+                    // ======================================
+
+                    'amount' => $netAmount,
+
+                    // ======================================
+                    // TAX
+                    //
+                    // Example: 100.00
+                    // ======================================
+
+                    'tax_amount' => $taxAmount,
+
+                    // ======================================
+                    // WITHDRAWAL TYPE
+                    // ======================================
+
                     'type' => $type,
+
+                    // ======================================
+                    // METHOD
+                    // ======================================
+
                     'withdrawal_method' => $this->withdrawalMethod,
 
+                    // ======================================
+                    // BANK NAME
+                    // ======================================
+
                     'bank_name' => $this->withdrawalMethod === 'Bank Transfer'
-                    ? $this->bankName
-                    : null, // <--- Added bank_name mapping
+                        ? $this->bankName
+                        : null,
+
+                    // ======================================
+                    // ACCOUNT NAME
+                    // ======================================
 
                     'account_name' => $this->withdrawalMethod === 'Cash'
                         ? null
                         : $this->accountName,
 
+                    // ======================================
+                    // ACCOUNT NUMBER
+                    // ======================================
+
                     'account_number' => $this->withdrawalMethod === 'Cash'
                         ? null
                         : $this->accountNumber,
 
+                    // ======================================
+                    // PAYMENT REFERENCE
+                    // ======================================
+
                     'payment_reference' => $this->paymentReference ?: null,
 
+                    // ======================================
+                    // PROCESSED BY
+                    // ======================================
+
                     'ProcessedBy' => $processedBy,
+
+                    // ======================================
+                    // STATUS
+                    // ======================================
 
                     'status' => 'Pending',
                 ]);
             });
+
+            // ==========================================
+            // RESET FORM
+            // ==========================================
 
             $this->reset([
                 'withdrawAmount',
@@ -389,15 +598,26 @@ class WithdrawalModal extends Component
                 'paymentReference',
             ]);
 
+            // ==========================================
+            // SUCCESS EVENT
+            // ==========================================
+
             $this->dispatch(
                 'withdrawal-submitted',
-                amount: number_format($submittedAmount, 2)
+                amount: number_format($requestedAmount, 2),
+                taxAmount: number_format($taxAmount, 2),
+                netAmount: number_format($netAmount, 2)
             );
 
         } catch (\Exception $e) {
 
+            // ==========================================
+            // LOG ERROR
+            // ==========================================
+
             Log::error('Withdrawal submission failed.', [
                 'message' => $e->getMessage(),
+                'user_id' => $userID ?? null,
             ]);
 
             report($e);
@@ -410,11 +630,17 @@ class WithdrawalModal extends Component
             return;
         }
 
-        // Admin mode only lives for a single request —
-        // clear it so the next open (dashboard or a
-        // different admin target) starts clean.
+        // ==========================================
+        // CLEAR ADMIN MODE
+        // ==========================================
+
         $this->targetUserID = null;
+
         $this->isAdminMode = false;
+
+        // ==========================================
+        // REFRESH BALANCE
+        // ==========================================
 
         $this->refreshBalance();
     }

@@ -16,7 +16,9 @@ class Withdrawal extends Model
 
     protected $fillable = [
         'UserID',
+        'requested_amount',
         'amount',
+        'tax_amount',
         'type',
         'withdrawal_method',
         'bank_name', // <--- Added here
@@ -29,6 +31,8 @@ class Withdrawal extends Model
     ];
 
     protected $casts = [
+        'requested_amount' => 'decimal:2',
         'amount' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
     ];
 }

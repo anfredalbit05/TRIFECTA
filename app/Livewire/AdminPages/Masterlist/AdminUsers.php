@@ -1037,12 +1037,8 @@ class AdminUsers extends Component
                 }
 
                 $withdrawalAmount = (float) $withdrawal->amount;
-
-                // ==========================================
-                // CALCULATE 10% TRANSACTION
-                // ==========================================
-
-                $transactionAmount = $withdrawalAmount * 0.10;
+                $taxAmount = (float) $withdrawal->tax_amount;
+                $requestedAmount = (float) $withdrawal->requested_amount;
 
                 // ==========================================
                 // APPROVE WITHDRAWAL
@@ -1054,16 +1050,12 @@ class AdminUsers extends Component
                     'confirmed_by' => $confirmedBy,
                 ]);
 
-                // ==========================================
-                // DEDUCT FROM WALLET
-                // ==========================================
-
                 Wallet::create([
                     'UserID' => $withdrawal->UserID,
 
                     'withdrawID' => $withdrawal->WithdrawID,
 
-                    'amount' => -abs($withdrawalAmount),
+                    'amount' => -abs($requestedAmount),
 
                     'source' => 'WD',
 
@@ -1097,7 +1089,7 @@ class AdminUsers extends Component
 
                     'WithdrawID' => $withdrawal->WithdrawID,
 
-                    'amount' => $transactionAmount,
+                    'amount' => $taxAmount,
 
                     'Source' => 'TX',
 

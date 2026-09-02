@@ -316,9 +316,25 @@
 
                         <div class="space-y-2 text-sm">
 
-                            {{-- Amount --}}
+                            {{-- Requested Amount --}}
                             <div class="flex justify-between gap-4">
-                                <span class="text-gray-500">Amount</span>
+                                <span class="text-gray-500">Requested Amount</span>
+                                <span class="font-bold text-slate-800 text-right">
+                                    ₱{{ number_format($selectedWithdrawal->requested_amount ?? 0, 2) }}
+                                </span>
+                            </div>
+
+                              {{-- Tax Amount --}}
+                            <div class="flex justify-between gap-4">
+                                <span class="text-gray-500">Tax Amount</span>
+                                <span class="font-bold text-slate-800 text-right">
+                                    - ₱{{ number_format($selectedWithdrawal->tax_amount ?? 0, 2) }}
+                                </span>
+                            </div>
+
+                              {{-- Release Amount --}}
+                            <div class="flex justify-between gap-4">
+                                <span class="text-gray-500">Release Amount</span>
                                 <span class="font-bold text-slate-800 text-right">
                                     ₱{{ number_format($selectedWithdrawal->amount ?? 0, 2) }}
                                 </span>
@@ -387,7 +403,7 @@
                                 Approving this request will mark the withdrawal as
                                 <strong>Approved</strong> and deduct
                                 <strong>
-                                    ₱{{ number_format($selectedWithdrawal->amount ?? 0, 2) }}
+                                    ₱{{ number_format($selectedWithdrawal->requested_amount ?? 0, 2) }}
                                 </strong>
                                 from the user's wallet.
                             </p>

@@ -673,20 +673,19 @@ class Members extends Component
                 }
 
                 // ==========================================
-                // WITHDRAWAL AMOUNT
-                // ==========================================
-
-                $withdrawalAmount = (float) $withdrawal->amount;
-
-                // ==========================================
-                // CALCULATE 10% TRANSACTION
+                // WITHDRAWAL VALUES
                 //
                 // Example:
-                // Withdrawal = ₱500
-                // TX = ₱50
+                //
+                // requested_amount = 1000
+                // tax_amount       = 100
+                // amount           = 900
                 // ==========================================
 
-                $transactionAmount = $withdrawalAmount * 0.10;
+                $requestedAmount = (float) $withdrawal->requested_amount;
+                $taxAmount       = (float) $withdrawal->tax_amount;
+                $withdrawalAmount = (float) $withdrawal->amount;
+
 
                 // ==========================================
                 // APPROVE WITHDRAWAL
@@ -712,21 +711,23 @@ class Members extends Component
 
                     'withdrawID' => $withdrawal->WithdrawID,
 
-                    'amount' => -abs($withdrawalAmount),
+                    'amount' => -abs($requestedAmount),
 
                     'source' => 'WD',
 
                     'status' => 'Active',
                 ]);
 
-                // ==========================================
-                // LEDGER: WITHDRAWAL
-                //
-                // Example:
-                // Withdrawal ₱500
-                // Ledger = -₱500
-                // Source = WD
-                // ==========================================
+                    // ==========================================
+                    // LEDGER: WITHDRAWAL
+                    //
+                    // Record the NET withdrawal amount.
+                    //
+                    // Example:
+                    // amount = 900
+                    // Ledger WD = -900
+                    // Source = WD
+                    // ==========================================
 
                 Ledger::create([
                     'RefID' => $withdrawal->UserID,
@@ -743,11 +744,14 @@ class Members extends Component
                 ]);
 
                 // ==========================================
-                // LEDGER: 10% TRANSACTION
+                // LEDGER: TAX
+                //
+                // Use the tax_amount already stored
+                // in the withdrawal record.
                 //
                 // Example:
-                // ₱500 × 10% = ₱50
-                // Ledger = +₱50
+                // tax_amount = 100
+                // Ledger TX = +100
                 // Source = TX
                 // ==========================================
 
@@ -756,7 +760,7 @@ class Members extends Component
 
                     'WithdrawID' => $withdrawal->WithdrawID,
 
-                    'amount' => $transactionAmount,
+                    'amount' => $taxAmount,
 
                     'Source' => 'TX',
 
