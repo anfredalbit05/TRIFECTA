@@ -364,74 +364,102 @@ x-on:close-withdraw-modal.window="
 
 
             {{-- ==========================================
-                 ONLINE ACCOUNT DETAILS
+                ONLINE ACCOUNT DETAILS
             ========================================== --}}
             @if (
                 $this->withdrawalMethod
                 && $this->withdrawalMethod !== 'Cash'
             )
 
+                {{-- BANK SELECTION (ONLY FOR BANK TRANSFER) --}}
+                @if ($this->withdrawalMethod === 'Bank Transfer')
+                    <div class="space-y-1.5" x-data="{
+                        banks: [
+                            'Al-Amanah Islamic Investment Bank of the Philippines',
+                            'Asia United Bank Corporation (AUB)',
+                            'Bank of Commerce',
+                            'Bank of the Philippine Islands (BPI)',
+                            'BDO Unibank, Inc.',
+                            'BDO Private Bank',
+                            'China Banking Corporation (Chinabank)',
+                            'CIMB Bank Philippines Inc.',
+                            'Citibank Philippines',
+                            'CTBC Bank (Philippines) Corporation',
+                            'Development Bank of the Philippines (DBP)',
+                            'East West Banking Corporation (EastWest Bank)',
+                            'Land Bank of the Philippines (Landbank)',
+                            'Maybank Philippines, Inc.',
+                            'Metropolitan Bank and Trust Company (Metrobank)',
+                            'Philippine Bank of Communications (PBCom)',
+                            'Philippine National Bank (PNB)',
+                            'Philippine Trust Company (Philtrust Bank)',
+                            'Philippine Veterans Bank',
+                            'Rizal Commercial Banking Corporation (RCBC)',
+                            'Security Bank Corporation',
+                            'Union Bank of the Philippines (UnionBank)',
+                            'United Overseas Bank Limited Manila Branch'
+                        ]
+                    }">
+                        <label class="block text-xs font-semibold text-gray-700">
+                            Select Bank
+                        </label>
+
+                        <select
+                            wire:model="bankName"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm bg-white"
+                        >
+                            <option value="">Select destination bank</option>
+                            <template x-for="bank in banks" :key="bank">
+                                <option :value="bank" x-text="bank"></option>
+                            </template>
+                        </select>
+
+                        @error('bankName')
+                            <p class="text-xs text-red-500">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+                @endif
+
                 {{-- ACCOUNT NAME --}}
                 <div class="space-y-1.5">
-
-                    <label
-                        class="block text-xs font-semibold text-gray-700"
-                    >
-                        Account Name
+                    <label class="block text-xs font-semibold text-gray-700">
+                        Account Name *
                     </label>
-
 
                     <input
                         type="text"
-
                         wire:model="accountName"
-
                         placeholder="Enter account holder name"
-
                         class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm"
                     />
 
-
                     @error('accountName')
-
                         <p class="text-xs text-red-500">
                             {{ $message }}
                         </p>
-
                     @enderror
-
                 </div>
-
 
                 {{-- ACCOUNT NUMBER --}}
                 <div class="space-y-1.5">
-
-                    <label
-                        class="block text-xs font-semibold text-gray-700"
-                    >
-                        Account Number
+                    <label class="block text-xs font-semibold text-gray-700">
+                        Account Number *
                     </label>
-
 
                     <input
                         type="text"
-
                         wire:model="accountNumber"
-
                         placeholder="Enter account number"
-
                         class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm"
                     />
 
-
                     @error('accountNumber')
-
                         <p class="text-xs text-red-500">
                             {{ $message }}
                         </p>
-
                     @enderror
-
                 </div>
 
             @endif
@@ -504,44 +532,205 @@ x-on:close-withdraw-modal.window="
 <script>
 
     // ==========================================
-    // CONFIRM WITHDRAWAL
+    // CONFIRM WITHDRAWAL WITH VALIDATION
     // ==========================================
 
     window.confirmWithdrawal = function () {
 
+        // ==========================================
+        // VALIDATE WITHDRAWAL AMOUNT
+        // ==========================================
+
+        const amount = parseFloat($wire.withdrawAmount);
+
+        if (!amount || amount <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Amount',
+                text: 'Please enter a valid withdrawal amount first.',
+                confirmButtonColor: '#0C2C6B',
+            });
+
+            return;
+        }
+
+        // ==========================================
+        // VALIDATE WITHDRAWAL METHOD
+        // ==========================================
+
+        const withdrawalMethod = $wire.withdrawalMethod;
+
+        if (!withdrawalMethod || withdrawalMethod.trim() === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Withdrawal Method Required',
+                text: 'Please select a withdrawal method before submitting.',
+                confirmButtonColor: '#0C2C6B',
+            });
+
+            return;
+        }
+
+        // ==========================================
+        // VALIDATE BANK NAME
+        // ==========================================
+
+        if (
+            withdrawalMethod === 'Bank Transfer' &&
+            (!$wire.bankName || $wire.bankName.trim() === '')
+        ) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Bank Required',
+                text: 'Please select a destination bank.',
+                confirmButtonColor: '#0C2C6B',
+            });
+
+            return;
+        }
+
+        // ==========================================
+        // VALIDATE ACCOUNT DETAILS
+        // Only required for non-cash withdrawals
+        // ==========================================
+
+        if (withdrawalMethod !== 'Cash') {
+
+            if (
+                !$wire.accountName ||
+                $wire.accountName.trim() === ''
+            ) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Account Name Required',
+                    text: 'Please enter the account name.',
+                    confirmButtonColor: '#0C2C6B',
+                });
+
+                return;
+            }
+
+            if (
+                !$wire.accountNumber ||
+                $wire.accountNumber.trim() === ''
+            ) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Account Number Required',
+                    text: 'Please enter the account number.',
+                    confirmButtonColor: '#0C2C6B',
+                });
+
+                return;
+            }
+        }
+
+        // ==========================================
+        // FORMAT AMOUNT
+        // ==========================================
+
+        const formattedAmount = amount.toFixed(2);
+
+        // ==========================================
+        // CONFIRM WITHDRAWAL
+        // ==========================================
+
         Swal.fire({
-            icon: 'question',
+            icon: 'warning',
+            title: 'Confirm Withdrawal',
 
-            title: 'Confirm Withdrawal?',
+            html: `
+                <div class="text-left">
 
-            text: 'Are you sure you want to submit this withdrawal request?',
+                    <p class="mb-3 text-sm text-slate-600">
+                        You are about to submit a withdrawal request for:
+                    </p>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4 text-center">
+
+                        <span class="block text-xs text-slate-500 mb-1">
+                            Withdrawal Amount
+                        </span>
+
+                        <strong class="text-2xl text-[#0C2C6B]">
+                            ₱${formattedAmount}
+                        </strong>
+
+                    </div>
+
+                    <p class="text-sm text-slate-600 mb-2">
+                        To confirm, type:
+                    </p>
+
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-center">
+
+                        <strong class="text-amber-700">
+                            ${formattedAmount}
+                        </strong>
+
+                    </div>
+
+                </div>
+            `,
+
+            input: 'text',
+
+            inputPlaceholder: `Type ${formattedAmount}`,
+
+            inputAttributes: {
+                autocapitalize: 'off',
+                autocomplete: 'off'
+            },
 
             showCancelButton: true,
 
-            confirmButtonText: 'Yes, Submit Request',
+            confirmButtonText: 'Submit Withdrawal',
 
             cancelButtonText: 'Cancel',
 
             confirmButtonColor: '#0C2C6B',
 
-            cancelButtonColor: '#6b7280',
+            cancelButtonColor: '#D79B10',
 
             reverseButtons: true,
 
             allowOutsideClick: false,
 
-            allowEscapeKey: false
+            allowEscapeKey: false,
+
+            preConfirm: (value) => {
+
+                const typedAmount = value.trim();
+
+                if (typedAmount !== formattedAmount) {
+
+                    Swal.showValidationMessage(
+                        `Please type exactly: ${formattedAmount}`
+                    );
+
+                    return false;
+                }
+
+                return true;
+            }
 
         }).then((result) => {
 
             if (result.isConfirmed) {
 
-                console.log(
-                    'WithdrawalModal: submitting withdrawal request.'
-                );
+                Swal.fire({
+                    title: 'Submitting Withdrawal...',
+                    text: 'Please wait.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
                 $wire.submitWithdrawal();
-
             }
 
         });
@@ -599,6 +788,12 @@ html: `
             data.method !== 'Cash'
                 ? `
                     <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                        ${data.method === 'Bank Transfer' ? `
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Bank Name</span>
+                                <strong>${data.bankName ?? '-'}</strong>
+                            </div>
+                        ` : ''}
 
                         <div class="flex justify-between">
                             <span class="text-gray-500">Account Name</span>
@@ -609,7 +804,6 @@ html: `
                             <span class="text-gray-500">Account Number</span>
                             <strong>${data.accountNumber ?? '-'}</strong>
                         </div>
-
                     </div>
                 `
                 : `

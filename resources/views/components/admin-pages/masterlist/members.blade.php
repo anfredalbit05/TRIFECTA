@@ -1,6 +1,8 @@
 <div class="members-container w-full px-4 sm:px-6 lg:px-8 py-6">
 
-    <!-- HEADER -->
+    {{-- ============================================================ --}}
+    {{-- HEADER --}}
+    {{-- ============================================================ --}}
     <div class="members-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
             <h2 class="masterlist-title text-2xl font-bold text-slate-800">Members</h2>
@@ -18,9 +20,12 @@
         @endif
     </div>
 
-    <!-- SEARCH INPUT, FILTERS & REFRESH BUTTON CONTAINER -->
+    {{-- ============================================================ --}}
+    {{-- SEARCH INPUT, FILTERS & REFRESH BUTTON CONTAINER --}}
+    {{-- ============================================================ --}}
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <!-- SEARCH INPUT -->
+
+        {{-- SEARCH INPUT --}}
         <div class="relative max-w-sm w-full sm:w-auto flex-1">
             <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
                 🔍
@@ -30,10 +35,10 @@
                 class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
         </div>
 
-        <!-- FILTERS AND REFRESH GROUP -->
+        {{-- FILTERS AND REFRESH GROUP --}}
         <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
 
-            <!-- DATE RANGE FILTER -->
+            {{-- DATE RANGE FILTER --}}
             <div wire:ignore class="relative">
                 <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none z-10">
                     📅
@@ -50,7 +55,7 @@
                 </button>
             @endif
 
-            <!-- REFRESH BUTTON -->
+            {{-- REFRESH BUTTON --}}
             <button wire:click="resetTable" wire:loading.attr="disabled" title="Refresh Table"
                 class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
                 <span wire:loading.remove wire:target="resetTable">🔄</span>
@@ -60,12 +65,13 @@
         </div>
     </div>
 
-    <!-- MEMBERS TABLE -->
+    {{-- ============================================================ --}}
+    {{-- MEMBERS TABLE --}}
+    {{-- ============================================================ --}}
     <div class="member-table overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr
-                    class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
+                <tr class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">Name</th>
                     <th class="py-3 px-4">Contact</th>
@@ -80,6 +86,7 @@
             <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
                 @forelse($members as $index => $member)
                     <tr wire:key="member-row-{{ $member->UserID }}" class="hover:bg-slate-50 transition-colors">
+
                         <td class="py-4 px-4 font-medium text-slate-500">
                             {{ $members->firstItem() + $index }}
                         </td>
@@ -95,8 +102,7 @@
                         </td>
 
                         <td class="py-4 px-4">
-                            <span
-                                class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
+                            <span class="inline-flex justify-center items-center px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
                                 {{ $member->gender }}
                             </span>
                         </td>
@@ -107,25 +113,22 @@
 
                         <td class="py-4 px-4">
                             @if (strtolower($member->status) === 'active')
-                                <span
-                                    class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-xs font-semibold shadow-sm">
+                                <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-xs font-semibold shadow-sm">
                                     Active
                                 </span>
                             @else
-                                <span
-                                    class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-slate-600 text-white text-xs font-semibold shadow-sm">
+                                <span class="inline-flex justify-center items-center w-24 px-3 py-1 rounded-md bg-slate-600 text-white text-xs font-semibold shadow-sm">
                                     Inactive
                                 </span>
                             @endif
                         </td>
 
-                        <!-- ACTIONS COLUMN -->
+                        {{-- ACTIONS COLUMN --}}
                         @if ($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
                             <td class="py-4 px-4 text-center">
-
                                 <div class="flex gap-2 justify-center items-center">
 
-                                    <!-- VIEW -->
+                                    {{-- VIEW --}}
                                     @if ($this->canRead)
                                         <button wire:click="viewMember({{ $member->UserID }})" title="View Member"
                                             class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-slate-600 text-white hover:bg-slate-700 transition cursor-pointer text-xs font-semibold shadow">
@@ -133,7 +136,7 @@
                                         </button>
                                     @endif
 
-                                    <!-- EDIT / UPDATE -->
+                                    {{-- EDIT / UPDATE --}}
                                     @if ($this->canUpdate)
                                         <button wire:click="editMember({{ $member->UserID }})" title="Update Member"
                                             class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
@@ -141,7 +144,7 @@
                                         </button>
                                     @endif
 
-                                    <!-- STATUS / ACTIVATION ACTIONS (Requires Update Permission) -->
+                                    {{-- STATUS / ACTIVATION ACTIONS (Requires Update Permission) --}}
                                     @if ($this->canUpdate)
                                         @if (strtolower($member->status) === 'active')
                                             <button wire:click="confirmStatus({{ $member->UserID }})"
@@ -164,17 +167,14 @@
                                         @endif
                                     @endif
 
-                                    <!-- WITHDRAWAL ACTION -->
+                                    {{-- WITHDRAWAL ACTION --}}
                                     @if ($member->has_pending_withdrawal)
-
                                         <button wire:click="openWithdrawalApproval({{ $member->UserID }})"
                                             title="Approve Withdrawal Request"
                                             class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow">
                                             Pending
                                         </button>
-
                                     @elseif ($isWithdrawalActive)
-
                                         @if ($this->canCreate)
                                             <button wire:click="openWithdrawalModal({{ $member->UserID }})"
                                                 title="Create Withdrawal Request"
@@ -182,18 +182,13 @@
                                                 Withdraw
                                             </button>
                                         @endif
-
                                     @else
-
                                         @if ($this->canCreate)
-                                            <span
-                                                title="Withdrawals are currently unavailable"
-                                                class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-gray-400 text-xs font-semibold cursor-not-allowed"
-                                            >
+                                            <span title="Withdrawals are currently unavailable"
+                                                class="inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-gray-400 text-xs font-semibold cursor-not-allowed">
                                                 🔒 Off
                                             </span>
                                         @endif
-
                                     @endif
 
                                 </div>
@@ -211,7 +206,9 @@
             </tbody>
         </table>
 
-        <!-- Withdrawal Approval Modal -->
+        {{-- ============================================================ --}}
+        {{-- WITHDRAWAL APPROVAL MODAL --}}
+        {{-- ============================================================ --}}
         @if ($isWithdrawalModalOpen && $selectedWithdrawalUser && $selectedWithdrawal)
             <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
                 <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative border border-slate-100">
@@ -222,9 +219,7 @@
                             Approve &amp; Release Withdrawal
                         </h3>
 
-                        <button
-                            type="button"
-                            wire:click="closeWithdrawalModal"
+                        <button type="button" wire:click="closeWithdrawalModal"
                             class="cursor-pointer text-white/80 hover:text-white text-xl font-bold transition">
                             &times;
                         </button>
@@ -271,6 +266,15 @@
                                     </span>
                                 </div>
 
+                                @if ($selectedWithdrawal->withdrawal_method === 'Bank Transfer' && $selectedWithdrawal->bank_name)
+                                    <div class="flex justify-between gap-4">
+                                        <span class="text-gray-500">Bank Name</span>
+                                        <span class="font-semibold text-slate-800 text-right">
+                                            {{ $selectedWithdrawal->bank_name }}
+                                        </span>
+                                    </div>
+                                @endif
+
                                 @if ($selectedWithdrawal->account_name)
                                     <div class="flex justify-between gap-4">
                                         <span class="text-gray-500">Account Name</span>
@@ -305,7 +309,6 @@
                         <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-900">
                             <div class="flex items-start gap-2">
                                 <span>ℹ️</span>
-
                                 <p>
                                     Approving this request will mark the withdrawal as
                                     <strong>Approved</strong> and deduct
@@ -320,26 +323,31 @@
                     </div>
 
                     {{-- Footer --}}
-                    <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end space-x-2">
+                    <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex flex-col sm:flex-row justify-end gap-2">
 
-                        <button
-                            type="button"
-                            wire:click="closeWithdrawalModal"
-                            wire:loading.attr="disabled"
+                        {{-- Cancel --}}
+                        <button type="button" wire:click="closeWithdrawalModal" wire:loading.attr="disabled"
                             class="cursor-pointer px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-300 transition">
                             Cancel
                         </button>
 
-                        <button
-                            type="button"
-                            wire:click="processWithdrawalApproval"
-                            wire:loading.attr="disabled"
-                            class="cursor-pointer px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition shadow-sm">
+                        {{-- Reject --}}
+                        <button type="button" wire:click="confirmWithdrawalRejection" wire:loading.attr="disabled"
+                            class="cursor-pointer px-4 py-2 bg-[#D79B10] text-white rounded-xl text-sm font-semibold hover:bg-[#c58d0f] transition shadow-sm">
+                            <span wire:loading.remove wire:target="confirmWithdrawalRejection">
+                                Reject
+                            </span>
+                            <span wire:loading wire:target="confirmWithdrawalRejection">
+                                Processing...
+                            </span>
+                        </button>
 
+                        {{-- Approve --}}
+                        <button type="button" wire:click="processWithdrawalApproval" wire:loading.attr="disabled"
+                            class="cursor-pointer px-4 py-2 bg-[#0C2C6B] text-white rounded-xl text-sm font-semibold hover:bg-[#09204f] transition shadow-sm">
                             <span wire:loading.remove wire:target="processWithdrawalApproval">
                                 Approve &amp; Release
                             </span>
-
                             <span wire:loading wire:target="processWithdrawalApproval">
                                 Processing...
                             </span>
@@ -350,8 +358,9 @@
             </div>
         @endif
 
-
-        <!-- PAGINATION -->
+        {{-- ============================================================ --}}
+        {{-- PAGINATION --}}
+        {{-- ============================================================ --}}
         @if ($members->hasPages())
             <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
 
@@ -391,22 +400,25 @@
         @endif
     </div>
 
-    <!-- LIVEWIRE MODAL COMPONENT -->
+    {{-- ============================================================ --}}
+    {{-- LIVEWIRE MODAL COMPONENTS --}}
+    {{-- ============================================================ --}}
     <livewire:member-pages.my-profile.activation-modal />
     <livewire:components.withdrawal-modal />
 
-    <!-- SWEETALERT SCRIPTS -->
+    {{-- ============================================================ --}}
+    {{-- SWEETALERT SCRIPTS --}}
+    {{-- ============================================================ --}}
     @script
         <script>
-
             $wire.on('swal:error', (data) => {
-            Swal.fire({
-                icon: 'error',
-                title: data.title ?? 'Error',
-                text: data.text ?? 'Something went wrong.',
-                confirmButtonColor: '#0C2C6B',
+                Swal.fire({
+                    icon: 'error',
+                    title: data.title ?? 'Error',
+                    text: data.text ?? 'Something went wrong.',
+                    confirmButtonColor: '#0C2C6B',
+                });
             });
-        });
 
             $wire.on('confirm-status', (data) => {
                 const actionText = data.action === 'deactivate' ?
@@ -466,6 +478,9 @@
 
     @script
         <script>
+            // =====================================================
+            // DATE RANGE PICKER
+            // =====================================================
             const dateInput = $wire.$el.querySelector('#memberDateRange');
 
             const picker = flatpickr(dateInput, {
@@ -475,32 +490,74 @@
                 altFormat: 'M d, Y',
                 maxDate: 'today',
                 defaultDate: @js($dateRange ? explode(' to ', $dateRange) : []),
+
                 onChange: (selectedDates, dateStr, instance) => {
                     // Full range picked (2 different days) — send immediately
                     if (selectedDates.length === 2) {
                         const start = instance.formatDate(selectedDates[0], 'Y-m-d');
                         const end = instance.formatDate(selectedDates[1], 'Y-m-d');
+
                         $wire.set('dateRange', `${start} to ${end}`);
                     } else if (selectedDates.length === 0) {
                         $wire.set('dateRange', '');
                     }
                 },
+
                 onClose: (selectedDates, dateStr, instance) => {
                     // User picked exactly ONE day and closed the calendar
                     if (selectedDates.length === 1) {
                         const day = instance.formatDate(selectedDates[0], 'Y-m-d');
 
                         // Force the picker to redraw as a "day to day" range
-                        // so the visible input actually shows the date
-                        instance.setDate([selectedDates[0], selectedDates[0]], true);
+                        instance.setDate(
+                            [selectedDates[0], selectedDates[0]],
+                            true
+                        );
 
                         $wire.set('dateRange', `${day} to ${day}`);
                     }
                 }
             });
 
+            // =====================================================
+            // RESET DATE RANGE
+            // =====================================================
             $wire.on('ranges-reset', () => {
                 picker.clear();
+            });
+
+            // =====================================================
+            // REJECT WITHDRAWAL CONFIRMATION
+            // =====================================================
+            $wire.on('confirm-withdrawal-rejection', () => {
+                Swal.fire({
+                    title: 'Reject Withdrawal?',
+                    text: 'This withdrawal request will be rejected. This action cannot be undone.',
+                    icon: 'warning',
+                    showCancelButton: true,
+
+                    confirmButtonColor: '#0C2C6B',
+                    cancelButtonColor: '#D79B10',
+
+                    confirmButtonText: 'Yes, Reject',
+                    cancelButtonText: 'Cancel',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Rejecting...',
+                            text: 'Please wait.',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false,
+
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        $wire.rejectWithdrawal();
+                    }
+                });
             });
         </script>
     @endscript

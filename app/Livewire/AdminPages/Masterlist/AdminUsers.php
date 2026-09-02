@@ -144,7 +144,7 @@ class AdminUsers extends Component
         return $this->hasPermission('delete');
     }
 
-        // ==========================================
+    // ==========================================
     // WITHDRAWAL GLOBAL STATUS
     //
     // Mirrors WithdrawalModal::isWithdrawalActive()
@@ -776,6 +776,194 @@ class AdminUsers extends Component
     }
 
     /*
+    |--------------------------------------------------------------------------
+    | Confirm Withdrawal Rejection
+    |--------------------------------------------------------------------------
+    */
+
+    public function confirmWithdrawalRejection(): void
+    {
+        if (!$this->selectedWithdrawal) {
+
+            session()->flash(
+                'error',
+                'No withdrawal request selected.'
+            );
+
+            return;
+        }
+
+        $this->dispatch(
+            'confirm-withdrawal-rejection',
+            amount: number_format(
+                $this->selectedWithdrawal->amount,
+                2
+            )
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reject Withdrawal
+    |--------------------------------------------------------------------------
+    */
+
+    public function processWithdrawalRejection(): void
+    {
+        // ==========================================
+        // PERMISSION CHECK
+        // ==========================================
+
+        if (!$this->canUpdate) {
+
+            $this->dispatch(
+                'withdrawal-rejected-error',
+                message: 'You do not have permission to reject withdrawals.'
+            );
+
+            return;
+        }
+
+        if (!$this->selectedWithdrawal) {
+
+            $this->dispatch(
+                'withdrawal-rejected-error',
+                message: 'No withdrawal request selected.'
+            );
+
+            return;
+        }
+
+        // ==========================================
+        // GET AUTHENTICATED USER
+        // ==========================================
+
+        $confirmedBy = Auth::user()?->UserID;
+
+        if (!$confirmedBy) {
+
+            Log::error(
+                'Withdrawal rejection failed: No authenticated user found.'
+            );
+
+            $this->dispatch(
+                'withdrawal-rejected-error',
+                message: 'Authenticated user not found.'
+            );
+
+            return;
+        }
+
+        try {
+
+            DB::transaction(function () use ($confirmedBy) {
+
+                $withdrawal = Withdrawal::where(
+                    'WithdrawID',
+                    $this->selectedWithdrawal->WithdrawID
+                )
+                    ->lockForUpdate()
+                    ->first();
+
+                // ==========================================
+                // MAKE SURE STILL PENDING
+                // ==========================================
+
+                if (
+                    !$withdrawal ||
+                    $withdrawal->status !== 'Pending'
+                ) {
+
+                    throw new \Exception(
+                        'Withdrawal is no longer pending.'
+                    );
+                }
+
+                // ==========================================
+                // REJECT WITHDRAWAL
+                // ==========================================
+
+                $withdrawal->update([
+                    'status' => 'Rejected',
+
+                    'confirmed_by' => $confirmedBy,
+                ]);
+            });
+
+            // ==========================================
+            // CLOSE MODAL
+            // ==========================================
+
+            $this->closeWithdrawalModal();
+
+            // ==========================================
+            // SUCCESS ALERT
+            // ==========================================
+
+            $this->dispatch(
+                'withdrawal-rejected-success'
+            );
+
+        } catch (\Exception $e) {
+
+            report($e);
+
+            Log::error(
+                'Withdrawal rejection failed: ' . $e->getMessage()
+            );
+
+            $this->dispatch(
+                'withdrawal-rejected-error',
+                message: 'Something went wrong while rejecting the withdrawal.'
+            );
+        }
+    }
+
+    /*
+    |----------------------------------------------------------------------
+    | Withdrawal Approval / Rejection Event Listeners
+    |----------------------------------------------------------------------
+    */
+
+    #[On('process-withdrawal-approval')]
+    public function handleWithdrawalApproval(): void
+    {
+        $this->processWithdrawalApproval();
+    }
+
+    #[On('process-withdrawal-rejection')]
+    public function handleWithdrawalRejection(): void
+    {
+        $this->processWithdrawalRejection();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Confirm Withdrawal Approval
+    |--------------------------------------------------------------------------
+    */
+
+    public function confirmWithdrawalApproval(): void
+    {
+        if (!$this->selectedWithdrawal) {
+            session()->flash(
+                'error',
+                'No withdrawal request selected.'
+            );
+
+            return;
+        }
+
+        $this->dispatch(
+            'confirm-withdrawal-approval',
+            amount: number_format(
+                $this->selectedWithdrawal->amount,
+                2
+            )
+        );
+    }
+
+    /*
     |----------------------------------------------------------------------
     | Approve / Release Withdrawal
     |----------------------------------------------------------------------
@@ -783,94 +971,161 @@ class AdminUsers extends Component
 
     public function processWithdrawalApproval(): void
     {
+        // ==========================================
+        // PERMISSION CHECK
+        // ==========================================
+
+        if (!$this->canUpdate) {
+
+            $this->dispatch(
+                'withdrawal-approved-error',
+                message: 'You do not have permission to approve withdrawals.'
+            );
+
+            return;
+        }
+
         if (!$this->selectedWithdrawal) {
+
+            $this->dispatch(
+                'withdrawal-approved-error',
+                message: 'No withdrawal request selected.'
+            );
+
+            return;
+        }
+
+        // ==========================================
+        // GET CURRENT AUTHENTICATED USER
+        // ==========================================
+
+        $confirmedBy = Auth::user()?->UserID;
+
+        if (!$confirmedBy) {
+
+            Log::error('Withdrawal approval failed: No authenticated user found.', [
+                'auth_user' => Auth::user(),
+                'auth_id' => Auth::id(),
+            ]);
+
+            $this->dispatch(
+                'withdrawal-approved-error',
+                message: 'Authenticated user not found.'
+            );
+
             return;
         }
 
         try {
 
-            DB::transaction(function () {
+            DB::transaction(function () use ($confirmedBy) {
 
-                $withdrawal =
-                    Withdrawal::where(
-                        'WithdrawID',
-                        $this->selectedWithdrawal->WithdrawID
-                    )
-                        ->lockForUpdate()
-                        ->first();
+                $withdrawal = Withdrawal::where(
+                    'WithdrawID',
+                    $this->selectedWithdrawal->WithdrawID
+                )
+                    ->lockForUpdate()
+                    ->first();
 
                 if (
-                    !$withdrawal
-                    || $withdrawal->status !== 'Pending'
+                    !$withdrawal ||
+                    $withdrawal->status !== 'Pending'
                 ) {
                     throw new \Exception(
                         'Withdrawal is no longer pending.'
                     );
                 }
 
+                $withdrawalAmount = (float) $withdrawal->amount;
+
                 // ==========================================
-                // APPROVE / RELEASE WITHDRAWAL
+                // CALCULATE 10% TRANSACTION
+                // ==========================================
+
+                $transactionAmount = $withdrawalAmount * 0.10;
+
+                // ==========================================
+                // APPROVE WITHDRAWAL
                 // ==========================================
 
                 $withdrawal->update([
                     'status' => 'Approved',
 
-                    'ProcessedBy' =>
-                        Auth::user()?->UserID,
+                    'confirmed_by' => $confirmedBy,
                 ]);
 
                 // ==========================================
                 // DEDUCT FROM WALLET
-                //
-                // Negative wallet entry keeps the wallet
-                // history intact.
                 // ==========================================
 
                 Wallet::create([
-                    'UserID' =>
-                        $withdrawal->UserID,
+                    'UserID' => $withdrawal->UserID,
 
-                    'withdrawID' =>
-                        $withdrawal->WithdrawID,
+                    'withdrawID' => $withdrawal->WithdrawID,
 
-                    'amount' =>
-                        -abs((float) $withdrawal->amount),
+                    'amount' => -abs($withdrawalAmount),
 
-                    'source' =>
-                        'WD',
+                    'source' => 'WD',
 
-                    'status' =>
-                        'Active',
+                    'status' => 'Active',
                 ]);
 
                 // ==========================================
-                // COMPLETE LEDGER ENTRY
+                // CREATE WITHDRAWAL LEDGER
                 // ==========================================
 
-                Ledger::where(
-                    'WithdrawID',
-                    $withdrawal->WithdrawID
-                )->update([
+                Ledger::create([
+                    'RefID' => $withdrawal->UserID,
+
+                    'WithdrawID' => $withdrawal->WithdrawID,
+
+                    'amount' => -abs($withdrawalAmount),
+
+                    'Source' => 'WD',
+
+                    'ActivationID' => null,
+
+                    'status' => 'Completed',
+                ]);
+
+                // ==========================================
+                // CREATE TRANSACTION FEE LEDGER
+                // ==========================================
+
+                Ledger::create([
+                    'RefID' => $withdrawal->UserID,
+
+                    'WithdrawID' => $withdrawal->WithdrawID,
+
+                    'amount' => $transactionAmount,
+
+                    'Source' => 'TX',
+
+                    'ActivationID' => null,
+
                     'status' => 'Completed',
                 ]);
             });
 
-            session()->flash(
-                'success',
-                'Withdrawal approved, released, and deducted from the wallet successfully.'
+            $this->closeWithdrawalModal();
+
+            $this->dispatch(
+                'withdrawal-approved-success'
             );
 
         } catch (\Exception $e) {
 
             report($e);
 
-            session()->flash(
-                'error',
-                'Something went wrong while approving the withdrawal.'
+            Log::error(
+                'Withdrawal approval failed: ' . $e->getMessage()
+            );
+
+            $this->dispatch(
+                'withdrawal-approved-error',
+                message: 'Something went wrong while approving the withdrawal.'
             );
         }
-
-        $this->closeWithdrawalModal();
     }
 
     /*

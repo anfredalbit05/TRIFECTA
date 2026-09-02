@@ -15,7 +15,6 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
-
 class Members extends Component
 {
     use WithPagination;
@@ -110,8 +109,6 @@ class Members extends Component
     {
         return $this->hasPermission('delete'); // checks can_delete
     }
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -214,7 +211,6 @@ class Members extends Component
         ]);
     }
 
-
     protected function parsedDateRange(): array
     {
         if (blank($this->dateRange) || !str_contains($this->dateRange, ' to ')) {
@@ -237,7 +233,6 @@ class Members extends Component
         $this->resetPage();
         $this->dispatch('ranges-reset');
     }
-
 
     public function updatingSearch()
     {
@@ -495,8 +490,59 @@ class Members extends Component
         $this->selectedWithdrawal = null;
     }
 
-    public function processWithdrawalApproval(): void
+    /*
+    |--------------------------------------------------------------------------
+    | Confirm Withdrawal Rejection
+    |--------------------------------------------------------------------------
+    */
+
+    public function confirmWithdrawalRejection(): void
     {
+        if (!$this->canUpdate) {
+
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to reject withdrawals.',
+            ]);
+
+            return;
+        }
+
+        if (!$this->selectedWithdrawal) {
+
+            $this->dispatch('swal:error', [
+                'title' => 'No Withdrawal Selected',
+                'text' => 'Please select a withdrawal request first.',
+            ]);
+
+            return;
+        }
+
+        $this->dispatch('confirm-withdrawal-rejection');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reject Withdrawal
+    |--------------------------------------------------------------------------
+    */
+
+    public function rejectWithdrawal(): void
+    {
+        // ==========================================
+        // PERMISSION CHECK
+        // ==========================================
+
+        if (!$this->canUpdate) {
+
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to reject withdrawals.',
+            ]);
+
+            return;
+        }
+
         if (!$this->selectedWithdrawal) {
             return;
         }
@@ -504,6 +550,10 @@ class Members extends Component
         try {
 
             DB::transaction(function () {
+
+                // ==========================================
+                // LOCK WITHDRAWAL
+                // ==========================================
 
                 $withdrawal = Withdrawal::where(
                     'WithdrawID',
@@ -513,8 +563,8 @@ class Members extends Component
                     ->first();
 
                 if (
-                    !$withdrawal
-                    || $withdrawal->status !== 'Pending'
+                    !$withdrawal ||
+                    $withdrawal->status !== 'Pending'
                 ) {
                     throw new \Exception(
                         'Withdrawal is no longer pending.'
@@ -522,59 +572,231 @@ class Members extends Component
                 }
 
                 // ==========================================
-                // APPROVE / RELEASE WITHDRAWAL
+                // REJECT WITHDRAWAL
+                //
+                // No wallet deduction
+                // No ledger transaction
                 // ==========================================
 
                 $withdrawal->update([
-                    'status' => 'Approved',
-                    'ProcessedBy' => Auth::user()?->UserID,
+                    'status' => 'Rejected',
+
+                    'confirmed_by' => Auth::user()?->UserID,
                 ]);
 
-                // ==========================================
-                // DEDUCT FROM WALLET
-                //
-                // Negative wallet entry keeps the wallet
-                // history intact.
-                // ==========================================
-
-                Wallet::create([
-                    'UserID' => $withdrawal->UserID,
-                    'withdrawID' => $withdrawal->WithdrawID,
-                    'amount' => -abs((float) $withdrawal->amount),
-                    'source' => 'WD',
-                    'status' => 'Active',
-                ]);
-
-                // ==========================================
-                // COMPLETE LEDGER ENTRY
-                // ==========================================
-
-                Ledger::where(
-                    'WithdrawID',
-                    $withdrawal->WithdrawID
-                )->update([
-                    'status' => 'Completed',
-                ]);
             });
 
+            // ==========================================
+            // CLOSE MODAL
+            // ==========================================
+
+            $this->closeWithdrawalModal();
+
+            // ==========================================
+            // SUCCESS MESSAGE
+            // ==========================================
+
             $this->dispatch('swal:success', [
-                'title' => 'Success!',
-                'text' => 'Withdrawal approved, released, and deducted from the wallet successfully.',
+                'title' => 'Withdrawal Rejected',
+                'text' => 'The withdrawal request has been rejected successfully.',
             ]);
+
+            // ==========================================
+            // REFRESH TABLE
+            // ==========================================
+
+            $this->skipRender = false;
 
         } catch (\Exception $e) {
 
             report($e);
+
+            Log::error(
+                'Withdrawal rejection failed: ' . $e->getMessage()
+            );
+
+            $this->dispatch('swal:error', [
+                'title' => 'Error',
+                'text' => 'Something went wrong while rejecting the withdrawal.',
+            ]);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Approve & Release Withdrawal
+    |--------------------------------------------------------------------------
+    */
+
+    public function processWithdrawalApproval(): void
+    {
+        // ==========================================
+        // PERMISSION CHECK
+        // ==========================================
+
+        if (!$this->canUpdate) {
+
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to approve withdrawals.',
+            ]);
+
+            return;
+        }
+
+        if (!$this->selectedWithdrawal) {
+            return;
+        }
+
+        try {
+
+            DB::transaction(function () {
+
+                // ==========================================
+                // LOCK WITHDRAWAL
+                // ==========================================
+
+                $withdrawal = Withdrawal::where(
+                    'WithdrawID',
+                    $this->selectedWithdrawal->WithdrawID
+                )
+                    ->lockForUpdate()
+                    ->first();
+
+                if (
+                    !$withdrawal ||
+                    $withdrawal->status !== 'Pending'
+                ) {
+                    throw new \Exception(
+                        'Withdrawal is no longer pending.'
+                    );
+                }
+
+                // ==========================================
+                // WITHDRAWAL AMOUNT
+                // ==========================================
+
+                $withdrawalAmount = (float) $withdrawal->amount;
+
+                // ==========================================
+                // CALCULATE 10% TRANSACTION
+                //
+                // Example:
+                // Withdrawal = ₱500
+                // TX = ₱50
+                // ==========================================
+
+                $transactionAmount = $withdrawalAmount * 0.10;
+
+                // ==========================================
+                // APPROVE WITHDRAWAL
+                // ==========================================
+
+                $withdrawal->update([
+                    'status' => 'Approved',
+
+                    'confirmed_by' => Auth::user()?->UserID,
+                ]);
+
+                // ==========================================
+                // WALLET ENTRY
+                //
+                // Example:
+                // Withdrawal ₱500
+                // Wallet = -₱500
+                // Source = WD
+                // ==========================================
+
+                Wallet::create([
+                    'UserID' => $withdrawal->UserID,
+
+                    'withdrawID' => $withdrawal->WithdrawID,
+
+                    'amount' => -abs($withdrawalAmount),
+
+                    'source' => 'WD',
+
+                    'status' => 'Active',
+                ]);
+
+                // ==========================================
+                // LEDGER: WITHDRAWAL
+                //
+                // Example:
+                // Withdrawal ₱500
+                // Ledger = -₱500
+                // Source = WD
+                // ==========================================
+
+                Ledger::create([
+                    'RefID' => $withdrawal->UserID,
+
+                    'WithdrawID' => $withdrawal->WithdrawID,
+
+                    'amount' => -abs($withdrawalAmount),
+
+                    'Source' => 'WD',
+
+                    'ActivationID' => null,
+
+                    'status' => 'Completed',
+                ]);
+
+                // ==========================================
+                // LEDGER: 10% TRANSACTION
+                //
+                // Example:
+                // ₱500 × 10% = ₱50
+                // Ledger = +₱50
+                // Source = TX
+                // ==========================================
+
+                Ledger::create([
+                    'RefID' => $withdrawal->UserID,
+
+                    'WithdrawID' => $withdrawal->WithdrawID,
+
+                    'amount' => $transactionAmount,
+
+                    'Source' => 'TX',
+
+                    'ActivationID' => null,
+
+                    'status' => 'Completed',
+                ]);
+            });
+
+            // ==========================================
+            // CLOSE MODAL
+            // ==========================================
+
+            $this->closeWithdrawalModal();
+
+            // ==========================================
+            // SUCCESS MESSAGE
+            // ==========================================
+
+            $this->dispatch('swal:success', [
+                'title' => 'Success!',
+                'text' => 'Withdrawal approved and released successfully.',
+            ]);
+
+            // Refresh table
+            $this->skipRender = false;
+
+        } catch (\Exception $e) {
+
+            report($e);
+
+            Log::error(
+                'Withdrawal approval failed: ' . $e->getMessage()
+            );
 
             $this->dispatch('swal:error', [
                 'title' => 'Error',
                 'text' => 'Something went wrong while approving the withdrawal.',
             ]);
         }
-
-        $this->closeWithdrawalModal();
-
-        $this->skipRender = false;
     }
 
     /*

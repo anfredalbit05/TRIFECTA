@@ -45,6 +45,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
     'lastname',
     'firstname',
     'middlename',
+    'occupation',
     'gender',
     'civilstatus',
     'birthdate',
@@ -54,6 +55,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
     'longitude',
     'email',
     'policy_number',
+    'policy_expiration_date',
 
     // Emergency Contact Information (Added)
     'emergencyName',

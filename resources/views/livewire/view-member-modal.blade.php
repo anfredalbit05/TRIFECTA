@@ -5,21 +5,24 @@
  Backing component: App\Livewire\ViewMemberModal
  Opened via the 'open-view-member' event (dispatched with UserID).
 
- Layout notes:
-   - Outer modal box is a flex column capped at max-h-[92vh] so it
-     never exceeds the viewport (important on mobile).
-   - Header and Footer are `shrink-0` so they always stay visible.
-   - Body is `flex-1 overflow-y-auto` — it's the only scrollable
-     region, sitting between the fixed header and fixed footer.
+ Layout & color palette matched to the Application Modal:
+   - Section headers: navy bar (#0B2A5B) + gold uppercase title (#E8B923)
+     + slate-200 subtitle.
+   - Field cards: slate-50 background, slate-400 uppercase label,
+     slate-700/800 value.
+   - Outer modal: rounded-2xl, border-slate-100, shadow-2xl,
+     max-h-[90vh] flex column so header/footer stay fixed and only
+     the body scrolls.
 
  Sections:
-   1. Header (avatar + name + close button)
+   1. Header (avatar + name + status + close button)
    2. Body
       2a. Personal Information
-      2b. Address & Pinpoint Location (Leaflet map)
-      2c. Contact Information
-      2d. Activation Information
-      2e. Beneficiaries
+      2b. Policy Information
+      2c. Address & Pinpoint Location (Leaflet map)
+      2d. Contact Information
+      2e. Activation Information
+      2f. Beneficiaries
    3. Footer (Certificate & Policy downloads — Active members only)
 =====================================================================
 --}}
@@ -29,230 +32,303 @@
     @if ($open)
 
         {{-- ============================= BACKDROP ============================= --}}
-        <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+        <div class="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-black/70 p-3 backdrop-blur-sm sm:p-4">
 
             {{-- ============================= MODAL BOX ============================= --}}
-            <div class="flex max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div class="my-auto flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-2xl">
 
                 {{-- ======================== 1. HEADER ======================== --}}
-                <div class="shrink-0 bg-[#0C2C6B] px-6 py-5 text-white">
-                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
-                        <div class="flex items-center gap-4">
-                            {{-- Avatar --}}
-                            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-2xl font-bold">
-                                {{ strtoupper(substr($first_name, 0, 1)) }}
-                            </div>
-
-                            {{-- @if (!empty($this->selectedUser->profilepic))
-                                <img src="{{ Str::startsWith($this->selectedUser->profilepic, 'storage/')
-                                    ? asset($this->selectedUser->profilepic)
-                                    : asset('storage/' . $this->selectedUser->profilepic) }}"
-                                    alt="profile-image"
-                                    class="w-14 h-14 rounded-full object-cover border border-slate-200 shadow-sm shrink-0">
-                            @else
-                                <div
-                                    class="w-14 h-14 rounded-full bg-[#0C2C6B] text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
-                                    {{ strtoupper(substr($this->selectedUser->firstname, 0, 1) . substr($this->selectedUser->lastname, 0, 1)) }}
-                                </div>
-                            @endif --}}
-
-                            <div>
-                                <h2 class="text-2xl font-bold">
-                                    {{ $first_name }} {{ $middle_name }} {{ $surname }}
-                                </h2>
-                                <p class="text-sm text-blue-100">Member Information</p>
+                <div class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4 shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#0B2A5B] text-lg font-extrabold text-[#E8B923]">
+                            {{ strtoupper(substr($first_name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-extrabold text-[#0B2A5B] sm:text-xl">
+                                {{ $first_name }} {{ $middle_name }} {{ $surname }}
+                            </h2>
+                            <div class="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                                <span>Member Information</span>
+                                @if ($status)
+                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase text-slate-600">
+                                        <span class="h-1.5 w-1.5 rounded-full {{ $status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
+                                        {{ $status }}
+                                    </span>
+                                @endif
                             </div>
                         </div>
-
-                        <button wire:click="close" class="rounded-lg bg-white/20 px-4 py-2 transition hover:bg-red-500">
-                            ✕
-                        </button>
-
                     </div>
+                    <button
+                        wire:click="close"
+                        type="button"
+                        class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 font-bold text-slate-500 transition hover:bg-rose-100 hover:text-rose-600"
+                        title="Close">
+                        &#10005;
+                    </button>
                 </div>
 
                 {{-- ======================== 2. BODY (scrollable) ======================== --}}
-                <div class="flex-1 overflow-y-auto p-6">
+                <div class="space-y-7 overflow-y-auto p-4 sm:p-6">
 
-                    {{-- ---- 2a. Personal Information ---- --}}
-                    <div class="mb-6 rounded-xl border border-slate-200 shadow-sm">
-                        <div class="border-b border-slate-200 bg-slate-50 px-5 py-3">
-                            <h3 class="font-bold text-slate-800">👤 Personal Information</h3>
+                {{-- =================================================
+                    2b. POLICY INFORMATION
+                ================================================== --}}
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
+                                Policy Information
+                            </h3>
+                            <p class="mt-0.5 text-[10px] font-normal normal-case tracking-normal text-slate-200">
+                                Membership policy details and expiration information.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2 lg:grid-cols-3">
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-bold uppercase text-slate-400">Policy Number</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-800">{{ $policy_number ?: 'N/A' }}</p>
                         </div>
 
-                        <div class="grid grid-cols-1 gap-4 p-5 md:grid-cols-2 lg:grid-cols-3">
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400">Surname</p>
-                                <p class="mt-1 font-semibold">{{ $surname }}</p>
-                            </div>
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-bold uppercase text-slate-400">Policy Expiration Date</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-800">
+                                {{ $policy_expiration_date
+                                    ? \Carbon\Carbon::parse($policy_expiration_date)->format('F d, Y')
+                                    : 'N/A' }}
+                            </p>
+                        </div>
 
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400">First Name</p>
-                                <p class="mt-1 font-semibold">{{ $first_name }}</p>
-                            </div>
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-bold uppercase text-slate-400">Policy Status</p>
+                            <div class="mt-1 flex min-h-[20px] flex-col">
+                                @if ($policy_expiration_date)
+                                    @php
+                                        $now = \Carbon\Carbon::now();
+                                        $expiry = \Carbon\Carbon::parse($policy_expiration_date);
+                                        $isExpired = $expiry->isPast();
 
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400">Middle Name</p>
-                                <p class="mt-1 font-semibold">{{ $middle_name ?: 'N/A' }}</p>
-                            </div>
+                                        // Exact breakdown (absolute diff, no rounding to a single unit)
+                                        $diff = $isExpired ? $expiry->diff($now) : $now->diff($expiry);
 
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400">Gender</p>
-                                <p class="mt-1 font-semibold">{{ $gender }}</p>
-                            </div>
+                                        $parts = [];
+                                        if ($diff->y > 0) $parts[] = $diff->y . ' ' . \Illuminate\Support\Str::plural('year', $diff->y);
+                                        if ($diff->m > 0) $parts[] = $diff->m . ' ' . \Illuminate\Support\Str::plural('month', $diff->m);
+                                        if ($diff->d > 0) $parts[] = $diff->d . ' ' . \Illuminate\Support\Str::plural('day', $diff->d);
 
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400">Civil Status</p>
-                                <p class="mt-1 font-semibold">{{ $civil_status }}</p>
-                            </div>
+                                        $exactText = count($parts) > 0 ? implode(', ', $parts) : '0 days';
+                                    @endphp
 
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400">Birthdate</p>
-                                <p class="mt-1 font-semibold">
-                                    {{ \Carbon\Carbon::parse($birthdate)->format('F d, Y') }}
+                                    @if ($isExpired)
+                                        <span class="inline-flex items-center gap-1.5 text-sm font-bold text-red-600">
+                                            <span class="h-2 w-2 rounded-full bg-red-500"></span>
+                                            Expired
+                                        </span>
+                                        <span class="mt-0.5 text-xs font-medium text-slate-500">
+                                            {{ $exactText }} ago
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1.5 text-sm font-bold text-green-600">
+                                            <span class="h-2 w-2 rounded-full bg-green-500"></span>
+                                            Active
+                                        </span>
+                                        <span class="mt-0.5 text-xs font-medium text-slate-500">
+                                            {{ $exactText }} left
+                                        </span>
+                                    @endif
+                                @else
+                                    <span class="text-sm font-semibold text-slate-400">
+                                        Not Set
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                    {{-- =================================================
+                         2c. ADDRESS & PINPOINT LOCATION
+                    ================================================== --}}
+                    <div
+                        class="space-y-4"
+                        x-data="{
+                            map: null,
+                            initMap() {
+                                if (this.map) {
+                                    this.map.remove();
+                                }
+                                let lat = {{ $latitude ?? 7.442294461028405 }};
+                                let lng = {{ $longitude ?? 125.81370503321095 }};
+
+                                setTimeout(() => {
+                                    this.map = L.map('member-map').setView([lat, lng], 15);
+                                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                        maxZoom: 19,
+                                        attribution: '&copy; OpenStreetMap'
+                                    }).addTo(this.map);
+                                    L.marker([lat, lng]).addTo(this.map).bindPopup('Member Location').openPopup();
+                                }, 150);
+                            }
+                        }"
+                        x-init="initMap()">
+                        <div class="flex items-center justify-between rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
+                            <div>
+                                <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
+                                    Address & Location
+                                </h3>
+                                <p class="mt-0.5 text-[10px] font-normal normal-case tracking-normal text-slate-200">
+                                    The applicant's complete address and pinpointed location.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 pt-1">
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p class="text-xs font-bold uppercase text-slate-400">Complete Address</p>
+                                <p class="mt-1 text-sm font-semibold text-slate-800">
+                                    {{ $address ?: 'No address provided' }}
                                 </p>
                             </div>
 
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400">Referral Code</p>
-                                <p class="mt-1 font-semibold">{{ $referralCode }}</p>
-                            </div>
-
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400">Upline Code</p>
-                                <p class="mt-1 font-semibold">{{ $uplineCode }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- ---- 2b. Address & Pinpoint Location ---- --}}
-                    <div class="mb-6 rounded-xl border border-slate-200 shadow-sm" x-data="{
-                        map: null,
-                        initMap() {
-                            if (this.map) {
-                                this.map.remove();
-                            }
-                            let lat = {{ $latitude ?? 7.442294461028405 }};
-                            let lng = {{ $longitude ?? 125.81370503321095 }};
-                    
-                            setTimeout(() => {
-                                this.map = L.map('member-map').setView([lat, lng], 15);
-                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                    maxZoom: 19,
-                                    attribution: '&copy; OpenStreetMap'
-                                }).addTo(this.map);
-                                L.marker([lat, lng]).addTo(this.map).bindPopup('Member Location').openPopup();
-                            }, 150);
-                        }
-                    }"
-                        x-init="initMap()">
-                        <div class="border-b border-slate-200 bg-slate-50 px-5 py-3">
-                            <h3 class="font-bold text-slate-800">📍 Address & Pinpoint Location</h3>
-                        </div>
-
-                        <div class="p-5 space-y-4">
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400 mb-1">Text Address</p>
-                                {{ $address ?: 'No address provided' }}
-                            </div>
-
                             {{-- Leaflet Map Container --}}
-                            <div class="overflow-hidden rounded-lg border border-slate-200">
-                                <div id="member-map" class="h-100 w-full z-0"></div>
+                            <div class="h-[300px] overflow-hidden rounded-xl border border-slate-300">
+                                <div id="member-map" class="h-full w-full z-0"></div>
                             </div>
                         </div>
                     </div>
 
-                    {{-- ---- 2c. Contact Information ---- --}}
-                    <div class="mb-6 rounded-xl border border-slate-200 shadow-sm">
-                        <div class="border-b border-slate-200 bg-slate-50 px-5 py-3">
-                            <h3 class="font-bold text-slate-800">📞 Contact Information</h3>
+                    {{-- =================================================
+                         2d. CONTACT INFORMATION
+                    ================================================== --}}
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
+                            <div>
+                                <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
+                                    Account & Contact Information
+                                </h3>
+                                <p class="mt-0.5 text-[10px] font-normal normal-case tracking-normal text-slate-200">
+                                    Account credentials and contact information on record.
+                                </p>
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 gap-4 p-5 md:grid-cols-3">
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400">Mobile</p>
-                                <p class="mt-1 font-semibold">{{ $mobile }}</p>
+                        <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2 lg:grid-cols-3">
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p class="text-xs font-bold uppercase text-slate-400">Mobile Number</p>
+                                <p class="mt-1 text-sm font-semibold text-slate-800">{{ $mobile ?: 'N/A' }}</p>
                             </div>
 
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400">Email</p>
-                                <p class="mt-1 font-semibold">{{ $email ?: 'N/A' }}</p>
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p class="text-xs font-bold uppercase text-slate-400">Email Address</p>
+                                <p class="mt-1 text-sm font-semibold text-slate-800">{{ $email ?: 'N/A' }}</p>
                             </div>
 
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400">Username</p>
-                                <p class="mt-1 font-semibold">{{ $username }}</p>
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p class="text-xs font-bold uppercase text-slate-400">Username</p>
+                                <p class="mt-1 text-sm font-semibold text-slate-800">{{ $username ?: 'N/A' }}</p>
                             </div>
                         </div>
                     </div>
 
-                    {{-- ---- 2d. Activation Information ---- --}}
-                    <div class="mb-6 rounded-xl border border-slate-200 shadow-sm">
-                        <div class="border-b border-slate-200 bg-slate-50 px-5 py-3">
-                            <h3 class="font-bold text-slate-800">✅ Activation Information</h3>
+                    {{-- =================================================
+                         2e. ACTIVATION INFORMATION
+                    ================================================== --}}
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
+                            <div>
+                                <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
+                                    Activation Information
+                                </h3>
+                                <p class="mt-0.5 text-[10px] font-normal normal-case tracking-normal text-slate-200">
+                                    Current activation status and relevant date.
+                                </p>
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 gap-4 p-5 md:grid-cols-2">
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400">Activation Status</p>
-                                <p class="mt-1 font-semibold">
+                        <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2">
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p class="text-xs font-bold uppercase text-slate-400">Activation Status</p>
+                                <p class="mt-1 text-sm font-bold">
                                     @if ($activationStatus === 'Approved')
                                         <span class="text-green-600">Approved</span>
                                     @elseif ($activationStatus === 'Rejected')
                                         <span class="text-red-600">Rejected</span>
                                     @elseif (empty($activationStatus))
-                                        <span class="text-gray-600">N/A</span>
+                                        <span class="text-slate-500">N/A</span>
                                     @else
-                                        <span class="text-yellow-600">Pending</span>
+                                        <span class="text-amber-600">Pending</span>
                                     @endif
                                 </p>
                             </div>
 
-                            <div class="rounded-lg bg-slate-50 p-4">
-                                <p class="text-xs uppercase text-slate-400">{{ $activationLabel ?? 'Date' }}</p>
-                                <p class="mt-1 font-semibold">{{ $activationDate ?? 'N/A' }}</p>
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p class="text-xs font-bold uppercase text-slate-400">{{ $activationLabel ?? 'Date' }}</p>
+                                <p class="mt-1 text-sm font-semibold text-slate-800">{{ $activationDate ?? 'N/A' }}</p>
                             </div>
                         </div>
                     </div>
 
-                    {{-- ---- 2e. Beneficiaries ---- --}}
-                    <div class="rounded-xl border border-slate-200 shadow-sm">
-                        <div class="border-b border-slate-200 bg-slate-50 px-5 py-3">
-                            <h3 class="font-bold text-slate-800">👨‍👩‍👧 Beneficiaries</h3>
+                    {{-- =================================================
+                         2f. BENEFICIARY INFORMATION
+                    ================================================== --}}
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
+                            <div>
+                                <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
+                                    Beneficiary Information
+                                </h3>
+                                <p class="mt-0.5 text-[10px] font-normal normal-case tracking-normal text-slate-200">
+                                    Beneficiaries on record for this member.
+                                </p>
+                            </div>
+                            <span class="hidden text-[10px] font-normal uppercase text-slate-200 sm:block">
+                                Up to 3 Dependents
+                            </span>
                         </div>
 
-                        <div class="p-5">
+                        <div class="space-y-4 pt-1">
                             @forelse ($beneficiaries as $index => $beneficiary)
-                                <div class="mb-4 rounded-xl border border-slate-200 p-4">
-                                    <div class="mb-4 flex items-center justify-between">
-                                        <h4 class="font-bold text-slate-700">
+                                <div class="relative rounded-xl border border-slate-200 bg-slate-50 p-3 pt-12 sm:p-4 sm:pt-12">
+
+                                    {{-- BENEFICIARY HEADER --}}
+                                    <div class="absolute left-4 top-3 flex items-center gap-2">
+                                        <div class="flex h-6 min-w-6 items-center justify-center rounded-full bg-[#0B2A5B] px-2 text-[10px] font-bold text-[#E8B923]">
+                                            {{ $index + 1 }}
+                                        </div>
+                                        <span class="text-xs font-bold text-slate-600">
                                             Beneficiary {{ $index + 1 }}
-                                        </h4>
+                                        </span>
                                     </div>
 
-                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                        <div class="rounded-lg bg-slate-50 p-4">
-                                            <p class="text-xs uppercase text-slate-400">Full Name</p>
-                                            <p class="mt-1 font-semibold">{{ $beneficiary['fullname'] ?: 'N/A' }}</p>
+                                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                        <div class="rounded-lg border border-slate-200 bg-white p-3">
+                                            <p class="text-xs font-bold uppercase text-slate-400">Full Name</p>
+                                            <p class="mt-1 text-sm font-semibold text-slate-800">
+                                                {{ $beneficiary['fullname'] ?: 'N/A' }}
+                                            </p>
                                         </div>
 
-                                        <div class="rounded-lg bg-slate-50 p-4">
-                                            <p class="text-xs uppercase text-slate-400">Birthdate</p>
-                                            <p class="mt-1 font-semibold">{{ $beneficiary['birthdate'] ?: 'N/A' }}</p>
+                                        <div class="rounded-lg border border-slate-200 bg-white p-3">
+                                            <p class="text-xs font-bold uppercase text-slate-400">Birthdate</p>
+                                            <p class="mt-1 text-sm font-semibold text-slate-800">
+                                                {{ $beneficiary['birthdate']
+                                                    ? \Carbon\Carbon::parse($beneficiary['birthdate'])->format('F d, Y')
+                                                    : 'N/A' }}
+                                            </p>
                                         </div>
 
-                                        <div class="rounded-lg bg-slate-50 p-4">
-                                            <p class="text-xs uppercase text-slate-400">Relationship</p>
-                                            <p class="mt-1 font-semibold">{{ $beneficiary['relationship'] ?: 'N/A' }}
+                                        <div class="rounded-lg border border-slate-200 bg-white p-3">
+                                            <p class="text-xs font-bold uppercase text-slate-400">Relationship</p>
+                                            <p class="mt-1 text-sm font-semibold text-slate-800">
+                                                {{ $beneficiary['relationship'] ?: 'N/A' }}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                             @empty
-                                <div
-                                    class="rounded-lg border border-dashed border-slate-300 p-10 text-center text-slate-500">
+                                <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center text-sm text-slate-500">
                                     No beneficiaries found.
                                 </div>
                             @endforelse
@@ -263,39 +339,46 @@
                 {{-- end 2. BODY --}}
 
                 {{-- ======================== 3. FOOTER ======================== --}}
-                @if ($status === 'Active')
-                    <div
-                        class="shrink-0 flex flex-col gap-3 border-t border-slate-200 px-6 py-4 sm:flex-row sm:justify-end">
+                <div class="flex flex-col items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 p-4 sm:flex-row">
+                    <span class="text-center text-xs text-slate-500 sm:text-left">
+                        Viewing full member record.
+                    </span>
 
-                        <a href="{{ route('admin.member.policy.download', $UserID) }}" target="_blank"
-                            class="inline-flex items-center justify-center gap-2 rounded-lg border border-[#0C2C6B] px-4 py-2 text-sm font-semibold text-[#0C2C6B] transition hover:bg-[#0C2C6B]/5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Download Policy
-                        </a>
+                    <div class="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
 
-                        <a href="{{ route('admin.member.certificate.download', $UserID) }}" target="_blank"
-                            class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#0C2C6B] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0C2C6B]/90">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                            Download Certificate
-                        </a>
+                        @if ($status === 'Active')
+                            <a href="{{ route('admin.member.policy.download', $UserID) }}" target="_blank"
+                                class="flex w-full items-center justify-center gap-2 rounded-xl border border-[#0B2A5B] px-5 py-2.5 text-xs font-bold text-[#0B2A5B] shadow-sm transition hover:bg-[#0B2A5B]/5 sm:w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Download Policy
+                            </a>
 
+                            <a href="{{ route('admin.member.certificate.download', $UserID) }}" target="_blank"
+                                class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#D4A017] px-6 py-2.5 text-xs font-bold text-[#0B2A5B] shadow-md transition hover:bg-[#E8B923] sm:w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Download Certificate
+                            </a>
+                        @endif
+
+                        <button
+                            wire:click="close"
+                            type="button"
+                            class="w-full rounded-xl border border-slate-300 px-5 py-2.5 text-center text-xs font-bold text-slate-600 transition hover:bg-slate-100 sm:w-auto">
+                            Close
+                        </button>
                     </div>
-                @endif
-
+                </div>
             </div>
-            {{-- end MODAL BOX --}}
-
         </div>
-        {{-- end BACKDROP --}}
 
     @endif
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </div>

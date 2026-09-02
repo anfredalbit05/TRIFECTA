@@ -22,6 +22,7 @@ class WithdrawalModal extends Component
 
     public $withdrawAmount = '';
     public $withdrawalMethod = '';
+    public $bankName = ''; // <--- Added property
     public $accountName = '';
     public $accountNumber = '';
     public $paymentReference = '';
@@ -94,6 +95,7 @@ class WithdrawalModal extends Component
         $this->reset([
             'withdrawAmount',
             'withdrawalMethod',
+            'bankName', // <--- Added here
             'accountName',
             'accountNumber',
             'paymentReference',
@@ -293,12 +295,10 @@ class WithdrawalModal extends Component
                 'min:' . $minimumWithdrawal,
                 'max:' . max(0, $availableBalance),
             ],
-
             'withdrawalMethod' => [
                 'required',
                 'in:Cash,GCash,Maya,Bank Transfer',
             ],
-
             'paymentReference' => [
                 'nullable',
                 'string',
@@ -306,8 +306,15 @@ class WithdrawalModal extends Component
             ],
         ];
 
-        if ($this->withdrawalMethod !== 'Cash') {
+        if ($this->withdrawalMethod === 'Bank Transfer') {
+            $rules['bankName'] = [
+                'required',
+                'string',
+                'max:255',
+            ];
+        }
 
+        if ($this->withdrawalMethod !== 'Cash') {
             $rules['accountName'] = [
                 'required',
                 'string',
@@ -326,13 +333,11 @@ class WithdrawalModal extends Component
             'withdrawAmount.numeric' => 'Withdrawal amount must be a valid number.',
             'withdrawAmount.min' => "Minimum withdrawal amount is ₱{$minimumWithdrawal}.",
             'withdrawAmount.max' => 'Withdrawal amount exceeds the available balance.',
-
             'withdrawalMethod.required' => 'Please select a withdrawal method.',
-
+            'bankName.required' => 'Please select a bank.', // <--- Added custom message
             'accountName.required' => 'Please enter the account name.',
             'accountNumber.required' => 'Please enter the account number.',
         ]);
-
         try {
 
             $submittedAmount = (float) $this->withdrawAmount;
@@ -344,11 +349,20 @@ class WithdrawalModal extends Component
                     ? 'W'
                     : 'O';
 
-                $withdrawal = Withdrawal::create([
+                // ==========================================
+                // CREATE WITHDRAWAL REQUEST ONLY
+                // Ledger entries will be created upon approval
+                // ==========================================
+
+                Withdrawal::create([
                     'UserID' => $userID,
-                    'amount' => $this->withdrawAmount,
+                    'amount' => (float) $this->withdrawAmount,
                     'type' => $type,
                     'withdrawal_method' => $this->withdrawalMethod,
+
+                    'bank_name' => $this->withdrawalMethod === 'Bank Transfer'
+                    ? $this->bankName
+                    : null, // <--- Added bank_name mapping
 
                     'account_name' => $this->withdrawalMethod === 'Cash'
                         ? null
@@ -360,20 +374,8 @@ class WithdrawalModal extends Component
 
                     'payment_reference' => $this->paymentReference ?: null,
 
-                    // The person taking the action —
-                    // the admin in admin mode, or the
-                    // user themself on the dashboard.
                     'ProcessedBy' => $processedBy,
 
-                    'status' => 'Pending',
-                ]);
-
-                Ledger::create([
-                    'RefID' => $userID,
-                    'WithdrawID' => $withdrawal->WithdrawID,
-                    'amount' => -$this->withdrawAmount,
-                    'Source' => 'WD',
-                    'ActivationID' => null,
                     'status' => 'Pending',
                 ]);
             });
@@ -381,6 +383,7 @@ class WithdrawalModal extends Component
             $this->reset([
                 'withdrawAmount',
                 'withdrawalMethod',
+                'bankName',
                 'accountName',
                 'accountNumber',
                 'paymentReference',
