@@ -37,8 +37,8 @@ class ApplicationModal extends Component
     public bool $isEditMode = false;
 
     public ?int $userId = null;
-    public $policy_number = '';
-    public $policy_expiration_date = '';
+    public $policy_number = null;
+    public $policy_expiration_date = null;
 
     public $upline = '';
 
@@ -571,9 +571,70 @@ class ApplicationModal extends Component
             return;
         }
 
+        // Normalize optional policy fields
+        $this->policy_number = blank($this->policy_number)
+            ? null
+            : trim($this->policy_number);
+
+        $this->policy_expiration_date = blank($this->policy_expiration_date)
+            ? null
+            : trim($this->policy_expiration_date);
+
+        try {
+            $this->validate([
+                'surname' => 'required|string|max:255',
+                'first_name' => 'required|string|max:255',
+                'gender' => 'required',
+                'civil_status' => 'required',
+                'birthdate' => 'required|date',
+                'occupation' => 'nullable|string|max:255',
+                'address' => 'required|string|max:500',
+
+                'mobile' => 'required|digits:11',
+
+                'email' => 'nullable|email|unique:users,email,' . $this->userId . ',UserID',
+
+                'username' => 'required|string|max:100|unique:users,username,' . $this->userId . ',UserID',
+
+                'policy_number' => 'nullable|string|max:100',
+                'policy_expiration_date' => 'nullable|date',
+            ]);
+        } catch (ValidationException $e) {
+            $errors = $e->validator->errors()->all();
+
+            $html = '<ul style="text-align:left; list-style-type:disc; padding-left:20px;">';
+
+            foreach ($errors as $error) {
+                $html .= "<li style='margin-bottom:6px'>{$error}</li>";
+            }
+
+            $html .= '</ul>';
+
+            $this->dispatch(
+                'validation-error',
+                title: 'Missing or Invalid Fields',
+                html: $html
+            );
+
+            return;
+        }
+
         $changes = $this->getChangedFields();
 
-        $this->dispatch('swal-confirm-update', changes: $changes);
+        if (empty($changes)) {
+            $this->dispatch(
+                'validation-error',
+                title: 'No Changes',
+                html: 'There are no changes to save.'
+            );
+
+            return;
+        }
+
+        $this->dispatch(
+            'swal-confirm-update',
+            changes: $changes
+        );
     }
 
     /**
@@ -653,6 +714,16 @@ class ApplicationModal extends Component
     #[On('confirmed-update-member')]
     public function updateMember(): void
     {
+
+        $this->policy_number = blank($this->policy_number)
+        ? null
+        : trim($this->policy_number);
+
+        $this->policy_expiration_date = blank($this->policy_expiration_date)
+        ? null
+        : trim($this->policy_expiration_date);
+
+
         $this->validate([
             'surname' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',
@@ -844,10 +915,12 @@ class ApplicationModal extends Component
         $this->mobile = $user->contactno ?? '';
         $this->email = $user->email ?? '';
         $this->username = $user->username ?? '';
-        $this->policy_number = $user->policy_number ?? '';
+        // Policy fields
+        $this->policy_number = $user->policy_number ?: null;
+
         $this->policy_expiration_date = $user->policy_expiration_date
             ? \Carbon\Carbon::parse($user->policy_expiration_date)->format('Y-m-d')
-            : '';
+            : null;
 
         // Reset both the form slots and the "which slot is a saved DB row" tracker.
         $this->beneficiaries = [
