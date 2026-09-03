@@ -31,6 +31,8 @@ class PolicyController extends Controller
 
             'policyNumber' => $user->policy_number,
 
+            'policy_expiration_date' => $user->policy_expiration_date,
+
             'effectiveDate' => now(),
 
             'expiryDate' => now()->addYear(),
@@ -54,6 +56,7 @@ class PolicyController extends Controller
         'user' => $user,
         'beneficiaries' => $beneficiaries,
         'policyNumber' => $user->policy_number,
+        'policy_expiration_date' => $user->policy_expiration_date,
         'effectiveDate' => now(),
         'expiryDate' => now()->addYear(),
     ])

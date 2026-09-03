@@ -86,7 +86,10 @@ body{
 
     <!-- Expiry Date -->
     <div class="field" style="left:140px;top:316px;">
-        {{ $expiryDate->format('M d, Y') }}
+        {{ $policy_expiration_date
+    ? \Carbon\Carbon::parse($policy_expiration_date)->format('M d, Y')
+    : ''
+}}
     </div>
 
     <!-- Policy Number -->
