@@ -63,19 +63,23 @@ body{
     </div>
 
 @php
-    $address = wordwrap(strtoupper($user->address), 32, "\n", true);
+    $address = strtoupper($user->address);
+
+    // Wrap address at 28 characters, but never cut a word in half
+    $address = wordwrap($address, 28, "\n", false);
 @endphp
 
 <div
     class="field"
     style="
         left:140px;
-        top:241px;
+        top:240px;
         width:310px;
         font-size:12px;
         line-height:14px;
         white-space:pre-line;
-    ">
+    "
+>
     {{ $address }}
 </div>
 
