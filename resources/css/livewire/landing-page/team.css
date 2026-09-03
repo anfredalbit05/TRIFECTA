@@ -1,7 +1,7 @@
 /* ===================================================
-   TEAM PAGE — MASTER STYLESHEET
-   Organized & merged. Import this single file in your
-   CSS entry point (e.g. resources/css/app.css):
+   TEAM PAGE — MASTER STYLESHEET (FULLY RESPONSIVE)
+   Import this single file in your CSS entry point
+   (e.g. resources/css/app.css):
 
        @import './team.css';
 
@@ -13,6 +13,16 @@
      5. Branch & Field Support
      6. Partnership Banner
      7. Call To Action
+
+   NOTE ON CHANGES FROM THE ORIGINAL FILE:
+   The original used several *fixed* pixel heights/scales
+   (e.g. h-[1200px], min-h-[950px], scale-140) that applied
+   at every breakpoint, including mobile. That forced huge
+   empty space / overflow on small screens. Below, those
+   values now scale up progressively via sm:/md:/lg: prefixes
+   and only reach their original size at lg (desktop).
+   Headings that jumped straight to a large fixed size now
+   step down for narrow screens too.
 =================================================== */
 
 /* ===================================================
@@ -20,23 +30,23 @@
 =================================================== */
 
 .team-hero {
-    @apply relative overflow-hidden bg-gradient-to-br from-[#0B2A5B] via-[#123B78] to-[#071D3F] py-24 text-white;
+    @apply relative overflow-hidden bg-gradient-to-br from-[#0B2A5B] via-[#123B78] to-[#071D3F] py-16 sm:py-20 lg:py-24 text-white;
 }
 
 .team-hero-glow-top {
-    @apply absolute -top-20 -left-20 w-80 h-80 rounded-full bg-[#D4A017]/20 blur-3xl pointer-events-none;
+    @apply absolute -top-20 -left-20 w-56 h-56 sm:w-80 sm:h-80 rounded-full bg-[#D4A017]/20 blur-3xl pointer-events-none;
 }
 
 .team-hero-glow-bottom {
-    @apply absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none;
+    @apply absolute -bottom-20 -right-20 w-56 h-56 sm:w-80 sm:h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none;
 }
 
 .team-hero-badge {
-    @apply uppercase tracking-[0.2em] text-[#FFD54A] font-bold text-sm block;
+    @apply uppercase tracking-[0.15em] sm:tracking-[0.2em] text-[#FFD54A] font-bold text-xs sm:text-sm block;
 }
 
 .team-hero-title {
-    @apply mt-5 text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight;
+    @apply mt-5 text-3xl sm:text-4xl lg:text-6xl font-black tracking-tight leading-tight;
 }
 
 .team-hero-title-highlight {
@@ -44,7 +54,7 @@
 }
 
 .team-hero-description {
-    @apply mt-8 max-w-3xl mx-auto text-base sm:text-lg text-slate-300 leading-relaxed;
+    @apply mt-6 sm:mt-8 max-w-3xl mx-auto text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed;
 }
 
 /* ===================================================
@@ -58,41 +68,43 @@
 /* --- Leadership: CEO (detailed) --- */
 
 .team-leadership-ceo-section {
-    @apply relative overflow-hidden bg-slate-100 py-24;
+    @apply relative overflow-hidden bg-slate-100 py-16 sm:py-20 lg:py-24;
 }
 
 .team-leadership-ceo-decor-blue {
-    @apply absolute top-0 left-0 h-96 w-96 rounded-full bg-blue-100 blur-3xl opacity-40;
+    @apply absolute top-0 left-0 h-56 w-56 sm:h-96 sm:w-96 rounded-full bg-blue-100 blur-3xl opacity-40;
 }
 
 .team-leadership-ceo-decor-yellow {
-    @apply absolute bottom-0 right-0 h-96 w-96 rounded-full bg-yellow-100 blur-3xl opacity-40;
+    @apply absolute bottom-0 right-0 h-56 w-56 sm:h-96 sm:w-96 rounded-full bg-yellow-100 blur-3xl opacity-40;
 }
 
 .team-leadership-ceo-container {
-    @apply max-w-7xl mx-auto px-6;
+    @apply max-w-7xl mx-auto px-4 sm:px-6;
 }
 
 .team-leadership-ceo-card {
-    @apply overflow-hidden rounded-[40px] bg-white shadow-2xl;
+    @apply overflow-hidden rounded-3xl sm:rounded-[40px] bg-white shadow-2xl;
 }
 
+/* min-h now only forces the tall two-column height at lg+;
+   below that, content sets its own height and stacks. */
 .team-leadership-ceo-grid {
-    @apply grid lg:grid-cols-12 min-h-[950px];
+    @apply grid grid-cols-1 lg:grid-cols-12 lg:min-h-[950px];
 }
 
 /* Left content */
 
 .team-leadership-ceo-left {
-    @apply lg:col-span-7 p-8 lg:p-14 flex flex-col;
+    @apply lg:col-span-7 p-6 sm:p-8 lg:p-14 flex flex-col;
 }
 
 .team-leadership-ceo-badge {
-    @apply inline-flex items-center gap-2 rounded-full bg-blue-900 px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white;
+    @apply inline-flex items-center gap-2 rounded-full bg-blue-900 px-4 py-1.5 sm:px-5 sm:py-2 text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-white;
 }
 
 .team-leadership-ceo-heading {
-    @apply mt-8 text-5xl lg:text-7xl font-black leading-[0.95] text-slate-900;
+    @apply mt-6 sm:mt-8 text-3xl sm:text-5xl lg:text-7xl font-black leading-[1.05] sm:leading-[0.95] text-slate-900;
 }
 
 .team-leadership-ceo-heading-blue {
@@ -104,31 +116,31 @@
 }
 
 .team-leadership-ceo-description {
-    @apply mt-8 max-w-2xl text-lg leading-relaxed text-slate-600;
+    @apply mt-6 sm:mt-8 max-w-2xl text-base sm:text-lg leading-relaxed text-slate-600;
 }
 
 .team-leadership-ceo-info-card {
-    @apply mt-10 rounded-[30px] border border-slate-200 bg-slate-50 p-8;
+    @apply mt-8 sm:mt-10 rounded-2xl sm:rounded-[30px] border border-slate-200 bg-slate-50 p-5 sm:p-8;
 }
 
 .team-leadership-ceo-info-label {
-    @apply text-sm font-bold uppercase tracking-[0.3em] text-blue-900;
+    @apply text-xs sm:text-sm font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] text-blue-900;
 }
 
 .team-leadership-ceo-info-name {
-    @apply mt-3 text-4xl font-black text-slate-900;
+    @apply mt-3 text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900;
 }
 
 .team-leadership-ceo-info-subtitle {
-    @apply mt-4 text-xl font-bold text-yellow-600;
+    @apply mt-3 sm:mt-4 text-base sm:text-xl font-bold text-yellow-600;
 }
 
 .team-leadership-ceo-experience-grid {
-    @apply mt-10 grid gap-6 md:grid-cols-2;
+    @apply mt-8 sm:mt-10 grid gap-6 md:grid-cols-2;
 }
 
 .team-leadership-ceo-exp-card {
-    @apply rounded-3xl border border-slate-200 p-6 shadow-sm;
+    @apply rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-6 shadow-sm;
 }
 
 .team-leadership-ceo-exp-header {
@@ -136,7 +148,7 @@
 }
 
 .team-leadership-ceo-exp-icon-box {
-    @apply flex h-14 w-14 items-center justify-center rounded-2xl text-2xl text-white;
+    @apply flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl text-xl sm:text-2xl text-white shrink-0;
 }
 
 .team-leadership-ceo-exp-icon-blue {
@@ -148,19 +160,19 @@
 }
 
 .team-leadership-ceo-exp-title {
-    @apply font-bold uppercase text-slate-900;
+    @apply font-bold uppercase text-slate-900 text-sm sm:text-base;
 }
 
 .team-leadership-ceo-exp-label {
-    @apply text-sm text-slate-500;
+    @apply text-xs sm:text-sm text-slate-500;
 }
 
 .team-leadership-ceo-exp-list {
-    @apply space-y-2 text-slate-600;
+    @apply space-y-2 text-sm sm:text-base text-slate-600;
 }
 
 .team-leadership-ceo-academic-box {
-    @apply mt-6 rounded-3xl bg-blue-900 p-8 text-white;
+    @apply mt-6 rounded-2xl sm:rounded-3xl bg-blue-900 p-5 sm:p-8 text-white;
 }
 
 .team-leadership-ceo-academic-header {
@@ -168,31 +180,31 @@
 }
 
 .team-leadership-ceo-academic-icon {
-    @apply flex h-14 w-14 items-center justify-center rounded-full bg-white text-2xl;
+    @apply flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-white text-xl sm:text-2xl shrink-0;
 }
 
 .team-leadership-ceo-academic-title {
-    @apply text-2xl font-bold;
+    @apply text-xl sm:text-2xl font-bold;
 }
 
 .team-leadership-ceo-academic-text {
-    @apply text-blue-100;
+    @apply text-blue-100 text-sm sm:text-base;
 }
 
 .team-leadership-ceo-profile-box {
-    @apply mt-6 rounded-[30px] bg-gradient-to-r from-slate-900 to-blue-950 p-8 text-white;
+    @apply mt-6 rounded-2xl sm:rounded-[30px] bg-gradient-to-r from-slate-900 to-blue-950 p-5 sm:p-8 text-white;
 }
 
 .team-leadership-ceo-profile-title {
-    @apply text-2xl font-bold text-yellow-400;
+    @apply text-xl sm:text-2xl font-bold text-yellow-400;
 }
 
 .team-leadership-ceo-profile-divider {
-    @apply mt-4 h-1 w-24 rounded bg-yellow-500;
+    @apply mt-4 h-1 w-20 sm:w-24 rounded bg-yellow-500;
 }
 
 .team-leadership-ceo-profile-text {
-    @apply mt-5 leading-relaxed text-slate-300;
+    @apply mt-4 sm:mt-5 leading-relaxed text-sm sm:text-base text-slate-300;
 }
 
 /* Right image side */
@@ -202,51 +214,53 @@
 }
 
 .team-leadership-ceo-right-decor-yellow {
-    @apply absolute top-0 right-0 h-96 w-96 rounded-full bg-yellow-400/20 blur-3xl;
+    @apply absolute top-0 right-0 h-56 w-56 sm:h-96 sm:w-96 rounded-full bg-yellow-400/20 blur-3xl;
 }
 
 .team-leadership-ceo-right-decor-blue {
-    @apply absolute bottom-0 left-0 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl;
+    @apply absolute bottom-0 left-0 h-48 w-48 sm:h-80 sm:w-80 rounded-full bg-blue-400/20 blur-3xl;
 }
 
 .team-leadership-ceo-image-wrap {
     @apply flex h-full items-end justify-center;
 }
 
+/* Was a flat h-[1200px] at every breakpoint — now scales up
+   and only reaches full size on large screens. */
 .team-leadership-ceo-image {
-    @apply relative z-10 h-[1200px] object-contain object-bottom;
+    @apply relative z-10 h-[320px] sm:h-[480px] md:h-[640px] lg:h-[900px] xl:h-[1200px] object-contain object-bottom;
 }
 
 /* --- Leadership: COO --- */
 
 .team-leadership-coo-section {
-    @apply py-24 bg-slate-100;
+    @apply py-16 sm:py-20 lg:py-24 bg-slate-100;
 }
 
 .team-leadership-coo-container {
-    @apply max-w-7xl mx-auto px-6;
+    @apply max-w-7xl mx-auto px-4 sm:px-6;
 }
 
 .team-leadership-coo-card {
-    @apply overflow-hidden rounded-[40px] bg-white shadow-2xl;
+    @apply overflow-hidden rounded-3xl sm:rounded-[40px] bg-white shadow-2xl;
 }
 
 .team-leadership-coo-grid {
-    @apply grid lg:grid-cols-12 min-h-[950px];
+    @apply grid grid-cols-1 lg:grid-cols-12 lg:min-h-[950px];
 }
 
 /* Left image side */
 
 .team-leadership-coo-image-col {
-    @apply relative lg:col-span-5 overflow-hidden bg-gradient-to-b from-blue-950 to-slate-900 min-h-[950px];
+    @apply relative lg:col-span-5 overflow-hidden bg-gradient-to-b from-blue-950 to-slate-900 min-h-[320px] sm:min-h-[420px] md:min-h-[550px] lg:min-h-[950px];
 }
 
 .team-leadership-coo-decor-yellow {
-    @apply absolute top-10 right-10 h-40 w-40 rounded-full bg-yellow-400/20 blur-3xl;
+    @apply absolute top-6 right-6 sm:top-10 sm:right-10 h-24 w-24 sm:h-40 sm:w-40 rounded-full bg-yellow-400/20 blur-3xl;
 }
 
 .team-leadership-coo-decor-blue {
-    @apply absolute bottom-10 left-10 h-40 w-40 rounded-full bg-blue-400/20 blur-3xl;
+    @apply absolute bottom-6 left-6 sm:bottom-10 sm:left-10 h-24 w-24 sm:h-40 sm:w-40 rounded-full bg-blue-400/20 blur-3xl;
 }
 
 .team-leadership-coo-gold-line {
@@ -257,42 +271,45 @@
     @apply flex h-full items-end justify-center;
 }
 
+/* scale-140 was fixed for every screen size — now it only
+   scales up that much on large screens so it doesn't
+   overflow its column on mobile. */
 .team-leadership-coo-image {
-    @apply relative z-10 h-full w-auto object-contain object-bottom scale-140 origin-bottom;
+    @apply relative z-10 h-full w-auto object-contain object-bottom scale-100 sm:scale-110 lg:scale-140 origin-bottom;
 }
 
 /* Right content */
 
 .team-leadership-coo-content {
-    @apply lg:col-span-7 p-10 lg:p-14 flex flex-col justify-center;
+    @apply lg:col-span-7 p-6 sm:p-10 lg:p-14 flex flex-col justify-center;
 }
 
 .team-leadership-coo-badge {
-    @apply inline-flex rounded-full bg-blue-900 px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white;
+    @apply inline-flex rounded-full bg-blue-900 px-4 py-1.5 sm:px-5 sm:py-2 text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-white;
 }
 
 .team-leadership-coo-position {
-    @apply mt-5 text-4xl lg:text-5xl font-black uppercase leading-tight text-slate-900;
+    @apply mt-4 sm:mt-5 text-2xl sm:text-4xl lg:text-5xl font-black uppercase leading-tight text-slate-900;
 }
 
 .team-leadership-coo-name {
-    @apply mt-6 text-5xl font-black uppercase text-blue-900;
+    @apply mt-4 sm:mt-6 text-3xl sm:text-4xl lg:text-5xl font-black uppercase text-blue-900;
 }
 
 .team-leadership-coo-subtitle {
-    @apply mt-4 text-2xl font-semibold text-yellow-600;
+    @apply mt-3 sm:mt-4 text-lg sm:text-2xl font-semibold text-yellow-600;
 }
 
 .team-leadership-coo-divider {
-    @apply mt-8 h-1 w-32 rounded-full bg-yellow-500;
+    @apply mt-6 sm:mt-8 h-1 w-24 sm:w-32 rounded-full bg-yellow-500;
 }
 
 .team-leadership-coo-cards {
-    @apply mt-10 grid gap-6;
+    @apply mt-8 sm:mt-10 grid gap-5 sm:gap-6;
 }
 
 .team-leadership-coo-info-card {
-    @apply rounded-3xl border border-slate-200 p-6 shadow-sm;
+    @apply rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-6 shadow-sm;
 }
 
 .team-leadership-coo-info-row {
@@ -300,7 +317,7 @@
 }
 
 .team-leadership-coo-info-icon {
-    @apply flex h-16 w-16 items-center justify-center rounded-2xl text-white text-2xl;
+    @apply flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl text-white text-xl sm:text-2xl shrink-0;
 }
 
 .team-leadership-coo-info-icon-blue {
@@ -312,42 +329,45 @@
 }
 
 .team-leadership-coo-info-title {
-    @apply text-2xl font-bold text-slate-900;
+    @apply text-xl sm:text-2xl font-bold text-slate-900;
 }
 
 .team-leadership-coo-info-text {
-    @apply text-slate-500;
+    @apply text-sm sm:text-base text-slate-500;
 }
 
 .team-leadership-coo-info-text-tight {
-    @apply text-slate-500 leading-relaxed;
+    @apply text-sm sm:text-base text-slate-500 leading-relaxed;
 }
 
 /* ===================================================
    3. CEO SECTION (original/legacy hero-style block)
-   Kept exactly as provided — unrelated to section 2
-   above, only the naming looked similar.
+   Kept structurally the same — unrelated to section 2
+   above — but heights/scales/typography are now
+   responsive instead of fixed.
 =================================================== */
 
 .team-ceo-section {
-    @apply relative py-24 overflow-hidden bg-gradient-to-br from-[#0B2A5B] via-[#123B78] to-[#071D3F];
+    @apply relative py-16 sm:py-20 lg:py-24 overflow-hidden bg-gradient-to-br from-[#0B2A5B] via-[#123B78] to-[#071D3F];
 }
 
 .team-ceo-section::before {
     content: "";
-    @apply absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#D4A017]/20 blur-3xl;
+    @apply absolute -top-32 -left-32 w-64 h-64 sm:w-96 sm:h-96 rounded-full bg-[#D4A017]/20 blur-3xl;
 }
 
 .team-ceo-section::after {
     content: "";
-    @apply absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-blue-400/10 blur-3xl;
+    @apply absolute -bottom-32 -right-32 w-64 h-64 sm:w-96 sm:h-96 rounded-full bg-blue-400/10 blur-3xl;
 }
 
 .team-ceo-card {
     @apply relative z-10
     grid
+    grid-cols-1
     lg:grid-cols-2
-    gap-16
+    gap-10
+    lg:gap-16
     items-center;
 }
 
@@ -360,60 +380,75 @@
 .team-ceo-badge {
     @apply inline-flex
     items-center
-    px-5
-    py-2
+    px-4
+    py-1.5
+    sm:px-5
+    sm:py-2
     rounded-full
     border
     border-[#D4A017]/30
     bg-[#D4A017]/10
     text-[#E8B923]
-    text-xs
+    text-[10px]
+    sm:text-xs
     font-bold
     uppercase
-    tracking-[0.25em];
+    tracking-[0.15em]
+    sm:tracking-[0.25em];
 }
 
 .team-ceo-name {
-    @apply mt-6
-    text-5xl
+    @apply mt-5
+    sm:mt-6
+    text-3xl
     sm:text-6xl
     lg:text-7xl
     font-black
-    leading-[1.05]
+    leading-[1.1]
+    sm:leading-[1.05]
     text-white;
 }
 
 .team-ceo-position {
-    @apply mt-4
-    text-lg
+    @apply mt-3
+    sm:mt-4
+    text-sm
+    sm:text-lg
     uppercase
-    tracking-[0.2em]
+    tracking-[0.15em]
+    sm:tracking-[0.2em]
     font-semibold
     text-[#E8B923];
 }
 
 .team-ceo-description {
-    @apply mt-8 max-w-2xl text-lg leading-9;
+    @apply mt-6 sm:mt-8 max-w-2xl text-base sm:text-lg leading-7 sm:leading-9 mx-auto lg:mx-0;
     color: white !important;
 }
 
 /* Buttons */
 
 .team-ceo-actions {
-    @apply mt-10
+    @apply mt-8
+    sm:mt-10
     flex
     flex-wrap
-    gap-5
+    gap-4
+    sm:gap-5
     justify-center
     lg:justify-start;
 }
 
 .team-ceo-primary-btn {
-    @apply px-8
-    py-4
+    @apply px-6
+    py-3
+    sm:px-8
+    sm:py-4
     rounded-full
     bg-[#D4A017]
     text-[#0B2A5B]
+    text-sm
+    sm:text-base
     font-bold
     shadow-xl
     hover:bg-[#E8B923]
@@ -423,14 +458,18 @@
 }
 
 .team-ceo-secondary-btn {
-    @apply px-8
-    py-4
+    @apply px-6
+    py-3
+    sm:px-8
+    sm:py-4
     rounded-full
     border
     border-white/20
     bg-white/5
     backdrop-blur-md
     text-white
+    text-sm
+    sm:text-base
     font-bold
     hover:bg-white/10
     transition-all
@@ -446,20 +485,28 @@
 .team-ceo-image-card {
     @apply relative
     w-full
-    max-w-[550px]
-    rounded-[32px]
+    max-w-[320px]
+    sm:max-w-[420px]
+    lg:max-w-[550px]
+    rounded-2xl
+    sm:rounded-[32px]
     border
     border-[#D4A017]/20
     bg-white/5
     backdrop-blur-xl
     overflow-hidden
     shadow-2xl
-    p-5;
+    p-4
+    sm:p-5;
 }
 
+/* Was a flat h-[700px] at every breakpoint. */
 .team-ceo-avatar {
     @apply w-full
-    h-[700px]
+    h-[320px]
+    sm:h-[420px]
+    md:h-[550px]
+    lg:h-[700px]
     object-cover
     object-top;
 }
@@ -469,19 +516,19 @@
 =================================================== */
 
 .team-board-section {
-    @apply py-20 bg-slate-50;
+    @apply py-14 sm:py-20 bg-slate-50;
 }
 
 .team-board-header {
-    @apply text-center mb-14;
+    @apply text-center mb-10 sm:mb-14;
 }
 
 .team-board-subtitle {
-    @apply text-sm uppercase tracking-widest text-[#D4A017] font-bold block;
+    @apply text-xs sm:text-sm uppercase tracking-widest text-[#D4A017] font-bold block;
 }
 
 .team-board-title {
-    @apply mt-3 text-3xl sm:text-4xl font-extrabold text-[#0B2A5B];
+    @apply mt-3 text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B2A5B];
 }
 
 .team-board-description {
@@ -489,33 +536,33 @@
 }
 
 .team-board-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8;
+    @apply grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8;
 }
 
 .team-board-card {
-    @apply bg-white rounded-3xl shadow-md border border-slate-200 overflow-hidden hover:-translate-y-2 hover:shadow-xl transition duration-300 flex flex-col justify-between;
+    @apply bg-white rounded-2xl sm:rounded-3xl shadow-md border border-slate-200 overflow-hidden hover:-translate-y-2 hover:shadow-xl transition duration-300 flex flex-col justify-between;
 }
 
 .team-board-card-body {
-    @apply p-8 text-center;
+    @apply p-4 sm:p-8 text-center;
 }
 
 .team-board-avatar {
-    @apply w-36 h-36 rounded-full object-cover mx-auto border-4 border-[#D4A017] shadow-sm transition-transform duration-300 hover:scale-105;
+    @apply w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 rounded-full object-cover mx-auto border-4 border-[#D4A017] shadow-sm transition-transform duration-300 hover:scale-105;
 }
 
 .team-board-name {
-    @apply mt-6 text-xl font-bold text-[#0B2A5B];
+    @apply mt-4 sm:mt-6 text-sm sm:text-lg lg:text-xl font-bold text-[#0B2A5B];
 }
 
 .team-board-position {
-    @apply mt-2 text-[#D4A017] font-semibold uppercase tracking-wide text-sm;
+    @apply mt-2 text-[#D4A017] font-semibold uppercase tracking-wide text-xs sm:text-sm;
 }
 
 /* --- Board Member Preview Modal --- */
 
 .board-modal-overlay {
-    @apply fixed inset-0 z-[9999] hidden items-center justify-center bg-black/75 p-5;
+    @apply fixed inset-0 z-[9999] hidden items-center justify-center bg-black/75 p-4 sm:p-5;
 }
 
 .board-modal-overlay.active {
@@ -523,11 +570,11 @@
 }
 
 .board-modal-inner {
-    @apply relative w-full max-w-md;
+    @apply relative w-full max-w-sm sm:max-w-md;
 }
 
 .board-modal-content {
-    @apply w-full rounded-3xl bg-white p-6 text-center shadow-2xl;
+    @apply w-full rounded-2xl sm:rounded-3xl bg-white p-5 sm:p-6 text-center shadow-2xl;
     animation: boardModalFadeIn 0.2s ease;
 }
 
@@ -537,19 +584,19 @@
 }
 
 .board-modal-image {
-    @apply w-full max-h-[420px] object-contain rounded-2xl mb-5 border-4 border-[#D4A017];
+    @apply w-full max-h-[320px] sm:max-h-[420px] object-contain rounded-2xl mb-4 sm:mb-5 border-4 border-[#D4A017];
 }
 
 .board-modal-close-btn {
-    @apply w-full py-3.5 rounded-full bg-[#0B2A5B] text-white font-bold shadow-lg hover:bg-blue-900 transition-colors duration-200;
+    @apply w-full py-3 sm:py-3.5 rounded-full bg-[#0B2A5B] text-white font-bold shadow-lg hover:bg-blue-900 transition-colors duration-200;
 }
 
 .board-modal-name {
-    @apply text-xl font-bold text-[#0B2A5B];
+    @apply text-lg sm:text-xl font-bold text-[#0B2A5B];
 }
 
 .board-modal-position {
-    @apply mt-1 text-[#D4A017] font-semibold uppercase tracking-wide text-sm;
+    @apply mt-1 text-[#D4A017] font-semibold uppercase tracking-wide text-xs sm:text-sm;
 }
 
 /* ===================================================
@@ -557,11 +604,11 @@
 =================================================== */
 
 .team-field-section {
-    @apply py-20 bg-white border-t border-slate-100;
+    @apply py-14 sm:py-20 bg-white border-t border-slate-100;
 }
 
 .team-field-header {
-    @apply text-center max-w-2xl mx-auto mb-16;
+    @apply text-center max-w-2xl mx-auto mb-10 sm:mb-16;
 }
 
 .team-field-subtitle {
@@ -569,7 +616,7 @@
 }
 
 .team-field-title {
-    @apply mt-2 text-2xl sm:text-4xl font-extrabold text-[#0B2A5B];
+    @apply mt-2 text-xl sm:text-2xl lg:text-4xl font-extrabold text-[#0B2A5B];
 }
 
 .team-field-description {
@@ -577,15 +624,15 @@
 }
 
 .team-field-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6;
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6;
 }
 
 .team-field-card {
-    @apply p-6 bg-slate-50 rounded-2xl border border-slate-200 text-center flex flex-col items-center;
+    @apply p-5 sm:p-6 bg-slate-50 rounded-2xl border border-slate-200 text-center flex flex-col items-center;
 }
 
 .team-field-icon-box {
-    @apply w-20 h-20 mx-auto rounded-full flex items-center justify-center font-bold text-2xl mb-4;
+    @apply w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full flex items-center justify-center font-bold text-xl sm:text-2xl mb-4;
 }
 
 .team-icon-blue { @apply bg-blue-100 text-[#0B2A5B]; }
@@ -594,7 +641,7 @@
 .team-icon-indigo { @apply bg-indigo-100 text-indigo-700; }
 
 .team-field-card-title {
-    @apply font-bold text-lg text-[#0B2A5B];
+    @apply font-bold text-base sm:text-lg text-[#0B2A5B];
 }
 
 .team-field-card-role {
@@ -610,11 +657,11 @@
 =================================================== */
 
 .team-partner-section {
-    @apply py-16 bg-[#0B2A5B] text-white;
+    @apply py-12 sm:py-16 bg-[#0B2A5B] text-white;
 }
 
 .team-partner-card {
-    @apply bg-white/10 backdrop-blur-md rounded-3xl p-8 sm:p-12 border border-white/20 flex flex-col lg:flex-row items-center justify-between gap-8;
+    @apply bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 border border-white/20 flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8;
 }
 
 .team-partner-content {
@@ -626,7 +673,7 @@
 }
 
 .team-partner-title {
-    @apply text-2xl sm:text-3xl font-black;
+    @apply text-xl sm:text-2xl lg:text-3xl font-black;
 }
 
 .team-partner-text {
@@ -634,7 +681,7 @@
 }
 
 .team-partner-btn {
-    @apply inline-flex items-center px-6 py-3.5 bg-[#D4A017] hover:bg-[#E8B923] text-[#0B2A5B] font-bold rounded-xl shadow-lg transition duration-200 text-sm shrink-0;
+    @apply inline-flex items-center px-5 py-3 sm:px-6 sm:py-3.5 bg-[#D4A017] hover:bg-[#E8B923] text-[#0B2A5B] font-bold rounded-xl shadow-lg transition duration-200 text-sm shrink-0;
 }
 
 /* ===================================================
@@ -642,19 +689,19 @@
 =================================================== */
 
 .team-cta-section {
-    @apply py-20 bg-slate-50 text-center;
+    @apply py-14 sm:py-20 bg-slate-50 text-center;
 }
 
 .team-cta-container {
-    @apply max-w-3xl mx-auto px-6 sm:px-8 lg:px-12;
+    @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-12;
 }
 
 .team-cta-title {
-    @apply text-2xl sm:text-4xl font-extrabold text-[#0B2A5B];
+    @apply text-xl sm:text-2xl lg:text-4xl font-extrabold text-[#0B2A5B];
 }
 
 .team-cta-description {
-    @apply mt-4 text-slate-600 text-base sm:text-lg;
+    @apply mt-4 text-slate-600 text-sm sm:text-base lg:text-lg;
 }
 
 .team-cta-buttons {
@@ -662,9 +709,9 @@
 }
 
 .team-cta-btn-primary {
-    @apply px-8 py-3.5 bg-[#0B2A5B] hover:bg-blue-900 text-white font-bold rounded-xl shadow-lg transition duration-200 text-sm sm:text-base;
+    @apply px-6 py-3 sm:px-8 sm:py-3.5 bg-[#0B2A5B] hover:bg-blue-900 text-white font-bold rounded-xl shadow-lg transition duration-200 text-sm sm:text-base;
 }
 
 .team-cta-btn-secondary {
-    @apply px-8 py-3.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-xl transition duration-200 text-sm sm:text-base;
+    @apply px-6 py-3 sm:px-8 sm:py-3.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-xl transition duration-200 text-sm sm:text-base;
 }
