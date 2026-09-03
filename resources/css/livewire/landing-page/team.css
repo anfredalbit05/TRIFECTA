@@ -275,7 +275,7 @@
    scales up that much on large screens so it doesn't
    overflow its column on mobile. */
 .team-leadership-coo-image {
-    @apply relative z-10 h-full w-auto object-contain object-bottom scale-100 sm:scale-110 lg:scale-140 origin-bottom;
+    @apply relative z-10 h-full w-auto object-contain object-bottom scale-90 sm:scale-110 lg:scale-140 origin-bottom mb-10;
 }
 
 /* Right content */
