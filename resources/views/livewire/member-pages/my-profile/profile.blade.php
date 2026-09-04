@@ -347,8 +347,14 @@
                                     {{ $birthdate ? \Carbon\Carbon::parse($birthdate)->format('F d, Y') : 'N/A' }}</p>
                                 <p><strong>DATE JOINED:</strong>
                                     {{ auth()->user()->created_at?->format('F d, Y') ?? 'N/A' }}</p>
-                                 <p><strong>EXPIRATION DATE:</strong>
-                                     {{ auth()->user()->created_at ? auth()->user()->created_at->copy()->addYear()->format('F d, Y') : 'N/A' }}</p>
+                                <p>
+                                <strong>EXPIRATION DATE:</strong>
+                                {{ auth()->user()->policy_expiration_date
+                                    ? \Carbon\Carbon::parse(auth()->user()->policy_expiration_date)->format('F d, Y')
+                                    : 'N/A'
+                                }}
+                            </p>
+
                             </div>
 
                             <div class="id-qr">

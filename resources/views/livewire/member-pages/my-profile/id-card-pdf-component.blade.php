@@ -66,7 +66,7 @@
                 <br>
 
                 <span class="label">BIRTH DATE:</span>
-                <span class="val">{{ \Carbon\Carbon::parse($user->birth_date)->format('F d, Y') }}</span>
+                <span class="val">{{ \Carbon\Carbon::parse($user->birthdate)->format('F d, Y') }}</span>
                 <br>
 
                 <span class="label">DATE JOINED:</span>
@@ -75,7 +75,10 @@
 
                 <span class="label">EXPIRATION DATE:</span>
                 <span class="val">
-                    {{ $user->created_at ? $user->created_at->copy()->addYear()->format('F d, Y') : 'N/A' }}
+                    {{ $user->policy_expiration_date
+                        ? \Carbon\Carbon::parse($user->policy_expiration_date)->format('F d, Y')
+                        : 'N/A'
+                    }}
                 </span>
             </div>
 
