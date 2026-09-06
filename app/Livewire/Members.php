@@ -2,31 +2,39 @@
 
 namespace App\Livewire;
 
+use App\Mail\PasswordResetConfirmation;
 use App\Models\Ledger;
+use App\Models\Privilege;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
 
 class Members extends Component
 {
     use WithPagination;
 
     public string $search = '';
+
     public string $dateRange = '';   // e.g. "2026-08-01 to 2026-08-16"
 
     public string $summaryFilter = 'all';
 
     // Excel Export Filters
     public $exportYear = '';
+
     public $exportMonth = '';
+
     public $exportStatus = '';
 
     public bool $skipRender = true;
@@ -44,8 +52,11 @@ class Members extends Component
     // =====================================================
 
     public bool $isWithdrawalModalOpen = false;
+
     public ?int $selectedWithdrawalUserId = null;
+
     public ?User $selectedWithdrawalUser = null;
+
     public ?Withdrawal $selectedWithdrawal = null;
 
     public function mount()
@@ -64,7 +75,7 @@ class Members extends Component
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -73,7 +84,7 @@ class Members extends Component
             return true;
         }
 
-        $column = 'can_' . $action;
+        $column = 'can_'.$action;
 
         // Safely check role permissions or fallback to direct query
         if ($user->role && method_exists($user->role, 'permissions')) {
@@ -84,7 +95,7 @@ class Members extends Component
         }
 
         // Fallback direct check against privileges table
-        return \App\Models\Privilege::where('RoleID', $user->RoleID)
+        return Privilege::where('RoleID', $user->RoleID)
             ->where('ModuleID', 2)
             ->where($column, 1)
             ->exists();
@@ -179,12 +190,12 @@ class Members extends Component
                 },
                 'withdrawals as has_pending_withdrawal' => function ($query) {
                     $query->where('status', 'Pending');
-                }
+                },
             ])
             ->withExists([
                 'activations as has_pending_activation' => function ($query) {
                     $query->where('status', 'Pending');
-                }
+                },
             ])
             ->when(filled($this->search), function ($query) {
                 $search = trim($this->search);
@@ -213,7 +224,7 @@ class Members extends Component
 
     protected function parsedDateRange(): array
     {
-        if (blank($this->dateRange) || !str_contains($this->dateRange, ' to ')) {
+        if (blank($this->dateRange) || ! str_contains($this->dateRange, ' to ')) {
             return [null, null];
         }
 
@@ -247,7 +258,7 @@ class Members extends Component
 
     public function openReview($id): void
     {
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
             return;
         }
 
@@ -255,8 +266,9 @@ class Members extends Component
 
         $member = User::find($id);
 
-        if (!$member) {
+        if (! $member) {
             Log::warning('Review failed: member not found.', ['UserID' => $id]);
+
             return;
         }
 
@@ -271,7 +283,7 @@ class Members extends Component
 
     public function confirmStatus($id): void
     {
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
             return;
         }
 
@@ -279,8 +291,9 @@ class Members extends Component
 
         $member = User::find($id);
 
-        if (!$member) {
+        if (! $member) {
             Log::warning('Status update failed: member not found.', ['UserID' => $id]);
+
             return;
         }
 
@@ -297,7 +310,7 @@ class Members extends Component
 
     public function updateStatus($id): void
     {
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
             return;
         }
 
@@ -305,8 +318,9 @@ class Members extends Component
 
         $member = User::find($id);
 
-        if (!$member) {
+        if (! $member) {
             Log::warning('Status update failed: member not found.', ['UserID' => $id]);
+
             return;
         }
 
@@ -335,7 +349,7 @@ class Members extends Component
 
     public function openActivation($id): void
     {
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
             return;
         }
 
@@ -343,8 +357,9 @@ class Members extends Component
 
         $member = User::find($id);
 
-        if (!$member) {
+        if (! $member) {
             Log::warning('Activation failed. Member not found.', ['target_UserID' => $id]);
+
             return;
         }
 
@@ -359,7 +374,7 @@ class Members extends Component
 
     public function editMember($id): void
     {
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
             return;
         }
 
@@ -367,8 +382,9 @@ class Members extends Component
 
         $member = User::find($id);
 
-        if (!$member) {
+        if (! $member) {
             Log::warning('Edit member not found.', ['UserID' => $id]);
+
             return;
         }
 
@@ -377,7 +393,7 @@ class Members extends Component
 
     public function viewMember($id): void
     {
-        if (!$this->canRead) {
+        if (! $this->canRead) {
             return;
         }
 
@@ -388,6 +404,191 @@ class Members extends Component
         }
 
         $this->dispatch('open-view-member', UserID: $member->UserID);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Set New Password (Admin-Forced Password Reset)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * The active password policy, read from the SAME rule that self-service
+     * resets use (Password::default()), so the admin dialog always matches
+     * the sign-up / reset requirements for the current environment.
+     */
+    private function passwordPolicy(): array
+    {
+        $applied = Password::default()->appliedRules();
+
+        return [
+            'min' => (int) $applied['min'],
+            'mixedCase' => (bool) $applied['mixedCase'],
+            'letters' => (bool) $applied['letters'],
+            'numbers' => (bool) $applied['numbers'],
+            'symbols' => (bool) $applied['symbols'],
+            'uncompromised' => (bool) $applied['uncompromised'],
+        ];
+    }
+
+    private function passwordPolicyHint(array $policy): string
+    {
+        $parts = ['at least '.$policy['min'].' characters'];
+
+        if ($policy['mixedCase']) {
+            $parts[] = 'uppercase and lowercase letters';
+        } elseif ($policy['letters']) {
+            $parts[] = 'letters';
+        }
+
+        if ($policy['numbers']) {
+            $parts[] = 'numbers';
+        }
+
+        if ($policy['symbols']) {
+            $parts[] = 'symbols';
+        }
+
+        return 'Must contain '.implode(', ', $parts).'.';
+    }
+
+    public function promptMemberPasswordReset($id): void
+    {
+        if (! $this->canUpdate) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to reset member passwords.',
+            ]);
+
+            return;
+        }
+
+        $member = User::find($id);
+
+        if (! $member) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Found',
+                'text' => 'Member not found.',
+            ]);
+
+            return;
+        }
+
+        $policy = $this->passwordPolicy();
+
+        $this->dispatch(
+            'set-member-password',
+            id: $member->UserID,
+            name: trim(($member->firstname ?? '').' '.($member->lastname ?? '')),
+            policy: $policy,
+            hint: $this->passwordPolicyHint($policy),
+        );
+    }
+
+    /**
+     * Persist the new password (called from the SweetAlert confirm dialog).
+     * Guarded server-side: permissions, existence, and password rules are
+     * re-validated here so this can never be triggered without authorization.
+     */
+    public function resetMemberPassword($id, $password): void
+    {
+        if (! $this->canUpdate) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to reset member passwords.',
+            ]);
+
+            return;
+        }
+
+        $member = User::find($id);
+
+        if (! $member) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Found',
+                'text' => 'Member not found.',
+            ]);
+
+            return;
+        }
+
+        $password = (string) $password;
+
+        // Validate against the exact same rule used by self-service
+        // resets (Password::default()) instead of a hardcoded minimum.
+        $validator = Validator::make(
+            ['password' => $password],
+            ['password' => ['required', 'string', Password::default()]]
+        );
+
+        if ($validator->fails()) {
+            $this->dispatch('swal:error', [
+                'title' => 'Password Requirements Not Met',
+                'text' => $validator->errors()->first('password'),
+            ]);
+
+            return;
+        }
+
+        try {
+            // The User model casts 'password' as 'hashed', so it is
+            // automatically bcrypt-hashed before it hits the database.
+            $member->update([
+                'password' => $password,
+            ]);
+
+            Log::info('Admin reset member password', [
+                'member_user_id' => $member->UserID,
+                'reset_by' => Auth::id(),
+            ]);
+
+            // Notify the member by email when one is on file, using the same
+            // branded confirmation template as the self-service reset flow.
+            // The email itself carries the new password.
+            $emailSent = false;
+
+            if (filled($member->email)) {
+                try {
+                    Mail::to($member->email)->send(
+                        new PasswordResetConfirmation($member, $password)
+                    );
+
+                    $emailSent = true;
+                } catch (\Throwable $e) {
+                    Log::error('Failed to email member about password reset', [
+                        'member_user_id' => $member->UserID,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            $name = trim(
+                ($member->firstname ?? '').' '.($member->lastname ?? '')
+            );
+
+            $text = $emailSent
+                ? "{$name}'s password has been changed successfully. "
+                    .'A confirmation email containing the new password was '
+                    ."sent to {$member->email}."
+                : "{$name}'s password has been changed successfully to: "
+                    ."{$password}. No email is on file, so please share the "
+                    .'new password with the member.';
+
+            $this->dispatch('swal:success', [
+                'title' => 'Password Updated!',
+                'text' => $text,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Member password reset failed', [
+                'member_user_id' => $member->UserID,
+                'error' => $e->getMessage(),
+            ]);
+
+            $this->dispatch('swal:error', [
+                'title' => 'Error',
+                'text' => 'Something went wrong while updating the password.',
+            ]);
+        }
     }
 
     public function handleActivationBroadcast($event): void
@@ -414,7 +615,7 @@ class Members extends Component
 
     public function openWithdrawalModal(int $userId): void
     {
-        if (!$this->canCreate) {
+        if (! $this->canCreate) {
 
             $this->dispatch('swal:error', [
                 'title' => 'Not Allowed',
@@ -426,7 +627,7 @@ class Members extends Component
 
         $member = User::find($userId);
 
-        if (!$member) {
+        if (! $member) {
 
             $this->dispatch('swal:error', [
                 'title' => 'Not Found',
@@ -446,7 +647,7 @@ class Members extends Component
 
     public function openWithdrawalApproval($id): void
     {
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
             return;
         }
 
@@ -454,8 +655,9 @@ class Members extends Component
 
         $member = User::find($id);
 
-        if (!$member) {
+        if (! $member) {
             Log::warning('Withdrawal approval failed: member not found.', ['UserID' => $id]);
+
             return;
         }
 
@@ -464,7 +666,7 @@ class Members extends Component
             ->latest('WithdrawID')
             ->first();
 
-        if (!$withdrawal) {
+        if (! $withdrawal) {
 
             $this->dispatch('swal:error', [
                 'title' => 'No Pending Request',
@@ -498,7 +700,7 @@ class Members extends Component
 
     public function confirmWithdrawalRejection(): void
     {
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
 
             $this->dispatch('swal:error', [
                 'title' => 'Not Allowed',
@@ -508,7 +710,7 @@ class Members extends Component
             return;
         }
 
-        if (!$this->selectedWithdrawal) {
+        if (! $this->selectedWithdrawal) {
 
             $this->dispatch('swal:error', [
                 'title' => 'No Withdrawal Selected',
@@ -533,7 +735,7 @@ class Members extends Component
         // PERMISSION CHECK
         // ==========================================
 
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
 
             $this->dispatch('swal:error', [
                 'title' => 'Not Allowed',
@@ -543,7 +745,7 @@ class Members extends Component
             return;
         }
 
-        if (!$this->selectedWithdrawal) {
+        if (! $this->selectedWithdrawal) {
             return;
         }
 
@@ -563,7 +765,7 @@ class Members extends Component
                     ->first();
 
                 if (
-                    !$withdrawal ||
+                    ! $withdrawal ||
                     $withdrawal->status !== 'Pending'
                 ) {
                     throw new \Exception(
@@ -612,7 +814,7 @@ class Members extends Component
             report($e);
 
             Log::error(
-                'Withdrawal rejection failed: ' . $e->getMessage()
+                'Withdrawal rejection failed: '.$e->getMessage()
             );
 
             $this->dispatch('swal:error', [
@@ -634,7 +836,7 @@ class Members extends Component
         // PERMISSION CHECK
         // ==========================================
 
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
 
             $this->dispatch('swal:error', [
                 'title' => 'Not Allowed',
@@ -644,7 +846,7 @@ class Members extends Component
             return;
         }
 
-        if (!$this->selectedWithdrawal) {
+        if (! $this->selectedWithdrawal) {
             return;
         }
 
@@ -664,7 +866,7 @@ class Members extends Component
                     ->first();
 
                 if (
-                    !$withdrawal ||
+                    ! $withdrawal ||
                     $withdrawal->status !== 'Pending'
                 ) {
                     throw new \Exception(
@@ -683,9 +885,8 @@ class Members extends Component
                 // ==========================================
 
                 $requestedAmount = (float) $withdrawal->requested_amount;
-                $taxAmount       = (float) $withdrawal->tax_amount;
+                $taxAmount = (float) $withdrawal->tax_amount;
                 $withdrawalAmount = (float) $withdrawal->amount;
-
 
                 // ==========================================
                 // APPROVE WITHDRAWAL
@@ -718,16 +919,16 @@ class Members extends Component
                     'status' => 'Active',
                 ]);
 
-                    // ==========================================
-                    // LEDGER: WITHDRAWAL
-                    //
-                    // Record the NET withdrawal amount.
-                    //
-                    // Example:
-                    // amount = 900
-                    // Ledger WD = -900
-                    // Source = WD
-                    // ==========================================
+                // ==========================================
+                // LEDGER: WITHDRAWAL
+                //
+                // Record the NET withdrawal amount.
+                //
+                // Example:
+                // amount = 900
+                // Ledger WD = -900
+                // Source = WD
+                // ==========================================
 
                 Ledger::create([
                     'RefID' => $withdrawal->UserID,
@@ -793,7 +994,7 @@ class Members extends Component
             report($e);
 
             Log::error(
-                'Withdrawal approval failed: ' . $e->getMessage()
+                'Withdrawal approval failed: '.$e->getMessage()
             );
 
             $this->dispatch('swal:error', [

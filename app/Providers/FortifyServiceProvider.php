@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Laravel\Fortify\Contracts\PasswordResetResponse;
 use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -18,7 +19,12 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Use a branded response after a successful password reset so the
+        // login modal can show a clear "reset successful" banner.
+        $this->app->bind(
+            PasswordResetResponse::class,
+            \App\Http\Responses\PasswordResetResponse::class
+        );
     }
 
     /**

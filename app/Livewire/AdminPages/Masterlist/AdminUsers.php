@@ -2,16 +2,21 @@
 
 namespace App\Livewire\AdminPages\Masterlist;
 
-use App\Models\User;
+use App\Mail\PasswordResetConfirmation;
+use App\Models\Ledger;
 use App\Models\Module;
 use App\Models\Privilege;
-use App\Models\Withdrawal;
-use App\Models\Wallet;
-use App\Models\Ledger;
 use App\Models\Setting;
+use App\Models\User;
+use App\Models\Wallet;
+use App\Models\Withdrawal;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -33,10 +38,15 @@ class AdminUsers extends Component
     // =====================================================
 
     public bool $isViewModalOpen = false;
+
     public bool $isAddModalOpen = false;
+
     public bool $isEditModalOpen = false;
+
     public bool $isAccessModalOpen = false;
+
     public bool $isDeleteModalOpen = false;
+
     public bool $isWithdrawalModalOpen = false;
 
     // =====================================================
@@ -50,18 +60,31 @@ class AdminUsers extends Component
     // =====================================================
 
     public string $firstname = '';
+
     public string $middlename = '';
+
     public string $lastname = '';
+
     public string $username = '';
+
     public string $email = '';
+
     public string $password = '';
+
     public string $contactno = '';
+
     public string $gender = '';
+
     public string $birthdate = '';
+
     public string $address = '';
+
     public string $status = 'Inactive';
+
     public string $RoleID = '';
+
     public string $position = '';
+
     public string $referralCode = '';
 
     // =====================================================
@@ -78,7 +101,9 @@ class AdminUsers extends Component
     // =====================================================
 
     public ?int $selectedWithdrawalUserId = null;
+
     public ?User $selectedWithdrawalUser = null;
+
     public ?Withdrawal $selectedWithdrawal = null;
 
     public function mount(): void
@@ -96,7 +121,7 @@ class AdminUsers extends Component
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -105,7 +130,7 @@ class AdminUsers extends Component
             return true;
         }
 
-        $column = 'can_' . $action;
+        $column = 'can_'.$action;
 
         if ($user->role && method_exists($user->role, 'permissions')) {
             $hasPermission = optional($user->role->permissions)
@@ -315,7 +340,7 @@ class AdminUsers extends Component
         $this->gender = $user->gender ?? '';
 
         $this->birthdate = $user->birthdate
-            ? \Carbon\Carbon::parse($user->birthdate)
+            ? Carbon::parse($user->birthdate)
                 ->format('Y-m-d')
             : '';
 
@@ -338,10 +363,9 @@ class AdminUsers extends Component
             'middlename' => 'nullable|string|max:100',
             'lastname' => 'required|string|max:100',
 
-            'username' =>
-                'required|string|max:50|unique:users,username,'
-                . $this->selectedUserId
-                . ',UserID',
+            'username' => 'required|string|max:50|unique:users,username,'
+                .$this->selectedUserId
+                .',UserID',
 
             'contactno' => 'nullable|string|max:20',
             'gender' => 'nullable|in:Male,Female,Other',
@@ -352,13 +376,12 @@ class AdminUsers extends Component
 
             'position' => 'nullable|string|max:255',
 
-            'status' =>
-                'required|in:Active,Inactive,Suspended',
+            'status' => 'required|in:Active,Inactive,Suspended',
         ]);
 
         $user = User::find($this->selectedUserId);
 
-        if (!$user) {
+        if (! $user) {
             Log::warning(
                 "updateUser: no user found for ID {$this->selectedUserId}"
             );
@@ -371,8 +394,7 @@ class AdminUsers extends Component
         $user->update([
             'firstname' => $this->firstname,
 
-            'middlename' =>
-                $this->middlename !== ''
+            'middlename' => $this->middlename !== ''
                     ? $this->middlename
                     : null,
 
@@ -380,23 +402,19 @@ class AdminUsers extends Component
 
             'username' => $this->username,
 
-            'contactno' =>
-                $this->contactno !== ''
+            'contactno' => $this->contactno !== ''
                     ? $this->contactno
                     : null,
 
-            'gender' =>
-                $this->gender !== ''
+            'gender' => $this->gender !== ''
                     ? $this->gender
                     : null,
 
-            'birthdate' =>
-                $this->birthdate !== ''
+            'birthdate' => $this->birthdate !== ''
                     ? $this->birthdate
                     : null,
 
-            'address' =>
-                $this->address !== ''
+            'address' => $this->address !== ''
                     ? $this->address
                     : null,
 
@@ -404,8 +422,7 @@ class AdminUsers extends Component
 
             'RoleID' => $this->RoleID,
 
-            'position' =>
-                $this->position !== ''
+            'position' => $this->position !== ''
                     ? $this->position
                     : null,
         ]);
@@ -428,6 +445,196 @@ class AdminUsers extends Component
 
         $this->isAddModalOpen = false;
         $this->isEditModalOpen = false;
+    }
+
+    /*
+    |----------------------------------------------------------------------
+    | Set New Password (Admin-Forced Password Reset)
+    |
+    | Mirrors the Members table flow so staff/admin accounts can have
+    | their passwords reset the same way — same policy, same branded
+    | confirmation email carrying the new password.
+    |----------------------------------------------------------------------
+    */
+
+    /**
+     * The active password policy, read from the SAME rule that self-service
+     * resets use (Password::default()), so the admin dialog always matches
+     * the sign-up / reset requirements for the current environment.
+     */
+    private function passwordPolicy(): array
+    {
+        $applied = Password::default()->appliedRules();
+
+        return [
+            'min' => (int) $applied['min'],
+            'mixedCase' => (bool) $applied['mixedCase'],
+            'letters' => (bool) $applied['letters'],
+            'numbers' => (bool) $applied['numbers'],
+            'symbols' => (bool) $applied['symbols'],
+            'uncompromised' => (bool) $applied['uncompromised'],
+        ];
+    }
+
+    private function passwordPolicyHint(array $policy): string
+    {
+        $parts = ['at least '.$policy['min'].' characters'];
+
+        if ($policy['mixedCase']) {
+            $parts[] = 'uppercase and lowercase letters';
+        } elseif ($policy['letters']) {
+            $parts[] = 'letters';
+        }
+
+        if ($policy['numbers']) {
+            $parts[] = 'numbers';
+        }
+
+        if ($policy['symbols']) {
+            $parts[] = 'symbols';
+        }
+
+        return 'Must contain '.implode(', ', $parts).'.';
+    }
+
+    public function promptUserPasswordReset($id): void
+    {
+        if (! $this->canUpdate) {
+            $this->dispatch(
+                'user-password-error',
+                message: 'You do not have permission to reset user passwords.'
+            );
+
+            return;
+        }
+
+        $user = User::find($id);
+
+        if (! $user) {
+            $this->dispatch(
+                'user-password-error',
+                message: 'User not found.'
+            );
+
+            return;
+        }
+
+        $policy = $this->passwordPolicy();
+
+        $this->dispatch(
+            'set-user-password',
+            id: $user->UserID,
+            name: trim(
+                ($user->firstname ?? '').' '.($user->lastname ?? '')
+            ),
+            policy: $policy,
+            hint: $this->passwordPolicyHint($policy),
+        );
+    }
+
+    /**
+     * Persist the new password (called from the SweetAlert confirm dialog).
+     * Guarded server-side: permissions, existence, and password rules are
+     * re-validated here so this can never be triggered without authorization.
+     */
+    public function resetUserPassword($id, $password): void
+    {
+        if (! $this->canUpdate) {
+            $this->dispatch(
+                'user-password-error',
+                message: 'You do not have permission to reset user passwords.'
+            );
+
+            return;
+        }
+
+        $user = User::find($id);
+
+        if (! $user) {
+            $this->dispatch(
+                'user-password-error',
+                message: 'User not found.'
+            );
+
+            return;
+        }
+
+        $password = (string) $password;
+
+        // Validate against the exact same rule used by self-service resets
+        // (Password::default()) instead of a hardcoded minimum.
+        $validator = Validator::make(
+            ['password' => $password],
+            ['password' => ['required', 'string', Password::default()]]
+        );
+
+        if ($validator->fails()) {
+            $this->dispatch(
+                'user-password-error',
+                message: $validator->errors()->first('password')
+            );
+
+            return;
+        }
+
+        try {
+            // The User model casts 'password' as 'hashed', so it is
+            // automatically bcrypt-hashed before it hits the database.
+            $user->update([
+                'password' => $password,
+            ]);
+
+            Log::info('Admin reset user password', [
+                'user_id' => $user->UserID,
+                'reset_by' => Auth::id(),
+            ]);
+
+            // Notify the user by email when one is on file, using the same
+            // branded confirmation template as the member / self-service flow.
+            $emailSent = false;
+
+            if (filled($user->email)) {
+                try {
+                    Mail::to($user->email)->send(
+                        new PasswordResetConfirmation($user, $password)
+                    );
+
+                    $emailSent = true;
+                } catch (\Throwable $e) {
+                    Log::error('Failed to email user about password reset', [
+                        'user_id' => $user->UserID,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            $name = trim(
+                ($user->firstname ?? '').' '.($user->lastname ?? '')
+            );
+
+            $text = $emailSent
+                ? "{$name}'s password has been changed successfully. "
+                    .'A confirmation email containing the new password was '
+                    ."sent to {$user->email}."
+                : "{$name}'s password has been changed successfully to: "
+                    ."{$password}. No email is on file, so please share the "
+                    .'new password with the user.';
+
+            $this->dispatch('swal:success', [
+                'title' => 'Password Updated!',
+                'text' => $text,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('User password reset failed', [
+                'user_id' => $user->UserID,
+                'error' => $e->getMessage(),
+            ]);
+
+            $this->dispatch(
+                'user-password-error',
+                message: 'Something went wrong while updating the password.'
+            );
+        }
     }
 
     /*
@@ -529,7 +736,7 @@ class AdminUsers extends Component
 
             foreach ($privileges as $privilege) {
 
-                if (!$privilege->module) {
+                if (! $privilege->module) {
                     continue;
                 }
 
@@ -540,23 +747,17 @@ class AdminUsers extends Component
 
                     $this->userAccess[$moduleName] = [
 
-                        'create' =>
-                            (bool) $privilege->can_create,
+                        'create' => (bool) $privilege->can_create,
 
-                        'retrieve' =>
-                            (bool) $privilege->can_read,
+                        'retrieve' => (bool) $privilege->can_read,
 
-                        'update' =>
-                            (bool) $privilege->can_update,
+                        'update' => (bool) $privilege->can_update,
 
-                        'delete' =>
-                            (bool) $privilege->can_delete,
+                        'delete' => (bool) $privilege->can_delete,
 
-                        'status' =>
-                            (bool) $privilege->can_change_status,
+                        'status' => (bool) $privilege->can_change_status,
 
-                        'printall' =>
-                            (bool) $privilege->can_print,
+                        'printall' => (bool) $privilege->can_print,
                     ];
                 }
             }
@@ -573,7 +774,7 @@ class AdminUsers extends Component
 
         $user = $this->selectedUser;
 
-        if (!$user || !$user->RoleID) {
+        if (! $user || ! $user->RoleID) {
 
             Log::warning(
                 'saveAccess: User or RoleID not found.'
@@ -583,8 +784,7 @@ class AdminUsers extends Component
         }
 
         foreach (
-            $this->userAccess
-            as $moduleName => $permissions
+            $this->userAccess as $moduleName => $permissions
         ) {
 
             $module = Module::where(
@@ -592,7 +792,7 @@ class AdminUsers extends Component
                 $moduleName
             )->first();
 
-            if (!$module) {
+            if (! $module) {
                 continue;
             }
 
@@ -605,23 +805,17 @@ class AdminUsers extends Component
                 ],
 
                 [
-                    'can_create' =>
-                        $permissions['create'],
+                    'can_create' => $permissions['create'],
 
-                    'can_read' =>
-                        $permissions['retrieve'],
+                    'can_read' => $permissions['retrieve'],
 
-                    'can_update' =>
-                        $permissions['update'],
+                    'can_update' => $permissions['update'],
 
-                    'can_delete' =>
-                        $permissions['delete'],
+                    'can_delete' => $permissions['delete'],
 
-                    'can_print' =>
-                        $permissions['printall'],
+                    'can_print' => $permissions['printall'],
 
-                    'can_change_status' =>
-                        $permissions['status'],
+                    'can_change_status' => $permissions['status'],
                 ]
             );
         }
@@ -648,7 +842,7 @@ class AdminUsers extends Component
 
     public function openWithdrawalModal(int $userId): void
     {
-        if (!$this->canCreate) {
+        if (! $this->canCreate) {
 
             session()->flash(
                 'error',
@@ -660,7 +854,7 @@ class AdminUsers extends Component
 
         $user = User::find($userId);
 
-        if (!$user) {
+        if (! $user) {
 
             session()->flash(
                 'error',
@@ -710,7 +904,7 @@ class AdminUsers extends Component
 
     public function openWithdrawalApproval(int $userId): void
     {
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
 
             session()->flash(
                 'error',
@@ -722,7 +916,7 @@ class AdminUsers extends Component
 
         $user = User::find($userId);
 
-        if (!$user) {
+        if (! $user) {
 
             session()->flash(
                 'error',
@@ -737,7 +931,7 @@ class AdminUsers extends Component
             ->latest('WithdrawID')
             ->first();
 
-        if (!$withdrawal) {
+        if (! $withdrawal) {
 
             session()->flash(
                 'message',
@@ -783,7 +977,7 @@ class AdminUsers extends Component
 
     public function confirmWithdrawalRejection(): void
     {
-        if (!$this->selectedWithdrawal) {
+        if (! $this->selectedWithdrawal) {
 
             session()->flash(
                 'error',
@@ -814,7 +1008,7 @@ class AdminUsers extends Component
         // PERMISSION CHECK
         // ==========================================
 
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
 
             $this->dispatch(
                 'withdrawal-rejected-error',
@@ -824,7 +1018,7 @@ class AdminUsers extends Component
             return;
         }
 
-        if (!$this->selectedWithdrawal) {
+        if (! $this->selectedWithdrawal) {
 
             $this->dispatch(
                 'withdrawal-rejected-error',
@@ -840,7 +1034,7 @@ class AdminUsers extends Component
 
         $confirmedBy = Auth::user()?->UserID;
 
-        if (!$confirmedBy) {
+        if (! $confirmedBy) {
 
             Log::error(
                 'Withdrawal rejection failed: No authenticated user found.'
@@ -870,7 +1064,7 @@ class AdminUsers extends Component
                 // ==========================================
 
                 if (
-                    !$withdrawal ||
+                    ! $withdrawal ||
                     $withdrawal->status !== 'Pending'
                 ) {
 
@@ -909,7 +1103,7 @@ class AdminUsers extends Component
             report($e);
 
             Log::error(
-                'Withdrawal rejection failed: ' . $e->getMessage()
+                'Withdrawal rejection failed: '.$e->getMessage()
             );
 
             $this->dispatch(
@@ -945,7 +1139,7 @@ class AdminUsers extends Component
 
     public function confirmWithdrawalApproval(): void
     {
-        if (!$this->selectedWithdrawal) {
+        if (! $this->selectedWithdrawal) {
             session()->flash(
                 'error',
                 'No withdrawal request selected.'
@@ -975,7 +1169,7 @@ class AdminUsers extends Component
         // PERMISSION CHECK
         // ==========================================
 
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
 
             $this->dispatch(
                 'withdrawal-approved-error',
@@ -985,7 +1179,7 @@ class AdminUsers extends Component
             return;
         }
 
-        if (!$this->selectedWithdrawal) {
+        if (! $this->selectedWithdrawal) {
 
             $this->dispatch(
                 'withdrawal-approved-error',
@@ -1001,7 +1195,7 @@ class AdminUsers extends Component
 
         $confirmedBy = Auth::user()?->UserID;
 
-        if (!$confirmedBy) {
+        if (! $confirmedBy) {
 
             Log::error('Withdrawal approval failed: No authenticated user found.', [
                 'auth_user' => Auth::user(),
@@ -1028,7 +1222,7 @@ class AdminUsers extends Component
                     ->first();
 
                 if (
-                    !$withdrawal ||
+                    ! $withdrawal ||
                     $withdrawal->status !== 'Pending'
                 ) {
                     throw new \Exception(
@@ -1110,7 +1304,7 @@ class AdminUsers extends Component
             report($e);
 
             Log::error(
-                'Withdrawal approval failed: ' . $e->getMessage()
+                'Withdrawal approval failed: '.$e->getMessage()
             );
 
             $this->dispatch(
@@ -1134,8 +1328,7 @@ class AdminUsers extends Component
 
             ->withExists([
 
-                'activations as has_pending_activation'
-                    => function ($query) {
+                'activations as has_pending_activation' => function ($query) {
 
                     $query->where(
                         'status',
@@ -1143,8 +1336,7 @@ class AdminUsers extends Component
                     );
                 },
 
-                'withdrawals as has_pending_withdrawal'
-                    => function ($query) {
+                'withdrawals as has_pending_withdrawal' => function ($query) {
 
                     $query->where(
                         'status',
@@ -1152,8 +1344,7 @@ class AdminUsers extends Component
                     );
                 },
 
-                'withdrawals as has_approved_withdrawal'
-                    => function ($query) {
+                'withdrawals as has_approved_withdrawal' => function ($query) {
 
                     $query->where(
                         'status',
@@ -1177,30 +1368,26 @@ class AdminUsers extends Component
                                 'like',
                                 "%{$search}%"
                             )
-
-                            ->orWhere(
-                                'middlename',
-                                'like',
-                                "%{$search}%"
-                            )
-
-                            ->orWhere(
-                                'lastname',
-                                'like',
-                                "%{$search}%"
-                            )
-
-                            ->orWhere(
-                                'username',
-                                'like',
-                                "%{$search}%"
-                            )
-
-                            ->orWhere(
-                                'contactno',
-                                'like',
-                                "%{$search}%"
-                            );
+                                ->orWhere(
+                                    'middlename',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'lastname',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'username',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'contactno',
+                                    'like',
+                                    "%{$search}%"
+                                );
                         }
                     );
                 }

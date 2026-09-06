@@ -141,6 +141,15 @@
                                         </button>
                                     @endif
 
+                                    {{-- SET NEW PASSWORD --}}
+                                    @if ($this->canUpdate)
+                                        <button wire:click="promptUserPasswordReset({{ $user->UserID }})"
+                                            title="Set New Password"
+                                            class="cursor-pointer p-1.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition shadow-sm">
+                                            🔑
+                                        </button>
+                                    @endif
+
                                     @if ($this->canDelete)
                                         <button wire:click="confirmDelete({{ $user->UserID }})" title="Delete"
                                             class="cursor-pointer p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition">
@@ -1264,6 +1273,171 @@
                     confirmButtonText: 'OK'
                 });
 
+            });
+        </script>
+    @endscript
+
+    @script
+        <script>
+            /*
+            |--------------------------------------------------------------------------
+            | SET NEW PASSWORD (dialog)
+            |--------------------------------------------------------------------------
+            */
+
+            $wire.on('set-user-password', (data) => {
+                const name = data?.name || 'this user';
+                const policy = data?.policy || { min: 8, mixedCase: false, letters: false, numbers: false, symbols: false };
+                const hint = data?.hint || 'Must contain at least ' + policy.min + ' characters.';
+
+                Swal.fire({
+                    title: 'Set New Password',
+                    width: 460,
+                    padding: '1.25rem 1.5rem 1.5rem',
+                    html:
+                        '<div style="text-align: left;">' +
+                            '<p style="margin: 0 0 14px; font-size: 13px; line-height: 1.5; color: #475569;">' +
+                                'Setting a new password for <b style="color: #0B2A5B;">' + name + '</b>.' +
+                            '</p>' +
+
+                            '<div style="margin-bottom: 12px;">' +
+                                '<label for="swal-user-new-password" style="display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; color: #334155;">New Password</label>' +
+                                '<div class="relative">' +
+                                    '<input id="swal-user-new-password" type="password" autocomplete="new-password" ' +
+                                        'placeholder="••••••••" ' +
+                                        'style="width: 100%; box-sizing: border-box; margin: 0;" ' +
+                                        'class="w-full border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:border-[#0B2A5B] focus:outline-none transition">' +
+                                    '<button type="button" class="swal-pw-toggle absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer" ' +
+                                        'data-target="swal-user-new-password" tabindex="-1" aria-label="Show or hide password">' +
+                                        '<svg data-ico="show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">' +
+                                            '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />' +
+                                            '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />' +
+                                        '</svg>' +
+                                        '<svg data-ico="hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" style="display: none;">' +
+                                            '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L9.88 9.88" />' +
+                                        '</svg>' +
+                                    '</button>' +
+                                '</div>' +
+                            '</div>' +
+
+                            '<div style="margin-bottom: 14px;">' +
+                                '<label for="swal-user-confirm-password" style="display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; color: #334155;">Confirm New Password</label>' +
+                                '<div class="relative">' +
+                                    '<input id="swal-user-confirm-password" type="password" autocomplete="new-password" ' +
+                                        'placeholder="••••••••" ' +
+                                        'style="width: 100%; box-sizing: border-box; margin: 0;" ' +
+                                        'class="w-full border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:border-[#0B2A5B] focus:outline-none transition">' +
+                                    '<button type="button" class="swal-pw-toggle absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer" ' +
+                                        'data-target="swal-user-confirm-password" tabindex="-1" aria-label="Show or hide password">' +
+                                        '<svg data-ico="show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">' +
+                                            '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />' +
+                                            '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />' +
+                                        '</svg>' +
+                                        '<svg data-ico="hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" style="display: none;">' +
+                                            '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L9.88 9.88" />' +
+                                        '</svg>' +
+                                    '</button>' +
+                                '</div>' +
+                            '</div>' +
+
+                            '<p style="margin: 0; font-size: 11px; line-height: 1.5; color: #64748b;">' + hint + '</p>' +
+                        '</div>',
+                    showCancelButton: true,
+                    confirmButtonText: 'Update Password',
+                    confirmButtonColor: '#0C2C6B',
+                    cancelButtonColor: '#D79B10',
+                    focusConfirm: false,
+                    allowOutsideClick: false,
+                    didOpen: (modal) => {
+                        modal.querySelectorAll('.swal-pw-toggle').forEach((btn) => {
+                            btn.addEventListener('click', () => {
+                                const input = modal.querySelector('#' + btn.getAttribute('data-target'));
+                                const show = input.type === 'password';
+                                input.type = show ? 'text' : 'password';
+
+                                const showIcon = btn.querySelector('[data-ico="show"]');
+                                const hideIcon = btn.querySelector('[data-ico="hide"]');
+
+                                if (showIcon) {
+                                    showIcon.style.display = show ? 'none' : '';
+                                }
+                                if (hideIcon) {
+                                    hideIcon.style.display = show ? '' : 'none';
+                                }
+                            });
+                        });
+                    },
+                    preConfirm: () => {
+                        const password = document.getElementById('swal-user-new-password').value;
+                        const confirmation = document.getElementById('swal-user-confirm-password').value;
+
+                        const messages = [];
+
+                        if (!password) {
+                            messages.push('Please enter a new password.');
+                        } else {
+                            if (password.length < policy.min) {
+                                messages.push('Password must be at least ' + policy.min + ' characters long.');
+                            }
+
+                            if (policy.mixedCase && !(/[a-z]/.test(password) && /[A-Z]/.test(password))) {
+                                messages.push('Include both uppercase and lowercase letters.');
+                            } else if (policy.letters && !/[a-zA-Z]/.test(password)) {
+                                messages.push('Include at least one letter.');
+                            }
+
+                            if (policy.numbers && !/\d/.test(password)) {
+                                messages.push('Include at least one number.');
+                            }
+
+                            if (policy.symbols && !/[^A-Za-z0-9]/.test(password)) {
+                                messages.push('Include at least one symbol.');
+                            }
+                        }
+
+                        if (confirmation !== password) {
+                            messages.push('Passwords do not match.');
+                        }
+
+                        if (messages.length > 0) {
+                            Swal.showValidationMessage(messages.join(' '));
+                            return false;
+                        }
+
+                        return password;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed && result.value) {
+                        Swal.fire({
+                            title: 'Updating...',
+                            text: 'Please wait.',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        $wire.resetUserPassword(data.id, result.value);
+                    }
+                });
+            });
+
+            /*
+            |--------------------------------------------------------------------------
+            | SET NEW PASSWORD ERROR
+            |--------------------------------------------------------------------------
+            */
+
+            $wire.on('user-password-error', (event) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Password Update Failed',
+                    text: event.message || 'Something went wrong while updating the password.',
+                    confirmButtonColor: '#0C2C6B',
+                    confirmButtonText: 'OK'
+                });
             });
         </script>
     @endscript

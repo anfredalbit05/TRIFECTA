@@ -27,6 +27,24 @@
                     </p>
                 </div>
 
+                <!-- Session Status (e.g. "Your password has been reset!") -->
+                @if (session('status'))
+                    @if (session('password_reset_success'))
+                        <div class="mx-6 sm:mx-8 mt-5 px-4 py-4 rounded-xl bg-emerald-50 border border-emerald-200">
+                            <p class="text-xs font-extrabold uppercase tracking-wide text-emerald-700">
+                                ✅ Password Reset Successful!
+                            </p>
+                            <p class="text-xs text-emerald-700 mt-1 leading-relaxed">
+                                {{ session('status') }}
+                            </p>
+                        </div>
+                    @else
+                        <div class="mx-6 sm:mx-8 mt-5 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
+                            ✅ {{ session('status') }}
+                        </div>
+                    @endif
+                @endif
+
                 <!-- Form Body -->
                 @if(!$isForgotPassword)
                     <!-- ================= LOGIN FORM ================= -->
@@ -81,6 +99,14 @@
                                     class="w-4 h-4 rounded text-[#0B2A5B] focus:ring-[#0B2A5B] border-slate-300">
                                 <span class="text-xs text-slate-600 font-medium">Remember me</span>
                             </label>
+
+                            <!-- Forgot Password -->
+                            <button
+                                type="button"
+                                wire:click="toggleForgotPassword"
+                                class="text-xs font-bold text-[#0B2A5B] hover:text-[#D4A017] hover:underline transition cursor-pointer">
+                                Forgot password?
+                            </button>
                         </div>
 
                         <!-- Submit Login Button -->
@@ -174,16 +200,22 @@
                 });
             });
 
-            $wire.on('swal:info', (event) => {
+            $wire.on('password-reset-link-sent', (event) => {
                 Swal.close();
                 const data = Array.isArray(event) ? event[0] : event;
                 const message = data?.message || 'Check your email for the reset link!';
 
                 Swal.fire({
                     icon: 'success',
-                    title: 'Email Sent!',
+                    title: 'Reset Link Sent!',
                     text: message,
-                    confirmButtonColor: '#0B2A5B'
+                    confirmButtonColor: '#0B2A5B',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false
+                }).then(() => {
+                    // Return to the sign-in form so the member can log in
+                    // with their new password right away.
+                    $wire.resetToLogin();
                 });
             });
 

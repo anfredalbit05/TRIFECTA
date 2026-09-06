@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetPassword;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -13,10 +16,6 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Activation;
-use App\Models\Beneficiary;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @property int $id
@@ -31,7 +30,6 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-
 #[Fillable([
     // Account
     'username',
@@ -71,14 +69,14 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
     'position',
     'branchCode',
     'status',
-    'signature'
+    'signature',
 ])]
 
 #[Hidden([
     'password',
     'two_factor_secret',
     'two_factor_recovery_codes',
-    'remember_token'
+    'remember_token',
 ])]
 
 class User extends Authenticatable implements PasskeyUser
@@ -89,7 +87,6 @@ class User extends Authenticatable implements PasskeyUser
         PasskeyAuthenticatable,
         TwoFactorAuthenticatable;
 
-
     /*
     |--------------------------------------------------------------------------
     | Primary Key
@@ -98,31 +95,28 @@ class User extends Authenticatable implements PasskeyUser
 
     protected $primaryKey = 'UserID';
 
-
     /*
     |--------------------------------------------------------------------------
     | Attribute Casts
     |--------------------------------------------------------------------------
     */
 
-        protected function casts(): array
-        {
-            return [
+    protected function casts(): array
+    {
+        return [
 
-                // Email verification date
-                'email_verified_at' => 'datetime',
+            // Email verification date
+            'email_verified_at' => 'datetime',
 
-                // Convert birthdate from a database string
-                // into a Carbon date object
-                'birthdate' => 'date',
+            // Convert birthdate from a database string
+            // into a Carbon date object
+            'birthdate' => 'date',
 
-                // Laravel automatically hashes the password
-                'password' => 'hashed',
+            // Laravel automatically hashes the password
+            'password' => 'hashed',
 
-            ];
-        }
-
-
+        ];
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -134,55 +128,62 @@ class User extends Authenticatable implements PasskeyUser
     {
         $name = trim(
 
-            ($this->firstname ?? '') . ' ' .
+            ($this->firstname ?? '').' '.
 
             ($this->lastname ?? '')
 
         );
-
 
         $initials = Str::initials(
             $name,
             true
         );
 
-
         return Str::length($initials) > 1
 
             ? Str::substr($initials, 0, 1)
 
-                . Str::substr($initials, -1)
+                .Str::substr($initials, -1)
 
             : $initials;
     }
 
+    /**
+     * Send the password reset notification using the application's branded
+     * email template (resources/views/emails/reset-password.blade.php).
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(
+            new ResetPassword($token)
+        );
+    }
 
+    public function beneficiaries(): HasMany
+    {
+        return $this->hasMany(
+            Beneficiary::class,
+            'UserID',
+            'UserID'
+        );
+    }
 
-     public function beneficiaries(): HasMany
-{
-    return $this->hasMany(
-        Beneficiary::class,
-        'UserID',
-        'UserID'
-    );
-}
+    public function activations(): HasMany
+    {
+        // 'UserID' on the activations table references the member being activated
+        return $this->hasMany(Activation::class, 'UserID', 'UserID');
+    }
 
-public function activations(): HasMany
-{
-    // 'UserID' on the activations table references the member being activated
-    return $this->hasMany(Activation::class, 'UserID', 'UserID');
-}
+    public function processedActivations()
+    {
+        return $this->hasMany(
+            Activation::class,
+            'ProcessedBy',
+            'UserID'
+        );
+    }
 
-public function processedActivations()
-{
-    return $this->hasMany(
-        Activation::class,
-        'ProcessedBy',
-        'UserID'
-    );
-}
-
-public function directDownlines(): HasManyThrough
+    public function directDownlines(): HasManyThrough
     {
         // Activations where THIS user was the referral owner (UserID)
         // and ProcessedBy is the downline user who activated under them.
@@ -204,8 +205,7 @@ public function directDownlines(): HasManyThrough
         return $this->hasMany(Activation::class, 'UserID', 'UserID');
     }
 
-
-        public function role()
+    public function role()
     {
         return $this->belongsTo(Role::class, 'RoleID', 'RoleID');
     }
@@ -218,20 +218,20 @@ public function directDownlines(): HasManyThrough
         return $this->hasMany(Wallet::class, 'UserID', 'UserID');
     }
 
-   public function ledgers(): HasManyThrough
-{
-    return $this->hasManyThrough(
-        Ledger::class,
-        Activation::class,
-        'UserID',       // Foreign key on activations table (links to users.UserID)
-        'ActivationID', // Foreign key on ledgers table (links to activations.ActivationID)
-        'UserID',       // Local key on users table
-        'ActivationID'  // Local key on activations table
-    );
-}
+    public function ledgers(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Ledger::class,
+            Activation::class,
+            'UserID',       // Foreign key on activations table (links to users.UserID)
+            'ActivationID', // Foreign key on ledgers table (links to activations.ActivationID)
+            'UserID',       // Local key on users table
+            'ActivationID'  // Local key on activations table
+        );
+    }
 
-public function withdrawals()
-{
-    return $this->hasMany(Withdrawal::class, 'UserID', 'UserID');
-}
+    public function withdrawals()
+    {
+        return $this->hasMany(Withdrawal::class, 'UserID', 'UserID');
+    }
 }
