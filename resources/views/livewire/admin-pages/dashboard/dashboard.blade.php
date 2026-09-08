@@ -1,4 +1,4 @@
-<div class="dashboard-container">
+{{-- <div class="dashboard-container">
 
     <!-- TOP SECTION: CREATE POST CARD -->
     @if(auth()->check() && (int) auth()->user()->RoleID === 1)
@@ -244,4 +244,4 @@
         </div>
     @endif
 
-</div>
+</div> --}}

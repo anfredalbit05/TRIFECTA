@@ -3,94 +3,65 @@
 @section('title', 'Dashboard')
 
 @section('content')
+<div class="dashboard-page" x-data="{ tab: 'overview' }">
 
-<div class="dashboard-container" x-data="{ tab: 'overview' }">
-
-    <!-- DASHBOARD TOP NAVIGATION -->
-    <nav class="dashboard-nav">
-        <div class="dashboard-nav-title">
+    <!-- DASHBOARD HEADER -->
+    <nav class="dashboard-header">
+        <div class="dashboard-header-title">
             <h1>Dashboard</h1>
         </div>
     </nav>
 
-    <!-- CONTENT WRAPPER (Includes both Nav Menu and Tabs to keep identical width matching genealogy) -->
-    <div class="dashboard-layout px-12 pt-4 flex flex-col gap-4">
+    <!-- DASHBOARD CONTENT -->
+    <div class="dashboard-content">
 
-        <!-- NAVIGATION MENU -->
-        <div class="dashboard-nav-menu">
-
-             @if(auth()->user()->RoleID != 4)
-              <a href="#"
-               @click.prevent="tab='analytics'"
-               :class="tab === 'analytics' ? 'active' : ''">
-                Overview
-            </a>
+        <!-- DESKTOP NAVIGATION -->
+        <div class="dashboard-tabs dashboard-desktop-tabs">
+            @if(auth()->user()->RoleID != 4)
+                <a href="#" @click.prevent="tab = 'analytics'" :class="tab === 'analytics' ? 'active' : ''">
+                    <span class="dashboard-tab-icon">▦</span>
+                    <span>Overview</span>
+                </a>
             @endif
 
-            <a href="#"
-               @click.prevent="tab = 'overview'"
-               :class="tab === 'overview' ? 'active' : ''">
-                My Dashboard
+            <a href="#" @click.prevent="tab = 'overview'" :class="tab === 'overview' ? 'active' : ''">
+                <span class="dashboard-tab-icon">⌂</span>
+                <span>My Dashboard</span>
             </a>
-
-{{--
-             @if(auth()->user()->RoleID == 1)
-            <a href="#"
-               @click.prevent="tab='admin-users'"
-               :class="tab === 'admin-users' ? 'active' : ''">
-                All Users
-            </a>
-            @endif --}}
-
-
-            {{-- <a href="#"
-               @click.prevent="tab = 'my-dashboard'"
-               :class="tab === 'my-dashboard' ? 'active' : ''">
-                My Dashboard
-            </a>
-
-
-            <a href="#"
-               @click.prevent="tab = 'all-users'"
-               :class="tab === 'all-users' ? 'active' : ''">
-                All Users
-            </a> --}}
-
         </div>
 
-        <!-- OVERVIEW TAB -->
-        <div x-show="tab === 'overview'" x-cloak class="tab-card">
+        <!-- TAB CONTENT -->
+
+        <!-- MY DASHBOARD -->
+        <div x-show="tab === 'overview'" x-cloak class="dashboard-card">
             <livewire:share-pages.dashboard.news-updates />
         </div>
 
-          <div
-            x-show="tab === 'analytics'"
-            x-cloak
-            class="dashboard-main-card full-width-card">
-            <livewire:admin-pages.dashboard.overview-analytics />
-        </div>
-
-{{--
-        <!-- ALL USERS -->
-        <div
-            x-show="tab === 'all-users'"
-            x-cloak
-            class="dashboard-main-card full-width-card">
-            <livewire:admin-pages.dashboard.admin-users />
-        </div> --}}
-
-        {{-- <!-- MY DASHBOARD TAB -->
-        <div x-show="tab === 'my-dashboard'" x-cloak class="tab-card">
-            <!-- Add content here -->
-        </div>
-
-        <!-- ALL USERS TAB -->
-        <div x-show="tab === 'all-users'" x-cloak class="tab-card">
-            <!-- Add content here -->
-        </div> --}}
+        <!-- ANALYTICS -->
+        @if(auth()->user()->RoleID != 4)
+            <div x-show="tab === 'analytics'" x-cloak class="dashboard-card">
+                <livewire:admin-pages.dashboard.overview-analytics />
+            </div>
+        @endif
 
     </div>
 
-</div>
+    <!-- MOBILE BOTTOM NAVIGATION (separate from desktop nav to avoid scrolling/overflow issues) -->
+    <template x-teleport="body">
+        <nav class="dashboard-mobile-nav">
+            @if(auth()->user()->RoleID != 4)
+                <a href="#" @click.prevent="tab = 'analytics'" :class="tab === 'analytics' ? 'active' : ''">
+                    <span class="dashboard-mobile-icon">▦</span>
+                    <span class="dashboard-mobile-label">Overview</span>
+                </a>
+            @endif
 
+            <a href="#" @click.prevent="tab = 'overview'" :class="tab === 'overview' ? 'active' : ''">
+                <span class="dashboard-mobile-icon">⌂</span>
+                <span class="dashboard-mobile-label">My Dashboard</span>
+            </a>
+        </nav>
+    </template>
+
+</div>
 @endsection

@@ -1,0 +1,448 @@
+/* =========================================================
+   OVERVIEW ANALYTICS
+========================================================= */
+
+.analytics-container {
+    @apply space-y-6;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.analytics-header {
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4;
+}
+
+.analytics-title {
+    @apply text-2xl font-bold text-[#0C2C6B];
+}
+
+.analytics-subtitle {
+    @apply text-sm text-gray-500;
+}
+
+.analytics-subtitle-highlight {
+    @apply font-semibold text-gray-700;
+}
+
+.analytics-actions {
+    @apply flex items-center gap-3;
+}
+
+.analytics-year-select {
+    @apply bg-white border border-slate-200 text-slate-700 text-sm font-semibold
+    rounded-xl px-3 py-2 shadow-sm
+    focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
+    cursor-pointer;
+}
+
+.analytics-refresh-btn {
+    @apply inline-flex items-center gap-2 px-4 py-2
+    bg-white border border-slate-200 text-slate-700 hover:bg-slate-50
+    text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer;
+}
+
+
+/* =========================================================
+   KPI CARDS
+========================================================= */
+
+.analytics-kpi-grid {
+    @apply grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4;
+}
+
+.analytics-kpi-card {
+    @apply relative overflow-hidden rounded-2xl p-5 backdrop-blur-xl
+    bg-gradient-to-br from-[#0C2C6B]/90 via-[#133880]/80 to-[#1b469b]/70
+    border border-white/10
+    hover:shadow-blue-500/60 shadow-xl
+    transition-all duration-300 hover:-translate-y-1.5
+    text-white;
+}
+
+.analytics-kpi-watermark {
+    @apply absolute -right-3 -bottom-3 text-7xl text-white opacity-10
+    transition-transform duration-500
+    group-hover:scale-125 group-hover:opacity-20
+    pointer-events-none select-none brightness-0 invert;
+}
+
+.analytics-kpi-content {
+    @apply relative z-10;
+}
+
+.analytics-kpi-label {
+    @apply text-xs uppercase tracking-wider text-gray-300 font-semibold opacity-90;
+}
+
+.analytics-kpi-value {
+    @apply text-2xl font-bold mt-1 text-white tracking-tight drop-shadow-sm;
+}
+
+
+/* =========================================================
+   SHARED CARD
+========================================================= */
+
+.analytics-card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6;
+}
+
+.analytics-card-title {
+    @apply font-bold text-[#0C2C6B] text-lg mb-4;
+}
+
+.analytics-card-header-row {
+    @apply flex items-center justify-between mb-4;
+}
+
+.analytics-empty-text {
+    @apply text-sm text-gray-400 py-4 text-center;
+}
+
+
+/* =========================================================
+   RECENT MEMBERS
+========================================================= */
+
+.analytics-members-card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between;
+}
+
+.analytics-list-divide {
+    @apply divide-y divide-gray-100;
+}
+
+.analytics-list-item {
+    @apply flex items-center justify-between py-3 first:pt-0 last:pb-0;
+}
+
+.analytics-item-title {
+    @apply font-semibold text-gray-800 text-sm;
+}
+
+.analytics-item-subtitle {
+    @apply text-xs text-gray-400 mt-0.5;
+}
+
+.analytics-badge-active {
+    @apply text-xs font-semibold px-2.5 py-1 rounded-full bg-green-50 text-green-600;
+}
+
+.analytics-badge-inactive {
+    @apply text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-50 text-gray-500;
+}
+
+
+/* =========================================================
+   INQUIRY ANALYTICS
+========================================================= */
+
+.analytics-stat-row {
+    @apply flex justify-between items-center p-3 bg-gray-50 rounded-xl;
+}
+
+.analytics-stat-label {
+    @apply text-sm font-medium text-gray-600;
+}
+
+.analytics-stat-value-red {
+    @apply font-bold text-red-600 bg-red-50 px-3 py-1 rounded-lg text-sm;
+}
+
+.analytics-stat-value-green {
+    @apply font-bold text-green-600 bg-green-50 px-3 py-1 rounded-lg text-sm;
+}
+
+
+/* =========================================================
+   BENEFITS DISTRIBUTION
+========================================================= */
+
+.analytics-benefit-list {
+    @apply divide-y divide-gray-100 max-h-[250px] overflow-y-auto pr-1;
+}
+
+.analytics-benefit-row {
+    @apply flex justify-between items-center py-2.5 text-sm;
+}
+
+.analytics-benefit-name {
+    @apply text-gray-600 truncate pr-2;
+}
+
+.analytics-benefit-count {
+    @apply font-bold text-[#0C2C6B] bg-blue-50 px-2.5 py-0.5 rounded-md text-xs;
+}
+
+
+/* =========================================================
+   ROW GRIDS
+========================================================= */
+
+.analytics-row-grid {
+    @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
+}
+
+.analytics-row-grid-2 {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+}
+
+
+/* =========================================================
+   LATEST NEWS
+========================================================= */
+
+.analytics-news-item {
+    @apply py-3 first:pt-0 last:pb-0;
+}
+
+.analytics-news-title {
+    @apply font-semibold text-gray-800 text-sm hover:text-[#0C2C6B] transition-colors cursor-pointer;
+}
+
+.analytics-news-date {
+    @apply text-xs text-gray-400 mt-1;
+}
+
+
+/* =========================================================
+   TOP REFERRERS
+========================================================= */
+
+.analytics-leaderboard-badge {
+    @apply text-xs font-semibold bg-blue-50 text-[#0C2C6B] px-2.5 py-1 rounded-lg;
+}
+
+.analytics-referrer-list {
+    @apply space-y-3 max-h-[380px] overflow-y-auto pr-1;
+}
+
+.analytics-referrer-row {
+    @apply flex items-center justify-between p-3.5
+    bg-gray-50/70 hover:bg-gray-50 border border-gray-100/80 rounded-xl transition-all;
+}
+
+.analytics-referrer-info {
+    @apply flex items-center gap-3.5;
+}
+
+.analytics-rank-badge {
+    @apply w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold border;
+}
+
+.analytics-avatar {
+    @apply w-12 h-12 rounded-full overflow-hidden bg-[#0C2C6B]/10
+    flex items-center justify-center shrink-0 border border-gray-200;
+}
+
+.analytics-avatar-img {
+    @apply w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity;
+}
+
+.analytics-referrer-name {
+    @apply text-sm font-bold text-gray-800 leading-tight;
+}
+
+.analytics-referrer-code {
+    @apply text-xs text-gray-400 font-mono mt-1 flex items-center gap-1;
+}
+
+.analytics-referrer-code-value {
+    @apply text-[#0C2C6B] font-semibold bg-white px-1.5 py-0.5 rounded border border-gray-200;
+}
+
+.analytics-referrer-right {
+    @apply text-right;
+}
+
+.analytics-invites-btn {
+    @apply inline-flex items-center gap-1 font-extrabold text-[#0C2C6B]
+    bg-blue-50/80 hover:bg-blue-100 border border-blue-100
+    px-3 py-1.5 rounded-xl text-sm shadow-sm transition cursor-pointer;
+}
+
+.analytics-invites-label {
+    @apply text-xs font-medium text-blue-600/70;
+}
+
+.analytics-empty-state {
+    @apply text-center py-6;
+}
+
+.analytics-empty-icon {
+    @apply text-3xl mb-2;
+}
+
+
+/* =========================================================
+   INVITED MEMBERS MODAL
+========================================================= */
+
+.analytics-modal-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs;
+}
+
+.analytics-modal-box {
+    @apply bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl flex flex-col max-h-[85vh]
+    border border-gray-100 animate-in fade-in zoom-in-95 duration-200;
+}
+
+.analytics-modal-header {
+    @apply flex items-center justify-between pb-4 border-b border-gray-100;
+}
+
+.analytics-modal-header-info {
+    @apply flex items-center gap-3;
+}
+
+.analytics-modal-icon {
+    @apply w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-[#0C2C6B] text-lg font-bold;
+}
+
+.analytics-modal-title {
+    @apply font-bold text-[#0C2C6B] text-lg leading-snug;
+}
+
+.analytics-modal-subtitle {
+    @apply text-xs text-gray-500;
+}
+
+.analytics-modal-subtitle-highlight {
+    @apply font-semibold text-gray-700;
+}
+
+.analytics-modal-close {
+    @apply w-8 h-8 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400
+    hover:text-gray-600 hover:bg-gray-100 font-bold transition cursor-pointer;
+}
+
+.analytics-modal-banner {
+    @apply flex items-center justify-between bg-blue-50/60 border border-blue-100/60 rounded-2xl px-4 py-3 my-4;
+}
+
+.analytics-modal-banner-label {
+    @apply text-xs font-semibold uppercase tracking-wider text-blue-900/70;
+}
+
+.analytics-modal-banner-value {
+    @apply inline-flex items-center gap-1 font-extrabold text-[#0C2C6B]
+    bg-white border border-blue-200/60 px-3 py-1 rounded-xl text-sm shadow-2xs;
+}
+
+.analytics-modal-body {
+    @apply overflow-y-auto space-y-3 max-h-[42vh] pr-1;
+}
+
+.analytics-modal-user-row {
+    @apply flex items-center justify-between p-3.5
+    bg-gray-50/70 hover:bg-gray-50 border border-gray-100 rounded-2xl transition-all;
+}
+
+.analytics-modal-user-info {
+    @apply flex items-center gap-3;
+}
+
+.analytics-modal-avatar {
+    @apply w-11 h-11 rounded-full overflow-hidden bg-[#0C2C6B]/10
+    flex items-center justify-center shrink-0 border border-gray-200 shadow-2xs;
+}
+
+.analytics-modal-user-name {
+    @apply text-sm font-bold text-gray-800 leading-tight;
+}
+
+.analytics-modal-user-joined {
+    @apply text-xs text-gray-400 mt-1 flex items-center gap-1;
+}
+
+.analytics-modal-user-joined-value {
+    @apply font-medium text-gray-600;
+}
+
+.analytics-modal-approved-badge {
+    @apply text-xs font-semibold px-3 py-1 rounded-full
+    bg-emerald-50 text-emerald-600 border border-emerald-100/60 shadow-2xs;
+}
+
+.analytics-modal-empty {
+    @apply text-center py-10;
+}
+
+.analytics-modal-empty-icon {
+    @apply text-4xl mb-2;
+}
+
+.analytics-modal-empty-title {
+    @apply text-sm font-bold text-gray-700;
+}
+
+.analytics-modal-empty-subtitle {
+    @apply text-xs text-gray-400 mt-0.5;
+}
+
+.analytics-modal-footer {
+    @apply pt-4 border-t border-gray-100 mt-4;
+}
+
+.analytics-modal-close-btn {
+    @apply w-full bg-[#0C2C6B] text-white py-3 rounded-2xl text-sm font-semibold
+    hover:bg-[#081f4f] transition-all shadow-md shadow-blue-900/10 cursor-pointer;
+}
+
+
+/* =========================================================
+   IMAGE PREVIEW MODAL
+========================================================= */
+
+.analytics-preview-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4;
+}
+
+.analytics-preview-box {
+    @apply bg-white rounded-2xl max-w-sm w-full p-6 text-center relative shadow-2xl;
+}
+
+.analytics-preview-close {
+    @apply absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-bold text-lg cursor-pointer;
+}
+
+.analytics-preview-name {
+    @apply font-bold text-[#0C2C6B] text-base mb-4;
+}
+
+.analytics-preview-image-wrap {
+    @apply w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-gray-100 shadow-inner mb-4;
+}
+
+.analytics-preview-image {
+    @apply w-full h-full object-cover;
+}
+
+.analytics-preview-address {
+    @apply text-xs text-gray-500 mb-4 flex items-center justify-center gap-1;
+}
+
+.analytics-preview-close-btn {
+    @apply w-full bg-[#0C2C6B] text-white py-2 rounded-xl text-sm font-semibold
+    hover:bg-[#081f4f] transition-colors cursor-pointer;
+}
+
+
+/* =========================================================
+   CHARTS SECTION
+========================================================= */
+
+.analytics-charts-section {
+    @apply grid grid-cols-1 gap-6 mt-6;
+}
+
+.analytics-chart-card {
+    @apply bg-white shadow-sm border border-gray-100 rounded-2xl p-6;
+}
+
+.analytics-chart-wrapper {
+    @apply relative h-64 sm:h-80 w-full;
+}

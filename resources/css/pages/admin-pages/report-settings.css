@@ -1,0 +1,398 @@
+/* =========================================================
+   REPORT & SETTINGS
+========================================================= */
+
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.report-settings-container {
+    @apply w-full min-h-screen;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.report-settings-header {
+    @apply sticky top-0 z-30 w-full overflow-hidden;
+    margin-bottom: 8px;
+}
+
+
+.report-settings-header-title {
+    @apply flex items-center justify-center w-full px-4 py-3;
+    background: #0C2C6B;
+}
+
+
+.report-settings-header-title h1 {
+    @apply m-0 text-center text-xl font-bold leading-tight text-white;
+}
+
+
+/* =========================================================
+   MAIN LAYOUT
+========================================================= */
+
+.report-settings-layout {
+    @apply flex w-full flex-col gap-4 px-12 py-4;
+}
+
+
+/* =========================================================
+   DESKTOP TAB NAVIGATION
+========================================================= */
+
+.report-settings-desktop-nav {
+    @apply sticky z-20 flex w-full flex-wrap items-center
+           justify-start gap-3 rounded-xl bg-white
+           px-5 py-3;
+
+    top: 78px;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================================================
+   DESKTOP TAB LINKS
+========================================================= */
+
+.report-settings-desktop-nav a {
+    @apply relative flex items-center justify-center
+           gap-1.5 rounded-lg px-4 py-2
+           text-sm font-semibold leading-tight
+           no-underline transition-all duration-200;
+
+    color: #6b7280;
+}
+
+
+.report-settings-desktop-nav a:hover {
+    @apply bg-gray-100;
+
+    color: #0C2C6B;
+}
+
+
+.report-settings-desktop-nav a.active {
+    @apply text-white;
+
+    background: #0C2C6B;
+}
+
+
+.report-settings-desktop-nav a:focus {
+    @apply outline-none;
+}
+
+
+/* =========================================================
+   DESKTOP TAB ICON
+========================================================= */
+
+.report-settings-tab-icon {
+    @apply inline-flex h-5 w-5 shrink-0
+           items-center justify-center;
+
+    font-size: 17px;
+    line-height: 1;
+}
+
+
+/* =========================================================
+   DESKTOP TAB LABEL
+========================================================= */
+
+.report-settings-tab-label {
+    @apply inline-block;
+}
+
+
+/* =========================================================
+   MAIN CARD
+========================================================= */
+
+.report-settings-main-card {
+    @apply w-full min-h-[500px] rounded-xl
+           bg-white p-5;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================================================
+   ALPINE CLOAK
+========================================================= */
+
+[x-cloak] {
+    display: none !important;
+}
+
+
+/* =========================================================
+   MOBILE BOTTOM NAVIGATION
+========================================================= */
+
+.report-settings-mobile-nav {
+    display: none;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media screen and (max-width: 768px) {
+
+
+    /* =====================================================
+       PAGE
+    ===================================================== */
+
+    .report-settings-container {
+        @apply relative w-full min-h-screen;
+
+        padding-bottom: 80px !important;
+
+        overflow: visible !important;
+    }
+
+
+    /* =====================================================
+       HEADER
+    ===================================================== */
+
+    .report-settings-header {
+        @apply sticky top-0 z-30 w-full;
+
+        margin: 0;
+
+        overflow: hidden;
+    }
+
+
+    .report-settings-header-title {
+        @apply px-4 py-3;
+    }
+
+
+    .report-settings-header-title h1 {
+        @apply text-lg;
+    }
+
+
+    /* =====================================================
+       CONTENT
+    ===================================================== */
+
+    .report-settings-layout {
+        @apply relative flex w-full flex-col gap-3;
+
+        margin-top: 25px;
+        padding:
+            12px
+            16px
+            100px
+            16px !important;
+
+        height: auto !important;
+
+        min-height: 100vh !important;
+
+        overflow: visible !important;
+    }
+
+
+    /* =====================================================
+       HIDE DESKTOP NAVIGATION
+    ===================================================== */
+
+    .report-settings-desktop-nav {
+        display: none !important;
+    }
+
+
+    /* =====================================================
+       MAIN CARD
+    ===================================================== */
+
+    .report-settings-main-card {
+        @apply w-full rounded-lg p-4;
+
+        max-width: 100% !important;
+
+        min-height: auto !important;
+
+        margin: 0 !important;
+
+        overflow: visible !important;
+    }
+
+
+    /* =====================================================
+       MOBILE BOTTOM NAVIGATION
+    ===================================================== */
+
+    .report-settings-mobile-nav {
+        position: fixed !important;
+
+        display: grid !important;
+
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr)) !important;
+
+        align-items: stretch;
+
+        gap: 0;
+
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+
+        width: 100vw !important;
+        max-width: 100vw !important;
+
+        height: 72px !important;
+
+        margin: 0 !important;
+
+        padding:
+            4px
+            2px
+            calc(4px + env(safe-area-inset-bottom))
+            2px !important;
+
+        background: #ffffff !important;
+
+        border: none !important;
+
+        border-top:
+            1px solid #eeeeee !important;
+
+        border-radius: 0 !important;
+
+        box-shadow:
+            0 -4px 20px rgba(0, 0, 0, 0.12) !important;
+
+        z-index: 2147483647 !important;
+
+        overflow: hidden !important;
+
+        box-sizing: border-box !important;
+    }
+
+
+    /* =====================================================
+       MOBILE TAB
+    ===================================================== */
+
+    .report-settings-mobile-nav a {
+        @apply relative flex h-full w-full
+               min-w-0 max-w-none flex-col
+               items-center justify-center
+               gap-[3px] bg-transparent
+               px-[1px] py-[3px]
+               text-center no-underline;
+
+        margin: 0 !important;
+
+        color: #777777 !important;
+
+        font-size: 9px !important;
+
+        font-weight: 600 !important;
+
+        line-height: 1.1 !important;
+
+        white-space: normal !important;
+
+        overflow: hidden !important;
+
+        box-sizing: border-box !important;
+
+        border: none !important;
+
+        border-radius: 0 !important;
+    }
+
+
+    /* =====================================================
+       MOBILE ICON
+    ===================================================== */
+
+    .report-settings-mobile-icon {
+        @apply flex h-[22px] w-[22px]
+               shrink-0 items-center
+               justify-center;
+
+        font-size: 18px !important;
+
+        line-height: 1 !important;
+    }
+
+
+    /* =====================================================
+       MOBILE LABEL
+    ===================================================== */
+
+    .report-settings-mobile-label {
+        @apply block w-full max-w-full
+               m-0 p-0 text-center;
+
+        overflow: hidden !important;
+
+        text-overflow: ellipsis !important;
+
+        white-space: nowrap !important;
+    }
+
+
+    /* =====================================================
+       ACTIVE MOBILE TAB
+    ===================================================== */
+
+    .report-settings-mobile-nav a.active {
+        @apply bg-transparent;
+
+        color: #0C2C6B !important;
+    }
+
+
+    .report-settings-mobile-nav a.active
+    .report-settings-mobile-icon {
+        transform: translateY(-1px);
+    }
+
+
+    /* =====================================================
+       ACTIVE INDICATOR
+    ===================================================== */
+
+    .report-settings-mobile-nav a.active::before {
+        content: "";
+
+        position: absolute;
+
+        top: 0;
+
+        left: 50%;
+
+        width: 24px;
+
+        height: 3px;
+
+        transform: translateX(-50%);
+
+        background: #0C2C6B;
+
+        border-radius:
+            0 0 4px 4px;
+    }
+
+}

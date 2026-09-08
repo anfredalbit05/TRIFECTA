@@ -4,104 +4,289 @@
 
 @section('content')
 
-{{--
-=====================================================================
- MY PROFILE — TAB SHELL
-=====================================================================
- New utility groups on this page (tab bar layout, link wrapping,
- activation button placement) live in profile.css section 14 as
- .profile-tabs-shell / .profile-tabs-bar / .profile-tabs-links /
- .profile-tabs-activation — applied alongside the existing global
- .dashboard-* classes, not replacing them.
- Sections:
-   1. Page navigation header
-   2. Tabs bar (tab links + activation button)
-   3. Tab panels (Profile / Account / Security / Activity / Certificate)
-   4. Activation modal
-=====================================================================
---}}
-
 <div
-    class="dashboard-container"
+    class="my-profile-container"
     x-data="{ tab: $persist('profile').as('my-profile-tab') }"
-    @account-activated.window="$wire.$refresh()">
+    @account-activated.window="$wire.$refresh()"
+>
 
-    {{-- ==================== 1. PAGE NAVIGATION HEADER ==================== --}}
-    <nav class="dashboard-nav">
-        <div class="dashboard-nav-title">
+    <!-- =========================================
+         MY PROFILE HEADER
+    ========================================== -->
+
+    <nav class="my-profile-header">
+
+        <div class="my-profile-header-title">
             <h1>My Profile</h1>
         </div>
+
     </nav>
 
-    {{-- Content wrapper (keeps nav menu and cards at identical layout width) --}}
-    <div class="dashboard-layout profile-tabs-shell">
 
-        {{-- ============ 2. TABS BAR (LINKS + ACTIVATION BUTTON) ============ --}}
-        <div class="dashboard-nav-menu profile-tabs-bar">
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
 
-            <div class="profile-tabs-links">
-                <a href="#" @click.prevent="tab = 'profile'" :class="tab === 'profile' ? 'active' : ''">
-                    Profile
+    <div class="my-profile-layout">
+
+        <!-- =====================================
+             TABS BAR
+        ====================================== -->
+
+        <div class="my-profile-nav-menu">
+
+            <!-- TAB LINKS -->
+            <div class="my-profile-tabs-links">
+
+                <!-- PROFILE -->
+                <a
+                    href="#"
+                    @click.prevent="tab = 'profile'"
+                    :class="tab === 'profile' ? 'active' : ''"
+                >
+                    <span class="my-profile-tab-icon">
+                        ♙
+                    </span>
+
+                    <span class="my-profile-tab-label">
+                        Profile
+                    </span>
                 </a>
 
-                <a href="#" @click.prevent="tab = 'account'" :class="tab === 'account' ? 'active' : ''">
-                    Account
+
+                <!-- ACCOUNT -->
+                <a
+                    href="#"
+                    @click.prevent="tab = 'account'"
+                    :class="tab === 'account' ? 'active' : ''"
+                >
+                    <span class="my-profile-tab-icon">
+                        ◉
+                    </span>
+
+                    <span class="my-profile-tab-label">
+                        Account
+                    </span>
                 </a>
 
-                <a href="#" @click.prevent="tab = 'security'" :class="tab === 'security' ? 'active' : ''">
-                    Security
+
+                <!-- SECURITY -->
+                <a
+                    href="#"
+                    @click.prevent="tab = 'security'"
+                    :class="tab === 'security' ? 'active' : ''"
+                >
+                    <span class="my-profile-tab-icon">
+                        🛡
+                    </span>
+
+                    <span class="my-profile-tab-label">
+                        Security
+                    </span>
                 </a>
 
-                {{-- @if(auth()->user()->RoleID == 4) --}}
-                    {{-- <a href="#" @click.prevent="tab = 'activity'" :class="tab === 'activity' ? 'active' : ''">
+
+                <!-- ACTIVITY -->
+                <a
+                    href="#"
+                    @click.prevent="tab = 'activity'"
+                    :class="tab === 'activity' ? 'active' : ''"
+                >
+                    <span class="my-profile-tab-icon">
+                        ◷
+                    </span>
+
+                    <span class="my-profile-tab-label">
                         Activity
-                    </a> --}}
+                    </span>
+                </a>
 
-                    <a href="#" @click.prevent="tab = 'certificate'" :class="tab === 'certificate' ? 'active' : ''">
+
+                <!-- CERTIFICATE -->
+                <a
+                    href="#"
+                    @click.prevent="tab = 'certificate'"
+                    :class="tab === 'certificate' ? 'active' : ''"
+                >
+                    <span class="my-profile-tab-icon">
+                        ▣
+                    </span>
+
+                    <span class="my-profile-tab-label">
                         Certificate
-                    </a>
-                {{-- @endif --}}
+                    </span>
+                </a>
+
             </div>
 
-            <div class="profile-tabs-activation">
+
+            <!-- ACTIVATION BUTTON -->
+            <div class="my-profile-tabs-activation">
                 <livewire:member-pages.my-profile.activation-button />
             </div>
 
         </div>
 
-        {{-- ==================== 3. TAB PANELS ==================== --}}
 
-        {{-- Profile --}}
-        <div x-show="tab === 'profile'" class="dashboard-main-card full-width-card">
+        <!-- =====================================
+             TAB CONTENT
+        ====================================== -->
+
+        <!-- PROFILE -->
+        <div
+            x-show="tab === 'profile'"
+            x-cloak
+            class="my-profile-main-card"
+        >
             <livewire:member-pages.my-profile.profile />
         </div>
 
-        {{-- Account --}}
-        <div x-show="tab === 'account'" x-cloak class="dashboard-main-card full-width-card">
+
+        <!-- ACCOUNT -->
+        <div
+            x-show="tab === 'account'"
+            x-cloak
+            class="my-profile-main-card"
+        >
             <livewire:member-pages.my-profile.account />
         </div>
 
-        {{-- Security --}}
-        <div x-show="tab === 'security'" x-cloak class="dashboard-main-card full-width-card">
+
+        <!-- SECURITY -->
+        <div
+            x-show="tab === 'security'"
+            x-cloak
+            class="my-profile-main-card"
+        >
             <livewire:member-pages.my-profile.security />
         </div>
 
-        {{-- @if(auth()->user()->RoleID == 4) --}}
-            {{-- Activity --}}
-            <div x-show="tab === 'activity'" x-cloak class="dashboard-main-card full-width-card">
-                <livewire:member-pages.my-profile.activity />
-            </div>
 
-            {{-- Certificate --}}
-            <div x-show="tab === 'certificate'" x-cloak class="dashboard-main-card full-width-card">
-                <livewire:member-pages.my-profile.certificate />
-            </div>
-        {{-- @endif --}}
+        <!-- ACTIVITY -->
+        <div
+            x-show="tab === 'activity'"
+            x-cloak
+            class="my-profile-main-card"
+        >
+            <livewire:member-pages.my-profile.activity />
+        </div>
+
+
+        <!-- CERTIFICATE -->
+        <div
+            x-show="tab === 'certificate'"
+            x-cloak
+            class="my-profile-main-card"
+        >
+            <livewire:member-pages.my-profile.certificate />
+        </div>
 
     </div>
 
-    {{-- ==================== 4. ACTIVATION MODAL ==================== --}}
+
+    <!-- =========================================
+         MOBILE BOTTOM NAVIGATION
+    ========================================== -->
+
+    <template x-teleport="body">
+
+        <nav class="my-profile-mobile-nav">
+
+            <!-- PROFILE -->
+            <a
+                href="#"
+                @click.prevent="tab = 'profile'"
+                :class="tab === 'profile' ? 'active' : ''"
+                aria-label="Profile"
+            >
+                <span class="my-profile-mobile-icon">
+                    ♙
+                </span>
+
+                <span class="my-profile-mobile-label">
+                    Profile
+                </span>
+            </a>
+
+
+            <!-- ACCOUNT -->
+            <a
+                href="#"
+                @click.prevent="tab = 'account'"
+                :class="tab === 'account' ? 'active' : ''"
+                aria-label="Account"
+            >
+                <span class="my-profile-mobile-icon">
+                    ◉
+                </span>
+
+                <span class="my-profile-mobile-label">
+                    Account
+                </span>
+            </a>
+
+
+            <!-- SECURITY -->
+            <a
+                href="#"
+                @click.prevent="tab = 'security'"
+                :class="tab === 'security' ? 'active' : ''"
+                aria-label="Security"
+            >
+                <span class="my-profile-mobile-icon">
+                    🛡
+                </span>
+
+                <span class="my-profile-mobile-label">
+                    Security
+                </span>
+            </a>
+
+
+            <!-- ACTIVITY -->
+            <a
+                href="#"
+                @click.prevent="tab = 'activity'"
+                :class="tab === 'activity' ? 'active' : ''"
+                aria-label="Activity"
+            >
+                <span class="my-profile-mobile-icon">
+                    ◷
+                </span>
+
+                <span class="my-profile-mobile-label">
+                    Activity
+                </span>
+            </a>
+
+
+            <!-- CERTIFICATE -->
+            <a
+                href="#"
+                @click.prevent="tab = 'certificate'"
+                :class="tab === 'certificate' ? 'active' : ''"
+                aria-label="Certificate"
+            >
+                <span class="my-profile-mobile-icon">
+                    ▣
+                </span>
+
+                <span class="my-profile-mobile-label">
+                    Certificate
+                </span>
+            </a>
+
+        </nav>
+
+    </template>
+
+
+    <!-- =========================================
+         ACTIVATION MODAL
+    ========================================== -->
+
     <livewire:member-pages.my-profile.activation-modal />
+
 </div>
 
 @endsection

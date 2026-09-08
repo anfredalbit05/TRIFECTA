@@ -4,73 +4,169 @@
 
 @section('content')
 
-<div class="dashboard-container"  x-data="{ tab: $persist('overview').as('overview-tab') }">
+<div
+    class="post-container"
+    x-data="{ tab: $persist('overview').as('post-tab') }"
+>
 
-    <!-- POST TOP NAVIGATION -->
-    <nav class="dashboard-nav">
-        <div class="dashboard-nav-title">
+    <!-- =========================================
+         POST HEADER
+    ========================================== -->
+
+    <nav class="post-header">
+
+        <div class="post-header-title">
             <h1>Post Management</h1>
         </div>
+
     </nav>
 
-    <!-- CONTENT WRAPPER (Includes both Nav Menu and Cards to keep identical layout width) -->
-    <div class="dashboard-layout px-12 pt-4 flex flex-col gap-4">
 
-        <!-- NAVIGATION MENU -->
-        <div class="dashboard-nav-menu">
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <div class="post-layout">
+
+        <!-- =====================================
+             DESKTOP TAB NAVIGATION
+        ====================================== -->
+
+        <div class="post-nav-menu post-desktop-nav">
+
+            <!-- OVERVIEW -->
             <a
                 href="#"
                 @click.prevent="tab = 'overview'"
                 :class="tab === 'overview' ? 'active' : ''"
             >
-                Overview
+                <span class="post-tab-icon">⌂</span>
+                <span class="post-tab-label">Overview</span>
             </a>
 
+
+            <!-- NEWS & UPDATE -->
             <a
                 href="#"
                 @click.prevent="tab = 'news'"
                 :class="tab === 'news' ? 'active' : ''"
             >
-                News & Update
+                <span class="post-tab-icon">▣</span>
+                <span class="post-tab-label">News & Update</span>
             </a>
 
+
+            <!-- TESTIMONIALS -->
             <a
                 href="#"
                 @click.prevent="tab = 'testimonials'"
                 :class="tab === 'testimonials' ? 'active' : ''"
             >
-                Testimonials
+                <span class="post-tab-icon">♡</span>
+                <span class="post-tab-label">Testimonials</span>
             </a>
+
         </div>
 
+
+        <!-- =====================================
+             TAB CONTENT
+        ====================================== -->
+
         <!-- OVERVIEW -->
-     <!-- OVERVIEW -->
         <div
             x-show="tab === 'overview'"
-            class="dashboard-main-card full-width-card"
+            x-cloak
+            class="post-main-card"
         >
-           <livewire:admin-pages.post.overview />
+            <livewire:admin-pages.post.overview />
         </div>
+
 
         <!-- NEWS -->
         <div
             x-show="tab === 'news'"
             x-cloak
-            class="dashboard-main-card full-width-card"
+            class="post-main-card"
         >
             <livewire:admin-pages.post.create-news-updates />
         </div>
+
 
         <!-- TESTIMONIALS -->
         <div
             x-show="tab === 'testimonials'"
             x-cloak
-            class="dashboard-main-card full-width-card"
+            class="post-main-card"
         >
             <livewire:admin-pages.post.manage-testimonials />
         </div>
 
+
     </div>
+
+
+    <!-- =========================================
+         MOBILE BOTTOM NAVIGATION
+    ========================================== -->
+
+    <template x-teleport="body">
+
+        <nav class="post-mobile-nav">
+
+            <!-- OVERVIEW -->
+            <a
+                href="#"
+                @click.prevent="tab = 'overview'"
+                :class="tab === 'overview' ? 'active' : ''"
+                aria-label="Overview"
+            >
+                <span class="post-mobile-icon">
+                    ⌂
+                </span>
+
+                <span class="post-mobile-label">
+                    Overview
+                </span>
+            </a>
+
+
+            <!-- NEWS -->
+            <a
+                href="#"
+                @click.prevent="tab = 'news'"
+                :class="tab === 'news' ? 'active' : ''"
+                aria-label="News & Update"
+            >
+                <span class="post-mobile-icon">
+                    ▣
+                </span>
+
+                <span class="post-mobile-label">
+                    News
+                </span>
+            </a>
+
+
+            <!-- TESTIMONIALS -->
+            <a
+                href="#"
+                @click.prevent="tab = 'testimonials'"
+                :class="tab === 'testimonials' ? 'active' : ''"
+                aria-label="Testimonials"
+            >
+                <span class="post-mobile-icon">
+                    ♡
+                </span>
+
+                <span class="post-mobile-label">
+                    Testimonials
+                </span>
+            </a>
+
+        </nav>
+
+    </template>
 
 </div>
 

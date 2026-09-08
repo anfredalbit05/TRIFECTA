@@ -1,0 +1,164 @@
+@reference "./app.css";
+
+/* =========================================================
+   MAINTENANCE PAGE
+========================================================= */
+
+.maintenance-body {
+    @apply bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200
+    text-slate-800
+    antialiased
+    selection:bg-[#D79B10] selection:text-white
+    min-h-screen
+    flex items-center justify-center
+    p-4 sm:p-6 lg:p-8;
+}
+
+
+/* =========================================================
+   CARD WRAPPER
+========================================================= */
+
+.maintenance-wrapper {
+    @apply w-full max-w-lg mx-auto
+    transform transition-all duration-500;
+}
+
+.maintenance-card {
+    @apply relative
+    rounded-3xl
+    bg-white/80
+    backdrop-blur-xl
+    p-8 sm:p-12
+    shadow-2xl
+    border border-white/60
+    text-center
+    overflow-hidden;
+}
+
+
+/* =========================================================
+   DECORATIVE BACKGROUND GLOW
+========================================================= */
+
+.maintenance-glow-top {
+    @apply absolute -top-24 -right-24
+    w-48 h-48
+    bg-[#0C2C6B]/10
+    rounded-full
+    blur-3xl
+    pointer-events-none;
+}
+
+.maintenance-glow-bottom {
+    @apply absolute -bottom-24 -left-24
+    w-48 h-48
+    bg-[#D79B10]/10
+    rounded-full
+    blur-3xl
+    pointer-events-none;
+}
+
+
+/* =========================================================
+   ANIMATED ICON
+========================================================= */
+
+.maintenance-icon-container {
+    @apply relative mx-auto
+    flex items-center justify-center
+    h-24 w-24 sm:h-28 sm:w-28
+    rounded-3xl
+    bg-gradient-to-tr from-amber-50 to-amber-100/80
+    border border-amber-200/60
+    shadow-lg shadow-amber-500/10
+    mb-8;
+}
+
+.maintenance-icon-pulse {
+    @apply absolute inset-0
+    rounded-3xl
+    bg-[#D79B10]/5;
+}
+
+.maintenance-icon-svg {
+    @apply h-12 w-12 sm:h-14 sm:w-14
+    text-[#D79B10]
+    relative z-10;
+}
+
+
+/* =========================================================
+   TITLE & DESCRIPTION
+========================================================= */
+
+.maintenance-text {
+    @apply space-y-3 relative z-10;
+}
+
+.maintenance-badge {
+    @apply inline-block
+    px-3.5 py-1
+    text-xs font-bold uppercase tracking-widest
+    text-[#0C2C6B]
+    bg-blue-50
+    border border-blue-100
+    rounded-full;
+}
+
+.maintenance-title {
+    @apply text-3xl sm:text-4xl
+    font-extrabold
+    text-[#0C2C6B]
+    tracking-tight;
+}
+
+.maintenance-description {
+    @apply text-sm sm:text-base
+    text-slate-600
+    leading-relaxed
+    max-w-md mx-auto;
+}
+
+
+/* =========================================================
+   FOOTER META
+========================================================= */
+
+.maintenance-footer {
+    @apply mt-8 pt-6
+    border-t border-slate-100
+    text-xs text-slate-400 font-medium
+    relative z-10;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.animate-float {
+    animation: float 3.5s ease-in-out infinite;
+}
+
+@keyframes pulse-subtle {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.animate-pulse-subtle {
+    animation: pulse-subtle 2.5s ease-in-out infinite;
+}

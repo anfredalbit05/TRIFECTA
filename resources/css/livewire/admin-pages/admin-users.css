@@ -1,0 +1,188 @@
+/* =============================================================
+   ADMIN USERS — Component Styles
+   All Tailwind utility classes from admin-users.blade.php,
+   extracted here and exposed as semantic classes via @apply.
+============================================================= */
+
+/* ---------- Header ---------- */
+.au-header { @apply flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6; }
+.au-title { @apply text-2xl font-bold text-slate-800; }
+.au-subtitle { @apply text-sm text-slate-500 mt-0.5; }
+.au-btn-add { @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer shadow bg-[#0C2C6B] text-white hover:bg-[#09204f] w-full sm:w-auto; }
+
+/* ---------- Icons ---------- */
+.au-icon { @apply w-5 h-5; }
+.au-icon-sm { @apply w-4 h-4 shrink-0; }
+
+/* ---------- Flash Messages ---------- */
+.au-alert-success { @apply mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-xl border border-green-200; }
+.au-alert-error { @apply mb-4 p-4 text-sm text-rose-700 bg-rose-100 rounded-xl border border-rose-200; }
+
+/* ---------- Toolbar (Search + Refresh) ---------- */
+.au-toolbar { @apply flex items-center justify-between gap-4 mb-6; }
+.au-search-wrap { @apply relative max-w-sm w-full; }
+.au-search-icon { @apply absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none; }
+.au-search-input { @apply w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm; }
+.au-btn-refresh { @apply inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer; }
+
+/* ---------- Users Table ---------- */
+.au-table-wrap { @apply overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm; }
+.au-table { @apply w-full text-left border-collapse; }
+.au-thead-row { @apply bg-[#0C2C6B] text-white text-xs uppercase; }
+.au-th { @apply py-3 px-4; }
+.au-th-center { @apply py-3 px-4 text-center; }
+.au-tbody { @apply divide-y divide-slate-200 text-sm; }
+.au-row { @apply hover:bg-slate-50; }
+.au-td { @apply py-4 px-4; }
+.au-td-name { @apply py-4 px-4 font-semibold; }
+.au-empty { @apply text-center py-8 text-slate-500; }
+
+/* Status Badges (table) */
+.au-badge-active { @apply px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-xs; }
+.au-badge-inactive { @apply px-3 py-1 rounded-md border border-amber-400 bg-amber-500 text-white text-xs; }
+
+/* Status Badges (modals, font-semibold variant) */
+.au-badge-active-lg { @apply px-3 py-1 rounded-md bg-[#0C2C6B] text-white text-xs font-semibold; }
+.au-badge-inactive-lg { @apply px-3 py-1 rounded-md border border-amber-400 bg-amber-500 text-white text-xs font-semibold; }
+.au-badge-danger-lg { @apply px-3 py-1 rounded-md border border-red-400 bg-red-500 text-white text-xs font-semibold; }
+
+/* ---------- Row Actions ---------- */
+.au-actions { @apply flex items-center justify-center space-x-2; }
+.au-action-btn { @apply cursor-pointer p-1.5 rounded-lg transition; }
+.au-action-blue { @apply text-blue-600 hover:bg-blue-50; }
+.au-action-emerald { @apply text-emerald-600 hover:bg-emerald-50; }
+.au-action-amber { @apply text-amber-600 hover:bg-amber-50; }
+.au-action-rose { @apply text-rose-600 hover:bg-rose-50; }
+.au-action-password { @apply cursor-pointer p-1.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition shadow-sm; }
+
+/* Withdrawal action buttons */
+.au-wd-pending { @apply inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow; }
+.au-wd-create { @apply inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow; }
+.au-wd-off { @apply inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-gray-400 text-xs font-semibold cursor-not-allowed; }
+
+/* ---------- Pagination ---------- */
+.au-pagination { @apply px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4; }
+.au-page-btn-disabled { @apply px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed; }
+.au-page-btn { @apply px-4 py-2 text-white rounded transition cursor-pointer; }
+.au-page-text { @apply text-sm text-gray-600; }
+
+/* ---------- Modal Shell ---------- */
+.au-modal-overlay { @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4; }
+.au-modal-box-md { @apply bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative border border-slate-100; }
+.au-modal-box-lg { @apply bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden relative border border-slate-100; }
+.au-modal-box-xl { @apply bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden relative border border-slate-100 max-h-[90vh] flex flex-col; }
+.au-modal-header { @apply bg-[#0C2C6B] px-6 py-4 flex items-center justify-between text-white shrink-0; }
+.au-modal-header-title-wrap { @apply flex items-center space-x-2; }
+.au-modal-title { @apply text-base font-bold uppercase tracking-wider; }
+.au-modal-close { @apply cursor-pointer text-white/80 hover:text-white text-xl font-bold transition; }
+.au-modal-body { @apply p-6 space-y-4 max-h-[75vh] overflow-y-auto; }
+.au-modal-body-lg { @apply p-6 space-y-6 max-h-[75vh] overflow-y-auto; }
+.au-modal-footer { @apply bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end space-x-2 shrink-0; }
+
+/* Footer buttons */
+.au-btn-secondary { @apply cursor-pointer px-4 py-2 bg-[#D79B10] text-white rounded-xl text-sm font-semibold hover:bg-[#BE850D] transition shadow-sm; }
+.au-btn-primary { @apply cursor-pointer px-4 py-2 bg-[#0B2A5B] text-white rounded-xl text-sm font-semibold hover:bg-[#081F45] transition shadow-sm; }
+
+/* ---------- Withdrawal Approval Modal ---------- */
+.au-detail-card { @apply bg-slate-50 border border-slate-200 rounded-xl p-3.5; }
+.au-detail-card-label { @apply block text-[11px] font-semibold text-gray-500 uppercase tracking-wider; }
+.au-detail-card-value { @apply mt-1 font-bold text-slate-800; }
+
+.au-pending-box { @apply bg-amber-50 border border-amber-200 rounded-xl p-4; }
+.au-pending-header { @apply flex items-center gap-2 mb-3; }
+.au-pending-title { @apply font-bold text-amber-800; }
+.au-pending-rows { @apply space-y-2 text-sm; }
+.au-pending-row { @apply flex justify-between gap-4; }
+.au-pending-label { @apply text-gray-500; }
+.au-pending-value { @apply font-bold text-slate-800 text-right; }
+.au-pending-value-sm { @apply font-semibold text-slate-800 text-right; }
+
+.au-info-box { @apply bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-900; }
+.au-info-flex { @apply flex items-start gap-2; }
+
+/* ---------- View User Modal ---------- */
+.au-profile-row { @apply flex items-center space-x-4 bg-slate-50 p-4 rounded-xl border border-slate-200; }
+.au-avatar { @apply w-14 h-14 rounded-full object-cover border border-slate-200 shadow-sm shrink-0; }
+.au-profile-info { @apply overflow-hidden; }
+.au-profile-name { @apply text-base font-bold text-slate-800 truncate; }
+.au-profile-username { @apply text-xs text-slate-500; }
+.au-profile-email { @apply text-xs text-slate-400 truncate; }
+
+.au-section-title { @apply text-xs font-bold text-[#0C2C6B] uppercase tracking-wider mb-3 pb-1 border-b border-slate-100 flex items-center space-x-1.5; }
+
+.au-detail-grid { @apply grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm; }
+.au-detail-item { @apply bg-slate-50/50 p-3 rounded-xl border border-slate-100; }
+.au-detail-item-full { @apply bg-slate-50/50 p-3 rounded-xl border border-slate-100 sm:col-span-2; }
+.au-detail-label { @apply block text-xs font-semibold text-slate-400 uppercase tracking-wide; }
+.au-detail-value { @apply font-medium text-slate-700; }
+.au-status-row { @apply bg-slate-50/50 p-3 rounded-xl border border-slate-100 sm:col-span-2 flex items-center justify-between; }
+.au-status-label { @apply text-xs font-semibold text-slate-400 uppercase tracking-wide; }
+
+/* ---------- Add / Edit User Modal ---------- */
+.au-form-grid { @apply grid grid-cols-1 sm:grid-cols-2 gap-4; }
+.au-form-label { @apply block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1; }
+.au-form-input { @apply w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm; }
+.au-form-select { @apply w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm cursor-pointer; }
+.au-form-error { @apply text-xs text-rose-500 font-semibold mt-1 block; }
+.au-col-span-2 { @apply sm:col-span-2; }
+
+.au-password-wrap { @apply relative; }
+.au-form-input-password { @apply w-full border border-slate-200 rounded-xl px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm; }
+.au-password-toggle { @apply absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer; }
+
+/* Birthdate Picker */
+.au-bday-wrap { @apply relative; }
+.au-bday-trigger { @apply w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm cursor-pointer flex items-center justify-between; }
+.au-bday-trigger-icon { @apply w-4 h-4 text-slate-400; }
+.au-bday-panel { @apply absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg p-3; }
+.au-bday-panel-header { @apply flex justify-between items-center mb-2 pb-2 border-b border-slate-100 text-xs font-bold text-[#0C2C6B]; }
+.au-bday-back { @apply text-slate-400 hover:text-slate-600; }
+.au-bday-grid-year { @apply grid grid-cols-4 gap-1 max-h-40 overflow-y-auto; }
+.au-bday-grid-month { @apply grid grid-cols-3 gap-1; }
+.au-bday-grid-day { @apply grid grid-cols-7 gap-1 max-h-40 overflow-y-auto; }
+.au-bday-item { @apply py-1 text-xs rounded hover:bg-slate-100 font-medium; }
+.au-bday-item-month { @apply py-2 text-xs rounded hover:bg-slate-100 font-medium; }
+.au-bday-item-active { @apply bg-[#0C2C6B] text-white hover:bg-[#0C2C6B]; }
+.au-bday-item-default { @apply text-slate-700; }
+
+/* ---------- User Access Modal ---------- */
+.au-access-subheader { @apply bg-slate-50 px-6 py-3 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shrink-0; }
+.au-access-user-wrap { @apply flex items-center space-x-3; }
+.au-avatar-circle { @apply w-10 h-10 rounded-full bg-[#0C2C6B] text-white flex items-center justify-center font-bold text-sm shadow-sm shrink-0; }
+.au-access-user-name { @apply text-sm font-bold text-slate-800; }
+.au-role-badge { @apply inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 shadow-sm self-start sm:self-auto; }
+.au-role-badge-label { @apply text-slate-400 uppercase tracking-wide text-[10px]; }
+
+.au-access-body { @apply overflow-y-auto flex-1 p-6; }
+.au-access-table-wrap { @apply border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm; }
+.au-access-table { @apply w-full text-left border-collapse text-sm; }
+.au-access-thead-row { @apply bg-slate-100 text-xs text-slate-600 uppercase border-b border-slate-200 font-semibold tracking-wider; }
+.au-access-th { @apply py-3 px-4; }
+.au-access-th-center { @apply py-3 px-3 text-center; }
+.au-access-tbody { @apply divide-y divide-slate-100; }
+.au-access-row { @apply hover:bg-slate-50/80 transition; }
+.au-access-module-td { @apply py-3.5 px-4 font-medium text-slate-700 flex items-center space-x-2.5; }
+.au-access-perm-td { @apply py-3.5 px-3 text-center; }
+.au-checkbox { @apply cursor-pointer rounded border-slate-300 text-[#0C2C6B] focus:ring-[#0C2C6B] w-4 h-4; }
+
+/* ---------- Delete Confirmation Modal ---------- */
+.au-delete-close { @apply absolute top-4 right-4 cursor-pointer text-slate-400 hover:text-slate-600 text-xl font-bold transition z-10; }
+.au-delete-body { @apply p-6 pt-8 text-center space-y-4; }
+.au-delete-icon-wrap { @apply w-16 h-16 bg-[#FFF8E7] text-[#D79B10] rounded-2xl flex items-center justify-center mx-auto shadow-sm border border-[#D79B10]/30 rotate-3; }
+.au-delete-icon { @apply w-8 h-8; }
+.au-delete-text-wrap { @apply space-y-1; }
+.au-delete-title { @apply text-lg font-bold text-slate-800; }
+.au-delete-message { @apply text-sm text-slate-500 leading-relaxed px-2; }
+.au-delete-footer { @apply bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-end space-x-2; }
+
+/* ---------- SweetAlert2 "Set New Password" injected markup ---------- */
+/* Note: `.swal-pw-toggle` must stay as-is — it's used by the JS
+   querySelector to wire up the show/hide password click handler. */
+.au-swal-intro { @apply m-0 mb-3.5 text-[13px] leading-relaxed text-slate-600; }
+.au-swal-field { @apply mb-3; }
+.au-swal-field-last { @apply mb-3.5; }
+.au-swal-label { @apply block mb-1.5 text-xs font-bold text-slate-700; }
+.au-swal-input-wrap { @apply relative; }
+.au-swal-input { @apply w-full border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:border-[#0B2A5B] focus:outline-none transition; }
+.au-swal-toggle-btn { @apply absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer; }
+.au-swal-hint { @apply m-0 text-[11px] leading-relaxed text-slate-500; }

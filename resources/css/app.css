@@ -1,75 +1,59 @@
-@import "tailwindcss";
-@import 'flatpickr/dist/flatpickr.min.css';
+/* =========================================================
+   TAILWIND
+========================================================= */
 
-/* Define the custom utility first so component files can @apply it */
 @import "tailwindcss";
-@import 'flatpickr/dist/flatpickr.min.css';
 
-/* Define field-base globally so component files can @apply it */
-/* Define the custom utility so Tailwind v4 recognizes it */
+
+/* =========================================================
+   THIRD-PARTY LIBRARIES
+========================================================= */
+
+@import "flatpickr/dist/flatpickr.min.css";
+
+
+/* =========================================================
+   CUSTOM UTILITIES
+========================================================= */
+
+/* Button base utility */
 @utility btn-base {
-  @apply px-4 text-white py-2 font-semibold rounded-lg; /* Update these styles to match your design */
+    @apply px-4 py-2 rounded-lg font-semibold text-white;
 }
 
+
+/* Form field base utility */
 @utility field-base {
-  @apply w-full rounded-xl border border-slate-300 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-100;
+    @apply w-full rounded-xl border border-slate-300
+        px-3.5 py-2.5
+        text-xs sm:px-4 sm:py-3 sm:text-sm
+        outline-none transition
+        focus:border-slate-500
+        focus:ring-4 focus:ring-slate-100;
 }
-/* Component imports follow below */
-/*Root Admin */
-@import "./components/home/hero.css";
-@import "./components/home/details.css";
-@import "./livewire/landing-page/testimonials.css";
-@import "./livewire/landing-page/how-it-works.css";
-@import "./livewire/landing-page/about.css";
-@import "./livewire/landing-page/new.css";
-@import "./livewire/landing-page/contact.css";
-@import "./livewire/landing-page/team.css";
-
-/*Member Pages */
-@import "./pages/member-pages/sidebar.css";
-@import "./pages/member-pages/dashboard.css";
-@import "./pages/member-pages/masterlist.css";
-@import "./pages/member-pages/post.css";
-@import "./pages/member-pages/report-setting.css";
-@import "./pages/member-pages/genealogy-tree.css";
-
-/*Member Pages Dashbord Components*/
-@import "./components/member-pages/dashboard/members.css";
-@import "./components/member-pages/dashboard/overview.css";
 
 
-/*Member Pages Masterlist Components*/
-@import "./components/member-pages/masterlist/overview.css";
-@import "./components/member-pages/masterlist/members.css";
-@import "./components/member-pages/masterlist/inquires.css";
-@import "./components/member-pages/masterlist/branches.css";
-@import "./components/member-pages/masterlist/benefits.css";
-
-
-/*Member Pages Post Components*/
-@import "./components/member-pages/post/overview.css";
-@import "./components/member-pages/post/news-updates.css";
-@import "./components/member-pages/post/testimonials.css";
-
-
-/*Member Pages Report & Settings Components*/
-@import "./components/member-pages/report-settings/overview.css";
-@import "./components/member-pages/report-settings/general.css";
-@import "./components/member-pages/report-settings/user-accounts.css";
-@import "./components/member-pages/report-settings/reports.css";
-
-/* My Profile Pages Liviwire */
-
-@import "./livewire/member-pages/my-profile/my-profile.css";
-
-@import "./livewire/member-pages/genealogy/genealogy.css";
+/* =========================================================
+   THEME
+========================================================= */
 
 @theme {
 
-    --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+    /* -----------------------------------------------------
+       Font
+    ----------------------------------------------------- */
+
+    --font-sans:
+        "Instrument Sans",
+        ui-sans-serif,
+        system-ui,
+        sans-serif;
 
 
-    /* Brand Colors */
+    /* -----------------------------------------------------
+       Brand Colors
+    ----------------------------------------------------- */
+
     --color-brand-navy: #0B2A5B;
     --color-brand-navy-dark: #071D3F;
     --color-brand-navy-light: #163E7A;
@@ -79,10 +63,124 @@
     --color-brand-gold-dark: #A87800;
 
 
-    /* Accent */
+    /* -----------------------------------------------------
+       Accent
+    ----------------------------------------------------- */
+
     --color-accent: var(--color-brand-gold);
     --color-accent-content: var(--color-brand-navy);
     --color-accent-foreground: #FFFFFF;
-
-
 }
+
+
+/* =========================================================
+   ROOT ADMIN
+========================================================= */
+
+/* Home */
+@import "./components/home/hero.css";
+@import "./components/home/details.css";
+
+
+/* Landing Page */
+@import "./livewire/landing-page/testimonials.css";
+@import "./livewire/landing-page/how-it-works.css";
+@import "./livewire/landing-page/about.css";
+@import "./livewire/landing-page/new.css";
+@import "./livewire/landing-page/contact.css";
+@import "./livewire/landing-page/team.css";
+
+
+/* =========================================================
+   MEMBER PAGES
+========================================================= */
+
+/* ---------------------------------------------------------
+   Member Page Layout
+--------------------------------------------------------- */
+
+@import "./pages/member-pages/sidebar.css";
+@import "./pages/member-pages/masterlist.css";
+@import "./pages/member-pages/genealogy.css";
+@import "./pages/member-pages/genealogy-tree.css";
+@import "./pages/member-pages/genealogy/board-member.css";
+
+
+/* ---------------------------------------------------------
+   Member Page Components — Dashboard
+--------------------------------------------------------- */
+
+@import "./components/member-pages/dashboard/members.css";
+@import "./components/member-pages/dashboard/overview.css";
+
+
+/* ---------------------------------------------------------
+   Member Page Components — Masterlist
+--------------------------------------------------------- */
+
+@import "./components/member-pages/masterlist/overview.css";
+@import "./components/member-pages/masterlist/members.css";
+@import "./components/member-pages/masterlist/inquires.css";
+@import "./components/member-pages/masterlist/branches.css";
+@import "./components/member-pages/masterlist/benefits.css";
+
+
+/* ---------------------------------------------------------
+   Member Page Components — Post
+--------------------------------------------------------- */
+
+@import "./components/member-pages/post/overview.css";
+@import "./components/member-pages/post/news-updates.css";
+@import "./components/member-pages/post/testimonials.css";
+
+
+/* ---------------------------------------------------------
+   Member Page Components — Report & Settings
+--------------------------------------------------------- */
+
+@import "./components/member-pages/report-settings/overview.css";
+@import "./components/member-pages/report-settings/general.css";
+@import "./components/member-pages/report-settings/user-accounts.css";
+@import "./components/member-pages/report-settings/reports.css";
+
+
+/* ---------------------------------------------------------
+   Member Page Components — My Profile
+--------------------------------------------------------- */
+
+@import "./livewire/member-pages/my-profile/my-profile.css";
+
+
+/* ---------------------------------------------------------
+   Member Page Components — Genealogy
+--------------------------------------------------------- */
+
+@import "./livewire/member-pages/genealogy/genealogy.css";
+
+
+/* =========================================================
+   ADMIN PAGES
+========================================================= */
+
+/* ---------------------------------------------------------
+   Admin Page Layout
+--------------------------------------------------------- */
+
+@import "./pages/admin-pages/masterlist.css";
+@import "./pages/admin-pages/post.css";
+@import "./pages/admin-pages/report-settings.css";
+
+
+/* ---------------------------------------------------------
+   Admin Page Components
+--------------------------------------------------------- */
+
+@import "./livewire/admin-pages/admin-users.css";
+
+
+/* =========================================================
+   SHARE PAGES
+========================================================= */
+
+@import "./pages/share-pages/dashboard.css";
+@import "./pages/share-pages/my-profile.css";

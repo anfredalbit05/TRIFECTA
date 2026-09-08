@@ -1,157 +1,12 @@
-/* =========================================
-   GENEALOGY PAGE LAYOUT
-========================================= */
-
-.genealogy-container {
-    @apply w-full min-h-screen;
-}
-
-
-/* =========================================
-   PAGE LAYOUT
-========================================= */
-
-.genealogy-layout {
-    @apply w-full
-    min-w-0
-    px-12
-    pt-4
-    pb-6
-    flex
-    flex-col
-    gap-4;
-}
-
-
-/* =========================================
-   GENEALOGY NAVIGATION
-========================================= */
-
-.genealogy-nav {
-    @apply sticky
-    top-0
-    z-30
-    w-full
-    mt-0
-    mb-2
-    overflow-hidden;
-}
-
-
-/* =========================================
-   BLUE TITLE BAR
-========================================= */
-
-.genealogy-nav-title {
-    @apply flex
-    items-center
-    justify-center
-    bg-[#0C2C6B]
-    py-3;
-}
-
-.genealogy-nav-title h1 {
-    @apply text-xl
-    font-bold
-    text-white;
-}
-
-
-/* =========================================
-   TAB NAVIGATION
-========================================= */
-
-.genealogy-nav-menu {
-    @apply sticky
-    top-[78px]
-    md:top-[65px]
-    z-20
-    w-full
-    flex
-    flex-wrap
-    items-center
-    justify-start
-    gap-3
-    bg-white
-    rounded-xl
-    shadow-md
-    mt-4
-    md:mt-0
-    px-5
-    py-3;
-}
-
-
-/* =========================================
-   TAB BUTTON
-========================================= */
-
-.genealogy-nav-menu button {
-    @apply rounded-lg
-    px-4
-    py-2
-    text-sm
-    font-semibold
-    text-gray-500
-    transition-all
-    duration-200;
-}
-
-.genealogy-nav-menu button:hover {
-    @apply bg-gray-100
-    text-[#0C2C6B];
-}
-
-
-/* =========================================
-   ACTIVE TAB
-========================================= */
-
-.genealogy-nav-menu button.active {
-    @apply bg-[#0C2C6B]
-    text-white
-    shadow-sm;
-}
-
-
-/* =========================================
-   TAB CONTENT
-========================================= */
-
-.genealogy-tab-content {
-    @apply w-full min-w-0;
-}
-
-
-/* =========================================
-   ALPINE CLOAK
-========================================= */
-
-[x-cloak] {
-    display: none !important;
-}
-
-
-/* =========================================
+/* =========================================================
    GENEALOGY EXPLORER
-========================================= */
+========================================================= */
 
 .genealogy-explorer {
-    @apply w-full
-    min-w-0
-    overflow-y-auto
-    overflow-x-hidden
-    rounded-2xl
-    border
-    border-slate-200
-    bg-[#F8FAFC]
-    shadow-sm;
-
+    @apply w-full min-w-0 overflow-y-auto overflow-x-hidden rounded-2xl border border-slate-200 bg-[#F8FAFC] shadow-sm;
     max-height: calc(100vh - 176px);
-
     scroll-behavior: smooth;
     overscroll-behavior: contain;
-
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -160,246 +15,102 @@
     display: none;
 }
 
-
-/* =========================================
-   EXPLORER HEADER
-========================================= */
-
 .genealogy-explorer-header {
-    @apply sticky
-    top-0
-    z-10
-    flex
-    flex-col
-    gap-4
-    border-b
-    border-slate-200
-    bg-white
-    px-4
-    py-5
-    sm:flex-row
-    sm:items-center
-    sm:justify-between
-    sm:px-6;
+    @apply sticky top-0 z-10 flex flex-col gap-4 border-b border-slate-200 bg-white px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6;
 }
 
 .genealogy-explorer-title {
-    @apply text-xl
-    font-bold
-    tracking-tight
-    text-[#0C2C6B]
-    sm:text-2xl;
+    @apply text-xl font-bold tracking-tight text-[#0C2C6B] sm:text-2xl;
 }
 
 .genealogy-explorer-subtitle {
-    @apply mt-1
-    text-sm
-    leading-relaxed
-    text-slate-500;
+    @apply mt-1 text-sm leading-relaxed text-slate-500;
 }
 
 
-/* =========================================
+/* =========================================================
    BACK TO ROOT BUTTON
-========================================= */
+========================================================= */
 
 .genealogy-back-root {
-    @apply inline-flex
-    w-full
-    shrink-0
-    items-center
-    justify-center
-    gap-2
-    rounded-xl
-    bg-[#0C2C6B]
-    px-4
-    py-2.5
-    text-sm
-    font-semibold
-    text-white
-    shadow-sm
-    transition-all
-    duration-200
-    hover:-translate-y-0.5
-    hover:bg-[#123c88]
-    hover:shadow-md
-    active:translate-y-0
-    sm:w-auto;
+    @apply inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[#0C2C6B] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#123c88] hover:shadow-md active:translate-y-0 sm:w-auto;
 }
 
 
-/* =========================================
+/* =========================================================
    GENERATION SECTION
-========================================= */
+========================================================= */
 
 .generation-section {
-    @apply relative
-    w-full
-    min-w-0
-    px-4
-    py-6
-    sm:px-6
-    sm:py-8;
+    @apply relative w-full min-w-0 px-4 py-6 sm:px-6 sm:py-8;
 }
-
-
-/* =========================================
-   GENERATION SEPARATOR
-========================================= */
 
 .generation-section:not(.generation-root) {
-    @apply border-t
-    border-slate-200;
+    @apply border-t border-slate-200;
 }
-
-
-/* =========================================
-   NESTED GENERATIONS
-========================================= */
 
 .generation-section .generation-section {
-    @apply px-0
-    pt-8
-    pb-0;
+    @apply px-0 pt-8 pb-0;
 }
 
-
-/* =========================================
-   GENERATION HEADER
-========================================= */
-
 .generation-heading {
-    @apply relative
-    z-[1]
-    mb-5
-    flex
-    items-center
-    gap-3;
+    @apply relative z-[1] mb-5 flex items-center gap-3;
 }
 
 .generation-number {
-    @apply flex
-    h-11
-    w-11
-    shrink-0
-    items-center
-    justify-center
-    rounded-xl
-    bg-[#0C2C6B]
-    text-sm
-    font-bold
-    text-white
-    shadow-sm;
+    @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#0C2C6B] text-sm font-bold text-white shadow-sm;
 }
 
 .generation-heading h3 {
-    @apply text-base
-    font-bold
-    text-slate-800
-    sm:text-lg;
+    @apply text-base font-bold text-slate-800 sm:text-lg;
 }
 
 .generation-heading p {
-    @apply mt-0.5
-    text-xs
-    text-slate-500
-    sm:text-sm;
+    @apply mt-0.5 text-xs text-slate-500 sm:text-sm;
 }
-
-
-/* =========================================
-   ROOT GENERATION
-========================================= */
 
 .generation-root {
-    @apply relative
-    bg-gradient-to-b
-    from-blue-50/60
-    via-white
-    to-transparent;
+    @apply relative bg-gradient-to-b from-blue-50/60 via-white to-transparent;
 }
 
 
-/* =========================================
+/* =========================================================
    ROOT MEMBER
-========================================= */
+========================================================= */
 
 .root-member-wrapper {
-    @apply flex
-    w-full
-    min-w-0
-    justify-center;
+    @apply flex w-full min-w-0 justify-center;
 }
 
 .root-member-card {
-    @apply w-full
-    max-w-2xl
-    border-[#0C2C6B]
-    bg-white
-    shadow-md
-    ring-1
-    ring-blue-100;
+    @apply w-full max-w-2xl border-[#0C2C6B] bg-white shadow-md ring-1 ring-blue-100;
 }
 
 
-/* =========================================
+/* =========================================================
    MEMBER GRID
-========================================= */
+========================================================= */
 
 .generation-grid {
-    @apply grid
-    w-full
-    min-w-0
-    grid-cols-1
-    gap-4
-    sm:grid-cols-2
-    xl:grid-cols-3
-    2xl:grid-cols-4;
+    @apply grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4;
 }
 
 
-/* =========================================
+/* =========================================================
    MEMBER CARD
-========================================= */
+========================================================= */
 
 .member-card {
-    @apply relative
-    flex
-    min-w-0
-    flex-col
-    overflow-hidden
-    rounded-xl
-    border
-    border-slate-200
-    bg-white
-    shadow-sm
-    transition-all
-    duration-200;
+    @apply relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-200;
 }
 
 .member-card:hover {
-    @apply -translate-y-1
-    border-blue-200
-    shadow-lg;
+    @apply -translate-y-1 border-blue-200 shadow-lg;
 }
-
-
-/* =========================================
-   CARD TOP ACCENT
-========================================= */
 
 .member-card::before {
     content: "";
-
-    @apply absolute
-    inset-x-0
-    top-0
-    z-10
-    h-1
-    bg-[#0C2C6B]
-    opacity-0
-    transition-opacity
-    duration-200;
+    @apply absolute inset-x-0 top-0 z-10 h-1 bg-[#0C2C6B] opacity-0 transition-opacity duration-200;
 }
 
 .member-card:hover::before {
@@ -410,214 +121,95 @@
     @apply opacity-100;
 }
 
-
-/* =========================================
-   MEMBER CARD TOP
-========================================= */
-
 .member-card-top {
-    @apply relative
-    flex
-    min-w-0
-    items-start
-    gap-3
-    p-4;
+    @apply relative flex min-w-0 items-start gap-3 p-4;
 }
 
-
-/* =========================================
-   MEMBER AVATAR
-========================================= */
-
 .member-avatar {
-    @apply flex
-    h-11
-    w-11
-    shrink-0
-    items-center
-    justify-center
-    rounded-full
-    bg-gradient-to-br
-    from-[#0C2C6B]
-    to-[#174EA6]
-    text-base
-    font-bold
-    text-white
-    shadow-sm;
+    @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#0C2C6B] to-[#174EA6] text-base font-bold text-white shadow-sm;
 }
 
 .root-member-card .member-avatar {
-    @apply h-12
-    w-12
-    ring-4
-    ring-blue-50;
+    @apply h-12 w-12 ring-4 ring-blue-50;
 }
 
-
-/* =========================================
-   MEMBER INFORMATION
-========================================= */
-
 .member-info {
-    @apply min-w-0
-    flex-1;
+    @apply min-w-0 flex-1;
 }
 
 .member-label {
-    @apply mb-1
-    block
-    text-[10px]
-    font-bold
-    uppercase
-    tracking-widest
-    text-slate-400;
+    @apply mb-1 block text-[10px] font-bold uppercase tracking-widest text-slate-400;
 }
 
 .member-info h4 {
-    @apply truncate
-    text-sm
-    font-bold
-    text-slate-800
-    sm:text-base;
+    @apply truncate text-sm font-bold text-slate-800 sm:text-base;
 }
 
 .member-info p {
-    @apply mt-1
-    truncate
-    text-xs
-    text-slate-500;
+    @apply mt-1 truncate text-xs text-slate-500;
 }
 
 .member-info p strong {
-    @apply font-semibold
-    text-slate-700;
+    @apply font-semibold text-slate-700;
 }
 
 
-/* =========================================
+/* =========================================================
    MEMBER STATUS
-========================================= */
+========================================================= */
 
 .member-status {
-    @apply shrink-0
-    whitespace-nowrap
-    rounded-full
-    px-2.5
-    py-1
-    text-[10px]
-    font-bold
-    uppercase
-    tracking-wide;
+    @apply shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide;
 }
 
 .member-status.is-active {
-    @apply border
-    border-green-200
-    bg-green-50
-    text-green-700;
+    @apply border border-green-200 bg-green-50 text-green-700;
 }
 
 .member-status.is-pending {
-    @apply border
-    border-amber-200
-    bg-amber-50
-    text-amber-700;
+    @apply border border-amber-200 bg-amber-50 text-amber-700;
 }
 
 .member-status.is-inactive {
-    @apply border
-    border-slate-200
-    bg-slate-100
-    text-slate-600;
+    @apply border border-slate-200 bg-slate-100 text-slate-600;
 }
 
 
-/* =========================================
-   CARD FOOTER
-========================================= */
+/* =========================================================
+   MEMBER CARD FOOTER
+========================================================= */
 
 .member-card-footer {
-    @apply mt-auto
-    flex
-    min-w-0
-    items-center
-    justify-between
-    gap-3
-    border-t
-    border-slate-100
-    bg-slate-50/80
-    px-4
-    py-3;
+    @apply mt-auto flex min-w-0 items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/80 px-4 py-3;
 }
 
 .member-card-footer > div {
-    @apply flex
-    min-w-0
-    items-center
-    gap-2;
+    @apply flex min-w-0 items-center gap-2;
 }
 
 .member-card-footer > div span {
-    @apply whitespace-nowrap
-    text-xs
-    text-slate-500;
+    @apply whitespace-nowrap text-xs text-slate-500;
 }
 
 .member-card-footer > div strong {
-    @apply flex
-    min-w-[30px]
-    shrink-0
-    items-center
-    justify-center
-    rounded-md
-    bg-white
-    px-2
-    py-1
-    text-xs
-    font-bold
-    text-[#0C2C6B]
-    shadow-sm
-    ring-1
-    ring-slate-100;
+    @apply flex min-w-[30px] shrink-0 items-center justify-center rounded-md bg-white px-2 py-1 text-xs font-bold text-[#0C2C6B] shadow-sm ring-1 ring-slate-100;
 }
 
 
-/* =========================================
+/* =========================================================
    EXPLORE BUTTON
-========================================= */
+========================================================= */
 
 .member-explore-btn {
-    @apply inline-flex
-    shrink-0
-    items-center
-    justify-center
-    gap-1.5
-    whitespace-nowrap
-    rounded-lg
-    border
-    border-blue-100
-    bg-white
-    px-3
-    py-2
-    text-xs
-    font-semibold
-    text-[#0C2C6B]
-    shadow-sm
-    transition-all
-    duration-200;
+    @apply inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-blue-100 bg-white px-3 py-2 text-xs font-semibold text-[#0C2C6B] shadow-sm transition-all duration-200;
 }
 
 .member-explore-btn:hover {
-    @apply border-[#0C2C6B]
-    bg-[#0C2C6B]
-    text-white
-    shadow-md;
+    @apply border-[#0C2C6B] bg-[#0C2C6B] text-white shadow-md;
 }
 
 .member-explore-btn span {
-    @apply text-sm
-    transition-transform
-    duration-200;
+    @apply text-sm transition-transform duration-200;
 }
 
 .member-explore-btn:hover span {
@@ -625,624 +217,219 @@
 }
 
 
-/* =========================================
+/* =========================================================
    EMPTY STATE
-========================================= */
+========================================================= */
 
 .genealogy-empty {
-    @apply flex
-    min-h-[400px]
-    flex-col
-    items-center
-    justify-center
-    px-5
-    py-12
-    text-center;
+    @apply flex min-h-[400px] flex-col items-center justify-center px-5 py-12 text-center;
 }
 
 .genealogy-empty-icon {
-    @apply mb-4
-    flex
-    h-20
-    w-20
-    items-center
-    justify-center
-    rounded-2xl
-    bg-blue-50
-    text-4xl
-    shadow-sm;
+    @apply mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-50 text-4xl shadow-sm;
 }
 
 .genealogy-empty h3 {
-    @apply text-lg
-    font-bold
-    text-slate-800;
+    @apply text-lg font-bold text-slate-800;
 }
 
 .genealogy-empty p {
-    @apply mt-2
-    max-w-sm
-    text-sm
-    leading-relaxed
-    text-slate-500;
+    @apply mt-2 max-w-sm text-sm leading-relaxed text-slate-500;
 }
 
 
-/* =========================================
-   BOARD PANEL
-========================================= */
-
-.board-panel {
-    @apply w-full
-    min-w-0
-    overflow-hidden
-    rounded-2xl
-    border
-    border-slate-200
-    bg-[#F8FAFC]
-    shadow-sm;
-
-    height: calc(100vh - 176px);
-    max-height: calc(100vh - 176px);
-
-    display: flex;
-    flex-direction: column;
-}
-
-
-/* =========================================
-   BOARD HEADER
-========================================= */
-
-.board-header {
-    @apply sticky
-    top-0
-    z-10
-    flex
-    flex-col
-    gap-4
-    border-b
-    border-slate-200
-    bg-white
-    px-4
-    py-5
-    sm:flex-row
-    sm:items-center
-    sm:justify-between
-    sm:px-6;
-}
-
-.board-title {
-    @apply m-0
-    text-xl
-    font-bold
-    tracking-tight
-    text-[#0C2C6B]
-    sm:text-2xl;
-}
-
-.board-subtitle {
-    @apply mt-1
-    mb-0
-    text-sm
-    leading-relaxed
-    text-slate-500;
-}
-
-
-/* =========================================
-   BOARD TREE
-   MAIN SCROLL AREA
-========================================= */
-
-.board-tree {
-    @apply flex-1
-    min-h-0
-    w-full
-    overflow-auto
-    bg-[#F8FAFC];
-
-    scroll-behavior: smooth;
-    overscroll-behavior: contain;
-}
-
-
-/* =========================================
-   BOARD TREE INNER
-========================================= */
-
-.board-tree-inner {
-    @apply min-w-max
-    px-12
-    py-10;
-
-    width: max-content;
-}
-
-
-/* =========================================
-   BOARD STRUCTURE
-========================================= */
-
-.board-level {
-    @apply flex
-    flex-col
-    items-center
-    justify-center;
-}
-
-
-/* =========================================
-   BOARD CARD
-========================================= */
-
-.board-card {
-    @apply flex
-    w-[260px]
-    flex-col
-    items-center
-    rounded-xl
-    border-2
-    border-t-4
-    bg-white
-    px-5
-    py-4
-    text-center
-    shadow-sm;
-}
-
-
-/* =========================================
-   BOARD CONNECTOR
-========================================= */
-
-.board-connector {
-    width: 2px;
-    height: 28px;
-
-    background-color: #94A3B8;
-}
-
-
-/* =========================================
-   CONNECTOR TO BOARD MEMBERS
-========================================= */
-
-.board-connector-line {
-    @apply relative
-    mx-auto
-    w-full;
-
-    height: 55px;
-}
-
-.board-connector-line__v:first-child {
-    position: absolute;
-
-    top: 0;
-    left: 50%;
-
-    width: 2px;
-    height: 25px;
-
-    transform: translateX(-50%);
-
-    background-color: #94A3B8;
-}
-
-.board-connector-line__h {
-    position: absolute;
-
-    top: 25px;
-    left: 12.5%;
-
-    width: 75%;
-    height: 2px;
-
-    background-color: #94A3B8;
-}
-
-.board-connector-line__v:last-child {
-    position: absolute;
-
-    top: 25px;
-    left: 50%;
-
-    width: 2px;
-    height: 30px;
-
-    transform: translateX(-50%);
-
-    background-color: #94A3B8;
-}
-
-
-/* =========================================
-   BOARD MEMBERS GRID
-========================================= */
-
-.board-grid {
-    @apply grid
-    w-full
-    gap-6;
-
-    min-width: 850px;
-}
-
-
-/* =====================================================
-   VISUAL TREE
-   RECURSIVE UNLIMITED GENEALOGY STRUCTURE
-===================================================== */
-
-
-/* =========================================
-   TREE ROOT / NODE WRAPPER
-========================================= */
+/* =========================================================
+   VISUAL TREE — RECURSIVE UNLIMITED GENEALOGY STRUCTURE
+========================================================= */
 
 .node-wrap {
     position: relative;
-
     display: flex;
     flex-direction: column;
     align-items: center;
-
     width: max-content;
     min-width: 160px;
-
     flex: 0 0 auto;
-
     box-sizing: border-box;
 }
-
-
-/* =========================================
-   NODE CARD
-========================================= */
 
 .node-card {
     position: relative;
     z-index: 5;
-
     width: 150px;
     min-height: 74px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
     padding: 9px 12px;
-
     background: #ffffff;
-
     border: 1.5px solid #8FAFE0;
     border-radius: 8px;
-
-    box-shadow:
-        0 2px 5px rgba(15, 23, 42, 0.06);
-
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.06);
     box-sizing: border-box;
-
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        border-color 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .node-card:hover {
     transform: translateY(-2px);
-
     border-color: #0C2C6B;
-
-    box-shadow:
-        0 5px 12px rgba(15, 23, 42, 0.10);
+    box-shadow: 0 5px 12px rgba(15, 23, 42, 0.10);
 }
-
-
-/* =========================================
-   ACTIVE NODE
-========================================= */
 
 .node-card--active {
     border-color: #2563EB;
-
-    box-shadow:
-        0 0 0 2px rgba(37, 99, 235, 0.08),
-        0 3px 8px rgba(15, 23, 42, 0.06);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08), 0 3px 8px rgba(15, 23, 42, 0.06);
 }
-
-
-/* =========================================
-   NODE AVATAR
-========================================= */
 
 .node-avatar {
     width: 22px;
     height: 22px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     margin-bottom: 5px;
-
     border-radius: 999px;
-
     background: #EFF6FF;
-
     color: #2563EB;
-
     font-size: 9px;
     font-weight: 700;
-
     flex-shrink: 0;
 }
 
-
-/* =========================================
-   NODE NAME
-========================================= */
-
 .node-name {
     display: block;
-
     width: 100%;
-
     overflow: hidden;
-
     white-space: nowrap;
     text-overflow: ellipsis;
-
     text-align: center;
-
     color: #334155;
-
     font-size: 9px;
     font-weight: 600;
-
     line-height: 1.25;
 }
 
-
-/* =========================================
-   NODE REFERENCE
-========================================= */
-
 .node-ref {
     display: block;
-
     width: 100%;
-
     margin-top: 3px;
-
     overflow: hidden;
-
     white-space: nowrap;
     text-overflow: ellipsis;
-
     text-align: center;
-
     color: #94A3B8;
-
     font-size: 7px;
-
     line-height: 1.2;
 }
-
-
-/* =========================================
-   LINE FROM PARENT ABOVE
-========================================= */
 
 .node-top-line {
     width: 2px;
     height: 26px;
-
     background-color: #A8B7CC;
-
     flex-shrink: 0;
 }
-
-
-/* =========================================
-   PARENT → CHILDREN STEM
-========================================= */
 
 .node-children-stem {
     width: 2px;
     height: 30px;
-
     background-color: #A8B7CC;
-
     flex-shrink: 0;
 }
 
-
-/* =========================================
-   CHILDREN ROW
-========================================= */
-
 .node-children-row {
     position: relative;
-
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: flex-start;
     justify-content: center;
-
     width: max-content;
-
     flex: 0 0 auto;
-
     box-sizing: border-box;
 }
-
-
-/* =========================================
-   INDIVIDUAL CHILD BRANCH
-========================================= */
 
 .node-child {
     position: relative;
-
     display: flex;
     flex-direction: column;
     align-items: center;
-
     width: max-content;
     min-width: 160px;
-
     padding-left: 18px;
     padding-right: 18px;
-
     flex: 0 0 auto;
-
     box-sizing: border-box;
 }
 
-
-/* =========================================
-   HORIZONTAL CONNECTOR
-========================================= */
-
 .node-horizontal-bar {
     position: absolute;
-
     top: 0;
     left: 0;
     right: 0;
-
     height: 2px;
-
     background-color: #A8B7CC;
-
     z-index: 1;
 }
 
-
-/* =========================================
-   MASK OUTSIDE FIRST CHILD CENTER
-
-   This prevents the horizontal line from
-   extending before the first child.
-========================================= */
-
 .node-child:first-child::before {
     content: "";
-
     position: absolute;
-
     top: -1px;
     left: 0;
-
     width: 50%;
     height: 4px;
-
     background: #F8FAFC;
-
     z-index: 2;
 }
-
-
-/* =========================================
-   MASK OUTSIDE LAST CHILD CENTER
-
-   This prevents the horizontal line from
-   extending after the last child.
-========================================= */
 
 .node-child:last-child::after {
     content: "";
-
     position: absolute;
-
     top: -1px;
     right: 0;
-
     width: 50%;
     height: 4px;
-
     background: #F8FAFC;
-
     z-index: 2;
 }
-
-
-/* =========================================
-   CHILD VERTICAL CONNECTOR
-========================================= */
 
 .node-child-line {
     position: relative;
     z-index: 3;
-
     width: 2px;
     height: 28px;
-
     background-color: #A8B7CC;
-
     flex-shrink: 0;
 }
-
-
-/* =========================================
-   MOBILE STUB
-   Hide unless needed by existing markup
-========================================= */
 
 .node-mobile-stub {
     display: none;
 }
 
-
-/* =========================================
-   SINGLE CHILD FIX
-========================================= */
-
-.node-children-row:has(.node-child:only-child)
-.node-horizontal-bar {
+.node-children-row:has(.node-child:only-child) .node-horizontal-bar {
     display: none;
 }
-
-
-/* =========================================
-   SINGLE CHILD CENTERING
-========================================= */
 
 .node-child:only-child {
     padding-left: 0;
     padding-right: 0;
 }
 
-
-/* =========================================
-   TREE SPACING IMPROVEMENT
-
-   Makes generations visually consistent
-========================================= */
-
 .node-wrap .node-children-row {
     margin-top: 0;
 }
-
-
-/* =========================================
-   PREVENT CONNECTOR OVERLAP
-========================================= */
 
 .node-child > .node-wrap {
     margin-top: 0;
 }
 
 
-/* =========================================
-   TREE CARD SCALE AT LARGE WIDTH
-========================================= */
+/* =========================================================
+   LARGE SCREEN TREE SCALE
+========================================================= */
 
 @media (min-width: 1600px) {
-
     .node-card {
         width: 160px;
         min-height: 78px;
@@ -1252,100 +439,44 @@
         padding-left: 20px;
         padding-right: 20px;
     }
-
 }
 
 
-/* =========================================
-   TABLET
-========================================= */
+/* =========================================================
+   TABLET SIZING
+========================================================= */
 
 @media (max-width: 1024px) {
-
-    .genealogy-layout {
-        @apply px-6;
-    }
-
     .genealogy-explorer {
         max-height: calc(100vh - 180px);
     }
-
-    .board-panel {
-        height: calc(100vh - 180px);
-        max-height: calc(100vh - 180px);
-    }
-
 }
 
 
-/* =========================================
+/* =========================================================
    MOBILE / TABLET
-========================================= */
+========================================================= */
 
 @media (max-width: 768px) {
-
-    .genealogy-layout {
-        @apply px-4;
-    }
-
-    .genealogy-nav-menu {
-        @apply top-[78px]
-        gap-2
-        px-3
-        py-2;
-    }
-
     .genealogy-explorer {
         max-height: calc(100vh - 175px);
     }
-
-    .board-panel {
-        height: calc(100vh - 175px);
-        max-height: calc(100vh - 175px);
-    }
-
-    .board-tree-inner {
-        padding: 28px;
-    }
-
 }
 
 
-/* =========================================
-   MOBILE
-========================================= */
+/* =========================================================
+   MOBILE COMPONENTS
+========================================================= */
 
 @media (max-width: 640px) {
 
-    .genealogy-layout {
-        @apply px-3;
-    }
-
-
-    /* Navigation */
-
-    .genealogy-nav-menu button {
-        @apply flex-1
-        px-3
-        py-2
-        text-xs;
-    }
-
-
-    /* Explorer */
-
     .genealogy-explorer {
         @apply rounded-xl;
-
         max-height: calc(100vh - 165px);
     }
 
-
-    /* Explorer Header */
-
     .genealogy-explorer-header {
-        @apply px-4
-        py-4;
+        @apply px-4 py-4;
     }
 
     .genealogy-explorer-title {
@@ -1356,29 +487,20 @@
         @apply text-xs;
     }
 
-
-    /* Generation */
-
     .generation-section {
-        @apply px-3
-        py-5;
+        @apply px-3 py-5;
     }
 
     .generation-section .generation-section {
-        @apply px-0
-        pt-6;
+        @apply px-0 pt-6;
     }
 
     .generation-heading {
-        @apply mb-4
-        gap-2.5;
+        @apply mb-4 gap-2.5;
     }
 
     .generation-number {
-        @apply h-9
-        w-9
-        rounded-lg
-        text-xs;
+        @apply h-9 w-9 rounded-lg text-xs;
     }
 
     .generation-heading h3 {
@@ -1389,35 +511,21 @@
         @apply text-xs;
     }
 
-
-    /* Grid */
-
     .generation-grid {
-        @apply grid-cols-1
-        gap-3;
+        @apply grid-cols-1 gap-3;
     }
 
-
-    /* Member Card */
-
     .member-card-top {
-        @apply gap-2.5
-        p-3.5;
+        @apply gap-2.5 p-3.5;
     }
 
     .member-avatar {
-        @apply h-10
-        w-10
-        text-sm;
+        @apply h-10 w-10 text-sm;
     }
 
     .root-member-card .member-avatar {
-        @apply h-11
-        w-11;
+        @apply h-11 w-11;
     }
-
-
-    /* Text */
 
     .member-label {
         @apply text-[9px];
@@ -1427,79 +535,29 @@
         @apply text-sm;
     }
 
-
-    /* Status */
-
     .member-status {
-        @apply px-2
-        py-0.5
-        text-[9px];
+        @apply px-2 py-0.5 text-[9px];
     }
 
-
-    /* Footer */
-
     .member-card-footer {
-        @apply px-3.5
-        py-3;
+        @apply px-3.5 py-3;
     }
 
     .member-card-footer > div span {
         @apply text-[11px];
     }
 
-
-    /* Explore */
-
     .member-explore-btn {
-        @apply px-2.5
-        py-1.5
-        text-[11px];
+        @apply px-2.5 py-1.5 text-[11px];
     }
-
-
-    /* Empty */
 
     .genealogy-empty {
         @apply min-h-[320px];
     }
 
     .genealogy-empty-icon {
-        @apply h-16
-        w-16
-        text-3xl;
+        @apply h-16 w-16 text-3xl;
     }
-
-
-    /* Board */
-
-    .board-panel {
-        @apply rounded-xl;
-
-        height: calc(100vh - 165px);
-        max-height: calc(100vh - 165px);
-    }
-
-    .board-header {
-        @apply px-4
-        py-4;
-    }
-
-    .board-title {
-        @apply text-lg;
-    }
-
-    .board-subtitle {
-        @apply text-xs;
-    }
-
-    .board-tree-inner {
-        @apply px-4
-        py-6;
-    }
-
-
-    /* Visual Tree */
 
     .node-card {
         width: 140px;
@@ -1508,9 +566,7 @@
 
     .node-child {
         min-width: 140px;
-
         padding-left: 14px;
         padding-right: 14px;
     }
-
 }

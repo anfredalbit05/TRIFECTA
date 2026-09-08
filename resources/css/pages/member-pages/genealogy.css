@@ -1,0 +1,342 @@
+/* GENEALOGY */
+
+/* CONTAINER */
+.genealogy-container {
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* HEADER */
+.genealogy-header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    width: 100%;
+    margin: 0 0 8px 0;
+    overflow: hidden;
+}
+
+.genealogy-header-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 16px;
+    background: #0C2C6B;
+}
+
+.genealogy-header-title h1 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+}
+
+/* MAIN LAYOUT */
+.genealogy-layout {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 48px;
+}
+
+/* DESKTOP TAB NAVIGATION */
+.genealogy-desktop-nav {
+    position: sticky;
+    top: 78px;
+    z-index: 20;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    margin: 0;
+    padding: 12px 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* DESKTOP TAB LINKS */
+.genealogy-desktop-nav a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.genealogy-desktop-nav a:hover {
+    background: #f3f4f6;
+    color: #0C2C6B;
+}
+
+.genealogy-desktop-nav a.active {
+    background: #0C2C6B;
+    color: #ffffff;
+}
+
+.genealogy-desktop-nav a:focus {
+    outline: none;
+}
+
+/* DESKTOP TAB ICON */
+.genealogy-tab-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    font-size: 17px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.genealogy-tab-label {
+    display: inline-block;
+}
+
+/* MAIN CONTENT CARD */
+.genealogy-main-card {
+    width: 100%;
+    min-height: 500px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* GENEALOGY SCROLL AREA */
+.genealogy-scroll-area {
+    width: 100%;
+    overflow: auto;
+    min-height: 460px;
+    scrollbar-width: thin;
+}
+
+/* Keeps horizontal genealogy tree scrolling inside this area instead of scrolling the whole page */
+.genealogy-scroll-area > * {
+    min-width: max-content;
+}
+
+/* ALPINE CLOAK */
+[x-cloak] {
+    display: none !important;
+}
+
+/* MOBILE BOTTOM NAVIGATION */
+.genealogy-mobile-nav {
+    display: none;
+}
+
+/* MOBILE */
+@media screen and (max-width: 768px) {
+
+    /* PAGE */
+    .genealogy-container {
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        padding-bottom: 80px !important;
+        overflow: visible !important;
+    }
+
+    /* HEADER */
+    .genealogy-header {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        width: 100%;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .genealogy-header-title {
+        padding: 12px 16px;
+    }
+
+    .genealogy-header-title h1 {
+        font-size: 18px;
+    }
+
+    /* CONTENT */
+    .genealogy-layout {
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 25px;
+        padding: 12px 16px 100px 16px !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        overflow: visible !important;
+    }
+
+    /* HIDE DESKTOP NAVIGATION */
+    .genealogy-desktop-nav {
+        display: none !important;
+    }
+
+    /* MAIN CARD */
+    .genealogy-main-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: auto !important;
+        padding: 16px !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        border-radius: 10px;
+    }
+
+    /* SCROLL AREA */
+    .genealogy-scroll-area {
+        width: 100%;
+        min-height: 0;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    /* MOBILE BOTTOM NAVIGATION */
+    .genealogy-mobile-nav {
+        position: fixed !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        align-items: stretch;
+        gap: 0;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 72px !important;
+        margin: 0 !important;
+        padding: 4px 2px calc(4px + env(safe-area-inset-bottom)) 2px !important;
+        background: #ffffff !important;
+        border: none !important;
+        border-top: 1px solid #eeeeee !important;
+        border-radius: 0 !important;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12) !important;
+        z-index: 2147483647 !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* MOBILE TAB */
+    .genealogy-mobile-nav a {
+        position: relative;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 3px 1px !important;
+        gap: 3px !important;
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        color: #777777 !important;
+        font-size: 10px !important;
+        font-weight: 600 !important;
+        line-height: 1.1 !important;
+        text-align: center !important;
+        text-decoration: none !important;
+        white-space: normal !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    /* MOBILE ICON */
+    .genealogy-mobile-icon {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 18px !important;
+        line-height: 1 !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* MOBILE LABEL */
+    .genealogy-mobile-label {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        text-align: center !important;
+    }
+
+    /* ACTIVE MOBILE TAB */
+    .genealogy-mobile-nav a.active {
+        background: transparent !important;
+        color: #0C2C6B !important;
+    }
+
+    /* ACTIVE ICON */
+    .genealogy-mobile-nav a.active .genealogy-mobile-icon {
+        transform: translateY(-1px);
+    }
+
+    /* ACTIVE INDICATOR */
+    .genealogy-mobile-nav a.active::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 28px;
+        height: 3px;
+        transform: translateX(-50%);
+        background: #0C2C6B;
+        border-radius: 0 0 4px 4px;
+    }
+
+}
+
+/* VERY SMALL PHONES */
+@media screen and (max-width: 380px) {
+
+    .genealogy-layout {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .genealogy-main-card {
+        padding: 12px !important;
+    }
+
+    .genealogy-mobile-nav a {
+        font-size: 9px;
+    }
+
+    .genealogy-mobile-icon {
+        width: 22px;
+        height: 22px;
+        font-size: 18px;
+    }
+
+}
