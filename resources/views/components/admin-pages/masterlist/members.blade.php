@@ -442,19 +442,6 @@
                                             @endif
 
                                         @else
-
-                                            @if ($this->canCreate)
-
-                                                <span
-                                                    title="Withdrawals are currently unavailable"
-                                                    class="member-action member-action-off"
-                                                >
-                                                    <span class="off-icon">🔒</span>
-                                                    <span>Off</span>
-                                                </span>
-
-                                            @endif
-
                                         @endif
 
                                     </div>

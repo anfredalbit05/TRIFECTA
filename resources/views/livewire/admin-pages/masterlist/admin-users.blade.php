@@ -51,12 +51,62 @@
                 class="au-search-input">
         </div>
 
-        <button wire:click="resetTable" wire:loading.attr="disabled" title="Refresh Table"
-            class="au-btn-refresh">
-            <span wire:loading.remove wire:target="resetTable">🔄</span>
-            <span wire:loading wire:target="resetTable" class="animate-spin">⏳</span>
-            <span class="hidden sm:inline">Refresh</span>
-        </button>
+            {{-- REFRESH --}}
+            <button
+                type="button"
+                wire:click="resetTable"
+                wire:loading.attr="disabled"
+                title="Refresh Table"
+                class="refresh-btn"
+            >
+
+                <span
+                    wire:loading.remove
+                    wire:target="resetTable"
+                    class="refresh-icon"
+                >
+                    <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6.5L20 9M18.5 15A7 7 0 0 1 6 17.5L4 15"
+                        />
+                    </svg>
+                </span>
+
+                <span
+                    wire:loading
+                    wire:target="resetTable"
+                    class="refresh-loading"
+                >
+                    <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            cx="12"
+                            cy="12"
+                            r="9"
+                            stroke-width="3"
+                            class="refresh-circle"
+                        />
+                        <path
+                            d="M21 12a9 9 0 0 1-9 9"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                        />
+                    </svg>
+                </span>
+
+                <span>Refresh</span>
+
+            </button>
     </div>
 
     {{-- =====================================================
@@ -192,17 +242,6 @@
                                             </button>
                                         @endif
                                     @else
-                                        {{-- No pending withdrawal, but withdrawals
-                                            are globally disabled: show a locked
-                                            state instead of a clickable button,
-                                            matching the dashboard's own disabled
-                                            message. --}}
-                                        @if ($this->canCreate)
-                                            <span title="Withdrawals are currently unavailable"
-                                                class="au-wd-off">
-                                                🔒 Off
-                                            </span>
-                                        @endif
                                     @endif
 
                                 </div>

@@ -341,7 +341,7 @@ class ActivationReviewModal extends Component
 
             return;
         }
-
+        /** @var User|null $activatedUser */
         $activatedUser = null;
 
         // 2. Atomic Database Operations (Database Changes Only)

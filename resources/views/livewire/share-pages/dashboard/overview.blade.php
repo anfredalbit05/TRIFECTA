@@ -19,31 +19,61 @@
                 </p>
             </div>
 
+            {{-- REFRESH --}}
             <button
                 type="button"
                 wire:click="refreshDashboard"
                 wire:loading.attr="disabled"
                 title="Refresh Dashboard"
-                class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold rounded-lg shadow-sm transition cursor-pointer"
+                class="refresh-btn"
             >
+                {{-- NORMAL STATE --}}
                 <span
                     wire:loading.remove
                     wire:target="refreshDashboard"
+                    class="refresh-icon"
                 >
-                    🔄
+                    <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6.5L20 9M18.5 15A7 7 0 0 1 6 17.5L4 15"
+                        />
+                    </svg>
                 </span>
 
+                {{-- LOADING STATE --}}
                 <span
                     wire:loading
                     wire:target="refreshDashboard"
-                    class="animate-spin"
+                    class="refresh-loading"
                 >
-                    ⏳
+                    <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            cx="12"
+                            cy="12"
+                            r="9"
+                            stroke-width="3"
+                            class="refresh-circle"
+                        />
+                        <path
+                            d="M21 12a9 9 0 0 1-9 9"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                        />
+                    </svg>
                 </span>
 
-                <span>
-                    Refresh
-                </span>
+                <span>Refresh</span>
             </button>
         </div>
 

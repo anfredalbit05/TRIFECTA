@@ -20,10 +20,60 @@
                 @endforeach
             </select>
 
-            <button wire:click="refreshAnalytics" wire:loading.attr="disabled" title="Refresh Analytics"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
-                <span wire:loading.remove wire:target="refreshAnalytics">🔄</span>
-                <span wire:loading wire:target="refreshAnalytics" class="animate-spin">⏳</span>
+            {{-- REFRESH ANALYTICS --}}
+            <button
+                type="button"
+                wire:click="refreshAnalytics"
+                wire:loading.attr="disabled"
+                title="Refresh Analytics"
+                class="refresh-btn"
+            >
+                {{-- NORMAL STATE --}}
+                <span
+                    wire:loading.remove
+                    wire:target="refreshAnalytics"
+                    class="refresh-icon"
+                >
+                    <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6.5L20 9M18.5 15A7 7 0 0 1 6 17.5L4 15"
+                        />
+                    </svg>
+                </span>
+
+                {{-- LOADING STATE --}}
+                <span
+                    wire:loading
+                    wire:target="refreshAnalytics"
+                    class="refresh-loading"
+                >
+                    <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            cx="12"
+                            cy="12"
+                            r="9"
+                            stroke-width="3"
+                            class="refresh-circle"
+                        />
+                        <path
+                            d="M21 12a9 9 0 0 1-9 9"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                        />
+                    </svg>
+                </span>
+
                 <span class="hidden sm:inline">Refresh</span>
             </button>
         </div>
@@ -69,9 +119,14 @@
                         <h3 class="font-bold text-[#0C2C6B] text-lg">
                             Membership Fee Breakdown
                         </h3>
-                        <button onclick="printCard('membership-fee')" title="Print this section"
-                            class="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition text-xs cursor-pointer shrink-0">
-                            🖨️
+                        <button
+                            onclick="printCard('membership-fee')"
+                            title="Print this section"
+                            class="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition text-xs cursor-pointer shrink-0"
+                        >
+                            <span class="text-xl">
+                                🖨️
+                            </span>
                         </button>
                     </div>
                     <div wire:ignore x-data="{
@@ -179,9 +234,14 @@
                         <h3 class="font-bold text-[#0C2C6B] text-lg">
                             Collection Summary by Source
                         </h3>
-                        <button onclick="printCard('source')" title="Print this section"
-                            class="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition text-xs cursor-pointer shrink-0">
-                            🖨️
+                        <button
+                            onclick="printCard('source')"
+                            title="Print this section"
+                            class="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition text-xs cursor-pointer shrink-0"
+                        >
+                            <span class="text-xl">
+                                🖨️
+                            </span>
                         </button>
                     </div>
                     <div wire:ignore x-data="{
@@ -286,9 +346,14 @@
                         <h3 class="font-bold text-[#0C2C6B] text-lg">
                             Wallet Incentives Breakdown
                         </h3>
-                        <button onclick="printCard('wallet')" title="Print this section"
-                            class="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition text-xs cursor-pointer shrink-0">
-                            🖨️
+                        <button
+                            onclick="printCard('wallet')"
+                            title="Print this section"
+                            class="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition text-xs cursor-pointer shrink-0"
+                        >
+                            <span class="text-xl">
+                                🖨️
+                            </span>
                         </button>
                     </div>
                     <div wire:ignore x-data="{
@@ -406,9 +471,15 @@
                 <h3 class="font-bold text-[#0C2C6B] text-lg">
                     Monthly Income Analytics (₱)
                 </h3>
-                <button onclick="printCard('monthly')" title="Print this section"
-                    class="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition text-xs cursor-pointer shrink-0 self-start sm:self-auto">
-                    🖨️
+                {{-- PRINT MONTHLY --}}
+                <button
+                    onclick="printCard('monthly')"
+                    title="Print this section"
+                    class="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition text-xs cursor-pointer shrink-0 self-start sm:self-auto"
+                >
+                    <span class="text-xl">
+                        🖨️
+                    </span>
                 </button>
             </div>
 
