@@ -148,28 +148,57 @@
                                 </label>
 
                                 <!-- GCASH -->
-                                <label class="flex items-center gap-3 cursor-pointer p-3.5 bg-white border border-slate-300 rounded-xl hover:border-[#0B2A5B] hover:bg-slate-50 transition">
+                                <label
+                                    class="flex items-center gap-3 p-3.5 rounded-xl border transition
+                                        {{ $gcashEnabled
+                                            ? 'cursor-pointer bg-white border-slate-300 hover:border-[#0B2A5B] hover:bg-slate-50'
+                                            : 'cursor-not-allowed bg-slate-100 border-slate-200 opacity-60' }}"
+                                >
                                     <input
                                         type="radio"
                                         wire:model.live="payment_method"
                                         value="GCash"
+                                        @disabled(!$gcashEnabled)
                                         class="w-4 h-4 text-[#0B2A5B] shrink-0">
+
                                     <div>
-                                        <span class="block text-sm font-bold text-slate-700">GCash</span>
-                                        <span class="block text-[11px] text-slate-500">Online Payment</span>
+                                        <span class="block text-sm font-bold text-slate-700">
+                                            GCash
+                                            @if(!$gcashEnabled)
+                                                <span class="text-[10px] text-red-500">(Unavailable)</span>
+                                            @endif
+                                        </span>
+
+                                        <span class="block text-[11px] text-slate-500">
+                                            {{ $gcashEnabled ? 'Online Payment' : 'Currently unavailable' }}
+                                        </span>
                                     </div>
                                 </label>
-
                                 <!-- BANK TRANSFER -->
-                                <label class="flex items-center gap-3 cursor-pointer p-3.5 bg-white border border-slate-300 rounded-xl hover:border-[#0B2A5B] hover:bg-slate-50 transition">
+                                <label
+                                    class="flex items-center gap-3 p-3.5 rounded-xl border transition
+                                        {{ $bankEnabled
+                                            ? 'cursor-pointer bg-white border-slate-300 hover:border-[#0B2A5B] hover:bg-slate-50'
+                                            : 'cursor-not-allowed bg-slate-100 border-slate-200 opacity-60' }}"
+                                >
                                     <input
                                         type="radio"
                                         wire:model.live="payment_method"
                                         value="Bank Transfer"
+                                        @disabled(!$bankEnabled)
                                         class="w-4 h-4 text-[#0B2A5B] shrink-0">
+
                                     <div>
-                                        <span class="block text-sm font-bold text-slate-700">Bank Transfer</span>
-                                        <span class="block text-[11px] text-slate-500">Online Payment</span>
+                                        <span class="block text-sm font-bold text-slate-700">
+                                            Bank Transfer
+                                            @if(!$bankEnabled)
+                                                <span class="text-[10px] text-red-500">(Unavailable)</span>
+                                            @endif
+                                        </span>
+
+                                        <span class="block text-[11px] text-slate-500">
+                                            {{ $bankEnabled ? 'Online Payment' : 'Currently unavailable' }}
+                                        </span>
                                     </div>
                                 </label>
                             </div>

@@ -396,6 +396,35 @@ class ActivationReviewModal extends Component
 
             /*
             |--------------------------------------------------------------------------
+            | GCash Convenience Fee (CF)
+            |--------------------------------------------------------------------------
+            | Only applies when payment_method is Gcash.
+            | CF = 1% of 1,999 = 19.99
+            |--------------------------------------------------------------------------
+            */
+
+            if (strtolower(trim($this->activation->payment_method)) === 'gcash') {
+
+                $cfAmount = round(1999 * 0.01, 2);
+
+                Ledger::create([
+                    'RefID'        => $this->selectedUserID,
+                    'amount'       => $cfAmount,
+                    'Source'       => 'CF',
+                    'ActivationID' => $this->activation->ActivationID,
+                    'status'       => 'Completed',
+                ]);
+
+                Log::info('GCash CF ledger entry created.', [
+                    'UserID' => $this->selectedUserID,
+                    'ActivationID' => $this->activation->ActivationID,
+                    'payment_method' => $this->activation->payment_method,
+                    'amount' => $cfAmount,
+                ]);
+            }
+
+            /*
+            |--------------------------------------------------------------------------
             | Provident Fund (PF: 50.00) to Direct Recruiter / Upline
             |--------------------------------------------------------------------------
             */

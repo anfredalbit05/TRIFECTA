@@ -15,6 +15,7 @@ use Livewire\Component;
 use App\Models\ActivationHistory;
 use Illuminate\Support\Facades\Mail;
 
+
 class ActivationModal extends Component
 {
     public bool $open = false;
@@ -48,6 +49,9 @@ class ActivationModal extends Component
     public string $bankAccountName = '';
     public string $bankAccountNumber = '';
 
+    public bool $gcashEnabled = false;
+    public bool $bankEnabled = false;
+
     /*
     |--------------------------------------------------------------------------
     | Modal State Variables
@@ -66,6 +70,19 @@ class ActivationModal extends Component
 
         // Fallback to '1999' if the setting is not found
         return $setting ? (string) $setting->value : '1999';
+    }
+
+    private function loadPaymentSettings(): void
+    {
+        $this->gcashEnabled = filter_var(
+            Setting::where('name', 'gcash_payment_enabled')->value('value'),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+        $this->bankEnabled = filter_var(
+            Setting::where('name', 'bank_payment_enabled')->value('value'),
+            FILTER_VALIDATE_BOOLEAN
+        );
     }
 
     /*
@@ -87,6 +104,7 @@ class ActivationModal extends Component
         $this->selectedUserID = $UserID;
         $this->selectedUserRecord = User::find($UserID);
 
+        $this->loadPaymentSettings();
         $this->activationData = null;
         $this->resetValidation();
 
@@ -108,6 +126,8 @@ class ActivationModal extends Component
 
         $this->selectedUserID = $UserID;
         $this->selectedUserRecord = User::find($UserID);
+
+        $this->loadPaymentSettings();
 
         $activation = Activation::where('UserID', $UserID)
             ->where('status', 'Rejected')
@@ -510,6 +530,7 @@ class ActivationModal extends Component
     #[On('activate')]
     public function activate(): void
     {
+        $this->loadPaymentSettings();
         $membershipFee = $this->getMembershipFee();
 
         Log::info('--- ACTIVATION PROCESS STARTED ---', [
@@ -533,6 +554,24 @@ class ActivationModal extends Component
                 'beneficiaries.*.birthdate' => ['nullable', 'date'],
                 'beneficiaries.*.relationship' => ['nullable', 'string', 'max:50'],
             ]);
+
+                // Check payment availability from settings
+            if ($this->payment_method === 'GCash' && !$this->gcashEnabled) {
+                $this->addError(
+                    'payment_method',
+                    'GCash payment is currently unavailable.'
+                );
+                return;
+            }
+
+            if ($this->payment_method === 'Bank Transfer' && !$this->bankEnabled) {
+                $this->addError(
+                    'payment_method',
+                    'Bank Transfer is currently unavailable.'
+                );
+                return;
+            }
+
         } catch (ValidationException $e) {
             $this->dispatch('swal:close');
             throw $e;
@@ -750,6 +789,7 @@ class ActivationModal extends Component
 
     public function confirmActivate(): void
     {
+        $this->loadPaymentSettings();
         $membershipFee = $this->getMembershipFee();
 
         try {
@@ -763,6 +803,26 @@ class ActivationModal extends Component
                 'beneficiaries.*.birthdate' => ['nullable', 'date'],
                 'beneficiaries.*.relationship' => ['nullable', 'string', 'max:50'],
             ]);
+
+             // Check payment availability
+            if ($this->payment_method === 'GCash' && !$this->gcashEnabled) {
+                $this->addError(
+                    'payment_method',
+                    'GCash payment is currently unavailable.'
+                );
+
+                return;
+            }
+
+            if ($this->payment_method === 'Bank Transfer' && !$this->bankEnabled) {
+                $this->addError(
+                    'payment_method',
+                    'Bank Transfer is currently unavailable.'
+                );
+
+                return;
+            }
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         }
