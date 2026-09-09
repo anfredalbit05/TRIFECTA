@@ -203,6 +203,7 @@
 
         </div>
 
+        @if ($newsUpdates->total() > 0 || $newsUpdates->total() < 6)
         <!-- Custom Pagination Controls -->
         <div class="mt-12 flex justify-center items-center space-x-4">
 
@@ -247,6 +248,7 @@
             @endif
 
         </div>
+        @endif
 
     </div>
 </section>

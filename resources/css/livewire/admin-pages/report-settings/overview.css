@@ -1,0 +1,576 @@
+/* ==========================================================================
+   overview.css
+   All styling for overview.blade.php — converted from Tailwind utility
+   classes to semantic, component-based classes. No Tailwind classes remain
+   in the markup; every rule below is the CSS equivalent of what used to be
+   inline utility classes.
+   ========================================================================== */
+
+/* ---- root ---- */
+.overview > * + * {
+    margin-top: 1.5rem; /* space-y-6 */
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+.overview__header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .overview__header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.overview__title {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 700;
+    color: #0C2C6B;
+}
+
+.overview__subtitle {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: #6b7280;
+}
+
+.overview__subtitle-highlight {
+    font-weight: 600;
+    color: #374151;
+}
+
+.overview__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.overview__year-select {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+
+.overview__year-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #0C2C6B;
+}
+
+/* ---- Refresh button ---- */
+.refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.9rem;
+    background-color: #0C2C6B;
+    color: #fff;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.refresh-btn:hover {
+    background-color: #133880;
+}
+
+.refresh-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.refresh-btn__icon svg,
+.refresh-btn__loading svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.refresh-btn__loading svg {
+    animation: refresh-spin 1s linear infinite;
+}
+
+.refresh-btn__circle {
+    opacity: 0.25;
+}
+
+.refresh-btn__label {
+    display: none;
+}
+
+@media (min-width: 640px) {
+    .refresh-btn__label {
+        display: inline;
+    }
+}
+
+@keyframes refresh-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   KPI cards
+   ========================================================================== */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1280px) {
+    .kpi-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+
+.kpi-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    backdrop-filter: blur(24px);
+    background: linear-gradient(to bottom right, rgba(12, 44, 107, 0.9), rgba(19, 56, 128, 0.8), rgba(27, 70, 155, 0.7));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    color: #ffffff;
+}
+
+.kpi-card:hover {
+    transform: translateY(-0.375rem);
+    box-shadow: 0 20px 25px -5px rgba(12, 44, 107, 0.6), 0 8px 10px -6px rgba(12, 44, 107, 0.6);
+}
+
+.kpi-card__icon {
+    position: absolute;
+    right: -0.75rem;
+    bottom: -0.75rem;
+    font-size: 4.5rem;
+    line-height: 1;
+    color: #ffffff;
+    opacity: 0.1;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    pointer-events: none;
+    user-select: none;
+    filter: brightness(0) invert(1);
+}
+
+.kpi-card:hover .kpi-card__icon {
+    transform: scale(1.25);
+    opacity: 0.2;
+}
+
+.kpi-card__content {
+    position: relative;
+    z-index: 10;
+}
+
+.kpi-card__label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #d1d5db;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.kpi-card__value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-top: 0.25rem;
+    color: #ffffff;
+    letter-spacing: -0.025em;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (min-width: 640px) {
+    .kpi-card__value { font-size: 1.5rem; }
+}
+
+/* ==========================================================================
+   Breakdown cards (Membership fee / Source / Wallet)
+   ========================================================================== */
+.breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .breakdown-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.breakdown-card {
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f3f4f6;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.breakdown-card__head {
+    margin-bottom: 1rem;
+}
+
+.breakdown-card__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.breakdown-card__title {
+    font-weight: 700;
+    color: #0C2C6B;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+/* ---- Print (per-card) button ---- */
+.print-btn {
+    width: 1.75rem;
+    height: 1.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #64748b;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    font-size: 0.75rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.print-btn:hover {
+    background: #f8fafc;
+    color: #0C2C6B;
+}
+
+.print-btn--auto-align {
+    align-self: flex-start;
+}
+
+@media (min-width: 640px) {
+    .print-btn--auto-align { align-self: auto; }
+}
+
+.print-btn__icon {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+/* ---- Date range input (flatpickr) ---- */
+.date-range-input {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+}
+
+.date-range-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 1px #0C2C6B;
+}
+
+/* ---- Scrollable list container shared by all 3 breakdown cards ---- */
+.breakdown-list {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+}
+
+.breakdown-list > * + * {
+    border-top: 1px solid #f3f4f6;
+}
+
+.breakdown-list__empty {
+    font-size: 0.875rem;
+    color: #9ca3af;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    text-align: center;
+}
+
+/* Membership fee & wallet share the same row shape */
+.breakdown-list__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.breakdown-list__item:first-child { padding-top: 0; }
+.breakdown-list__item:last-child { padding-bottom: 0; }
+
+.breakdown-list__name {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.875rem;
+}
+
+.breakdown-list__sub {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 0.125rem;
+}
+
+.breakdown-list__value-wrap {
+    text-align: right;
+}
+
+.breakdown-list__value {
+    display: block;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: #0C2C6B;
+}
+
+/* ---- Collection Summary by Source list ---- */
+.source-list__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+    font-size: 0.875rem;
+}
+
+.source-list__type {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.source-list__meta {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-left: 0.25rem;
+}
+
+.source-list__value {
+    font-weight: 700;
+    color: #0C2C6B;
+    background: rgba(12, 44, 107, 0.08);
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* ---- Wallet Incentives list ---- */
+.wallet-list__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.wallet-list__item:first-child { padding-top: 0; }
+.wallet-list__item:last-child { padding-bottom: 0; }
+
+.wallet-list__name {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.wallet-list__referral {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #D79B10;
+}
+
+/* ==========================================================================
+   Monthly income chart card
+   ========================================================================== */
+.chart-section {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+.chart-card {
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f3f4f6;
+    border-radius: 1rem;
+    padding: 1.5rem;
+}
+
+.chart-card__head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+    .chart-card__head {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.chart-card__canvas-wrap {
+    position: relative;
+    height: 16rem;
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    .chart-card__canvas-wrap { height: 20rem; }
+}
+
+/* ==========================================================================
+   Print-only sections (shared by all four report tables)
+   ========================================================================== */
+.print-section {
+    display: none; /* revealed only inside @media print, below */
+}
+
+.print-header {
+    text-align: center;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #1b365d;
+}
+
+.print-header__logo {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1b365d;
+    font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+}
+
+.print-header__tagline {
+    margin: 0.25rem 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: #c5a059;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.print-header__section-title {
+    margin-top: 0.625rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.print-header__period {
+    font-size: 0.75rem;
+    color: #475569;
+}
+
+.print-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 11px;
+}
+
+.print-table th,
+.print-table td {
+    border: 1px solid #0f172a;
+    padding: 0.25rem;
+}
+
+.print-table__head-row {
+    background: #0C2C6B;
+    color: #ffffff;
+    font-weight: 700;
+    text-align: center;
+    height: 24px;
+}
+
+.print-table__cell--center {
+    text-align: center;
+}
+
+.print-table__cell--right {
+    text-align: right;
+}
+
+.print-table__empty {
+    padding: 0.5rem;
+    text-align: center;
+}
+
+/* ==========================================================================
+   Print media rules
+   ========================================================================== */
+@media print {
+    @page { size: landscape; margin: 8mm; }
+
+    body[data-print-target] * { visibility: hidden !important; }
+
+    [data-print-section] { display: none !important; }
+
+    body[data-print-target="membership-fee"] [data-print-section="membership-fee"],
+    body[data-print-target="source"] [data-print-section="source"],
+    body[data-print-target="wallet"] [data-print-section="wallet"],
+    body[data-print-target="monthly"] [data-print-section="monthly"] {
+        display: block !important;
+        visibility: visible !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    body[data-print-target="membership-fee"] [data-print-section="membership-fee"] *,
+    body[data-print-target="source"] [data-print-section="source"] *,
+    body[data-print-target="wallet"] [data-print-section="wallet"] *,
+    body[data-print-target="monthly"] [data-print-section="monthly"] * {
+        visibility: visible !important;
+    }
+
+    .print-table { border-collapse: collapse !important; width: 100%; }
+    .print-table th,
+    .print-table td { border: 1px solid #000 !important; padding: 4px !important; }
+    .print-table__head-row {
+        background-color: #0C2C6B !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}

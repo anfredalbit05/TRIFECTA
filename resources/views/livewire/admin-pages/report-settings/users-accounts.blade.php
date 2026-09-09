@@ -14,7 +14,7 @@
 
     <!-- Success Message Notification -->
     @if (session()->has('message'))
-        <div class="p-4 mb-4 text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl text-sm font-medium">
+        <div class="p-4 mb-4 text-[#0C2C6B] bg-[#0C2C6B]/10 border border-[#0C2C6B]/30 rounded-xl text-sm font-medium">
             {{ session('message') }}
         </div>
     @endif
@@ -22,13 +22,33 @@
     <!-- SEARCH INPUT, STATUS FILTER, DATE FILTER & REFRESH BUTTON CONTAINER -->
     <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
         <!-- SEARCH INPUT -->
-        <div class="relative max-w-sm w-full">
-            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
-                🔍
-            </span>
-            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Name, email, or referral code..."
-                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
-        </div>
+    <div class="relative max-w-sm w-full">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+            <svg
+                class="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+                />
+            </svg>
+        </span>
+
+        <input
+            type="text"
+            wire:model.live.debounce.300ms="search"
+            placeholder="Name, email, or referral code..."
+            class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl
+                focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
+                focus:border-[#0C2C6B]
+                bg-white shadow-sm transition"
+        >
+    </div>
 
         <!-- FILTERS & REFRESH CONTAINER -->
         <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
@@ -53,15 +73,19 @@
             </select>
 
             @if ($dateRange)
-                <button type="button" wire:click="clearDateFilter" title="Clear date filter"
-                    class="inline-flex items-center px-3 py-2 text-sm text-slate-500 hover:text-red-500 hover:border-red-200 hover:bg-red-50 rounded-xl border border-slate-200 bg-white shadow-sm cursor-pointer transition">
+                <button
+                    type="button"
+                    wire:click="clearDateFilter"
+                    title="Clear date filter"
+                    class="inline-flex items-center px-3 py-2 text-sm text-slate-500 hover:text-[#D79B10] hover:border-[#D79B10]/30 hover:bg-[#D79B10]/10 rounded-xl border border-slate-200 bg-white shadow-sm cursor-pointer transition"
+                >
                     ✕
                 </button>
             @endif
 
             <!-- PRINT BUTTON (prints the full filtered table) -->
             <button type="button" onclick="window.print()" title="Print Report"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-[#0C2C6B] text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
                 <span>🖨️</span>
                 <span class="hidden sm:inline">Print</span>
             </button>
@@ -172,24 +196,24 @@
                             </span>
                         </td>
 
-                        <td class="py-4 px-4 font-bold text-emerald-600">
+                        <td class="py-4 px-4 font-bold text-[#0C2C6B]">
                             ₱{{ number_format($walletFund, 2) }}
                         </td>
 
-                        <td class="py-4 px-4 font-bold text-purple-600">
+                        <td class="py-4 px-4 font-bold text-[#D79B10]">
                             ₱{{ number_format($providentFund, 2) }}
                         </td>
 
-                        <td class="py-4 px-4 font-bold text-indigo-600">
+                        <td class="py-4 px-4 font-bold text-[#0B2A5B]">
                             ₱{{ number_format($ledgerFund, 2) }}
                         </td>
 
                         <td class="py-4 px-4">
                             @php
                                 $statusClasses = match ($user->status) {
-                                    'Active' => 'bg-emerald-50 text-emerald-600 border-emerald-200',
-                                    'Pending' => 'bg-amber-50 text-amber-600 border-amber-200',
-                                    default => 'bg-rose-50 text-rose-600 border-rose-200',
+                                    'Active' => 'bg-[#0C2C6B]/10 text-[#0C2C6B] border-[#0C2C6B]/30',
+                                    'Pending' => 'bg-[#D79B10]/10 text-[#D79B10] border-[#D79B10]/30',
+                                    default => 'bg-slate-100 text-slate-600 border-slate-300',
                                 };
                             @endphp
                             <span
@@ -198,12 +222,15 @@
                             </span>
                         </td>
 
-                        <td class="py-4 px-4 text-right">
-                            <button wire:click="viewLedger({{ $user->UserID }})" title="View Financials"
-                                class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-slate-600 text-white hover:bg-slate-700 transition cursor-pointer text-xs font-semibold shadow">
-                                👁️
-                            </button>
-                        </td>
+                    <td class="py-4 px-4 text-right">
+                        <button
+                            wire:click="viewLedger({{ $user->UserID }})"
+                            title="View Financials"
+                            class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow"
+                        >
+                            👁️
+                        </button>
+                    </td>
                     </tr>
                 @empty
                     <tr>
@@ -253,9 +280,11 @@
 
     <!-- PRINTABLE FULL-TABLE REPORT (hidden on screen, shown only when printing) -->
     <div id="printable-users" class="hidden print:block font-sans">
-        <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#1b365d]">
-            <h1 class="m-0 text-2xl font-bold text-[#1b365d] font-serif">TRUE LIFE DAYONGAN</h1>
-            <p class="my-1 text-[11px] font-bold text-[#c5a059] uppercase tracking-wider">&mdash; S O L I D A R I T A S &mdash;</p>
+        <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#0C2C6B]">
+            <h1 class="m-0 text-2xl font-bold text-[#0C2C6B] font-serif">TRUE LIFE</h1>
+            <p class="my-1 text-[11px] font-bold text-[#D79B10] uppercase tracking-wider">
+                &mdash; S O L I D A R I T A S &mdash;
+            </p>
             <h2 class="mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold">USER ACCOUNTS & FINANCIAL OVERVIEW</h2>
             <p class="text-xs text-slate-600">
                 Period: {{ $dateRangeLabel }}
@@ -318,8 +347,12 @@
     <!-- VIEW FINANCIALS / LEDGER MODAL -->
     @if ($isLedgerModalOpen && $selectedUser)
         <div
-            class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm overflow-y-auto print:hidden">
-            <div class="w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl my-8">
+            class="fixed inset-0 z-[9999] w-screen h-screen bg-slate-950/70 backdrop-blur-sm overflow-y-auto print:hidden">
+
+                    <!-- CENTER MODAL -->
+        <div class="min-h-screen w-full flex items-center justify-center p-4">
+
+            <div class="w-full max-w-3xl max-h-[calc(100vh-2rem)] overflow-hidden rounded-2xl bg-white shadow-2xl flex flex-col">
 
                 <!-- MODAL HEADER -->
                 <div class="bg-[#0C2C6B] px-6 py-4 text-white flex items-center justify-between">
@@ -328,7 +361,7 @@
                             User Financial Overview:
                             {{ trim(($selectedUser->firstname ?? '') . ' ' . ($selectedUser->lastname ?? '')) }}
                         </h3>
-                        <p class="text-xs text-blue-100">Reviewing wallets, provident funds, and individual ledger
+                        <p class="text-xs text-white/70">Reviewing wallets, provident funds, and individual ledger
                             records.</p>
                     </div>
                     <div class="flex items-center gap-2">
@@ -344,7 +377,7 @@
                 </div>
 
                 <!-- MODAL BODY -->
-                <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+                <div class="p-6 space-y-6 overflow-y-auto flex-1 min-h-0">
                     <!-- User Quick Info -->
                     <div
                         class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
@@ -382,16 +415,17 @@
                                             <td class="py-2 px-3">{{ $wallet->WalletID ?? $wallet->id }}</td>
                                             <td class="py-2 px-3 font-semibold">
                                                 @if (in_array($wallet->source, ['OV', 'DR']))
-                                                    <span
-                                                        class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Wallet
-                                                        Fund ({{ $wallet->source }})</span>
+                                                    <span class="text-[#0C2C6B] bg-[#0C2C6B]/10 px-2 py-0.5 rounded">
+                                                        Wallet Fund ({{ $wallet->source }})
+                                                    </span>
                                                 @elseif($wallet->source == 'PF')
-                                                    <span
-                                                        class="text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Provident
-                                                        Fund (PF)</span>
+                                                    <span class="text-[#D79B10] bg-[#D79B10]/10 px-2 py-0.5 rounded">
+                                                        Provident Fund (PF)
+                                                    </span>
                                                 @else
-                                                    <span
-                                                        class="text-slate-600 bg-slate-100 px-2 py-0.5 rounded">{{ $wallet->source }}</span>
+                                                    <span class="text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                                                        {{ $wallet->source }}
+                                                    </span>
                                                 @endif
                                             </td>
                                             <td class="py-2 px-3 font-semibold text-slate-900">
@@ -434,13 +468,13 @@
                                                 <span class="text-slate-400 text-[10px] block">Source:
                                                     {{ $ledger->Source }}</span>
                                             </td>
-                                            <td class="py-2 px-3 font-semibold text-indigo-600">
+                                            <td class="py-2 px-3 font-semibold text-[#0B2A5B]">
                                                 ₱{{ number_format($ledger->amount ?? 0, 2) }}</td>
                                             <td class="py-2 px-3">
-                                                <span
-                                                    class="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-600 rounded-full">
-                                                    {{ $ledger->status }}
-                                                </span>
+                                            <span
+                                                class="px-2 py-0.5 text-[10px] font-semibold bg-[#0C2C6B]/10 text-[#0C2C6B] rounded-full">
+                                                {{ $ledger->status }}
+                                            </span>
                                             </td>
                                             <td class="py-2 px-3 text-slate-400">
                                                 {{ $ledger->created_at?->format('Y-m-d H:i') }}</td>
@@ -470,16 +504,21 @@
 
         <!-- PRINTABLE SINGLE-USER FINANCIAL REPORT -->
         <div id="printable-user-financials" class="hidden font-sans">
-            <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#1b365d]">
-                <h1 class="m-0 text-2xl font-bold text-[#1b365d] font-serif">TRUE LIFE DAYONGAN</h1>
-                <p class="my-1 text-[11px] font-bold text-[#c5a059] uppercase tracking-wider">&mdash; S O L I D A R I T A S &mdash;</p>
-                <h2 class="mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold">USER FINANCIAL OVERVIEW</h2>
-                <p class="text-xs text-slate-600">
-                    {{ trim(($selectedUser->firstname ?? '') . ' ' . ($selectedUser->lastname ?? '')) }}
-                    &nbsp;|&nbsp; {{ $selectedUser->email }}
-                    &nbsp;|&nbsp; Status: {{ $selectedUser->status }}
-                </p>
-            </div>
+        <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#0C2C6B]">
+            <h1 class="m-0 text-2xl font-bold text-[#0C2C6B] font-serif">
+                TRUE LIFE
+            </h1>
+
+            <p class="my-1 text-[11px] font-bold text-[#D79B10] uppercase tracking-wider">
+                &mdash; S O L I D A R I T A S &mdash;
+            </p>
+
+            <p class="text-xs text-slate-600">
+                {{ trim(($selectedUser->firstname ?? '') . ' ' . ($selectedUser->lastname ?? '')) }}
+                &nbsp;|&nbsp; {{ $selectedUser->email }}
+                &nbsp;|&nbsp; Status: {{ $selectedUser->status }}
+            </p>
+        </div>
 
             <h3 class="text-xs font-bold uppercase text-slate-700 mb-1">Wallets & Provident Funds</h3>
             <table class="w-full border-collapse font-sans text-[10px] mb-4">

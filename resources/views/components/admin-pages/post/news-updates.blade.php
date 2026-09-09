@@ -24,13 +24,31 @@
 
         <!-- Search -->
         <div class="relative max-w-sm w-full">
-            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
-                🔍
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+                <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+                    />
+                </svg>
             </span>
 
-            <input type="text" wire:model.live.debounce.300ms="search"
+            <input
+                type="text"
+                wire:model.live.debounce.300ms="search"
                 placeholder="Search updates by title, details..."
-                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
+                class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl
+                    focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
+                    focus:border-[#0C2C6B]
+                    bg-white shadow-sm transition"
+            >
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3">
@@ -179,7 +197,7 @@
                             <input type="text" wire:model="title" placeholder="Enter post title..."
                                 class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] transition-all placeholder:text-slate-400">
                             @error('title')
-                                <p class="text-xs text-rose-500 font-medium mt-1">{{ $message }}</p>
+                                <p class="text-xs text-amber-600 font-medium mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -190,7 +208,7 @@
                             <textarea wire:model="details" placeholder="What's on your mind?" rows="3"
                                 class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] transition-all placeholder:text-slate-400"></textarea>
                             @error('details')
-                                <p class="text-xs text-rose-500 font-medium mt-1">{{ $message }}</p>
+                                <p class="text-xs text-amber-600 font-medium mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -217,7 +235,7 @@
                             </div>
 
                             @error('image')
-                                <p class="text-xs text-rose-500 font-medium">{{ $message }}</p>
+                                <p class="text-xs text-amber-600 font-medium">{{ $message }}</p>
                             @enderror
 
                             @if ($image)
@@ -225,7 +243,7 @@
                                     <img src="{{ $image->temporaryUrl() }}" alt="Preview"
                                         class="w-full max-h-48 object-contain rounded-xl border border-slate-200 bg-slate-50">
                                     <button type="button" wire:click="$set('image', null)"
-                                        class="absolute -top-2 -right-2 bg-rose-500 hover:bg-rose-600 text-white p-1 rounded-full shadow-md transition-all cursor-pointer"
+                                        class="absolute -top-2 -right-2 bg-amber-500 hover:bg-amber-600 text-white p-1 rounded-full shadow-md transition-all cursor-pointer"
                                         title="Remove Image">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
@@ -267,7 +285,7 @@
                                 </select>
 
                                 @error('category')
-                                    <p class="text-xs text-rose-500 font-medium mt-1">
+                                    <p class="text-xs text-amber-600 font-medium mt-1">
                                         {{ $message }}
                                     </p>
                                 @enderror
@@ -288,7 +306,7 @@
                                 </select>
 
                                 @error('status')
-                                    <p class="text-xs text-rose-500 font-medium mt-1">
+                                    <p class="text-xs text-amber-600 font-medium mt-1">
                                         {{ $message }}
                                     </p>
                                 @enderror
@@ -362,7 +380,7 @@
 
                                 @if ($news->status === 'Published')
                                     <span
-                                        class="inline-flex items-center px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-700 text-xs font-semibold">
+                                        class="inline-flex items-center px-2.5 py-1 rounded-md bg-[#0C2C6B]/10 text-[#0C2C6B] border border-[#0C2C6B]/30 text-xs font-semibold">
                                         Published
                                     </span>
                                 @elseif($news->status === 'Draft')
@@ -454,7 +472,7 @@
                             <!-- Status -->
                             @if ($news->status === 'Published')
                                 <span
-                                    class="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 text-[11px] font-semibold">
+                                    class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#0C2C6B]/10 text-[#0C2C6B] border border-[#0C2C6B]/30 text-[11px] font-semibold">
                                     Published
                                 </span>
                             @elseif ($news->status === 'Draft')
@@ -638,7 +656,7 @@
                 text: "You won't be able to revert this!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#E5B83B',
+                confirmButtonColor: '#D79B10',
                 cancelButtonColor: '#6b7280',
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {

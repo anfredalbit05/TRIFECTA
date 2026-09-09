@@ -850,8 +850,8 @@
 
                     showCancelButton: true,
 
-                    confirmButtonColor: '#0C2C6B',
-                    cancelButtonColor: '#6b7280',
+                    confirmButtonColor: '#0B2A5B',
+                    cancelButtonColor: '#D79B10',
 
                     confirmButtonText: 'Confirm ' + data.action,
                     cancelButtonText: 'Cancel',
@@ -1063,7 +1063,7 @@
 
                     confirmButtonText: 'Update Password',
 
-                    confirmButtonColor: '#0C2C6B',
+                    confirmButtonColor: '#0B2A5B',
 
                     cancelButtonColor: '#D79B10',
 
@@ -1426,7 +1426,7 @@
 
                         showCancelButton: true,
 
-                        confirmButtonColor: '#0C2C6B',
+                        confirmButtonColor: '#0B2A5B',
 
                         cancelButtonColor: '#D79B10',
 

@@ -45,11 +45,30 @@
          SEARCH + REFRESH
     ===================================================== --}}
     <div class="au-toolbar">
-        <div class="au-search-wrap">
-            <span class="au-search-icon">🔍</span>
-            <input type="text" wire:model.live="search" placeholder="Search users..."
-                class="au-search-input">
-        </div>
+    <div class="au-search-wrap">
+        <span class="au-search-icon">
+            <svg
+                class="au-search-svg"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+                />
+            </svg>
+        </span>
+
+        <input
+            type="text"
+            wire:model.live="search"
+            placeholder="Search users..."
+            class="au-search-input"
+        >
+    </div>
 
             {{-- REFRESH --}}
             <button

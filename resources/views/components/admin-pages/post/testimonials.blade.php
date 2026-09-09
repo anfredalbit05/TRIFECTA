@@ -22,13 +22,33 @@
     <!-- SEARCH INPUT & REFRESH BUTTON CONTAINER -->
     <div class="flex items-center justify-between gap-4 mb-6">
         <!-- SEARCH INPUT -->
-        <div class="relative max-w-sm w-full">
-            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
-                🔍
-            </span>
-            <input type="text" wire:model.live="search" placeholder="Search testimonials..."
-                class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm">
-        </div>
+    <div class="relative max-w-sm w-full">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+            <svg
+                class="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+                />
+            </svg>
+        </span>
+
+        <input
+            type="text"
+            wire:model.live="search"
+            placeholder="Search testimonials..."
+            class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl
+                focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
+                focus:border-[#0C2C6B]
+                bg-white shadow-sm transition"
+        >
+    </div>
 
         <!-- REFRESH BUTTON -->
         {{-- REFRESH TABLE --}}
@@ -312,8 +332,8 @@
             text: "Do you want to update this testimonial?",
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#0C2C6B',
-            cancelButtonColor: '#6b7280',
+            confirmButtonColor: '#0B2A5B',
+            cancelButtonColor: '#D79B10',
             confirmButtonText: 'Yes, update it!'
         }).then((result) => {
             if (result.isConfirmed) {
@@ -329,8 +349,8 @@
             text: "You won't be able to revert this!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#E5B83B',
-            cancelButtonColor: '#6b7280',
+            confirmButtonColor: '#0B2A5B',
+            cancelButtonColor: '#D79B10',
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {

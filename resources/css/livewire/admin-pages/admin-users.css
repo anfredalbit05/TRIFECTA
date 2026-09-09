@@ -20,9 +20,35 @@
 
 /* ---------- Toolbar (Search + Refresh) ---------- */
 .au-toolbar { @apply flex items-center justify-between gap-4 mb-6; }
-.au-search-wrap { @apply relative max-w-sm w-full; }
-.au-search-icon { @apply absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none; }
-.au-search-input { @apply w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white shadow-sm; }
+.au-search-wrap {
+    @apply relative max-w-sm w-full;
+}
+
+.au-search-icon {
+    @apply pointer-events-none absolute inset-y-0 left-0
+        flex items-center pl-3
+        text-slate-400;
+}
+
+.au-search-svg {
+    @apply h-4 w-4;
+}
+
+.au-search-input {
+    @apply w-full
+        rounded-xl
+        border border-slate-200
+        bg-white
+        py-2.5 pl-10 pr-4
+        text-sm text-slate-700
+        shadow-sm
+        outline-none
+        transition
+        placeholder:text-slate-400
+        focus:border-[#0C2C6B]
+        focus:ring-2
+        focus:ring-[#0C2C6B]/20;
+}
 .au-btn-refresh { @apply inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer; }
 
 /* ---------- Users Table ---------- */

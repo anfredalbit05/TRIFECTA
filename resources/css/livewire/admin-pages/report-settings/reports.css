@@ -1,0 +1,307 @@
+/* ==========================================================================
+   reports.css
+   Extracted styles for the Ledgers report Blade component.
+   Import this file in your main Tailwind entry (e.g. resources/css/app.css)
+   AFTER the @tailwind base/components/utilities directives, e.g.:
+
+   @tailwind base;
+   @tailwind components;
+   @tailwind utilities;
+   @import "./reports.css";
+   ========================================================================== */
+
+/* ---------- Page / header ---------- */
+.reports-container {
+    @apply w-full px-4 sm:px-6 lg:px-8 py-6;
+}
+
+.members-header {
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2;
+}
+
+.report-title {
+    @apply text-2xl font-bold text-slate-800;
+}
+
+.report-description {
+    @apply text-sm text-slate-500 mb-6;
+}
+
+/* ---------- Toolbar (search, filters, actions) ---------- */
+.ledgers-toolbar {
+    @apply flex flex-wrap items-center justify-between gap-4 mb-6;
+}
+
+.search-wrapper {
+    @apply relative max-w-sm w-full sm:w-auto flex-1;
+}
+
+.search-icon {
+    @apply absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none;
+}
+
+.search-icon svg {
+    @apply h-4 w-4;
+}
+
+.search-input {
+    @apply w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl
+           focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
+           focus:border-[#0C2C6B] bg-white shadow-sm transition;
+}
+
+.filters-group {
+    @apply flex items-center gap-3 w-full sm:w-auto justify-end;
+}
+
+.date-range-wrapper {
+    @apply relative w-72;
+}
+
+.date-range-icon {
+    @apply absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none z-10;
+}
+
+.date-range-input {
+    @apply pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl
+           focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white
+           text-slate-700 shadow-sm cursor-pointer w-full text-center font-medium;
+}
+
+.clear-date-btn {
+    @apply inline-flex items-center px-3 py-2 text-sm text-slate-500
+           hover:text-red-500 hover:border-red-200 hover:bg-red-50
+           rounded-xl border border-slate-200 bg-white shadow-sm
+           cursor-pointer transition;
+}
+
+.print-btn {
+    @apply inline-flex items-center gap-2 px-12 py-4.5 bg-white border
+           border-slate-200 text-slate-700 hover:bg-slate-50
+           hover:text-[#0C2C6B] text-sm font-semibold rounded-xl
+           shadow-sm transition cursor-pointer;
+}
+
+/* refresh-btn / refresh-icon / refresh-loading / refresh-circle were already
+   custom classes in the source (not raw Tailwind chains). Base styles are
+   included here in case they aren't defined elsewhere yet. */
+.refresh-btn {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-white border
+           border-slate-200 text-slate-700 hover:bg-slate-50
+           hover:text-[#0C2C6B] text-sm font-semibold rounded-xl
+           shadow-sm transition cursor-pointer disabled:opacity-50
+           disabled:cursor-not-allowed;
+}
+
+.refresh-icon svg,
+.refresh-loading svg {
+    @apply h-4 w-4;
+}
+
+.refresh-loading {
+    @apply inline-flex items-center gap-2;
+}
+
+.refresh-circle {
+    @apply opacity-25;
+}
+
+/* ---------- Table (screen view) ---------- */
+.ledgers-table-wrapper {
+    @apply overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm print:hidden;
+}
+
+.ledgers-table {
+    @apply w-full text-left border-collapse;
+}
+
+.ledgers-table thead tr {
+    @apply border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold
+           uppercase tracking-wider text-white;
+}
+
+.ledgers-table th {
+    @apply py-3 px-4;
+}
+
+.ledgers-table tbody {
+    @apply divide-y divide-slate-200 text-sm text-slate-700;
+}
+
+.ledger-row {
+    @apply hover:bg-slate-50 transition-colors;
+}
+
+.cell-index {
+    @apply py-4 px-4 font-medium text-slate-500;
+}
+
+.cell-text {
+    @apply py-4 px-4 text-slate-600;
+}
+
+.cell-amount {
+    @apply py-4 px-4 font-semibold;
+}
+
+.amount-negative {
+    @apply text-[#D79B10];
+}
+
+.amount-positive {
+    @apply text-[#0C2C6B];
+}
+
+.cell-status {
+    @apply py-4 px-4;
+}
+
+.badge {
+    @apply px-2.5 py-1 text-xs font-semibold rounded-full border;
+}
+
+.badge-source {
+    @apply bg-[#0C2C6B]/10 text-[#0C2C6B] border-[#0C2C6B]/30;
+}
+
+.badge-status-completed {
+    @apply bg-[#0C2C6B]/10 text-[#0C2C6B] border-[#0C2C6B]/30;
+}
+
+.badge-status-pending {
+    @apply bg-amber-50 text-amber-700 border-amber-200;
+}
+
+.cell-date {
+    @apply py-4 px-4 text-slate-500 text-xs;
+}
+
+.empty-row {
+    @apply text-center py-8 text-slate-500;
+}
+
+/* ---------- Pagination ---------- */
+.pagination-wrapper {
+    @apply px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4;
+}
+
+.pagination-label {
+    @apply text-sm text-gray-600;
+}
+
+.pagination-btn-disabled {
+    @apply px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed text-sm;
+}
+
+.pagination-btn {
+    @apply px-4 py-2 text-white rounded transition cursor-pointer text-sm;
+}
+
+.pagination-btn-prev {
+    background-color: #D79B10;
+}
+
+.pagination-btn-next {
+    background-color: #0C2C6B;
+}
+
+/* ---------- Printable report ---------- */
+.printable-ledgers {
+    @apply hidden print:block font-sans;
+}
+
+.print-header {
+    @apply text-center font-sans mb-5 pb-3 border-b-2 border-[#1b365d];
+}
+
+.print-org-name {
+    @apply m-0 text-2xl font-bold text-[#1b365d] font-serif;
+}
+
+.print-tagline {
+    @apply my-1 text-[11px] font-bold text-[#c5a059] uppercase tracking-wider;
+}
+
+.print-report-title {
+    @apply mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold;
+}
+
+.print-period {
+    @apply text-xs text-slate-600;
+}
+
+.print-table {
+    @apply w-full border-collapse font-sans text-[10px];
+}
+
+.print-table-header-row {
+    @apply bg-[#0C2C6B] text-white font-bold text-center h-[22px];
+}
+
+.print-th {
+    @apply border border-slate-900 p-1;
+}
+
+.print-td {
+    @apply border border-slate-900 p-1;
+}
+
+.print-td-center {
+    @apply text-center;
+}
+
+.print-td-right {
+    @apply text-right;
+}
+
+.print-td-bold {
+    @apply font-bold;
+}
+
+.print-empty {
+    @apply border border-slate-900 p-2.5 text-center;
+}
+
+/* ---------- Print media rules (moved from the inline <style> block) ---------- */
+@media print {
+    @page {
+        size: landscape;
+        margin: 8mm;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    #printable-ledgers,
+    #printable-ledgers * {
+        visibility: visible !important;
+    }
+
+    #printable-ledgers {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+    }
+
+    .print-table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+    }
+
+    .print-th,
+    .print-td,
+    .print-empty {
+        border: 1px solid #000 !important;
+        padding: 4px !important;
+    }
+
+    .print-table-header-row th {
+        background-color: #0C2C6B !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}

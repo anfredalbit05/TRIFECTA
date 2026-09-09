@@ -103,9 +103,6 @@
     <!-- MAIN CONTENT CARD -->
     <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6">
         <div class="text-center py-12">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 text-[#0C2C6B] mb-4 text-2xl">
-                📊
-            </div>
             <h3 class="text-lg font-semibold text-gray-800">Overview Panel Content</h3>
             <p class="text-sm text-gray-500 mt-1 max-w-sm mx-auto">
                 This space is ready for your overview metrics, analytics, or summary details.

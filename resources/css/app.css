@@ -176,6 +176,10 @@
 --------------------------------------------------------- */
 
 @import "./livewire/admin-pages/admin-users.css";
+@import "./livewire/admin-pages/report-settings/overview.css";
+@import "./livewire/admin-pages/report-settings/general.css";
+@import "./livewire/admin-pages/report-settings/users-accounts.css";
+@import "./livewire/admin-pages/report-settings/reports.css";
 
 
 /* =========================================================
