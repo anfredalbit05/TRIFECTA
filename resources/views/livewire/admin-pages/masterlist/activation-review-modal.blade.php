@@ -198,6 +198,106 @@
                     </section>
 
                     {{-- ================================================= --}}
+                    {{-- PAYMENT BREAKDOWN --}}
+                    {{-- ================================================= --}}
+                    @if($activation)
+                        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                            <div class="bg-[#0B2A5B] px-5 py-3">
+                                <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                                    Payment Breakdown
+                                </h3>
+                            </div>
+
+                            <div class="p-5">
+
+                                {{-- MEMBERSHIP FEE --}}
+                                <div class="flex items-center justify-between gap-4 py-2">
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-700">
+                                            Membership Fee
+                                        </p>
+                                        <p class="text-xs text-slate-400">
+                                            Base activation fee
+                                        </p>
+                                    </div>
+
+                                    <span class="text-sm font-bold text-slate-800">
+                                        ₱1,999.00
+                                    </span>
+                                </div>
+
+                                {{-- GCASH CONVENIENCE FEE --}}
+                                @if(
+                                    strtolower(trim($activation->payment_method ?? '')) === 'gcash'
+                                    && $gcashConvenienceFeeEnabled
+                                )
+                                    <div class="flex items-center justify-between gap-4 border-t border-slate-100 py-2">
+                                        <div>
+                                            <p class="text-sm font-semibold text-slate-700">
+                                                GCash Convenience Fee
+                                            </p>
+                                            <p class="text-xs text-slate-400">
+                                                1% convenience fee
+                                            </p>
+                                        </div>
+
+                                        <span class="text-sm font-bold text-slate-800">
+                                            ₱19.99
+                                        </span>
+                                    </div>
+                                @endif
+
+                                {{-- TOTAL --}}
+                                <div class="mt-3 flex items-center justify-between gap-4 rounded-xl bg-slate-50 px-4 py-3">
+                                    <div>
+                                        <p class="text-sm font-extrabold text-[#0B2A5B]">
+                                            Total Amount to Pay
+                                        </p>
+
+                                        @if(
+                                            strtolower(trim($activation->payment_method ?? '')) === 'gcash'
+                                            && $gcashConvenienceFeeEnabled
+                                        )
+                                            <p class="mt-0.5 text-[11px] text-slate-500">
+                                                Includes 1% GCash convenience fee
+                                            </p>
+                                        @endif
+                                    </div>
+
+                                    <span class="text-xl font-extrabold text-emerald-600">
+                                        ₱{{ number_format(
+                                            1999 + (
+                                                strtolower(trim($activation->payment_method ?? '')) === 'gcash'
+                                                && $gcashConvenienceFeeEnabled
+                                                    ? 19.99
+                                                    : 0
+                                            ),
+                                            2
+                                        ) }}
+                                    </span>
+                                </div>
+
+                                {{-- ADMIN CHECK NOTE --}}
+                                @if(strtolower(trim($activation->payment_method ?? '')) === 'gcash')
+                                    <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
+                                        <p class="text-xs font-semibold text-blue-800">
+                                            Payment Verification
+                                        </p>
+
+                                        <p class="mt-1 text-[11px] leading-relaxed text-blue-700">
+                                            Verify that the amount sent through GCash matches the
+                                            total amount above. You may use the payment reference
+                                            shown in the activation request to verify the transaction
+                                            on the GCash account.
+                                        </p>
+                                    </div>
+                                @endif
+
+                            </div>
+                        </section>
+                    @endif
+
+                    {{-- ================================================= --}}
                     {{-- REFERRAL INFORMATION --}}
                     {{-- ================================================= --}}
                     <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

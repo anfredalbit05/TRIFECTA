@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use App\Models\Setting;
 
 class ActivationReviewModal extends Component
 {
@@ -37,11 +38,21 @@ class ActivationReviewModal extends Component
 
     public bool $isRejecting = false;
 
+    public bool $gcashConvenienceFeeEnabled = false;
+
     /*
     |--------------------------------------------------------------------------
     | Open Review Modal
     |--------------------------------------------------------------------------
     */
+
+    private function loadPaymentSettings(): void
+    {
+        $this->gcashConvenienceFeeEnabled = filter_var(
+            Setting::where('name', 'gcash_convenience_fee_enabled')->value('value'),
+            FILTER_VALIDATE_BOOLEAN
+        );
+    }
 
     #[On('open-activation-review')]
     public function openModal($UserID): void
@@ -49,6 +60,8 @@ class ActivationReviewModal extends Component
         Log::info('Opening activation review modal.', ['UserID' => $UserID]);
 
         $this->selectedUserID = (int) $UserID;
+
+        $this->loadPaymentSettings();
 
         $this->member = User::find($this->selectedUserID);
 
@@ -341,6 +354,9 @@ class ActivationReviewModal extends Component
 
             return;
         }
+
+        $this->loadPaymentSettings();
+
         /** @var User|null $activatedUser */
         $activatedUser = null;
 
@@ -403,7 +419,10 @@ class ActivationReviewModal extends Component
             |--------------------------------------------------------------------------
             */
 
-            if (strtolower(trim($this->activation->payment_method)) === 'gcash') {
+            if (
+                strtolower(trim($this->activation->payment_method)) === 'gcash'
+                && $this->gcashConvenienceFeeEnabled
+            ) {
 
                 $cfAmount = round(1999 * 0.01, 2);
 

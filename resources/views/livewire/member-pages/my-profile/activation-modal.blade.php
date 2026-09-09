@@ -260,13 +260,95 @@
                                     <p class="mt-1 text-xs text-blue-700">Complete your payment first, then enter the transaction reference number below.</p>
                                 </div>
 
-                                {{-- GCASH DETAILS --}}
-                                @if($payment_method === 'GCash')
-                                    <div class="rounded-lg border border-blue-200 bg-white p-3 text-sm">
-                                        <p class="mb-1"><span class="font-bold text-slate-700">Send to (GCash Name):</span> {{ $gcashName }}</p>
-                                        <p><span class="font-bold text-slate-700">GCash Number:</span> {{ $gcashNumber }}</p>
+                        {{-- GCASH DETAILS --}}
+                        @if($payment_method === 'GCash')
+                            <div class="rounded-lg border border-blue-200 bg-white p-3 text-sm space-y-3">
+
+                                <!-- GCASH ACCOUNT -->
+                                <div>
+                                    <p class="mb-1">
+                                        <span class="font-bold text-slate-700">Send to (GCash Name):</span>
+                                        {{ $gcashName }}
+                                    </p>
+
+                                    <p>
+                                        <span class="font-bold text-slate-700">GCash Number:</span>
+                                        {{ $gcashNumber }}
+                                    </p>
+                                </div>
+
+                                <!-- PAYMENT BREAKDOWN -->
+                                <div class="border-t border-slate-200 pt-3">
+
+                                    <p class="text-xs font-bold uppercase tracking-wide text-slate-500 mb-2">
+                                        Payment Breakdown
+                                    </p>
+
+                                    <div class="space-y-1.5 text-sm">
+
+                                        <!-- MEMBERSHIP FEE -->
+                                        <div class="flex justify-between gap-4">
+                                            <span class="text-slate-600">
+                                                Membership Fee
+                                            </span>
+
+                                            <span class="font-semibold text-slate-700">
+                                                ₱1,999.00
+                                            </span>
+                                        </div>
+
+                                        @if($gcashConvenienceFeeEnabled)
+
+                                            <!-- GCASH CF -->
+                                            <div class="flex justify-between gap-4">
+                                                <span class="text-slate-600">
+                                                    GCash Convenience Fee (1%)
+                                                </span>
+
+                                                <span class="font-semibold text-slate-700">
+                                                    ₱19.99
+                                                </span>
+                                            </div>
+
+                                            <!-- TOTAL -->
+                                            <div class="flex justify-between gap-4 border-t border-slate-200 pt-2 mt-2">
+                                                <span class="font-extrabold text-[#0B2A5B]">
+                                                    Total Amount to Pay
+                                                </span>
+
+                                                <span class="font-extrabold text-[#0B2A5B]">
+                                                    ₱2,018.99
+                                                </span>
+                                            </div>
+
+                                        @else
+
+                                            <!-- TOTAL WITHOUT CF -->
+                                            <div class="flex justify-between gap-4 border-t border-slate-200 pt-2 mt-2">
+                                                <span class="font-extrabold text-[#0B2A5B]">
+                                                    Total Amount to Pay
+                                                </span>
+
+                                                <span class="font-extrabold text-[#0B2A5B]">
+                                                    ₱1,999.00
+                                                </span>
+                                            </div>
+
+                                        @endif
+
+                                    </div>
+                                </div>
+
+                                @if($gcashConvenienceFeeEnabled)
+                                    <div class="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
+                                        <p class="text-[11px] text-amber-700">
+                                            A 1% GCash convenience fee (₱19.99) is included in the total payment.
+                                        </p>
                                     </div>
                                 @endif
+
+                            </div>
+                        @endif
 
                                 {{-- BANK DETAILS --}}
                                 @if($payment_method === 'Bank Transfer')

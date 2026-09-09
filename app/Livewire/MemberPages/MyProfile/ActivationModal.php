@@ -51,6 +51,7 @@ class ActivationModal extends Component
 
     public bool $gcashEnabled = false;
     public bool $bankEnabled = false;
+    public bool $gcashConvenienceFeeEnabled = false;
 
     /*
     |--------------------------------------------------------------------------
@@ -81,6 +82,11 @@ class ActivationModal extends Component
 
         $this->bankEnabled = filter_var(
             Setting::where('name', 'bank_payment_enabled')->value('value'),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+        $this->gcashConvenienceFeeEnabled = filter_var(
+            Setting::where('name', 'gcash_convenience_fee_enabled')->value('value'),
             FILTER_VALIDATE_BOOLEAN
         );
     }
