@@ -46,14 +46,90 @@
 .au-badge-inactive-lg { @apply px-3 py-1 rounded-md border border-amber-400 bg-amber-500 text-white text-xs font-semibold; }
 .au-badge-danger-lg { @apply px-3 py-1 rounded-md border border-red-400 bg-red-500 text-white text-xs font-semibold; }
 
-/* ---------- Row Actions ---------- */
-.au-actions { @apply flex items-center justify-center space-x-2; }
-.au-action-btn { @apply cursor-pointer p-1.5 rounded-lg transition; }
-.au-action-blue { @apply text-blue-600 hover:bg-blue-50; }
-.au-action-emerald { @apply text-emerald-600 hover:bg-emerald-50; }
-.au-action-amber { @apply text-amber-600 hover:bg-amber-50; }
-.au-action-rose { @apply text-rose-600 hover:bg-rose-50; }
-.au-action-password { @apply cursor-pointer p-1.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition shadow-sm; }
+/* =============================================================
+   ROW ACTIONS
+============================================================= */
+
+.au-actions {
+    @apply flex items-center justify-center gap-2;
+}
+
+
+/* Base icon button */
+.au-action-btn {
+    @apply inline-flex
+        h-9 w-9
+        shrink-0
+        items-center justify-center
+        rounded-lg
+        text-xs
+        font-semibold
+        shadow-sm
+        transition
+        cursor-pointer;
+}
+
+
+/* Icon size */
+.au-action-btn .au-icon {
+    @apply h-4 w-4;
+}
+
+
+/* =============================================================
+   ACTION COLORS
+============================================================= */
+
+/* User Access */
+.au-action-blue {
+    @apply bg-[#0C2C6B]
+        text-white
+        hover:bg-[#09204f];
+}
+
+
+/* View */
+.au-action-emerald {
+    @apply bg-slate-600
+        text-white
+        hover:bg-slate-700;
+}
+
+
+/* Edit */
+.au-action-amber {
+    @apply bg-[#D79B10]
+        text-white
+        hover:bg-[#BE850D];
+}
+
+
+/* Delete */
+.au-action-rose {
+    @apply bg-red-500
+        text-white
+        hover:bg-red-600;
+}
+
+
+/* =============================================================
+   PASSWORD
+============================================================= */
+
+.au-action-password {
+    @apply inline-flex
+        h-9 w-9
+        shrink-0
+        items-center
+        justify-center
+        rounded-lg
+        bg-yellow-600
+        text-white
+        shadow-sm
+        transition
+        cursor-pointer
+        hover:bg-yellow-700;
+}
 
 /* Withdrawal action buttons */
 .au-wd-pending { @apply inline-flex items-center justify-center w-24 px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow; }

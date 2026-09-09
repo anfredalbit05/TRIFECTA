@@ -6,6 +6,50 @@
     @apply w-full min-w-0 space-y-5 px-3 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6;
 }
 
+/* =========================================================
+   SATELLITE ACTION
+========================================================= */
+
+.member-action-satellite {
+    @apply h-9 w-9 px-0;
+}
+
+.member-action-satellite {
+    background: linear-gradient(
+        90deg,
+        #D79B10 0%,
+        #D79B10 50%,
+        #0C2C6B 50%,
+        #0C2C6B 100%
+    );
+
+    @apply text-white
+        border
+        border-white/20;
+
+    cursor: pointer;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        filter 0.15s ease;
+}
+
+.member-action-satellite:hover {
+    filter: brightness(1.08);
+
+    box-shadow:
+        0 3px 8px rgba(12, 44, 107, 0.18);
+
+    transform: translateY(-1px);
+}
+
+.member-action-satellite:active {
+    transform: translateY(0);
+}
+
+.member-action-satellite svg {
+    @apply h-4 w-4;
+}
 
 /* =========================================================
    HEADER
