@@ -114,7 +114,7 @@
                         text-gray-500 text-sm font-semibold
                         mt-6 text-center cursor-not-allowed"
                     >
-                        🔒 Withdrawals are currently unavailable
+                        Withdrawals are currently unavailable
                     </div>
 
                 @endif
