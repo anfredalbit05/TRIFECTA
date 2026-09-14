@@ -13,6 +13,7 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use App\Models\ActivationHistory;
+use App\Models\MembershipFee;
 use Illuminate\Support\Facades\Mail;
 
 
@@ -56,6 +57,8 @@ class ActivationModal extends Component
     public bool $bankEnabled = false;
     public bool $gcashConvenienceFeeEnabled = false;
     public bool $paymayaConvenienceFeeEnabled = false;
+
+    public float $totalMembershipFeesCost = 0.00;
 
     /*
     |--------------------------------------------------------------------------
@@ -104,6 +107,9 @@ class ActivationModal extends Component
             Setting::where('name', 'paymaya_convenience_fee_enabled')->value('value'),
             FILTER_VALIDATE_BOOLEAN
         );
+
+        
+        $this->totalMembershipFeesCost = (float) MembershipFee::sum('Cost');
     }
 
     /*
@@ -292,9 +298,9 @@ class ActivationModal extends Component
             $this->gcashNumber = Setting::where('name', 'gcash_number1')->value('value') ?? '';
             $this->gcashName = Setting::where('name', 'gcash_number1_name')->value('value') ?? '';
 
-        } elseif ($this->payment_method === 'PayMaya') {
-            $this->paymayaNumber = Setting::where('name', 'paymaya_number1')->value('value') ?? '';
-            $this->paymayaName = Setting::where('name', 'paymaya_number1_name')->value('value') ?? '';
+        } elseif ($this->payment_method === 'Paymaya') {
+            $this->paymayaNumber = Setting::where('name', 'paymaya_account_number')->value('value') ?? '';
+            $this->paymayaName = Setting::where('name', 'paymaya_account_name')->value('value') ?? '';
 
         } elseif ($this->payment_method === 'Bank Transfer') {
             $this->bankName = 'BPI'; // hardcoded since settings only has bpi_* keys right now

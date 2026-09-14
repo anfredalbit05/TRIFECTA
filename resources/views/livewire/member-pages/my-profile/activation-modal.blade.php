@@ -169,7 +169,7 @@
                                     </div>
                                 </label>
 
-                                <!-- GCASH -->
+                                <!-- PAYMAYA -->
                                 <label
                                     class="flex items-center gap-3 p-3.5 rounded-xl border transition
                                         {{ $paymayaEnabled
@@ -300,7 +300,7 @@
                                                     </span>
 
                                                     <span class="font-semibold text-slate-700">
-                                                        ₱1,999.00
+                                                        ₱{{ number_format($totalMembershipFeesCost, 2) }}
                                                     </span>
                                                 </div>
 
@@ -312,7 +312,7 @@
                                                         </span>
 
                                                         <span class="font-semibold text-slate-700">
-                                                            ₱19.99
+                                                            ₱{{ number_format($totalMembershipFeesCost * 0.01, 2) }}
                                                         </span>
                                                     </div>
 
@@ -324,7 +324,13 @@
                                                         </span>
 
                                                         <span class="font-extrabold text-[#0B2A5B]">
-                                                            ₱2,018.99
+                                                            @if (
+                                                                (strtolower(trim($activation->payment_method ?? '')) === 'gcash' && $gcashConvenienceFeeEnabled) ||
+                                                                    (strtolower(trim($activation->payment_method ?? '')) === 'paymaya' && $paymayaConvenienceFeeEnabled))
+                                                                <p class="mt-0.5 text-[11px] text-slate-500">
+                                                                    Includes 1% convenience fee
+                                                                </p>
+                                                            @endif
                                                         </span>
                                                     </div>
                                                 @else
@@ -336,7 +342,7 @@
                                                         </span>
 
                                                         <span class="font-extrabold text-[#0B2A5B]">
-                                                            ₱1,999.00
+                                                            ₱{{ number_format($totalMembershipFeesCost, 2) }}
                                                         </span>
                                                     </div>
                                                 @endif
@@ -347,7 +353,7 @@
                                         @if ($gcashConvenienceFeeEnabled)
                                             <div class="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
                                                 <p class="text-[11px] text-amber-700">
-                                                    A 1% GCash convenience fee (₱19.99) is included in the total
+                                                    1% GCash convenience fee (₱19.99) is included in the total
                                                     payment.
                                                 </p>
                                             </div>
@@ -355,9 +361,8 @@
 
                                     </div>
                                 @endif
-
                                 {{-- PAYMAYA DETAILS --}}
-                                @if ($payment_method === 'PayMaya')
+                                @if ($payment_method === 'Paymaya')
                                     <div class="rounded-lg border border-blue-200 bg-white p-3 text-sm space-y-3">
 
                                         <!-- PAYMAYA ACCOUNT -->
@@ -389,7 +394,7 @@
                                                     </span>
 
                                                     <span class="font-semibold text-slate-700">
-                                                        ₱1,999.00
+                                                        ₱{{ number_format($totalMembershipFeesCost, 2) }}
                                                     </span>
                                                 </div>
 
@@ -401,7 +406,7 @@
                                                         </span>
 
                                                         <span class="font-semibold text-slate-700">
-                                                            ₱19.99
+                                                            ₱{{ number_format($totalMembershipFeesCost * 0.01, 2) }}
                                                         </span>
                                                     </div>
 
@@ -413,7 +418,13 @@
                                                         </span>
 
                                                         <span class="font-extrabold text-[#0B2A5B]">
-                                                            ₱2,018.99
+                                                            @if (
+                                                                (strtolower(trim($activation->payment_method ?? '')) === 'gcash' && $gcashConvenienceFeeEnabled) ||
+                                                                    (strtolower(trim($activation->payment_method ?? '')) === 'paymaya' && $paymayaConvenienceFeeEnabled))
+                                                                <p class="mt-0.5 text-[11px] text-slate-500">
+                                                                    Includes 1% convenience fee
+                                                                </p>
+                                                            @endif
                                                         </span>
                                                     </div>
                                                 @else
@@ -425,7 +436,7 @@
                                                         </span>
 
                                                         <span class="font-extrabold text-[#0B2A5B]">
-                                                            ₱1,999.00
+                                                            ₱{{ number_format($totalMembershipFeesCost, 2) }}
                                                         </span>
                                                     </div>
                                                 @endif
@@ -436,7 +447,7 @@
                                         @if ($paymayaConvenienceFeeEnabled)
                                             <div class="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
                                                 <p class="text-[11px] text-amber-700">
-                                                    A 1% PayMaya convenience fee (₱19.99) is included in the total
+                                                    1% PayMaya convenience fee (₱19.99) is included in the total
                                                     payment.
                                                 </p>
                                             </div>
@@ -454,6 +465,17 @@
                                             {{ $bankAccountName }}</p>
                                         <p><span class="font-bold text-slate-700">Account Number:</span>
                                             {{ $bankAccountNumber }}</p>
+                                    </div>
+
+                                    <!-- TOTAL WITHOUT CF -->
+                                    <div class="flex justify-between gap-4 border-t border-slate-200 pt-2 mt-2">
+                                        <span class="font-extrabold text-[#0B2A5B]">
+                                            Total Amount to Pay
+                                        </span>
+
+                                        <span class="font-extrabold text-[#0B2A5B]">
+                                            ₱{{ number_format($totalMembershipFeesCost, 2) }}
+                                        </span>
                                     </div>
                                 @endif
 

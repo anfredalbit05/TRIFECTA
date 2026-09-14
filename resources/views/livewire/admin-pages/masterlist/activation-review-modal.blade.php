@@ -1,5 +1,5 @@
 <div>
-    @if($open)
+    @if ($open)
         <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm">
             <div class="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
 
@@ -16,12 +16,9 @@
                         </p>
                     </div>
 
-                    <button
-                        wire:click="closeModal"
-                        type="button"
+                    <button wire:click="closeModal" type="button"
                         class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-lg font-bold text-slate-500 transition hover:bg-red-100 hover:text-red-600"
-                        title="Close"
-                    >
+                        title="Close">
                         ✕
                     </button>
                 </div>
@@ -48,15 +45,8 @@
                                     Full Name
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
-                                    {{
-                                        trim(
-                                            ($member?->firstname ?? '')
-                                            .' '
-                                            .($member?->middlename ?? '')
-                                            .' '
-                                            .($member?->lastname ?? '')
-                                        ) ?: '-'
-                                    }}
+                                    {{ trim(($member?->firstname ?? '') . ' ' . ($member?->middlename ?? '') . ' ' . ($member?->lastname ?? '')) ?:
+                                        '-' }}
                                 </p>
                             </div>
 
@@ -165,11 +155,7 @@
                                     Activation Type
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
-                                    {{
-                                        $activation?->type === 'W'
-                                            ? 'Walk-in'
-                                            : ($activation?->type ? 'Online' : '-')
-                                    }}
+                                    {{ $activation?->type === 'W' ? 'Walk-in' : ($activation?->type ? 'Online' : '-') }}
                                 </p>
                             </div>
 
@@ -189,7 +175,8 @@
                                     Request Status
                                 </p>
                                 <div class="mt-2">
-                                    <span class="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
+                                    <span
+                                        class="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
                                         {{ $activation?->status ?? 'Pending' }}
                                     </span>
                                 </div>
@@ -200,7 +187,7 @@
                     {{-- ================================================= --}}
                     {{-- PAYMENT BREAKDOWN --}}
                     {{-- ================================================= --}}
-                    @if($activation)
+                    @if ($activation)
                         <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                             <div class="bg-[#0B2A5B] px-5 py-3">
                                 <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
@@ -227,10 +214,7 @@
                                 </div>
 
                                 {{-- GCASH CONVENIENCE FEE --}}
-                                @if(
-                                    strtolower(trim($activation->payment_method ?? '')) === 'gcash'
-                                    && $gcashConvenienceFeeEnabled
-                                )
+                                @if (strtolower(trim($activation->payment_method ?? '')) === 'gcash' && $gcashConvenienceFeeEnabled)
                                     <div class="flex items-center justify-between gap-4 border-t border-slate-100 py-2">
                                         <div>
                                             <p class="text-sm font-semibold text-slate-700">
@@ -242,14 +226,11 @@
                                         </div>
 
                                         <span class="text-sm font-bold text-slate-800">
-                                        ₱{{ number_format($totalMembershipFeesCost  * 0.01, 2) }}
+                                            ₱{{ number_format($totalMembershipFeesCost * 0.01, 2) }}
                                         </span>
                                     </div>
                                 @endif
-                                @if(
-                                    strtolower(trim($activation->payment_method ?? '')) === 'paymaya'
-                                    && $paymayaConvenienceFeeEnabled
-                                )
+                                @if (strtolower(trim($activation->payment_method ?? '')) === 'paymaya' && $paymayaConvenienceFeeEnabled)
                                     <div class="flex items-center justify-between gap-4 border-t border-slate-100 py-2">
                                         <div>
                                             <p class="text-sm font-semibold text-slate-700">
@@ -261,43 +242,42 @@
                                         </div>
 
                                         <span class="text-sm font-bold text-slate-800">
-                                            ₱19.99
+                                            ₱{{ number_format($totalMembershipFeesCost * 0.01, 2) }}
                                         </span>
                                     </div>
                                 @endif
 
                                 {{-- TOTAL --}}
-                                <div class="mt-3 flex items-center justify-between gap-4 rounded-xl bg-slate-50 px-4 py-3">
+                                <div
+                                    class="mt-3 flex items-center justify-between gap-4 rounded-xl bg-slate-50 px-4 py-3">
                                     <div>
                                         <p class="text-sm font-extrabold text-[#0B2A5B]">
                                             Total Amount to Pay
                                         </p>
 
-                                        @if(
-                                            strtolower(trim($activation->payment_method ?? '')) === 'gcash'
-                                            && $gcashConvenienceFeeEnabled
-                                        )
+                                        @if (
+                                            (strtolower(trim($activation->payment_method ?? '')) === 'gcash' && $gcashConvenienceFeeEnabled) ||
+                                                (strtolower(trim($activation->payment_method ?? '')) === 'paymaya' && $paymayaConvenienceFeeEnabled))
                                             <p class="mt-0.5 text-[11px] text-slate-500">
-                                                Includes 1% GCash convenience fee
+                                                Includes 1% convenience fee
                                             </p>
                                         @endif
                                     </div>
 
                                     <span class="text-xl font-extrabold text-emerald-600">
                                         ₱{{ number_format(
-                                            1999 + (
-                                                strtolower(trim($activation->payment_method ?? '')) === 'gcash'
-                                                && $gcashConvenienceFeeEnabled
-                                                    ? 19.99
-                                                    : 0
-                                            ),
-                                            2
+                                            $totalMembershipFeesCost +
+                                                ((strtolower(trim($activation->payment_method ?? '')) === 'gcash' && $gcashConvenienceFeeEnabled) ||
+                                                (strtolower(trim($activation->payment_method ?? '')) === 'paymaya' && $paymayaConvenienceFeeEnabled)
+                                                    ? number_format($totalMembershipFeesCost * 0.01, 2)
+                                                    : 0),
+                                            2,
                                         ) }}
                                     </span>
                                 </div>
 
                                 {{-- ADMIN CHECK NOTE --}}
-                                @if(strtolower(trim($activation->payment_method ?? '')) === 'gcash')
+                                @if (strtolower(trim($activation->payment_method ?? '')) === 'gcash')
                                     <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
                                         <p class="text-xs font-semibold text-blue-800">
                                             Payment Verification
@@ -343,13 +323,8 @@
                                     Referral Member
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
-                                    {{
-                                        trim(
-                                            ($referralUser?->firstname ?? '')
-                                            .' '
-                                            .($referralUser?->lastname ?? '')
-                                        ) ?: 'No referral member found'
-                                    }}
+                                    {{ trim(($referralUser?->firstname ?? '') . ' ' . ($referralUser?->lastname ?? '')) ?:
+                                        'No referral member found' }}
                                 </p>
                             </div>
                         </div>
@@ -370,45 +345,37 @@
                             </span>
                         </div>
 
-                        @if(!empty($beneficiaries) && count($beneficiaries) > 0)
+                        @if (!empty($beneficiaries) && count($beneficiaries) > 0)
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-slate-200">
                                     <thead class="bg-slate-100">
                                         <tr>
-                                            <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
+                                            <th
+                                                class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                                                 Full Name
                                             </th>
-                                            <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
+                                            <th
+                                                class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                                                 Birthdate
                                             </th>
-                                            <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
+                                            <th
+                                                class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                                                 Relationship
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100 bg-white">
-                                        @foreach($beneficiaries as $beneficiary)
+                                        @foreach ($beneficiaries as $beneficiary)
                                             <tr class="transition hover:bg-slate-50">
-                                                <td class="whitespace-nowrap px-5 py-4 text-sm font-bold text-slate-800">
-                                                    {{
-                                                        is_array($beneficiary)
-                                                            ? ($beneficiary['fullname'] ?? '-')
-                                                            : ($beneficiary->fullname ?? '-')
-                                                    }}
+                                                <td
+                                                    class="whitespace-nowrap px-5 py-4 text-sm font-bold text-slate-800">
+                                                    {{ is_array($beneficiary) ? $beneficiary['fullname'] ?? '-' : $beneficiary->fullname ?? '-' }}
                                                 </td>
                                                 <td class="whitespace-nowrap px-5 py-4 text-sm text-slate-600">
-                                                    {{
-                                                        is_array($beneficiary)
-                                                            ? ($beneficiary['birthdate'] ?? '-')
-                                                            : ($beneficiary->birthdate ?? '-')
-                                                    }}
+                                                    {{ is_array($beneficiary) ? $beneficiary['birthdate'] ?? '-' : $beneficiary->birthdate ?? '-' }}
                                                 </td>
                                                 <td class="whitespace-nowrap px-5 py-4 text-sm text-slate-600">
-                                                    {{
-                                                        is_array($beneficiary)
-                                                            ? ($beneficiary['relationship'] ?? '-')
-                                                            : ($beneficiary->relationship ?? '-')
-                                                    }}
+                                                    {{ is_array($beneficiary) ? $beneficiary['relationship'] ?? '-' : $beneficiary->relationship ?? '-' }}
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -417,7 +384,8 @@
                             </div>
                         @else
                             <div class="flex flex-col items-center justify-center px-5 py-10 text-center">
-                                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl">
+                                <div
+                                    class="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl">
                                     👥
                                 </div>
                                 <p class="mt-3 font-bold text-slate-700">
@@ -435,24 +403,18 @@
                 {{-- ================================================= --}}
                 {{-- FOOTER --}}
                 {{-- ================================================= --}}
-                <div class="flex shrink-0 flex-col-reverse justify-between gap-3 border-t border-slate-200 bg-white p-4 sm:flex-row sm:items-center">
-                    <button
-                        wire:click="closeModal"
-                        type="button"
-                        class="rounded-xl border border-slate-300 px-6 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-100"
-                    >
+                <div
+                    class="flex shrink-0 flex-col-reverse justify-between gap-3 border-t border-slate-200 bg-white p-4 sm:flex-row sm:items-center">
+                    <button wire:click="closeModal" type="button"
+                        class="rounded-xl border border-slate-300 px-6 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-100">
                         Close
                     </button>
 
                     <div class="flex flex-col gap-3 sm:flex-row">
                         {{-- REJECT --}}
-                        <button
-                            type="button"
-                            wire:loading.attr="disabled"
-                            wire:target="rejectActivation"
+                        <button type="button" wire:loading.attr="disabled" wire:target="rejectActivation"
                             onclick="confirmReject()"
-                            class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
-                        >
+                            class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
                             <span wire:loading.remove wire:target="rejectActivation">
                                 Reject
                             </span>
@@ -462,13 +424,9 @@
                         </button>
 
                         {{-- APPROVE --}}
-                        <button
-                            type="button"
-                            wire:loading.attr="disabled"
-                            wire:target="approve"
+                        <button type="button" wire:loading.attr="disabled" wire:target="approve"
                             onclick="confirmApprove()"
-                            class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
-                        >
+                            class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
                             <span wire:loading.remove wire:target="approve">
                                 Approve Activation
                             </span>
@@ -484,90 +442,90 @@
     @endif
 
     @script
-    <script>
-        window.confirmReject = function () {
-            Swal.fire({
-                title: 'Reject Activation?',
-                icon: 'warning',
-                input: 'textarea',
-                inputLabel: 'Rejection remarks',
-                inputPlaceholder: 'Enter the reason for rejection...',
-                inputAttributes: {
-                    maxlength: 1000,
-                    rows: 5
-                },
-                showCancelButton: true,
-                cancelButtonText: 'Cancel',
-                confirmButtonText: 'Reject',
-                cancelButtonColor: '#D79B10',
-                confirmButtonColor: '#0B2A5B',
-                reverseButtons: false,
-                inputValidator: (value) => {
-                    if (!value || value.trim() === '') {
-                        return 'Remarks are required.';
+        <script>
+            window.confirmReject = function() {
+                Swal.fire({
+                    title: 'Reject Activation?',
+                    icon: 'warning',
+                    input: 'textarea',
+                    inputLabel: 'Rejection remarks',
+                    inputPlaceholder: 'Enter the reason for rejection...',
+                    inputAttributes: {
+                        maxlength: 1000,
+                        rows: 5
+                    },
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancel',
+                    confirmButtonText: 'Reject',
+                    cancelButtonColor: '#D79B10',
+                    confirmButtonColor: '#0B2A5B',
+                    reverseButtons: false,
+                    inputValidator: (value) => {
+                        if (!value || value.trim() === '') {
+                            return 'Remarks are required.';
+                        }
                     }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Rejecting activation...',
-                        text: 'Sending email and updating records.',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        showConfirmButton: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Rejecting activation...',
+                            text: 'Sending email and updating records.',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
 
-                    $wire.set('remarks', result.value);
-                    $wire.rejectActivation();
-                }
+                        $wire.set('remarks', result.value);
+                        $wire.rejectActivation();
+                    }
+                });
+            };
+
+            window.confirmApprove = function() {
+                Swal.fire({
+                    title: 'Approve activation?',
+                    text: 'This will activate the member account and send email notifications.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Approve',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#0B2A5B',
+                    cancelButtonColor: '#D79B10',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Approving activation...',
+                            text: 'Sending emails and updating records.',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        $wire.approve();
+                    }
+                });
+            };
+
+            window.addEventListener('swal:close', () => {
+                Swal.close();
             });
-        };
 
-        window.confirmApprove = function () {
-            Swal.fire({
-                title: 'Approve activation?',
-                text: 'This will activate the member account and send email notifications.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Approve',
-                cancelButtonText: 'Cancel',
-                confirmButtonColor: '#0B2A5B',
-                cancelButtonColor: '#D79B10',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Approving activation...',
-                        text: 'Sending emails and updating records.',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        showConfirmButton: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-
-                    $wire.approve();
-                }
+            window.addEventListener('swal:success', (event) => {
+                Swal.fire({
+                    icon: 'success',
+                    title: event.detail.title,
+                    text: event.detail.message,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0B2A5B',
+                    allowOutsideClick: false
+                });
             });
-        };
-
-        window.addEventListener('swal:close', () => {
-            Swal.close();
-        });
-
-        window.addEventListener('swal:success', (event) => {
-            Swal.fire({
-                icon: 'success',
-                title: event.detail.title,
-                text: event.detail.message,
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#0B2A5B',
-                allowOutsideClick: false
-            });
-        });
-    </script>
+        </script>
     @endscript
 </div>
