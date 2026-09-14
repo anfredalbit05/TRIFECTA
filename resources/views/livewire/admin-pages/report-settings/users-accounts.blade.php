@@ -159,9 +159,11 @@
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">User Profile</th>
                     <th class="py-3 px-4">Role</th>
-                    <th class="py-3 px-4">Wallet Fund (OV/DR)</th>
+                    <th class="py-3 px-4">Direct Referral (DR)</th>
                     <th class="py-3 px-4">Provident Fund (PF)</th>
-                    <th class="py-3 px-4">Ledger Fund</th>
+                    <th class="py-3 px-4">Overrides (OV)</th>
+                    <th class="py-3 px-4">Withdrawals (WD)</th>
+                    <th class="py-3 px-4">Balance</th>
                     <th class="py-3 px-4">Status</th>
                     <th class="py-3 px-4 text-right">Actions</th>
                 </tr>
@@ -169,13 +171,21 @@
             <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
                 @forelse($users as $index => $user)
                     @php
-                        $walletFund = $user->wallets
+                        $walletDR = $user->wallets
                             ->where('status', 'Active')
-                            ->whereIn('source', ['OV', 'DR'])
+                            ->where('source', 'DR')
                             ->sum('amount');
                         $providentFund = $user->wallets
                             ->where('status', 'Active')
                             ->where('source', 'PF')
+                            ->sum('amount');
+                        $walletOV = $user->wallets
+                            ->where('status', 'Active')
+                            ->where('source', 'OV')
+                            ->sum('amount');
+                        $walletWD = $user->wallets
+                            ->where('status', 'Active')
+                            ->where('source', 'WD')
                             ->sum('amount');
                         $ledgerFund = $user->ledgers->sum('amount');
                     @endphp
@@ -197,15 +207,23 @@
                         </td>
 
                         <td class="py-4 px-4 font-bold text-[#0C2C6B]">
-                            ₱{{ number_format($walletFund, 2) }}
+                            ₱{{ number_format($walletDR, 2) }}
                         </td>
 
-                        <td class="py-4 px-4 font-bold text-[#D79B10]">
+                        <td class="py-4 px-4 font-bold text-[#0C2C6B]">
                             ₱{{ number_format($providentFund, 2) }}
                         </td>
 
+                        <td class="py-4 px-4 font-bold text-[#0C2C6B]">
+                            ₱{{ number_format($walletOV, 2) }}
+                        </td>
+
+                        <td class="py-4 px-4 font-bold text-[#D79B10]">
+                            ₱{{ number_format($walletWD, 2) }}
+                        </td>
+
                         <td class="py-4 px-4 font-bold text-[#0B2A5B]">
-                            ₱{{ number_format($ledgerFund, 2) }}
+                            ₱{{ number_format((($walletDR + $providentFund + $walletOV) - $walletWD), 2) }}
                         </td>
 
                         <td class="py-4 px-4">
@@ -399,9 +417,11 @@
                     <!-- Wallets & Provident Funds Section -->
                     <div>
                         <h4 class="text-sm font-bold text-slate-800 mb-2">Wallets & Provident Funds</h4>
-                        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                        {{-- <div class="bg-white border border-slate-200 rounded-xl overflow-hidden"> --}}
+                        <div
+                            class="bg-white border border-slate-200 rounded-xl overflow-hidden max-h-60 overflow-y-auto">
                             <table class="w-full text-left text-xs">
-                                <thead class="bg-slate-100 text-slate-600">
+                                <thead class="bg-slate-100 text-slate-600 sticky top-0">
                                     <tr>
                                         <th class="py-2 px-3">Wallet ID</th>
                                         <th class="py-2 px-3">Source Type</th>
@@ -414,15 +434,29 @@
                                         <tr>
                                             <td class="py-2 px-3">{{ $wallet->WalletID ?? $wallet->id }}</td>
                                             <td class="py-2 px-3 font-semibold">
-                                                @if (in_array($wallet->source, ['OV', 'DR']))
+                                                
+                                                @if($wallet->source == 'DR')
                                                     <span class="text-[#0C2C6B] bg-[#0C2C6B]/10 px-2 py-0.5 rounded">
-                                                        Wallet Fund ({{ $wallet->source }})
+                                                        Direct Referral ({{ $wallet->source }})
                                                     </span>
-                                                @elseif($wallet->source == 'PF')
-                                                    <span class="text-[#D79B10] bg-[#D79B10]/10 px-2 py-0.5 rounded">
+                                                @endif
+                                                @if($wallet->source == 'PF')
+                                                    <span class="text-[#0C2C6B] bg-[#0C2C6B]/10 px-2 py-0.5 rounded">
                                                         Provident Fund (PF)
                                                     </span>
-                                                @else
+                                                @endif
+                                                @if($wallet->source == 'OV')
+                                                    <span class="text-[#0C2C6B] bg-[#0C2C6B]/10 px-2 py-0.5 rounded">
+                                                        Overrides ({{ $wallet->source }})
+                                                    </span>
+                                                @endif
+                                                @if($wallet->source == 'WD')
+                                                    <span class="text-[#0C2C6B] bg-[#0C2C6B]/10 px-2 py-0.5 rounded">
+                                                        Withdrawal (WD)
+                                                    </span>
+                                                @endif
+
+                                                @if (!in_array($wallet->source, ['OV', 'DR', 'PF', 'WD']))
                                                     <span class="text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
                                                         {{ $wallet->source }}
                                                     </span>
