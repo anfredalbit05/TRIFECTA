@@ -40,6 +40,8 @@ class ActivationReviewModal extends Component
 
     public bool $gcashConvenienceFeeEnabled = false;
 
+    public bool $paymayaConvenienceFeeEnabled = false;
+
     /*
     |--------------------------------------------------------------------------
     | Open Review Modal
@@ -50,6 +52,10 @@ class ActivationReviewModal extends Component
     {
         $this->gcashConvenienceFeeEnabled = filter_var(
             Setting::where('name', 'gcash_convenience_fee_enabled')->value('value'),
+            FILTER_VALIDATE_BOOLEAN
+        );
+        $this->paymayaConvenienceFeeEnabled = filter_var(
+            Setting::where('name', 'paymaya_convenience_fee_enabled')->value('value'),
             FILTER_VALIDATE_BOOLEAN
         );
     }
@@ -360,6 +366,9 @@ class ActivationReviewModal extends Component
         /** @var User|null $activatedUser */
         $activatedUser = null;
 
+        //Total Membership Fees (MF) Cost for the Activation
+        $totalAmount = (float) MembershipFee::sum('Cost');
+
         // 2. Atomic Database Operations (Database Changes Only)
         DB::transaction(function () use (&$activatedUser) {
 
@@ -415,16 +424,17 @@ class ActivationReviewModal extends Component
             | GCash Convenience Fee (CF)
             |--------------------------------------------------------------------------
             | Only applies when payment_method is Gcash.
-            | CF = 1% of 1,999 = 19.99
+            | CF = 1% of Total Cost Membership = 19.99
             |--------------------------------------------------------------------------
             */
 
             if (
-                strtolower(trim($this->activation->payment_method)) === 'gcash'
-                && $this->gcashConvenienceFeeEnabled
+                (strtolower(trim($this->activation->payment_method)) === 'gcash'
+                && $this->gcashConvenienceFeeEnabled) || strtolower(trim($this->activation->payment_method)) === 'gcash'
+                && $this->paymayaConvenienceFeeEnabled
             ) {
 
-                $cfAmount = round(1999 * 0.01, 2);
+                $cfAmount = round($totalAmount * 0.01, 2);
 
                 Ledger::create([
                     'RefID'        => $this->selectedUserID,
@@ -539,7 +549,6 @@ class ActivationReviewModal extends Component
         // Send email to the newly activated user
         if ($activatedUser && filled($activatedUser->email)) {
             try {
-                $totalAmount = (float) MembershipFee::sum('Cost');
 
                 Mail::to($activatedUser->email)
                     ->send(new ActivationApprovedMail($activatedUser, $this->activation, $totalAmount));
