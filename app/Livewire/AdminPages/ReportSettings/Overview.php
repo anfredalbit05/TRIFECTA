@@ -155,7 +155,10 @@ class Overview extends Component
             UNION ALL SELECT 4, 'PF', 'Provident Fund'
             UNION ALL SELECT 5, 'CL', 'Claim'
             UNION ALL SELECT 6, 'RF', 'Refund'
-            UNION ALL SELECT 7, 'OT', 'Others'
+            UNION ALL SELECT 7, 'CF', 'Convenience Fee'
+            UNION ALL SELECT 8, 'TX', 'TAX'
+            UNION ALL SELECT 9, 'WD', 'Withdrawals'
+            UNION ALL SELECT 10, 'OT', 'Others'
         ) as s"))
             ->leftJoin('ledgers as l', function ($join) {
                 $join->on('l.Source', '=', 's.Source')
@@ -189,6 +192,8 @@ class Overview extends Component
                 SELECT 2, 'PF', 'Provident Fund'
                 UNION ALL
                 SELECT 3, 'OV', 'Overrides'
+                UNION ALL
+                SELECT 4, 'WD', 'Withdrawals'
             ) s
             LEFT JOIN wallets w
                 ON w.UserID = u.UserID
