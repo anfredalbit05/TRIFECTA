@@ -260,6 +260,7 @@
                     <th class="border border-slate-900 p-1">Direct Referrals</th>
                     <th class="border border-slate-900 p-1">Provident Funds</th>
                     <th class="border border-slate-900 p-1">Overrides</th>
+                    <th class="border border-slate-900 p-1">Withdrawals</th>
                     <th class="border border-slate-900 p-1">Balance</th>
                     <th class="border border-slate-900 p-1">Status</th>
                 </tr>
