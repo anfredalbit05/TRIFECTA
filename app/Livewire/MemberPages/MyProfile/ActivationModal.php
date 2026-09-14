@@ -45,13 +45,17 @@ class ActivationModal extends Component
     // Display-only: pulled from settings when GCash/Bank is selected
     public string $gcashName = '';
     public string $gcashNumber = '';
+    public string $paymayaName = '';
+    public string $paymayaNumber = '';
     public string $bankName = '';
     public string $bankAccountName = '';
     public string $bankAccountNumber = '';
 
     public bool $gcashEnabled = false;
+    public bool $paymayaEnabled = false;
     public bool $bankEnabled = false;
     public bool $gcashConvenienceFeeEnabled = false;
+    public bool $paymayaConvenienceFeeEnabled = false;
 
     /*
     |--------------------------------------------------------------------------
@@ -80,6 +84,12 @@ class ActivationModal extends Component
             FILTER_VALIDATE_BOOLEAN
         );
 
+        $this->paymayaEnabled = filter_var(
+            Setting::where('name', 'paymaya_payment_enabled')->value('value'),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+
         $this->bankEnabled = filter_var(
             Setting::where('name', 'bank_payment_enabled')->value('value'),
             FILTER_VALIDATE_BOOLEAN
@@ -87,6 +97,11 @@ class ActivationModal extends Component
 
         $this->gcashConvenienceFeeEnabled = filter_var(
             Setting::where('name', 'gcash_convenience_fee_enabled')->value('value'),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+        $this->paymayaConvenienceFeeEnabled = filter_var(
+            Setting::where('name', 'paymaya_convenience_fee_enabled')->value('value'),
             FILTER_VALIDATE_BOOLEAN
         );
     }
@@ -566,6 +581,13 @@ class ActivationModal extends Component
                 $this->addError(
                     'payment_method',
                     'GCash payment is currently unavailable.'
+                );
+                return;
+            }
+            if ($this->payment_method === 'PayMaya' && !$this->paymayaEnabled) {
+                $this->addError(
+                    'payment_method',
+                    'PayMaya payment is currently unavailable.'
                 );
                 return;
             }
