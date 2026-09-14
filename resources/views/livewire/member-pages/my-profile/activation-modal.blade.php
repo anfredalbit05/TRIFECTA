@@ -324,13 +324,7 @@
                                                         </span>
 
                                                         <span class="font-extrabold text-[#0B2A5B]">
-                                                            @if (
-                                                                (strtolower(trim($activation->payment_method ?? '')) === 'gcash' && $gcashConvenienceFeeEnabled) ||
-                                                                    (strtolower(trim($activation->payment_method ?? '')) === 'paymaya' && $paymayaConvenienceFeeEnabled))
-                                                                <p class="mt-0.5 text-[11px] text-slate-500">
-                                                                    Includes 1% convenience fee
-                                                                </p>
-                                                            @endif
+                                                            ₱{{ number_format($totalMembershipFeesCost + $totalMembershipFeesCost * 0.01, 2) }}
                                                         </span>
                                                     </div>
                                                 @else
@@ -418,13 +412,7 @@
                                                         </span>
 
                                                         <span class="font-extrabold text-[#0B2A5B]">
-                                                            @if (
-                                                                (strtolower(trim($activation->payment_method ?? '')) === 'gcash' && $gcashConvenienceFeeEnabled) ||
-                                                                    (strtolower(trim($activation->payment_method ?? '')) === 'paymaya' && $paymayaConvenienceFeeEnabled))
-                                                                <p class="mt-0.5 text-[11px] text-slate-500">
-                                                                    Includes 1% convenience fee
-                                                                </p>
-                                                            @endif
+                                                            ₱{{ number_format($totalMembershipFeesCost + $totalMembershipFeesCost * 0.01, 2) }}
                                                         </span>
                                                     </div>
                                                 @else
