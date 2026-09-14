@@ -42,6 +42,8 @@ class ActivationReviewModal extends Component
 
     public bool $paymayaConvenienceFeeEnabled = false;
 
+    public float $totalMembershipFeesCost = 0.00;
+
     /*
     |--------------------------------------------------------------------------
     | Open Review Modal
@@ -58,6 +60,8 @@ class ActivationReviewModal extends Component
             Setting::where('name', 'paymaya_convenience_fee_enabled')->value('value'),
             FILTER_VALIDATE_BOOLEAN
         );
+
+        $this->totalMembershipFeesCost = (float) MembershipFee::sum('Cost');
     }
 
     #[On('open-activation-review')]
@@ -430,7 +434,7 @@ class ActivationReviewModal extends Component
 
             if (
                 (strtolower(trim($this->activation->payment_method)) === 'gcash'
-                && $this->gcashConvenienceFeeEnabled) || strtolower(trim($this->activation->payment_method)) === 'gcash'
+                && $this->gcashConvenienceFeeEnabled) || strtolower(trim($this->activation->payment_method)) === 'paymaya'
                 && $this->paymayaConvenienceFeeEnabled
             ) {
 
@@ -444,7 +448,7 @@ class ActivationReviewModal extends Component
                     'status'       => 'Completed',
                 ]);
 
-                Log::info('GCash CF ledger entry created.', [
+                Log::info('GCash | Paymaya CF ledger entry created.', [
                     'UserID' => $this->selectedUserID,
                     'ActivationID' => $this->activation->ActivationID,
                     'payment_method' => $this->activation->payment_method,

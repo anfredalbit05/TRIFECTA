@@ -222,7 +222,7 @@
                                     </div>
 
                                     <span class="text-sm font-bold text-slate-800">
-                                        ₱1,999.00
+                                        ₱{{ number_format($totalMembershipFeesCost, 2) }}
                                     </span>
                                 </div>
 
@@ -235,6 +235,25 @@
                                         <div>
                                             <p class="text-sm font-semibold text-slate-700">
                                                 GCash Convenience Fee
+                                            </p>
+                                            <p class="text-xs text-slate-400">
+                                                1% convenience fee
+                                            </p>
+                                        </div>
+
+                                        <span class="text-sm font-bold text-slate-800">
+                                        ₱{{ number_format($totalMembershipFeesCost  * 0.01, 2) }}
+                                        </span>
+                                    </div>
+                                @endif
+                                @if(
+                                    strtolower(trim($activation->payment_method ?? '')) === 'paymaya'
+                                    && $paymayaConvenienceFeeEnabled
+                                )
+                                    <div class="flex items-center justify-between gap-4 border-t border-slate-100 py-2">
+                                        <div>
+                                            <p class="text-sm font-semibold text-slate-700">
+                                                Paymaya Convenience Fee
                                             </p>
                                             <p class="text-xs text-slate-400">
                                                 1% convenience fee
