@@ -101,17 +101,7 @@ body{
 
 </div>
 
-<div class="date">
 
-{{ $issuedDate }}
-
-</div>
-
-<div class="cert">
-
-{{ $certificateNumber }}
-
-</div>
 
 </div>
 
