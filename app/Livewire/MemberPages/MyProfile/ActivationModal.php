@@ -282,6 +282,8 @@ class ActivationModal extends Component
         // reset first so switching methods doesn't leak old values
         $this->gcashName = '';
         $this->gcashNumber = '';
+        $this->paymayaName = '';
+        $this->paymayaNumber = '';
         $this->bankName = '';
         $this->bankAccountName = '';
         $this->bankAccountNumber = '';
@@ -289,6 +291,10 @@ class ActivationModal extends Component
         if ($this->payment_method === 'GCash') {
             $this->gcashNumber = Setting::where('name', 'gcash_number1')->value('value') ?? '';
             $this->gcashName = Setting::where('name', 'gcash_number1_name')->value('value') ?? '';
+
+        } elseif ($this->payment_method === 'PayMaya') {
+            $this->paymayaNumber = Setting::where('name', 'paymaya_number1')->value('value') ?? '';
+            $this->paymayaName = Setting::where('name', 'paymaya_number1_name')->value('value') ?? '';
 
         } elseif ($this->payment_method === 'Bank Transfer') {
             $this->bankName = 'BPI'; // hardcoded since settings only has bpi_* keys right now
@@ -313,6 +319,8 @@ class ActivationModal extends Component
             'rejectionRemarks',
             'gcashName',
             'gcashNumber',
+            'paymayaName',
+            'paymayaNumber',
             'bankName',
             'bankAccountName',
             'bankAccountNumber',
