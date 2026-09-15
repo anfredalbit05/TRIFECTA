@@ -371,7 +371,7 @@ class ActivationReviewModal extends Component
         $activatedUser = null;
 
         //Total Membership Fees (MF) Cost for the Activation
-        $totalAmount = (float) MembershipFee::sum('Cost');
+        // $totalAmount = (float) MembershipFee::sum('Cost');
 
         // 2. Atomic Database Operations (Database Changes Only)
         DB::transaction(function () use (&$activatedUser) {
@@ -438,6 +438,7 @@ class ActivationReviewModal extends Component
                 && $this->paymayaConvenienceFeeEnabled
             ) {
 
+                $totalAmount = (float) MembershipFee::sum('Cost');
                 $cfAmount = round($totalAmount * 0.01, 2);
 
                 Ledger::create([
