@@ -101,6 +101,15 @@
                         </div>
 
                         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-bold uppercase text-slate-400">Policy Effective Date</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-800">
+                                {{ $policy_effectivity_date
+                                    ? \Carbon\Carbon::parse($policy_effectivity_date)->format('F d, Y')
+                                    : 'N/A' }}
+                            </p>
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                             <p class="text-xs font-bold uppercase text-slate-400">Policy Status</p>
                             <div class="mt-1 flex min-h-[20px] flex-col">
                                 @if ($policy_expiration_date)

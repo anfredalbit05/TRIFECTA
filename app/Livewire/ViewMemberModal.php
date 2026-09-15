@@ -37,6 +37,7 @@ class ViewMemberModal extends Component
     */
     public $policy_number = '';
     public $policy_expiration_date = '';
+    public $policy_effectivity_date = '';
 
     /*
     |--------------------------------------------------------------------------
@@ -122,6 +123,7 @@ class ViewMemberModal extends Component
     {
         $this->policy_number = $user->policy_number;
         $this->policy_expiration_date = $user->policy_expiration_date;
+        $this->policy_effectivity_date = $user->policy_effectivity_date;
     }
 
     /*

@@ -53,7 +53,9 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
     'longitude',
     'email',
     'policy_number',
+    'policy_effectivity_date',
     'policy_expiration_date',
+
 
     // Emergency Contact Information (Added)
     'emergencyName',
