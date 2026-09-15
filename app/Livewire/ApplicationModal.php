@@ -38,6 +38,7 @@ class ApplicationModal extends Component
 
     public ?int $userId = null;
     public $policy_number = null;
+    public $policy_effectivity_date = null;
     public $policy_expiration_date = null;
 
     public $upline = '';
@@ -311,6 +312,7 @@ class ApplicationModal extends Component
             'latitude',
             'longitude',
             'policy_number',
+            'policy_effectivity_date',
             'policy_expiration_date'
         ]);
 
@@ -346,6 +348,7 @@ class ApplicationModal extends Component
                 'occupation' => 'nullable|string|max:255',
 
                 'policy_number' => 'nullable|string|max:100',
+                'policy_effectivity_date' => 'nullable|date',
                 'policy_expiration_date' => 'nullable|date',
 
                 'address' => 'required|string|max:500',
@@ -424,6 +427,7 @@ class ApplicationModal extends Component
                 'birthdate' => $this->birthdate,
                 'occupation' => $this->occupation,
                 'policy_number' => $this->policy_number ?: null,
+                'policy_effectivity_date' => $this->policy_effectivity_date ?: null,
                 'policy_expiration_date' => $this->policy_expiration_date ?: null,
                 'contactno' => $this->mobile,
                 'email' => filled($this->email) ? $this->email : null,
@@ -467,6 +471,7 @@ class ApplicationModal extends Component
                 'civil_status' => $this->civil_status,
                 'birthdate' => $this->birthdate,
                 'policy_number' => $this->policy_number,
+                'policy_effectivity_date' => $this->policy_effectivity_date,
                 'policy_expiration_date' => $this->policy_expiration_date,
                 'address' => $this->address,
                 'mobile' => $this->mobile,
@@ -576,9 +581,14 @@ class ApplicationModal extends Component
             ? null
             : trim($this->policy_number);
 
+        $this->policy_effectivity_date = blank($this->policy_effectivity_date)
+            ? null
+            : trim($this->policy_effectivity_date);
+
         $this->policy_expiration_date = blank($this->policy_expiration_date)
             ? null
             : trim($this->policy_expiration_date);
+
 
         try {
             $this->validate([
@@ -597,6 +607,7 @@ class ApplicationModal extends Component
                 'username' => 'required|string|max:100|unique:users,username,' . $this->userId . ',UserID',
 
                 'policy_number' => 'nullable|string|max:100',
+                'policy_effectivity_date' => 'nullable|date',
                 'policy_expiration_date' => 'nullable|date',
             ]);
         } catch (ValidationException $e) {
@@ -657,6 +668,7 @@ class ApplicationModal extends Component
             'email' => 'Email',
             'username' => 'Username',
             'policy_number' => 'Policy Number',
+            'policy_effectivity_date' => 'Policy Effectivity Date',
             'policy_expiration_date' => 'Policy Expiration Date',
         ];
 
@@ -719,6 +731,10 @@ class ApplicationModal extends Component
         ? null
         : trim($this->policy_number);
 
+        $this->policy_effectivity_date = blank($this->policy_effectivity_date)
+        ? null
+        : trim($this->policy_effectivity_date);
+
         $this->policy_expiration_date = blank($this->policy_expiration_date)
         ? null
         : trim($this->policy_expiration_date);
@@ -741,6 +757,7 @@ class ApplicationModal extends Component
             'email' => 'nullable|email|unique:users,email,' . $this->userId . ',UserID',
             'username' => 'required|string|max:100|unique:users,username,' . $this->userId . ',UserID',
             'policy_number' => 'nullable|string|max:100',
+            'policy_effectivity_date' => 'nullable|date',
             'policy_expiration_date' => 'nullable|date',
         ]);
 
@@ -764,6 +781,7 @@ class ApplicationModal extends Component
                 'latitude' => $this->latitude,
                 'longitude' => $this->longitude,
                 'policy_number' => $this->policy_number,
+                'policy_effectivity_date' => $this->policy_effectivity_date,
                 'policy_expiration_date' => $this->policy_expiration_date,
             ]);
 
@@ -918,9 +936,14 @@ class ApplicationModal extends Component
         // Policy fields
         $this->policy_number = $user->policy_number ?: null;
 
+        $this->policy_effectivity_date = $user->policy_effectivity_date
+            ? \Carbon\Carbon::parse($user->policy_effectivity_date)->format('Y-m-d')
+            : null;
+
         $this->policy_expiration_date = $user->policy_expiration_date
             ? \Carbon\Carbon::parse($user->policy_expiration_date)->format('Y-m-d')
             : null;
+
 
         // Reset both the form slots and the "which slot is a saved DB row" tracker.
         $this->beneficiaries = [
@@ -957,6 +980,7 @@ class ApplicationModal extends Component
             'email' => $this->email,
             'username' => $this->username,
             'policy_number' => $this->policy_number,
+            'policy_effectivity_date' => $this->policy_effectivity_date,
             'policy_expiration_date' => $this->policy_expiration_date,
             'beneficiaries' => $this->beneficiaries,
         ];

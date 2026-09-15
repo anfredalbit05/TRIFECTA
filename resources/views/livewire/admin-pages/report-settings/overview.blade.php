@@ -575,6 +575,7 @@
         document.body.setAttribute('data-print-target', section);
         window.print();
     }
+    
     window.addEventListener('afterprint', () => {
         document.body.removeAttribute('data-print-target');
     });
