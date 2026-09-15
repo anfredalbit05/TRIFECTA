@@ -172,9 +172,6 @@
             <!-- EARNINGS DISTRIBUTION -->
             <div class="distribution-card">
 
-                <div class="distribution-icon">
-                    📊
-                </div>
 
                 <div>
                     <h4>
