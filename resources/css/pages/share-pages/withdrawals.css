@@ -1,0 +1,22 @@
+.withdrawal-history-list {
+    max-height: 430px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.withdrawal-history-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.withdrawal-history-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.withdrawal-history-list::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 999px;
+}
+
+.withdrawal-history-list::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}

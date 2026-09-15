@@ -3,6 +3,14 @@
 @section('title', 'Dashboard')
 
 @section('content')
+
+@php
+    $hasWithdrawals = \App\Models\Withdrawal::where(
+        'UserID',
+        auth()->user()->UserID
+    )->exists();
+@endphp
+
 <div class="dashboard-page" x-data="{ tab: 'overview' }">
 
     <!-- DASHBOARD HEADER -->
@@ -28,6 +36,49 @@
                 <span class="dashboard-tab-icon">⌂</span>
                 <span>My Dashboard</span>
             </a>
+
+            @if($hasWithdrawals)
+
+                <a
+                    href="#"
+                    @click.prevent="tab = 'withdrawals'"
+                    :class="tab === 'withdrawals' ? 'active' : ''"
+                >
+                    <span class="dashboard-tab-icon">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            width="20"
+                            height="20"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.8"
+                                d="M3 7.5A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 16.5v-9Z"
+                            />
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.8"
+                                d="M3 9h18"
+                            />
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.8"
+                                d="M16 13h2"
+                            />
+                        </svg>
+                    </span>
+
+                    <span>My Withdrawals</span>
+                </a>
+
+            @endif
+
         </div>
 
         <!-- TAB CONTENT -->
@@ -35,6 +86,11 @@
         <!-- MY DASHBOARD -->
         <div x-show="tab === 'overview'" x-cloak class="dashboard-card">
             <livewire:share-pages.dashboard.news-updates />
+        </div>
+
+                <!-- MY WITHDRAWALS -->
+        <div x-show="tab === 'withdrawals'" x-cloak class="withdrawals-card">
+            <livewire:share-pages.dashboard.withdrawals />
         </div>
 
         <!-- ANALYTICS -->

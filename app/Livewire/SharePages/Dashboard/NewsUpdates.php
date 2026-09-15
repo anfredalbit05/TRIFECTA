@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use App\Models\Withdrawal;
 
 class NewsUpdates extends Component
 {
@@ -183,6 +184,14 @@ class NewsUpdates extends Component
         $userID = $user?->UserID;
 
         // ------------------------------------------
+        // TOTAL WITHDRAWALS
+        // ------------------------------------------
+
+        $totalWithdrawals = Withdrawal::where('UserID', $userID)
+            ->where('status', 'Approved')
+            ->sum('requested_amount');
+
+        // ------------------------------------------
         // CASH WALLET
         // ------------------------------------------
 
@@ -226,6 +235,8 @@ class NewsUpdates extends Component
                 'providentFundAmount' => $providentFundAmount,
 
                 'totalEarnings' => $totalEarnings,
+
+                'totalWithdrawals' => $totalWithdrawals,
 
                 'isWithdrawalActive' => $isWithdrawalActive,
             ]

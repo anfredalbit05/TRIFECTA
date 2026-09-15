@@ -162,7 +162,7 @@
                     </span>
 
                     <strong>
-                        ₱0.00
+                         ₱{{ number_format($totalWithdrawals, 2) }}
                     </strong>
                 </div>
 

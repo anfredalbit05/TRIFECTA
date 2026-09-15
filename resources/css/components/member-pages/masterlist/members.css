@@ -6,50 +6,6 @@
     @apply w-full min-w-0 space-y-5 px-3 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6;
 }
 
-/* =========================================================
-   SATELLITE ACTION
-========================================================= */
-
-.member-action-satellite {
-    @apply h-9 w-9 px-0;
-}
-
-.member-action-satellite {
-    background: linear-gradient(
-        90deg,
-        #D79B10 0%,
-        #D79B10 50%,
-        #0C2C6B 50%,
-        #0C2C6B 100%
-    );
-
-    @apply text-white
-        border
-        border-white/20;
-
-    cursor: pointer;
-    transition:
-        transform 0.15s ease,
-        box-shadow 0.15s ease,
-        filter 0.15s ease;
-}
-
-.member-action-satellite:hover {
-    filter: brightness(1.08);
-
-    box-shadow:
-        0 3px 8px rgba(12, 44, 107, 0.18);
-
-    transform: translateY(-1px);
-}
-
-.member-action-satellite:active {
-    transform: translateY(0);
-}
-
-.member-action-satellite svg {
-    @apply h-4 w-4;
-}
 
 /* =========================================================
    HEADER
@@ -78,15 +34,11 @@
 
 .masterlist-btn {
     @apply inline-flex w-full shrink-0 items-center justify-center gap-2
-        rounded-xl bg-[#0C2C6B]
-        px-4 py-2.5
-        text-sm font-semibold text-white
-        shadow-sm
+        rounded-xl bg-[#0C2C6B] px-4 py-2.5
+        text-sm font-semibold text-white shadow-sm
         transition duration-200
         hover:bg-[#09204f]
-        focus:outline-none
-        focus:ring-2
-        focus:ring-[#0C2C6B]/30
+        focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]/30
         cursor-pointer
         sm:w-auto;
 }
@@ -101,8 +53,11 @@
 ========================================================= */
 
 .members-toolbar {
-    @apply flex flex-col gap-3
-        xl:flex-row xl:items-center xl:justify-between;
+    @apply flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between;
+}
+
+.members-toolbar-actions {
+    @apply flex w-full flex-col gap-2 sm:flex-row sm:items-center xl:w-auto;
 }
 
 
@@ -116,8 +71,7 @@
 
 .masterlist-search-icon {
     @apply pointer-events-none absolute inset-y-0 left-0
-        flex items-center pl-3
-        text-slate-400;
+        flex items-center pl-3 text-slate-400;
 }
 
 .masterlist-search-svg {
@@ -125,30 +79,12 @@
 }
 
 .masterlist-search input {
-    @apply w-full
-        rounded-xl
-        border border-slate-200
-        bg-white
-        py-2.5 pl-10 pr-4
-        text-sm text-slate-700
-        shadow-sm
-        outline-none
-        transition
+    @apply w-full rounded-xl border border-slate-200 bg-white
+        py-2.5 pl-10 pr-4 text-sm text-slate-700
+        shadow-sm outline-none transition
         placeholder:text-slate-400
         focus:border-[#0C2C6B]
-        focus:ring-2
-        focus:ring-[#0C2C6B]/20;
-}
-
-
-/* =========================================================
-   TOOLBAR ACTIONS
-========================================================= */
-
-.members-toolbar-actions {
-    @apply flex w-full flex-col gap-2
-        sm:flex-row sm:items-center
-        xl:w-auto;
+        focus:ring-2 focus:ring-[#0C2C6B]/20;
 }
 
 
@@ -157,16 +93,12 @@
 ========================================================= */
 
 .date-range-wrapper {
-    @apply relative w-full
-        sm:flex-1
-        xl:w-72
-        xl:flex-none;
+    @apply relative w-full sm:flex-1 xl:w-72 xl:flex-none;
 }
 
 .date-range-icon {
     @apply pointer-events-none absolute inset-y-0 left-3 z-10
-        flex items-center
-        text-slate-400;
+        flex items-center text-slate-400;
 }
 
 .date-range-svg {
@@ -174,81 +106,48 @@
 }
 
 .date-range-input {
-    @apply w-full cursor-pointer
-        rounded-xl
-        border border-slate-200
-        bg-white
+    @apply w-full cursor-pointer rounded-xl
+        border border-slate-200 bg-white
         py-2.5 pl-10 pr-3
-        text-center
-        text-sm font-medium
-        text-slate-700
-        shadow-sm
-        outline-none
-        transition
+        text-center text-sm font-medium text-slate-700
+        shadow-sm outline-none transition
         focus:border-[#0C2C6B]
-        focus:ring-2
-        focus:ring-[#0C2C6B]/20;
-
-    transition:
-        box-shadow .15s ease,
-        border-color .15s ease;
+        focus:ring-2 focus:ring-[#0C2C6B]/20;
 }
 
 
 /* =========================================================
-   CLEAR DATE
+   CLEAR DATE / REFRESH
 ========================================================= */
 
-.clear-date-btn {
+.clear-date-btn,
+.refresh-btn {
     @apply inline-flex h-[42px] w-full shrink-0
         items-center justify-center
-        rounded-xl
-        border border-slate-200
-        bg-white
-        px-3
-        text-sm font-semibold
-        text-slate-500
-        shadow-sm
-        transition
-        hover:border-red-200
-        hover:bg-red-50
-        hover:text-red-500
-        cursor-pointer
-        sm:w-[42px];
+        rounded-xl border border-slate-200
+        bg-white text-sm font-semibold
+        shadow-sm transition cursor-pointer
+        sm:w-auto;
+}
+
+.clear-date-btn {
+    @apply px-3 text-slate-500
+        hover:border-red-200 hover:bg-red-50 hover:text-red-500;
 }
 
 .clear-date-text {
     @apply ml-1 sm:hidden;
 }
 
-
-/* =========================================================
-   REFRESH
-========================================================= */
-
 .refresh-btn {
-    @apply inline-flex h-[42px] w-full shrink-0
-        items-center justify-center gap-2
-        rounded-xl
-        border border-slate-200
-        bg-white
-        px-4
-        text-sm font-semibold
-        text-slate-700
-        shadow-sm
-        transition
+    @apply gap-2 px-4 text-slate-700
         hover:bg-slate-50
         disabled:cursor-not-allowed
-        disabled:opacity-60
-        cursor-pointer
-        sm:w-auto;
+        disabled:opacity-60;
 }
 
 .refresh-icon,
-.refresh-loading {
-    @apply h-4 w-4;
-}
-
+.refresh-loading,
 .refresh-icon svg,
 .refresh-loading svg {
     @apply h-4 w-4;
@@ -269,18 +168,11 @@
 
 .member-table {
     @apply w-full min-w-0 overflow-hidden rounded-xl
-        border border-slate-200
-        bg-white
-        shadow-sm;
+        border border-slate-200 bg-white shadow-sm;
 
     max-width: 100%;
     box-sizing: border-box;
 }
-
-
-/* =========================================================
-   TABLE HORIZONTAL SCROLL CONTAINER
-========================================================= */
 
 .member-table-scroll {
     width: 100%;
@@ -291,63 +183,35 @@
     overflow-y: hidden;
 
     -webkit-overflow-scrolling: touch;
-
-    /*
-     * Prevent horizontal scrolling from affecting
-     * the entire page.
-     */
     overscroll-behavior-x: contain;
 
     scrollbar-width: thin;
 }
 
-
-/* =========================================================
-   TABLE
-========================================================= */
-
 .member-table table {
     width: 100%;
-
     border-collapse: collapse;
-
     text-align: left;
-
     font-size: 14px;
 }
 
-
-/* =========================================================
-   TABLE HEADER
-========================================================= */
-
 .member-table th {
-    @apply whitespace-nowrap
-        bg-[#0C2C6B]
-        px-4 py-3.5
-        text-left
-        text-xs
-        font-semibold
-        uppercase
-        tracking-wider
-        text-white;
+    @apply whitespace-nowrap bg-[#0C2C6B]
+        px-4 py-3.5 text-left
+        text-xs font-semibold uppercase
+        tracking-wider text-white;
 }
 
 .member-actions-header {
     @apply text-center;
 }
 
-
-/* =========================================================
-   TABLE BODY
-========================================================= */
-
 .member-table tbody {
     @apply divide-y divide-slate-100;
 }
 
 .member-table tr {
-    transition: background-color 0.15s ease;
+    transition: background-color .15s ease;
 }
 
 .member-table tbody tr:hover {
@@ -355,9 +219,7 @@
 }
 
 .member-table td {
-    @apply px-4 py-4;
-
-    white-space: nowrap;
+    @apply whitespace-nowrap px-4 py-4;
 }
 
 
@@ -366,9 +228,7 @@
 ========================================================= */
 
 .member-number {
-    @apply whitespace-nowrap
-        font-medium
-        text-slate-500;
+    @apply font-medium text-slate-500;
 }
 
 .member-name-cell {
@@ -379,51 +239,33 @@
     max-width: 240px;
 
     overflow: hidden;
-
     text-overflow: ellipsis;
-
     white-space: nowrap;
 
     @apply font-semibold text-slate-900;
 }
 
-.member-contact {
-    @apply whitespace-nowrap
-        text-slate-500;
-}
-
+.member-contact,
 .member-birthday {
-    @apply whitespace-nowrap
-        text-slate-500;
+    @apply text-slate-500;
 }
 
 
 /* =========================================================
-   GENDER
+   BADGES
 ========================================================= */
 
 .gender-badge {
     @apply inline-flex items-center justify-center
-        rounded-lg
-        bg-slate-100
-        px-3 py-1
-        text-xs font-semibold
-        text-slate-700;
+        rounded-lg bg-slate-100
+        px-3 py-1 text-xs font-semibold text-slate-700;
 }
-
-
-/* =========================================================
-   STATUS
-========================================================= */
 
 .status-badge {
     @apply inline-flex min-w-[90px]
         items-center justify-center
-        rounded-lg
-        px-3 py-1
-        text-xs font-semibold
-        text-white
-        shadow-sm;
+        rounded-lg px-3 py-1
+        text-xs font-semibold text-white shadow-sm;
 }
 
 .status-active {
@@ -436,7 +278,7 @@
 
 
 /* =========================================================
-   ACTIONS
+   MEMBER ACTIONS
 ========================================================= */
 
 .member-actions-cell {
@@ -444,38 +286,25 @@
 }
 
 .member-actions {
-    @apply flex min-w-max
-        flex-nowrap
-        items-center
-        justify-center
-        gap-2;
+    @apply flex min-w-max flex-nowrap
+        items-center justify-center gap-2;
 }
 
 .member-action {
-    @apply inline-flex
-        shrink-0
-        items-center
-        justify-center
-        rounded-lg
-        text-xs
-        font-semibold
-        shadow-sm
-        transition
-        cursor-pointer;
+    @apply inline-flex shrink-0
+        items-center justify-center
+        rounded-lg text-xs font-semibold
+        shadow-sm transition cursor-pointer;
 }
 
 .member-action svg {
     @apply h-4 w-4;
 }
 
-
-/* =========================================================
-   ICON ACTIONS
-========================================================= */
-
 .member-action-view,
 .member-action-edit,
-.member-action-password {
+.member-action-password,
+.member-action-satellite {
     @apply h-9 w-9 px-0;
 }
 
@@ -485,21 +314,47 @@
 ========================================================= */
 
 .member-action-view {
-    @apply bg-slate-600
-        text-white
-        hover:bg-slate-700;
+    @apply bg-slate-600 text-white hover:bg-slate-700;
 }
 
 .member-action-edit {
-    @apply bg-[#0C2C6B]
-        text-white
-        hover:bg-[#09204f];
+    @apply bg-[#0C2C6B] text-white hover:bg-[#09204f];
 }
 
 .member-action-password {
-    @apply bg-yellow-600
-        text-white
-        hover:bg-yellow-700;
+    @apply bg-yellow-600 text-white hover:bg-yellow-700;
+}
+
+
+/* =========================================================
+   SATELLITE ACTION
+========================================================= */
+
+.member-action-satellite {
+    background: linear-gradient(
+        90deg,
+        #D79B10 0%,
+        #D79B10 50%,
+        #0C2C6B 50%,
+        #0C2C6B 100%
+    );
+
+    @apply border border-white/20 text-white;
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        filter .15s ease;
+}
+
+.member-action-satellite:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 3px 8px rgba(12, 44, 107, .18);
+    transform: translateY(-1px);
+}
+
+.member-action-satellite:active {
+    transform: translateY(0);
 }
 
 
@@ -512,40 +367,25 @@
 .member-action-activate,
 .member-action-withdraw,
 .member-action-off {
-    @apply min-w-[95px]
-        px-3 py-2;
+    @apply min-w-[95px] px-3 py-2;
 }
 
 .member-action-deactivate {
-    @apply bg-red-500
-        text-white
-        hover:bg-red-600;
+    @apply bg-red-500 text-white hover:bg-red-600;
 }
 
 .member-action-pending {
-    @apply bg-amber-500
-        text-white
-        hover:bg-amber-600;
+    @apply bg-amber-500 text-white hover:bg-amber-600;
 }
 
-.member-action-activate {
-    @apply bg-[#0C2C6B]
-        text-white
-        hover:bg-[#09204f];
-}
-
+.member-action-activate,
 .member-action-withdraw {
-    @apply bg-[#0C2C6B]
-        text-white
-        hover:bg-[#09204f];
+    @apply bg-[#0C2C6B] text-white hover:bg-[#09204f];
 }
 
 .member-action-off {
-    @apply cursor-not-allowed
-        border border-gray-200
-        bg-gray-100
-        text-gray-400
-        shadow-none;
+    @apply cursor-not-allowed border border-gray-200
+        bg-gray-100 text-gray-400 shadow-none;
 }
 
 .off-icon {
@@ -554,90 +394,11 @@
 
 
 /* =========================================================
-   MOBILE TABLE
-========================================================= */
-
-@media (max-width: 767px) {
-
-    /*
-     * IMPORTANT:
-     *
-     * The table itself is intentionally wider than
-     * the mobile screen.
-     *
-     * The parent .member-table-scroll handles
-     * the horizontal scrolling.
-     */
-    .member-table table {
-        width: 1050px;
-        min-width: 1050px;
-        max-width: none;
-    }
-
-
-    .member-table th,
-    .member-table td {
-        @apply px-3;
-    }
-
-
-    .member-actions {
-        @apply justify-start;
-    }
-
-
-    /*
-     * Optional: make the scrollbar easier to notice
-     * on mobile/tablet browsers.
-     */
-    .member-table-scroll {
-        overflow-x: auto;
-        overflow-y: hidden;
-    }
-}
-
-
-/* =========================================================
-   SMALL MOBILE
-========================================================= */
-
-@media (max-width: 639px) {
-
-    .member-table {
-        @apply rounded-lg;
-    }
-
-
-    .member-table-scroll {
-        width: 100%;
-        max-width: 100%;
-
-        overflow-x: auto;
-        overflow-y: hidden;
-    }
-
-
-    .member-table table {
-        width: 1050px;
-        min-width: 1050px;
-    }
-
-
-    .member-actions {
-        @apply justify-start;
-    }
-}
-
-
-/* =========================================================
    EMPTY STATE
 ========================================================= */
 
 .empty-members {
-    @apply px-4 py-10
-        text-center
-        text-sm
-        text-slate-500;
+    @apply px-4 py-10 text-center text-sm text-slate-500;
 }
 
 
@@ -646,30 +407,20 @@
 ========================================================= */
 
 .member-pagination {
-    @apply flex flex-wrap
-        items-center
-        justify-center
-        gap-3
-        border-t border-slate-200
-        bg-slate-50
-        px-4 py-4;
+    @apply flex flex-wrap items-center justify-center
+        gap-3 border-t border-slate-200
+        bg-slate-50 px-4 py-4;
 }
 
 .pagination-btn,
 .pagination-disabled {
-    @apply inline-flex
-        items-center
-        justify-center
-        rounded-lg
-        px-4 py-2
-        text-sm
-        font-semibold;
+    @apply inline-flex items-center justify-center
+        rounded-lg px-4 py-2
+        text-sm font-semibold;
 }
 
 .pagination-btn {
-    @apply text-white
-        transition
-        cursor-pointer;
+    @apply text-white transition cursor-pointer;
 }
 
 .pagination-prev {
@@ -689,9 +440,7 @@
 }
 
 .pagination-disabled {
-    @apply cursor-not-allowed
-        bg-gray-200
-        text-gray-400;
+    @apply cursor-not-allowed bg-gray-200 text-gray-400;
 }
 
 .pagination-info {
@@ -704,21 +453,44 @@
 ========================================================= */
 
 .member-modal-overlay {
-    @apply fixed inset-0 z-50
-        flex items-center justify-center
-        bg-black/50
-        p-3 sm:p-4;
+    position: fixed;
+    inset: 0;
+    z-index: 99990;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100dvh;
+
+    padding: 1rem;
+
+    overflow-y: auto;
+
+    background: rgba(0, 0, 0, .5);
+    backdrop-filter: blur(2px);
 }
 
 .member-modal {
-    @apply relative
-        w-full max-w-md
-        max-h-[92vh]
-        overflow-hidden
-        rounded-2xl
-        border border-slate-100
-        bg-white
-        shadow-2xl;
+    position: relative;
+
+    width: 100%;
+    max-width: 32rem;
+    max-height: calc(100dvh - 2rem);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    border: 1px solid #f1f5f9;
+    border-radius: 1rem;
+
+    background: #fff;
+
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, .25);
 }
 
 
@@ -727,28 +499,23 @@
 ========================================================= */
 
 .member-modal-header {
-    @apply flex items-center justify-between gap-3
+    @apply flex shrink-0 items-center
+        justify-between gap-3
         bg-[#0C2C6B]
-        px-4 py-4
-        text-white
-        sm:px-6;
+        px-4 py-4 text-white sm:px-6;
 }
 
 .member-modal-title {
-    @apply text-sm
-        font-bold
-        uppercase
-        tracking-wider
-        sm:text-base;
+    @apply text-sm font-bold uppercase
+        tracking-wider sm:text-base;
 }
 
 .member-modal-close {
-    @apply cursor-pointer
-        text-xl
-        font-bold
-        text-white/80
-        transition
-        hover:text-white;
+    @apply flex h-9 w-9 shrink-0
+        items-center justify-center
+        rounded-lg cursor-pointer
+        text-xl font-bold text-white/80
+        transition hover:bg-white/10 hover:text-white;
 }
 
 
@@ -757,12 +524,8 @@
 ========================================================= */
 
 .member-modal-body {
-    @apply max-h-[65vh]
-        space-y-4
-        overflow-y-auto
-        p-4
-        sm:max-h-[75vh]
-        sm:p-6;
+    @apply min-h-0 flex-1 space-y-4
+        overflow-y-auto p-4 sm:p-6;
 }
 
 
@@ -771,25 +534,18 @@
 ========================================================= */
 
 .withdrawal-member-card {
-    @apply rounded-xl
-        border border-slate-200
-        bg-slate-50
-        p-3.5;
+    @apply rounded-xl border border-slate-200
+        bg-slate-50 p-3.5;
 }
 
 .withdrawal-label {
-    @apply block
-        text-[11px]
-        font-semibold
-        uppercase
-        tracking-wider
-        text-gray-500;
+    @apply block text-[11px]
+        font-semibold uppercase
+        tracking-wider text-gray-500;
 }
 
 .withdrawal-member-name {
-    @apply mt-1
-        font-bold
-        text-slate-800;
+    @apply mt-1 font-bold text-slate-800;
 }
 
 
@@ -798,16 +554,12 @@
 ========================================================= */
 
 .withdrawal-details-card {
-    @apply rounded-xl
-        border border-amber-200
-        bg-amber-50
-        p-4;
+    @apply rounded-xl border border-amber-200
+        bg-amber-50 p-4;
 }
 
 .withdrawal-details-title {
-    @apply mb-3
-        flex items-center
-        gap-2;
+    @apply mb-3 flex items-center gap-2;
 }
 
 .withdrawal-details-title span {
@@ -815,19 +567,15 @@
 }
 
 .withdrawal-details-title h4 {
-    @apply font-bold
-        text-amber-800;
+    @apply font-bold text-amber-800;
 }
 
 .withdrawal-details {
-    @apply space-y-2
-        text-sm;
+    @apply space-y-2 text-sm;
 }
 
 .withdrawal-row {
-    @apply flex
-        justify-between
-        gap-4;
+    @apply flex justify-between gap-4;
 }
 
 .withdrawal-row span {
@@ -835,9 +583,7 @@
 }
 
 .withdrawal-row strong {
-    @apply text-right
-        font-semibold
-        text-slate-800;
+    @apply text-right font-semibold text-slate-800;
 }
 
 
@@ -847,12 +593,8 @@
 
 .withdrawal-warning {
     @apply flex items-start gap-2
-        rounded-xl
-        border border-blue-100
-        bg-blue-50
-        p-4
-        text-sm
-        text-blue-900;
+        rounded-xl border border-blue-100
+        bg-blue-50 p-4 text-sm text-blue-900;
 }
 
 .withdrawal-warning p {
@@ -865,41 +607,28 @@
 ========================================================= */
 
 .member-modal-footer {
-    @apply flex flex-col
-        justify-end
-        gap-2
-        border-t border-slate-100
-        bg-slate-50
-        px-4 py-3
-        sm:flex-row
-        sm:px-6;
+    @apply flex shrink-0 flex-col justify-end
+        gap-2 border-t border-slate-100
+        bg-slate-50 px-4 py-3
+        sm:flex-row sm:px-6;
 }
 
 .modal-btn {
-    @apply cursor-pointer
-        rounded-xl
-        px-4 py-2
-        text-sm font-semibold
-        shadow-sm
-        transition;
+    @apply cursor-pointer rounded-xl
+        px-4 py-2 text-sm font-semibold
+        shadow-sm transition;
 }
 
 .modal-btn-cancel {
-    @apply bg-slate-200
-        text-slate-700
-        hover:bg-slate-300;
+    @apply bg-slate-200 text-slate-700 hover:bg-slate-300;
 }
 
 .modal-btn-reject {
-    @apply bg-[#D79B10]
-        text-white
-        hover:bg-[#c58d0f];
+    @apply bg-[#D79B10] text-white hover:bg-[#c58d0f];
 }
 
 .modal-btn-approve {
-    @apply bg-[#0C2C6B]
-        text-white
-        hover:bg-[#09204f];
+    @apply bg-[#0C2C6B] text-white hover:bg-[#09204f];
 }
 
 
@@ -908,34 +637,31 @@
 ========================================================= */
 
 .flatpickr-calendar {
-    border-radius: 1rem !important;
-    border: 1px solid #e2e8f0 !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
 
-    box-shadow:
-        0 10px 30px -5px rgba(12, 44, 107, 0.15),
-        0 4px 10px -4px rgba(12, 44, 107, 0.1) !important;
-
-    font-family: inherit !important;
     overflow: hidden;
 
-    max-width: calc(100vw - 24px) !important;
-}
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 1rem !important;
 
+    font-family: inherit !important;
+
+    box-shadow:
+        0 10px 30px -5px rgba(12, 44, 107, .15),
+        0 4px 10px -4px rgba(12, 44, 107, .1) !important;
+}
 
 .flatpickr-calendar.arrowTop:before,
 .flatpickr-calendar.arrowTop:after {
     border-bottom-color: #0C2C6B !important;
 }
 
-
-/* =========================================================
-   FLATPICKR MONTH
-========================================================= */
-
 .flatpickr-months {
+    padding: 10px 0;
+
     background: #0C2C6B;
     border-radius: 1rem 1rem 0 0;
-    padding: 10px 0;
 }
 
 .flatpickr-current-month {
@@ -949,18 +675,13 @@
     font-weight: 600;
 }
 
-.flatpickr-current-month .flatpickr-monthDropdown-months option {
-    color: #0C2C6B;
-}
-
 .flatpickr-current-month .flatpickr-monthDropdown-months {
     background: transparent;
 }
 
-
-/* =========================================================
-   FLATPICKR NAVIGATION
-========================================================= */
+.flatpickr-current-month .flatpickr-monthDropdown-months option {
+    color: #0C2C6B;
+}
 
 .flatpickr-prev-month,
 .flatpickr-next-month {
@@ -973,42 +694,27 @@
     fill: #D79B10 !important;
 }
 
-
-/* =========================================================
-   FLATPICKR WEEKDAYS
-========================================================= */
-
 .flatpickr-weekdays {
     background: #f1f5f9;
 }
 
 span.flatpickr-weekday {
     color: #64748b !important;
+    font-size: .7rem;
     font-weight: 600;
-    font-size: 0.7rem;
     text-transform: uppercase;
 }
 
-
-/* =========================================================
-   FLATPICKR DAYS
-========================================================= */
-
 .flatpickr-day {
-    border-radius: 0.5rem !important;
-    font-weight: 500;
+    border-radius: .5rem !important;
     color: #334155;
+    font-weight: 500;
 }
 
 .flatpickr-day:hover {
     background: #eef2f9 !important;
     border-color: transparent !important;
 }
-
-
-/* =========================================================
-   TODAY
-========================================================= */
 
 .flatpickr-day.today {
     border-color: #0C2C6B !important;
@@ -1019,11 +725,6 @@ span.flatpickr-weekday {
     color: #fff !important;
 }
 
-
-/* =========================================================
-   SELECTED
-========================================================= */
-
 .flatpickr-day.selected,
 .flatpickr-day.startRange,
 .flatpickr-day.endRange {
@@ -1031,11 +732,6 @@ span.flatpickr-weekday {
     border-color: #0C2C6B !important;
     color: #fff !important;
 }
-
-
-/* =========================================================
-   RANGE
-========================================================= */
 
 .flatpickr-day.inRange {
     background: #dbe4f3 !important;
@@ -1054,11 +750,6 @@ span.flatpickr-weekday {
     box-shadow: -10px 0 0 #0C2C6B !important;
 }
 
-
-/* =========================================================
-   DISABLED / OTHER MONTH
-========================================================= */
-
 .flatpickr-day.disabled,
 .flatpickr-day.disabled:hover,
 .flatpickr-day.prevMonthDay,
@@ -1066,19 +757,9 @@ span.flatpickr-weekday {
     color: #cbd5e1 !important;
 }
 
-
-/* =========================================================
-   HIDE RAW INPUT
-========================================================= */
-
 input.flatpickr-input {
     display: none !important;
 }
-
-
-/* =========================================================
-   YEAR ARROWS
-========================================================= */
 
 .flatpickr-current-month .numInputWrapper span.arrowUp,
 .flatpickr-current-month .numInputWrapper span.arrowDown {
@@ -1094,27 +775,22 @@ input.flatpickr-input {
 }
 
 .flatpickr-current-month .numInputWrapper:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, .15);
 }
 
 
 /* =========================================================
-   RESPONSIVE TABLE
+   TABLET
 ========================================================= */
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
 
     .member-table table {
-        min-width: 1050px;
-    }
-
-    .member-table th,
-    .member-table td {
-        @apply px-3;
+        min-width: 900px;
     }
 
     .member-actions {
-        @apply justify-start;
+        justify-content: flex-start;
     }
 
 }
@@ -1124,55 +800,132 @@ input.flatpickr-input {
    MOBILE
 ========================================================= */
 
-@media (max-width: 639px) {
+@media (max-width: 767px) {
 
     .members-container {
         @apply px-3 py-3;
-    }
-
-    .members-header {
-        @apply gap-3;
-    }
-
-    .masterlist-btn {
-        @apply w-full;
-    }
-
-    .members-toolbar {
-        @apply gap-3;
-    }
-
-    .members-toolbar-actions {
-        @apply gap-2;
-    }
-
-    .date-range-input {
-        @apply w-full;
-    }
-
-    .clear-date-btn {
-        @apply w-full;
-    }
-
-    .refresh-btn {
-        @apply w-full;
     }
 
     .member-table {
         @apply rounded-lg;
     }
 
-    .member-actions {
-        @apply justify-start;
+    .member-table table {
+        width: 1050px;
+        min-width: 1050px;
+        max-width: none;
     }
 
-    .member-pagination {
+    .member-table th,
+    .member-table td {
+        @apply px-3;
+    }
+
+    .member-actions {
+        justify-content: flex-start;
+    }
+
+    /* Withdrawal modal */
+
+    .member-modal-overlay {
+        align-items: flex-start;
+
+        padding: .5rem;
+
+        overflow-y: auto;
+    }
+
+    .member-modal {
+        width: 100%;
+        max-width: none;
+
+        max-height: calc(100dvh - 1rem);
+
+        margin: auto 0;
+
+        border-radius: .875rem;
+    }
+
+    .member-modal-header {
+        padding: .875rem 1rem;
+    }
+
+    .member-modal-body {
+        padding: 1rem;
+    }
+
+    .member-modal-footer {
+        padding: .75rem;
+    }
+
+    .modal-btn {
+        width: 100%;
+    }
+
+    .withdrawal-row {
+        align-items: flex-start;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .members-container {
+        @apply px-2.5 py-2.5;
+    }
+
+    .masterlist-title {
+        @apply text-lg;
+    }
+
+    .masterlist-description {
+        @apply text-[11px];
+    }
+
+    .masterlist-btn {
+        @apply py-2.5;
+    }
+
+    .members-toolbar {
         @apply gap-2;
     }
 
+    .members-toolbar-actions {
+        @apply gap-2;
+    }
+
+    .member-table th {
+        @apply px-2.5 py-3 text-[10px];
+    }
+
+    .member-table td {
+        @apply px-2.5 py-3;
+    }
+
+    .member-modal-title {
+        @apply text-xs;
+    }
+
+    .withdrawal-details-title h4 {
+        @apply text-sm;
+    }
+
+    .withdrawal-row {
+        flex-direction: column;
+        gap: .15rem;
+    }
+
+    .withdrawal-row strong {
+        text-align: left;
+    }
+
     .pagination-info {
-        @apply w-full text-center text-xs;
-        order: -1;
+        @apply order-first w-full text-center text-xs;
     }
 
     .pagination-btn,
@@ -1180,25 +933,9 @@ input.flatpickr-input {
         @apply px-3 py-2 text-xs;
     }
 
-    .member-modal {
-        @apply max-h-[94vh] rounded-xl;
-    }
-
-    .member-modal-body {
-        @apply max-h-[68vh];
-    }
-
-    .member-modal-footer {
-        @apply flex-col;
-    }
-
-    .modal-btn {
-        @apply w-full;
-    }
-
     .flatpickr-calendar {
-        width: calc(100vw - 24px) !important;
-        max-width: calc(100vw - 24px) !important;
+        width: calc(100vw - 16px) !important;
+        max-width: calc(100vw - 16px) !important;
     }
 
     .flatpickr-days,
@@ -1210,6 +947,43 @@ input.flatpickr-input {
 
     .flatpickr-day {
         max-width: none !important;
+    }
+
+}
+
+
+/* =========================================================
+   EXTRA SMALL PHONES
+========================================================= */
+
+@media (max-width: 360px) {
+
+    .members-container {
+        @apply px-2;
+    }
+
+    .member-table table {
+        min-width: 1000px;
+    }
+
+    .member-modal-overlay {
+        padding: .375rem;
+    }
+
+    .member-modal {
+        max-height: calc(100dvh - .75rem);
+    }
+
+    .member-modal-header {
+        padding: .75rem;
+    }
+
+    .member-modal-body {
+        padding: .75rem;
+    }
+
+    .member-modal-footer {
+        padding: .625rem;
     }
 
 }

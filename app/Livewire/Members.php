@@ -275,6 +275,41 @@ class Members extends Component
         $this->dispatch('open-activation-review', UserID: $member->UserID);
     }
 
+        /*
+    |--------------------------------------------------------------------------
+    | Satellite Subscription Modal
+    |--------------------------------------------------------------------------
+    */
+
+    public function openSatellite($id): void
+    {
+        if (! $this->canUpdate) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to manage satellite subscriptions.',
+            ]);
+
+            return;
+        }
+
+        Log::info('Satellite modal clicked', ['UserID' => $id, 'opened_by' => Auth::id()]);
+
+        $member = User::find($id);
+
+        if (! $member) {
+            Log::warning('Satellite modal failed: member not found.', ['UserID' => $id]);
+
+            $this->dispatch('swal:error', [
+                'title' => 'Not Found',
+                'text' => 'Member not found.',
+            ]);
+
+            return;
+        }
+
+        $this->dispatch('open-satellite-modal', UserID: $member->UserID);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Activate / Deactivate Confirmation

@@ -373,44 +373,20 @@
                                         @endif
 
                                         {{-- SATELLITE --}}
-                                        {{-- SATELLITE --}}
-                                        @if ($this->canUpdate)
-
-                                            <button
-                                                type="button"
-                                                {{-- wire:click="openSatellite({{ $member->UserID }})" --}}
-                                                title="Manage Satellite Subscription"
-                                                class="member-action member-action-satellite"
-                                            >
-                                                <svg
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="1.8"
-                                                        d="M13.5 6.5l4 4m-7.5 7.5 4-4"
-                                                    />
-
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="1.8"
-                                                        d="M6.5 10.5l7-7 4 4-7 7-4-4Z"
-                                                    />
-
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="1.8"
-                                                        d="M8 20a8 8 0 0 0 12-12"
-                                                    />
-                                                </svg>
-                                            </button>
-
-                                        @endif
+                                    {{-- @if ($this->canUpdate)
+                                        <button
+                                            type="button"
+                                            wire:click="openSatellite({{ $member->UserID }})"
+                                            title="Manage Satellite Subscription"
+                                            class="member-action member-action-satellite"
+                                        >
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.5 6.5l4 4m-7.5 7.5 4-4" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6.5 10.5l7-7 4 4-7 7-4-4Z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 20a8 8 0 0 0 12-12" />
+                                            </svg>
+                                        </button>
+                                    @endif --}}
 
 
                                         {{-- STATUS --}}
@@ -805,7 +781,7 @@
     {{-- ============================================================ --}}
     <livewire:member-pages.my-profile.activation-modal />
     <livewire:components.withdrawal-modal />
-
+   <livewire:admin-pages.masterlist.members-components.satellite-modal />
 
     {{-- ============================================================ --}}
     {{-- SWEETALERT --}}
