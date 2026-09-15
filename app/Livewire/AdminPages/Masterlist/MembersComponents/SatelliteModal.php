@@ -510,7 +510,6 @@ class SatelliteModal extends Component
 
 
                 $newUser->RoleID = $satelliteRoleID;
-                $newUser->SatelliteID = $satellite['SatelliteID'];
 
                 $newUser->status = 'Inactive';
 
@@ -559,9 +558,6 @@ class SatelliteModal extends Component
 
                     'new_UserID' =>
                         $newUser->UserID,
-
-                    'SatelliteID' =>
-                        $satellite['SatelliteID'],
 
                     'satellite_type' =>
                         $this->satellite_type,
