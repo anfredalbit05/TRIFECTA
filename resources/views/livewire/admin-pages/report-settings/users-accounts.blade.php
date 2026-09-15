@@ -329,10 +329,10 @@
                                 records.</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="printUserFinancials()" title="Print this user's financial overview"
+                            {{-- <button onclick="printUserFinancials()" title="Print this user's financial overview"
                                 class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition hover:bg-white/30 text-white cursor-pointer text-sm">
                                 🖨️
-                            </button>
+                            </button> --}}
                             <button wire:click="closeLedgerModal"
                                 class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition hover:bg-white/30 text-white font-bold cursor-pointer">
                                 ✕
