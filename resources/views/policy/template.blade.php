@@ -83,9 +83,12 @@ body{
     {{ $address }}
 </div>
 
-    <!-- Effective Date -->
+        <!-- Effective Date -->
     <div class="field" style="left:140px;top:298px;">
-        {{ $effectiveDate->format('M d, Y') }}
+        {{ $policy_effectivity_date
+    ? \Carbon\Carbon::parse($policy_effectivity_date)->format('M d, Y')
+    : ''
+}}
     </div>
 
     <!-- Expiry Date -->
