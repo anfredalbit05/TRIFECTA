@@ -63,21 +63,40 @@ body{
     </div>
 
 @php
-    $address = strtoupper($user->address);
+    $address = strtoupper($user->address ?? '');
 
-    // Wrap address at 28 characters, but never cut a word in half
-    $address = wordwrap($address, 28, "\n", false);
+    // Determine font size based on address length
+    $addressLength = strlen($address);
+
+    if ($addressLength > 90) {
+        $addressFontSize = 9;
+        $addressLineHeight = 11;
+    } elseif ($addressLength > 75) {
+        $addressFontSize = 10;
+        $addressLineHeight = 12;
+    } elseif ($addressLength > 55) {
+        $addressFontSize = 11;
+        $addressLineHeight = 13;
+    } else {
+        $addressFontSize = 10;
+        $addressLineHeight = 14;
+    }
+
+    // Wrap address without cutting words
+    $address = wordwrap($address, 38, "\n", false);
 @endphp
 
 <div
     class="field"
     style="
         left:140px;
-        top:240px;
+        top:241px;
         width:310px;
-        font-size:12px;
-        line-height:14px;
+        font-size:{{ $addressFontSize }}px;
+        line-height:{{ $addressLineHeight }}px;
         white-space:pre-line;
+        max-height:34px;
+        overflow:hidden;
     "
 >
     {{ $address }}

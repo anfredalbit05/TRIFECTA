@@ -363,7 +363,7 @@
         display: grid !important;
 
         grid-template-columns:
-            repeat(7, minmax(0, 1fr)) !important;
+            repeat(8, minmax(0, 1fr)) !important;
 
         align-items: stretch;
 

@@ -556,7 +556,7 @@ class ActivationReviewModal extends Component
             try {
 
                 Mail::to($activatedUser->email)
-                    ->send(new ActivationApprovedMail($activatedUser, $this->activation, $totalAmount));
+                    ->send(new ActivationApprovedMail($activatedUser, $this->activation,  $this->totalMembershipFeesCost));
             } catch (\Throwable $e) {
                 Log::error('Failed to send approval email to user.', ['error' => $e->getMessage()]);
             }

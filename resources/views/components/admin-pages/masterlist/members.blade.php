@@ -373,7 +373,7 @@
                                         @endif
 
                                         {{-- SATELLITE --}}
-                                    {{-- @if ($this->canUpdate)
+                                    @if ($this->canUpdate)
                                         <button
                                             type="button"
                                             wire:click="openSatellite({{ $member->UserID }})"
@@ -386,7 +386,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 20a8 8 0 0 0 12-12" />
                                             </svg>
                                         </button>
-                                    @endif --}}
+                                    @endif
 
 
                                         {{-- STATUS --}}
