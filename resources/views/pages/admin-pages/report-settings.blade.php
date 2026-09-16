@@ -82,7 +82,7 @@
 
 
                 <!-- PANGKABUHAYAN FUND -->
-                @if (in_array(auth()->user()->RoleID, [1, 2]))
+                @if (in_array(auth()->user()->RoleID, [1, 2, 5, 6, 7]))
                     <a href="#" @click.prevent="tab = 'pangkabuhayan'"
                         :class="tab === 'pangkabuhayan' ? 'active' : ''">
                         <span class="report-settings-tab-icon">
@@ -143,7 +143,7 @@
             </div>
 
             <!-- PANGKABUHAYAN FUND -->
-            @if (in_array(auth()->user()->RoleID, [1, 2]))
+            @if (in_array(auth()->user()->RoleID, [1, 2, 5, 6, 7]))
                 <div x-show="tab === 'pangkabuhayan'" x-cloak class="report-settings-main-card">
                     <livewire:components.spin-fund-report />
                 </div>
