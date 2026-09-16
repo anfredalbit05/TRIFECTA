@@ -158,7 +158,8 @@ class Overview extends Component
             UNION ALL SELECT 7, 'CF', 'Convenience Fee'
             UNION ALL SELECT 8, 'TX', 'TAX'
             UNION ALL SELECT 9, 'WD', 'Withdrawals'
-            UNION ALL SELECT 10, 'OT', 'Others'
+            UNION ALL SELECT 10, 'PK', 'Pangkabuhayan'
+            UNION ALL SELECT 11, 'OT', 'Others'
         ) as s"))
             ->leftJoin('ledgers as l', function ($join) {
                 $join->on('l.Source', '=', 's.Source')

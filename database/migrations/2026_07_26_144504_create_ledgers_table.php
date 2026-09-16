@@ -20,6 +20,9 @@ return new class extends Migration
 
             $table->decimal('amount', 12, 2);
 
+            // Kept in step with the live `ledgers` table: WD / TX / CF / PK
+            // were added by hand as the app grew (withdrawals, transaction
+            // fees, PayMaya convenience fee, Pangkabuhayan spin prizes).
             $table->enum('Source', [
                 'MF', // Membership Fee
                 'DR', // Direct Referral
@@ -27,7 +30,10 @@ return new class extends Migration
                 'CL', // Claim
                 'RF', // Refund
                 'PF', // Provident Fund
-                'WT', // Withdrawal
+                'WD', // Withdrawal
+                'TX', // Transaction Fee
+                'CF', // Convenience Fee
+                'PK', // Pangkabuhayan (Spin the Wheel prize expense)
                 'OT', // Others
             ])->default('OT');
 

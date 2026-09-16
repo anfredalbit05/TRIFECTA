@@ -1,7 +1,5 @@
-<div
-    wire:key="withdrawal-modal-{{ $targetUser->UserID ?? 'self' }}"
-    x-data="{
-        showWithdrawModal: false,
+<div wire:key="withdrawal-modal-{{ $targetUser->UserID ?? 'self' }}" x-data="{
+    showWithdrawModal: false,
 
     balance: @entangle('totalAmount'),
 
@@ -20,9 +18,9 @@
     },
 
     get isBelowMinimum() {
-        return this.withdrawAmount !== ''
-            && this.amount > 0
-            && this.amount < this.minimumWithdrawalAmount;
+        return this.withdrawAmount !== '' &&
+            this.amount > 0 &&
+            this.amount < this.minimumWithdrawalAmount;
     },
 
     get exceedsBalance() {
@@ -50,596 +48,489 @@
         if (value.includes('.')) {
             let decimalParts = value.split('.');
 
-            value = decimalParts[0]
-                + '.'
-                + decimalParts[1].slice(0, 2);
+            value = decimalParts[0] +
+                '.' +
+                decimalParts[1].slice(0, 2);
         }
 
         this.withdrawAmount = value;
     }
 }"
-
-x-on:open-withdraw-modal.window="
+    x-on:open-withdraw-modal.window="
     console.log('WithdrawalModal: open-withdraw-modal received');
     showWithdrawModal = true;
 "
-
-x-on:close-withdraw-modal.window="
+    x-on:close-withdraw-modal.window="
     console.log('WithdrawalModal: close-withdraw-modal received');
     showWithdrawModal = false;
-"
->
+">
 
-{{-- ==========================================
+    {{-- ==========================================
      WITHDRAWAL MODAL
 ========================================== --}}
-<div
-    x-show="showWithdrawModal"
-    x-cloak
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-    x-transition.opacity
-    @click.self="showWithdrawModal = false"
->
+    <div x-show="showWithdrawModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        x-transition.opacity @click.self="showWithdrawModal = false">
 
-    <div
-        class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-gray-100"
-    >
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-gray-100">
 
-        {{-- ==========================================
+            {{-- ==========================================
              MODAL HEADER
         ========================================== --}}
-        <div
-            class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-slate-50"
-        >
-
-            <div>
-
-                <h3 class="font-bold text-gray-800 text-lg">
-                    @if ($targetUser)
-                        Withdrawal for {{ $targetUser->firstname }} {{ $targetUser->lastname }}
-                    @else
-                        Cash Wallet Withdrawal
-                    @endif
-                </h3>
-
-                {{-- ADMIN MODE BADGE --}}
-                @if ($targetUser)
-
-                    <span
-                        class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wide"
-                    >
-                        🛡️ Admin Mode
-                    </span>
-
-                @endif
-
-            </div>
-
-            <button
-                type="button"
-                @click="showWithdrawModal = false"
-                class="text-gray-400 hover:text-gray-600 font-bold text-xl cursor-pointer"
-            >
-                &times;
-            </button>
-
-        </div>
-
-
-        {{-- ==========================================
-             MODAL BODY
-        ========================================== --}}
-        <div class="p-6 space-y-4">
-
-            {{-- AVAILABLE BALANCE --}}
-            <div
-                class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between"
-            >
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-slate-50">
 
                 <div>
 
-                    <span
-                        class="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider"
-                    >
+                    <h3 class="font-bold text-gray-800 text-lg">
                         @if ($targetUser)
-                            {{ $targetUser->firstname }}'s Cash Wallet
+                            Withdrawal for {{ $targetUser->firstname }} {{ $targetUser->lastname }}
                         @else
-                            Available Cash Wallet
+                            Cash Wallet Withdrawal
                         @endif
-                    </span>
+                    </h3>
 
-                    <span
-                        class="text-lg font-bold text-[#0C2C6B]"
-                    >
-                        ₱{{ number_format($totalAmount, 2) }}
-                    </span>
+                    {{-- ADMIN MODE BADGE --}}
+                    @if ($targetUser)
+                        <span
+                            class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wide">
+                            🛡️ Admin Mode
+                        </span>
+                    @endif
 
                 </div>
 
-                <div
-                    class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-900 text-base font-bold"
-                >
-                    💳
-                </div>
-
-            </div>
-
-
-            {{-- PAYOUT SCHEDULE --}}
-            <div
-                class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-900 space-y-2"
-            >
-
-                <div
-                    class="font-bold flex items-center gap-1.5 text-blue-950 text-sm"
-                >
-                    <span>ℹ️</span>
-
-                    Payout Schedule & Cut-off Rules
-                </div>
-
-                <p>
-                    • <strong>Friday 6:01 PM to Friday 6:00 PM:</strong>
-
-                    Requests processed and released on the upcoming Monday.
-                </p>
+                <button type="button" @click="showWithdrawModal = false"
+                    class="text-gray-400 hover:text-gray-600 font-bold text-xl cursor-pointer">
+                    &times;
+                </button>
 
             </div>
 
 
             {{-- ==========================================
+             MODAL BODY
+        ========================================== --}}
+            <div class="p-6 space-y-4">
+
+                {{-- AVAILABLE BALANCE --}}
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between">
+
+                    <div>
+
+                        <span class="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                            @if ($targetUser)
+                                {{ $targetUser->firstname }}'s Cash Wallet
+                            @else
+                                Available Cash Wallet
+                            @endif
+                        </span>
+
+                        <span class="text-lg font-bold text-[#0C2C6B]">
+                            ₱{{ number_format($totalAmount, 2) }}
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-900 text-base font-bold">
+                        💳
+                    </div>
+
+                </div>
+
+
+                {{-- PAYOUT SCHEDULE --}}
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-900 space-y-2">
+
+                    <div class="font-bold flex items-center gap-1.5 text-blue-950 text-sm">
+                        <span>ℹ️</span>
+
+                        Payout Schedule & Cut-off Rules
+                    </div>
+
+                    <p>
+                        • <strong>Friday 6:01 PM to Friday 6:00 PM:</strong>
+
+                        Requests processed and released on the upcoming Monday.
+                    </p>
+
+                </div>
+
+
+                {{-- ==========================================
                  WITHDRAWAL AMOUNT
             ========================================== --}}
-            <div class="space-y-1.5">
+                <div class="space-y-1.5">
 
-                <label
-                    class="block text-xs font-semibold text-gray-700"
-                >
-                    Enter Withdrawal Amount
-                </label>
+                    <label class="block text-xs font-semibold text-gray-700">
+                        Enter Withdrawal Amount
+                    </label>
 
 
-                <div class="relative">
+                    <div class="relative">
 
-                    <span
-                        class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold pointer-events-none"
-                    >
-                        ₱
-                    </span>
+                        <span
+                            class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold pointer-events-none">
+                            ₱
+                        </span>
 
 
-                    <input
-                        type="text"
-                        inputmode="decimal"
-
-                        x-model="withdrawAmount"
-
-                        @input="sanitizeAmount()"
-
-                        @keydown="
+                        <input type="text" inputmode="decimal" x-model="withdrawAmount" @input="sanitizeAmount()"
+                            @keydown="
                             if (['-', '+', 'e', 'E'].includes($event.key)) {
                                 $event.preventDefault()
                             }
                         "
+                            placeholder="0.00" autocomplete="off"
+                            :class="{
+                                'border-red-500 focus:border-red-500': isBelowMinimum || exceedsBalance,
+                            
+                                'border-gray-200 focus:border-[#0C2C6B]':
+                                    !isBelowMinimum && !exceedsBalance
+                            }"
+                            class="w-full pl-8 pr-4 py-2 border rounded-xl focus:outline-none text-sm font-semibold" />
 
-                        placeholder="0.00"
-
-                        autocomplete="off"
-
-                        :class="{
-                            'border-red-500 focus:border-red-500':
-                                isBelowMinimum || exceedsBalance,
-
-                            'border-gray-200 focus:border-[#0C2C6B]':
-                                !isBelowMinimum && !exceedsBalance
-                        }"
-
-                        class="w-full pl-8 pr-4 py-2 border rounded-xl focus:outline-none text-sm font-semibold"
-                    />
-
-                </div>
+                    </div>
 
 
-                {{-- BELOW MINIMUM --}}
-                <p
-                    x-show="isBelowMinimum"
-                    x-cloak
-                    class="text-xs text-red-500 font-medium"
-                >
-                    ⚠ Minimum withdrawal amount is
-                    ₱{{ number_format($minimumWithdrawalAmount, 2) }}.
-                </p>
-
-
-                {{-- EXCEEDS BALANCE --}}
-                <p
-                    x-show="exceedsBalance"
-                    x-cloak
-                    class="text-xs text-red-500 font-medium"
-                >
-                    ⚠ Withdrawal amount exceeds
-                    @if ($targetUser)
-                        this user's
-                    @else
-                        your
-                    @endif
-                    available balance.
-                </p>
-
-
-                {{-- REMAINING BALANCE --}}
-                <div
-                    class="flex items-center justify-between mt-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg"
-                >
-
-                    <span class="text-xs text-gray-500">
-                        Remaining Balance
-                    </span>
-
-                    <span
-                        class="text-sm font-bold text-[#0C2C6B]"
-                        x-text="'₱' + formatMoney(remainingBalance)"
-                    >
-                    </span>
-
-                </div>
-
-
-                {{-- LIVEWIRE ERROR --}}
-                @error('withdrawAmount')
-
-                    <p class="text-xs text-red-500">
-                        {{ $message }}
+                    {{-- BELOW MINIMUM --}}
+                    <p x-show="isBelowMinimum" x-cloak class="text-xs text-red-500 font-medium">
+                        ⚠ Minimum withdrawal amount is
+                        ₱{{ number_format($minimumWithdrawalAmount, 2) }}.
                     </p>
 
-                @enderror
+
+                    {{-- EXCEEDS BALANCE --}}
+                    <p x-show="exceedsBalance" x-cloak class="text-xs text-red-500 font-medium">
+                        ⚠ Withdrawal amount exceeds
+                        @if ($targetUser)
+                            this user's
+                        @else
+                            your
+                        @endif
+                        available balance.
+                    </p>
 
 
-                {{-- DEFAULT HINT --}}
-                <p
-                    x-show="!isBelowMinimum && !exceedsBalance"
-                    class="text-[11px] text-gray-500"
-                >
-                    Minimum withdrawal amount is
+                    {{-- REMAINING BALANCE --}}
+                    <div
+                        class="flex items-center justify-between mt-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg">
 
-                    <strong>
-                        ₱{{ number_format($minimumWithdrawalAmount, 2) }}
-                    </strong>
+                        <span class="text-xs text-gray-500">
+                            Remaining Balance
+                        </span>
 
-                </p>
+                        <span class="text-sm font-bold text-[#0C2C6B]" x-text="'₱' + formatMoney(remainingBalance)">
+                        </span>
 
-            </div>
+                    </div>
 
 
-            {{-- ==========================================
+                    {{-- LIVEWIRE ERROR --}}
+                    @error('withdrawAmount')
+                        <p class="text-xs text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
+
+
+                    {{-- DEFAULT HINT --}}
+                    <p x-show="!isBelowMinimum && !exceedsBalance" class="text-[11px] text-gray-500">
+                        Minimum withdrawal amount is
+
+                        <strong>
+                            ₱{{ number_format($minimumWithdrawalAmount, 2) }}
+                        </strong>
+
+                    </p>
+
+                </div>
+
+
+                {{-- ==========================================
                  WITHDRAWAL METHOD
             ========================================== --}}
-            <div class="space-y-1.5">
+                <div class="space-y-1.5">
 
-                <label
-                    class="block text-xs font-semibold text-gray-700"
-                >
-                    Withdrawal Method
-                </label>
+                    <label class="block text-xs font-semibold text-gray-700">
+                        Withdrawal Method
+                    </label>
 
 
-                <select
-                    wire:model.live="withdrawalMethod"
+                    <select wire:model.live="withdrawalMethod"
+                        class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm">
 
-                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm"
-                >
+                        <option value="">
+                            Select withdrawal method
+                        </option>
 
-                    <option value="">
-                        Select withdrawal method
-                    </option>
+                        <option value="Cash">
+                            Cash
+                        </option>
 
-                    <option value="Cash">
-                        Cash
-                    </option>
+                        <option value="GCash">
+                            GCash
+                        </option>
 
-                    <option value="GCash">
-                        GCash
-                    </option>
+                        <option value="Maya">
+                            Maya
+                        </option>
 
-                    <option value="Maya">
-                        Maya
-                    </option>
+                        <option value="Bank Transfer">
+                            Bank Transfer
+                        </option>
 
-                    <option value="Bank Transfer">
-                        Bank Transfer
-                    </option>
-
-                </select>
+                    </select>
 
 
-                @error('withdrawalMethod')
+                    @error('withdrawalMethod')
+                        <p class="text-xs text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
 
-                    <p class="text-xs text-red-500">
-                        {{ $message }}
-                    </p>
-
-                @enderror
-
-            </div>
+                </div>
 
 
-            {{-- ==========================================
+                {{-- ==========================================
                 ONLINE ACCOUNT DETAILS
             ========================================== --}}
-            @if (
-                $this->withdrawalMethod
-                && $this->withdrawalMethod !== 'Cash'
-            )
+                @if ($this->withdrawalMethod && $this->withdrawalMethod !== 'Cash')
 
-                {{-- BANK SELECTION (ONLY FOR BANK TRANSFER) --}}
-                @if ($this->withdrawalMethod === 'Bank Transfer')
-                    <div class="space-y-1.5" x-data="{
-                        banks: [
-                            'Al-Amanah Islamic Investment Bank of the Philippines',
-                            'Asia United Bank Corporation (AUB)',
-                            'Bank of Commerce',
-                            'Bank of the Philippine Islands (BPI)',
-                            'BDO Unibank, Inc.',
-                            'BDO Private Bank',
-                            'China Banking Corporation (Chinabank)',
-                            'CIMB Bank Philippines Inc.',
-                            'Citibank Philippines',
-                            'CTBC Bank (Philippines) Corporation',
-                            'Development Bank of the Philippines (DBP)',
-                            'East West Banking Corporation (EastWest Bank)',
-                            'Land Bank of the Philippines (Landbank)',
-                            'Maybank Philippines, Inc.',
-                            'Metropolitan Bank and Trust Company (Metrobank)',
-                            'Philippine Bank of Communications (PBCom)',
-                            'Philippine National Bank (PNB)',
-                            'Philippine Trust Company (Philtrust Bank)',
-                            'Philippine Veterans Bank',
-                            'Rizal Commercial Banking Corporation (RCBC)',
-                            'Security Bank Corporation',
-                            'Union Bank of the Philippines (UnionBank)',
-                            'United Overseas Bank Limited Manila Branch'
-                        ]
-                    }">
+                    {{-- BANK SELECTION (ONLY FOR BANK TRANSFER) --}}
+                    @if ($this->withdrawalMethod === 'Bank Transfer')
+                        <div class="space-y-1.5" x-data="{
+                            banks: [
+                                'Al-Amanah Islamic Investment Bank of the Philippines',
+                                'Asia United Bank Corporation (AUB)',
+                                'Bank of Commerce',
+                                'Bank of the Philippine Islands (BPI)',
+                                'BDO Unibank, Inc.',
+                                'BDO Private Bank',
+                                'China Banking Corporation (Chinabank)',
+                                'CIMB Bank Philippines Inc.',
+                                'Citibank Philippines',
+                                'CTBC Bank (Philippines) Corporation',
+                                'Development Bank of the Philippines (DBP)',
+                                'East West Banking Corporation (EastWest Bank)',
+                                'Land Bank of the Philippines (Landbank)',
+                                'Maybank Philippines, Inc.',
+                                'Metropolitan Bank and Trust Company (Metrobank)',
+                                'Philippine Bank of Communications (PBCom)',
+                                'Philippine National Bank (PNB)',
+                                'Philippine Trust Company (Philtrust Bank)',
+                                'Philippine Veterans Bank',
+                                'Rizal Commercial Banking Corporation (RCBC)',
+                                'Security Bank Corporation',
+                                'Union Bank of the Philippines (UnionBank)',
+                                'United Overseas Bank Limited Manila Branch'
+                            ]
+                        }">
+                            <label class="block text-xs font-semibold text-gray-700">
+                                Select Bank
+                            </label>
+
+                            <select wire:model="bankName"
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm bg-white">
+                                <option value="">Select destination bank</option>
+                                <template x-for="bank in banks" :key="bank">
+                                    <option :value="bank" x-text="bank"></option>
+                                </template>
+                            </select>
+
+                            @error('bankName')
+                                <p class="text-xs text-red-500">
+                                    {{ $message }}
+                                </p>
+                            @enderror
+                        </div>
+                    @endif
+
+                    {{-- ACCOUNT NAME --}}
+                    <div class="space-y-1.5">
                         <label class="block text-xs font-semibold text-gray-700">
-                            Select Bank
+                            Account Name *
                         </label>
 
-                        <select
-                            wire:model="bankName"
-                            class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm bg-white"
-                        >
-                            <option value="">Select destination bank</option>
-                            <template x-for="bank in banks" :key="bank">
-                                <option :value="bank" x-text="bank"></option>
-                            </template>
-                        </select>
+                        <input type="text" wire:model="accountName" placeholder="Enter account holder name"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm" />
 
-                        @error('bankName')
+                        @error('accountName')
                             <p class="text-xs text-red-500">
                                 {{ $message }}
                             </p>
                         @enderror
                     </div>
+
+                    {{-- ACCOUNT NUMBER --}}
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-gray-700">
+                            Account Number *
+                        </label>
+
+                        <input type="text" wire:model="accountNumber" placeholder="Enter account number"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm" />
+
+                        @error('accountNumber')
+                            <p class="text-xs text-red-500">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
                 @endif
 
-                {{-- ACCOUNT NAME --}}
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-semibold text-gray-700">
-                        Account Name *
-                    </label>
-
-                    <input
-                        type="text"
-                        wire:model="accountName"
-                        placeholder="Enter account holder name"
-                        class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm"
-                    />
-
-                    @error('accountName')
-                        <p class="text-xs text-red-500">
-                            {{ $message }}
-                        </p>
-                    @enderror
-                </div>
-
-                {{-- ACCOUNT NUMBER --}}
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-semibold text-gray-700">
-                        Account Number *
-                    </label>
-
-                    <input
-                        type="text"
-                        wire:model="accountNumber"
-                        placeholder="Enter account number"
-                        class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0C2C6B] text-sm"
-                    />
-
-                    @error('accountNumber')
-                        <p class="text-xs text-red-500">
-                            {{ $message }}
-                        </p>
-                    @enderror
-                </div>
-
-            @endif
-
-        </div>
+            </div>
 
 
-        {{-- ==========================================
+            {{-- ==========================================
              MODAL FOOTER
         ========================================== --}}
-        <div
-            class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50"
-        >
+            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50">
 
-            {{-- CANCEL --}}
-            <button
-                type="button"
-
-                @click="showWithdrawModal = false"
-
-                wire:loading.attr="disabled"
-
-                class="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-100 text-xs font-semibold rounded-xl transition cursor-pointer"
-            >
-                Cancel
-            </button>
+                {{-- CANCEL --}}
+                <button type="button" @click="showWithdrawModal = false" wire:loading.attr="disabled"
+                    class="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-100 text-xs font-semibold rounded-xl transition cursor-pointer">
+                    Cancel
+                </button>
 
 
-            {{-- SUBMIT --}}
-            <button
-                type="button"
-
-                @click="confirmWithdrawal()"
-
-                wire:loading.attr="disabled"
-
-                wire:target="submitWithdrawal"
-
-                class="px-4 py-2 bg-[#0C2C6B] hover:bg-[#09204f] text-white text-xs font-semibold rounded-xl shadow-sm transition cursor-pointer disabled:opacity-50"
-            >
-
-                <span
-                    wire:loading.remove
+                {{-- SUBMIT --}}
+                <button type="button" @click="confirmWithdrawal()" wire:loading.attr="disabled"
                     wire:target="submitWithdrawal"
-                >
-                    Submit Request
-                </span>
+                    class="px-4 py-2 bg-[#0C2C6B] hover:bg-[#09204f] text-white text-xs font-semibold rounded-xl shadow-sm transition cursor-pointer disabled:opacity-50">
+
+                    <span wire:loading.remove wire:target="submitWithdrawal">
+                        Submit Request
+                    </span>
 
 
-                <span
-                    wire:loading
-                    wire:target="submitWithdrawal"
-                >
-                    Processing...
-                </span>
+                    <span wire:loading wire:target="submitWithdrawal">
+                        Processing...
+                    </span>
 
-            </button>
+                </button>
+
+            </div>
 
         </div>
 
     </div>
 
-</div>
 
-
-{{-- ==========================================
+    {{-- ==========================================
      JAVASCRIPT
 ========================================== --}}
-@script
-<script>
+    @script
+        <script>
+            // ==========================================
+            // CONFIRM WITHDRAWAL WITH VALIDATION
+            // ==========================================
 
-    // ==========================================
-    // CONFIRM WITHDRAWAL WITH VALIDATION
-    // ==========================================
+            window.confirmWithdrawal = function() {
 
-    window.confirmWithdrawal = function () {
+                // ==========================================
+                // VALIDATE WITHDRAWAL AMOUNT
+                // ==========================================
 
-        // ==========================================
-        // VALIDATE WITHDRAWAL AMOUNT
-        // ==========================================
+                const amount = parseFloat($wire.withdrawAmount);
 
-        const amount = parseFloat($wire.withdrawAmount);
+                if (!amount || amount <= 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Invalid Amount',
+                        text: 'Please enter a valid withdrawal amount first.',
+                        confirmButtonColor: '#0C2C6B',
+                    });
 
-        if (!amount || amount <= 0) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Invalid Amount',
-                text: 'Please enter a valid withdrawal amount first.',
-                confirmButtonColor: '#0C2C6B',
-            });
+                    return;
+                }
 
-            return;
-        }
+                // ==========================================
+                // VALIDATE WITHDRAWAL METHOD
+                // ==========================================
 
-        // ==========================================
-        // VALIDATE WITHDRAWAL METHOD
-        // ==========================================
+                const withdrawalMethod = $wire.withdrawalMethod;
 
-        const withdrawalMethod = $wire.withdrawalMethod;
+                if (!withdrawalMethod || withdrawalMethod.trim() === '') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Withdrawal Method Required',
+                        text: 'Please select a withdrawal method before submitting.',
+                        confirmButtonColor: '#0C2C6B',
+                    });
 
-        if (!withdrawalMethod || withdrawalMethod.trim() === '') {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Withdrawal Method Required',
-                text: 'Please select a withdrawal method before submitting.',
-                confirmButtonColor: '#0C2C6B',
-            });
+                    return;
+                }
 
-            return;
-        }
+                // ==========================================
+                // VALIDATE BANK NAME
+                // ==========================================
 
-        // ==========================================
-        // VALIDATE BANK NAME
-        // ==========================================
+                if (
+                    withdrawalMethod === 'Bank Transfer' &&
+                    (!$wire.bankName || $wire.bankName.trim() === '')
+                ) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Bank Required',
+                        text: 'Please select a destination bank.',
+                        confirmButtonColor: '#0C2C6B',
+                    });
 
-        if (
-            withdrawalMethod === 'Bank Transfer' &&
-            (!$wire.bankName || $wire.bankName.trim() === '')
-        ) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Bank Required',
-                text: 'Please select a destination bank.',
-                confirmButtonColor: '#0C2C6B',
-            });
+                    return;
+                }
 
-            return;
-        }
+                // ==========================================
+                // VALIDATE ACCOUNT DETAILS
+                // Only required for non-cash withdrawals
+                // ==========================================
 
-        // ==========================================
-        // VALIDATE ACCOUNT DETAILS
-        // Only required for non-cash withdrawals
-        // ==========================================
+                if (withdrawalMethod !== 'Cash') {
 
-        if (withdrawalMethod !== 'Cash') {
+                    if (
+                        !$wire.accountName ||
+                        $wire.accountName.trim() === ''
+                    ) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Account Name Required',
+                            text: 'Please enter the account name.',
+                            confirmButtonColor: '#0C2C6B',
+                        });
 
-            if (
-                !$wire.accountName ||
-                $wire.accountName.trim() === ''
-            ) {
+                        return;
+                    }
+
+                    if (
+                        !$wire.accountNumber ||
+                        $wire.accountNumber.trim() === ''
+                    ) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Account Number Required',
+                            text: 'Please enter the account number.',
+                            confirmButtonColor: '#0C2C6B',
+                        });
+
+                        return;
+                    }
+                }
+
+                // ==========================================
+                // FORMAT AMOUNT
+                // ==========================================
+
+                const formattedAmount = amount.toFixed(2);
+
+                // ==========================================
+                // CONFIRM WITHDRAWAL
+                // ==========================================
+
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Account Name Required',
-                    text: 'Please enter the account name.',
-                    confirmButtonColor: '#0C2C6B',
-                });
+                    title: 'Confirm Withdrawal',
 
-                return;
-            }
-
-            if (
-                !$wire.accountNumber ||
-                $wire.accountNumber.trim() === ''
-            ) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Account Number Required',
-                    text: 'Please enter the account number.',
-                    confirmButtonColor: '#0C2C6B',
-                });
-
-                return;
-            }
-        }
-
-        // ==========================================
-        // FORMAT AMOUNT
-        // ==========================================
-
-        const formattedAmount = amount.toFixed(2);
-
-        // ==========================================
-        // CONFIRM WITHDRAWAL
-        // ==========================================
-
-        Swal.fire({
-            icon: 'warning',
-            title: 'Confirm Withdrawal',
-
-            html: `
+                    html: `
                 <div class="text-left">
 
                     <p class="mb-3 text-sm text-slate-600">
@@ -673,92 +564,92 @@ x-on:close-withdraw-modal.window="
                 </div>
             `,
 
-            input: 'text',
+                    input: 'text',
 
-            inputPlaceholder: `Type ${formattedAmount}`,
+                    inputPlaceholder: `Type ${formattedAmount}`,
 
-            inputAttributes: {
-                autocapitalize: 'off',
-                autocomplete: 'off'
-            },
+                    inputAttributes: {
+                        autocapitalize: 'off',
+                        autocomplete: 'off'
+                    },
 
-            showCancelButton: true,
+                    showCancelButton: true,
 
-            confirmButtonText: 'Submit Withdrawal',
+                    confirmButtonText: 'Submit Withdrawal',
 
-            cancelButtonText: 'Cancel',
+                    cancelButtonText: 'Cancel',
 
-            confirmButtonColor: '#0C2C6B',
+                    confirmButtonColor: '#0C2C6B',
 
-            cancelButtonColor: '#D79B10',
+                    cancelButtonColor: '#D79B10',
 
-            reverseButtons: true,
+                    reverseButtons: true,
 
-            allowOutsideClick: false,
-
-            allowEscapeKey: false,
-
-            preConfirm: (value) => {
-
-                const typedAmount = value.trim();
-
-                if (typedAmount !== formattedAmount) {
-
-                    Swal.showValidationMessage(
-                        `Please type exactly: ${formattedAmount}`
-                    );
-
-                    return false;
-                }
-
-                return true;
-            }
-
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-
-                Swal.fire({
-                    title: 'Submitting Withdrawal...',
-                    text: 'Please wait.',
                     allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
 
-                    didOpen: () => {
-                        Swal.showLoading();
+                    allowEscapeKey: false,
+
+                    preConfirm: (value) => {
+
+                        const typedAmount = value.trim();
+
+                        if (typedAmount !== formattedAmount) {
+
+                            Swal.showValidationMessage(
+                                `Please type exactly: ${formattedAmount}`
+                            );
+
+                            return false;
+                        }
+
+                        return true;
                     }
+
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        Swal.fire({
+                            title: 'Submitting Withdrawal...',
+                            text: 'Please wait.',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false,
+
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        $wire.submitWithdrawal();
+                    }
+
                 });
 
-                $wire.submitWithdrawal();
-            }
-
-        });
-
-    };
+            };
 
 
-    // ==========================================
-    // PENDING WITHDRAWAL
-    // ==========================================
+            // ==========================================
+            // PENDING WITHDRAWAL
+            // ==========================================
 
-    window.addEventListener(
-        'pending-withdrawal',
-        (event) => {
+            window.addEventListener(
+                'pending-withdrawal',
+                (event) => {
 
-            console.log(
-                'WithdrawalModal: pending withdrawal received.',
-                event.detail
-            );
+                    console.log(
+                        'WithdrawalModal: pending withdrawal received.',
+                        event.detail
+                    );
 
-            const data = event.detail;
+                    const data = event.detail;
 
-            Swal.fire({
-                icon: 'warning',
+                    Swal.fire({
+                        icon: 'warning',
 
-                title: 'Pending Withdrawal Request',
+                        title: 'Pending Withdrawal Request',
 
-html: `
+                        html: `
     <div class="text-left space-y-3 text-sm">
 
         <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
@@ -787,30 +678,30 @@ html: `
         ${
             data.method !== 'Cash'
                 ? `
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
-                        ${data.method === 'Bank Transfer' ? `
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                                ${data.method === 'Bank Transfer' ? `
                             <div class="flex justify-between">
                                 <span class="text-gray-500">Bank Name</span>
                                 <strong>${data.bankName ?? '-'}</strong>
                             </div>
                         ` : ''}
 
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Account Name</span>
-                            <strong>${data.accountName ?? '-'}</strong>
-                        </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Account Name</span>
+                                    <strong>${data.accountName ?? '-'}</strong>
+                                </div>
 
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Account Number</span>
-                            <strong>${data.accountNumber ?? '-'}</strong>
-                        </div>
-                    </div>
-                `
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Account Number</span>
+                                    <strong>${data.accountNumber ?? '-'}</strong>
+                                </div>
+                            </div>
+                        `
                 : `
-                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-blue-900">
-                        This withdrawal will be processed through cash payout.
-                    </div>
-                `
+                            <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-blue-900">
+                                This withdrawal will be processed through cash payout.
+                            </div>
+                        `
         }
 
         <div class="border-t border-gray-200 pt-3 space-y-2">
@@ -834,52 +725,51 @@ html: `
     </div>
 `,
 
-                confirmButtonText: 'Okay',
+                        confirmButtonText: 'Okay',
 
-                confirmButtonColor: '#0C2C6B'
-            });
+                        confirmButtonColor: '#0C2C6B'
+                    });
 
-        }
-    );
-
-
-    // ==========================================
-    // WITHDRAWAL SUBMITTED
-    // ==========================================
-
-    window.addEventListener(
-        'withdrawal-submitted',
-        (event) => {
-
-            console.log(
-                'WithdrawalModal: withdrawal submitted.',
-                event.detail
+                }
             );
 
-            Swal.fire({
-                icon: 'success',
 
-                title: 'Withdrawal Submitted',
+            // ==========================================
+            // WITHDRAWAL SUBMITTED
+            // ==========================================
 
-                text: `Your withdrawal request of ₱${event.detail.amount} has been submitted.`,
+            window.addEventListener(
+                'withdrawal-submitted',
+                (event) => {
 
-                confirmButtonColor: '#0C2C6B'
+                    console.log(
+                        'WithdrawalModal: withdrawal submitted.',
+                        event.detail
+                    );
 
-            }).then(() => {
+                    Swal.fire({
+                        icon: 'success',
 
-                window.dispatchEvent(
-                    new CustomEvent(
-                        'close-withdraw-modal'
-                    )
-                );
+                        title: 'Withdrawal Submitted',
 
-            });
+                        text: `Your withdrawal request of ₱${event.detail.amount} has been submitted.`,
 
-        }
-    );
+                        confirmButtonColor: '#0C2C6B'
 
-</script>
-@endscript
+                    }).then(() => {
+
+                        window.dispatchEvent(
+                            new CustomEvent(
+                                'close-withdraw-modal'
+                            )
+                        );
+
+                    });
+
+                }
+            );
+        </script>
+    @endscript
 
 
 </div>

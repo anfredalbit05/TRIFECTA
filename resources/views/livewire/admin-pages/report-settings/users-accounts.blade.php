@@ -438,13 +438,14 @@
                                         <tr>
                                             <th class="py-2 px-3">ID</th>
                                             <th class="py-2 px-3">Ref ID / Source</th>
+                                            <th class="py-2 px-3">Detail</th>
                                             <th class="py-2 px-3">Amount</th>
                                             <th class="py-2 px-3">Status</th>
                                             <th class="py-2 px-3">Date</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100">
-                                        @forelse($selectedUser->ledgers as $ledger)
+                                        @forelse($statementLedgers as $ledger)
                                             <tr>
                                                 <td class="py-2 px-3 font-medium text-slate-500">
                                                     {{ $ledger->TransactionID }}</td>
@@ -453,6 +454,18 @@
                                                         class="font-semibold text-slate-800">{{ $ledger->RefID }}</span>
                                                     <span class="text-slate-400 text-[10px] block">Source:
                                                         {{ $ledger->Source }}</span>
+                                                </td>
+                                                <td class="py-2 px-3 text-[10px]">
+                                                    @if ($ledger->Source === 'PK')
+                                                        <span
+                                                            class="font-semibold text-[#D79B10]">🎡 Pangkabuhayan Prize</span>
+                                                        <span class="text-slate-400 block">
+                                                            {{ $ledger->draw?->prize_name }}
+                                                            {{ $ledger->draw ? '· draw of '.$ledger->draw->draw_date->format('M j, Y') : '' }}
+                                                        </span>
+                                                    @else
+                                                        <span class="text-slate-400">—</span>
+                                                    @endif
                                                 </td>
                                                 <td class="py-2 px-3 font-semibold text-[#0B2A5B]">
                                                     ₱{{ number_format($ledger->amount ?? 0, 2) }}</td>
@@ -467,7 +480,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="5" class="py-3 px-3 text-center text-slate-400">No
+                                                <td colspan="6" class="py-3 px-3 text-center text-slate-400">No
                                                     ledger
                                                     entries found.</td>
                                             </tr>
@@ -543,17 +556,25 @@
                             <th class="border border-slate-900 p-1">ID</th>
                             <th class="border border-slate-900 p-1">Ref ID</th>
                             <th class="border border-slate-900 p-1">Source</th>
+                            <th class="border border-slate-900 p-1">Detail</th>
                             <th class="border border-slate-900 p-1">Amount</th>
                             <th class="border border-slate-900 p-1">Status</th>
                             <th class="border border-slate-900 p-1">Date</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($selectedUser->ledgers as $ledger)
+                        @forelse($statementLedgers as $ledger)
                             <tr>
                                 <td class="border border-slate-900 p-1 text-center">{{ $ledger->TransactionID }}</td>
                                 <td class="border border-slate-900 p-1 text-center">{{ $ledger->RefID }}</td>
                                 <td class="border border-slate-900 p-1 text-center">{{ $ledger->Source }}</td>
+                                <td class="border border-slate-900 p-1 text-center">
+                                    @if ($ledger->Source === 'PK')
+                                        {{ $ledger->draw?->prize_name }}{{ $ledger->draw ? ' · draw of '.$ledger->draw->draw_date->format('M j, Y') : ' · Spin the Wheel' }}
+                                    @else
+                                        —
+                                    @endif
+                                </td>
                                 <td class="border border-slate-900 p-1 text-right">
                                     ₱{{ number_format($ledger->amount ?? 0, 2) }}</td>
                                 <td class="border border-slate-900 p-1 text-center">{{ $ledger->status }}</td>
@@ -562,7 +583,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="border border-slate-900 p-2 text-center">No ledger entries
+                                <td colspan="7" class="border border-slate-900 p-2 text-center">No ledger entries
                                     found.</td>
                             </tr>
                         @endforelse

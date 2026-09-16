@@ -3,6 +3,7 @@
 namespace App\Livewire\AdminPages\ReportSettings;
 
 use App\Models\User;
+use App\Models\Ledger;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
@@ -140,10 +141,32 @@ class UserAccounts extends Component
             ? User::with(['wallets', 'ledgers'])->find($this->selectedUserLedgerID)
             : null;
 
+        // Prize rows from the Pangkabuhayan Spin the Wheel are booked with
+        // Source 'PK' and RefID = the member's UserID (no ActivationID), so
+        // the hasManyThrough ledgers() relation never sees them. Merge them
+        // in directly so the member's own statement still shows their prizes.
+        $prizeLedgers = $selectedUser
+            ? Ledger::with('draw')
+                ->where('Source', 'PK')
+                ->where('RefID', (string) $selectedUser->UserID)
+                ->orderBy('TransactionID')
+                ->get()
+            : collect();
+
+        // One chronological statement = activation-linked rows + prize rows.
+        $statementLedgers = $selectedUser
+            ? $selectedUser->ledgers
+                ->concat($prizeLedgers)
+                ->sortBy(fn (Ledger $ledger) => $ledger->TransactionID)
+                ->values()
+            : collect();
+
         return view('livewire.admin-pages.report-settings.users-accounts', [
             'users' => $users,
             'printUsers' => $printUsers,
             'selectedUser' => $selectedUser,
+            'prizeLedgers' => $prizeLedgers,
+            'statementLedgers' => $statementLedgers,
             'dateRangeLabel' => $dateFrom && $dateTo
                 ? Carbon::parse($dateFrom)->format('M d, Y').' — '.Carbon::parse($dateTo)->format('M d, Y')
                 : 'All Time',

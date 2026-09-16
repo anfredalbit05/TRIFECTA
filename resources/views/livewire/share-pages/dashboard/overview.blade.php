@@ -6,9 +6,7 @@
     <div class="dashboard-sidebar order-1 lg:order-2">
 
         <!-- REFRESH BUTTON HEADER -->
-        <div
-            class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-100"
-        >
+        <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-100">
             <div>
                 <h3 class="font-bold text-gray-800 text-base">
                     Dashboard Actions
@@ -20,56 +18,21 @@
             </div>
 
             {{-- REFRESH --}}
-            <button
-                type="button"
-                wire:click="refreshDashboard"
-                wire:loading.attr="disabled"
-                title="Refresh Dashboard"
-                class="refresh-btn"
-            >
+            <button type="button" wire:click="refreshDashboard" wire:loading.attr="disabled" title="Refresh Dashboard"
+                class="refresh-btn">
                 {{-- NORMAL STATE --}}
-                <span
-                    wire:loading.remove
-                    wire:target="refreshDashboard"
-                    class="refresh-icon"
-                >
-                    <svg
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6.5L20 9M18.5 15A7 7 0 0 1 6 17.5L4 15"
-                        />
+                <span wire:loading.remove wire:target="refreshDashboard" class="refresh-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6.5L20 9M18.5 15A7 7 0 0 1 6 17.5L4 15" />
                     </svg>
                 </span>
 
                 {{-- LOADING STATE --}}
-                <span
-                    wire:loading
-                    wire:target="refreshDashboard"
-                    class="refresh-loading"
-                >
-                    <svg
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <circle
-                            cx="12"
-                            cy="12"
-                            r="9"
-                            stroke-width="3"
-                            class="refresh-circle"
-                        />
-                        <path
-                            d="M21 12a9 9 0 0 1-9 9"
-                            stroke-width="3"
-                            stroke-linecap="round"
-                        />
+                <span wire:loading wire:target="refreshDashboard" class="refresh-loading">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="9" stroke-width="3" class="refresh-circle" />
+                        <path d="M21 12a9 9 0 0 1-9 9" stroke-width="3" stroke-linecap="round" />
                     </svg>
                 </span>
 
@@ -97,26 +60,17 @@
 
                 <!-- WITHDRAWAL STATUS -->
                 @if ($isWithdrawalActive)
-
-                <button
-                    type="button"
-                    wire:click="openWithdrawalModal"
-                    class="wallet-btn-withdraw cursor-pointer"
-                >
-                    Withdraw Cash Wallet
-                </button>
-
+                    <button type="button" wire:click="openWithdrawalModal" class="wallet-btn-withdraw cursor-pointer">
+                        Withdraw Cash Wallet
+                    </button>
                 @else
-
                     <div
                         class="w-full px-4 py-2.5 rounded-lg
                         bg-gray-100 border border-gray-200
                         text-gray-500 text-sm font-semibold
-                        mt-6 text-center cursor-not-allowed"
-                    >
+                        mt-6 text-center cursor-not-allowed">
                         Withdrawals are currently unavailable
                     </div>
-
                 @endif
 
             </div>
@@ -162,7 +116,7 @@
                     </span>
 
                     <strong>
-                         ₱{{ number_format($totalWithdrawals, 2) }}
+                        ₱{{ number_format($totalWithdrawals, 2) }}
                     </strong>
                 </div>
 
@@ -187,6 +141,54 @@
 
         </aside>
 
+
+        <!-- =========================
+             SPIN THE WHEEL
+        ========================== -->
+        @if ($isKabuhayanSpinActive)
+            <button type="button" wire:click="$dispatch('open-spin-wheel')" wire:loading.attr="disabled"
+                wire:loading.class="opacity-70" class="wallet-btn-spin cursor-pointer">
+
+                <span class="wallet-btn-spin-icon">
+                    🎡
+                </span>
+
+                <span class="min-w-0 flex-1">
+
+                    <span class="wallet-btn-spin-title">
+                        Spin the Wheel
+                    </span>
+
+                    <span class="wallet-btn-spin-hint">
+                        Pangkabuhayan raffle · drawn every 12th
+                    </span>
+
+                </span>
+
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" class="h-4 w-4 shrink-0 text-white/70">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                </svg>
+
+            </button>
+        @else
+            <div
+                class="w-full px-4 py-2.5 rounded-lg
+                        bg-gray-100 border border-gray-200
+                        text-gray-500 text-sm font-semibold
+                        mt-6 text-center cursor-not-allowed
+                        wallet-btn-spin">
+
+                <span class="wallet-btn-spin-icon">
+                    🎡
+                </span>
+                
+                <span class="min-w-0 flex-1">
+                    Spin the Wheel is currently unavailable
+                </span>
+            </div>
+        @endif
+
     </div>
 
 
@@ -197,22 +199,14 @@
 
         <!-- NEWS ITEMS -->
         @forelse ($newsUpdates as $news)
-
-            <article
-                class="member-card feed-card"
-                wire:key="news-{{ $news->ID }}"
-            >
+            <article class="member-card feed-card" wire:key="news-{{ $news->ID }}">
 
                 <!-- CARD HEADER -->
                 <header class="card-header">
 
                     <div class="user-info">
 
-                        <img
-                            src="{{ asset('images/user.png') }}"
-                            alt="Profile Picture"
-                            class="user-avatar"
-                        >
+                        <img src="{{ asset('images/user.png') }}" alt="Profile Picture" class="user-avatar">
 
 
                         <div class="user-details">
@@ -221,26 +215,16 @@
                             <div class="user-name-row">
 
                                 <span class="user-name">
-                                    {{
-                                        $news->user
-                                            ? $news->user->firstname . ' ' . $news->user->lastname
-                                            : 'TRUELIFE'
-                                    }}
+                                    {{ $news->user ? $news->user->firstname . ' ' . $news->user->lastname : 'TRUELIFE' }}
                                 </span>
 
 
                                 <!-- VERIFIED ICON -->
                                 <span class="verified-icon">
 
-                                    <svg
-                                        viewBox="0 0 24 24"
-                                        width="14"
-                                        height="14"
-                                        fill="#1877F2"
-                                    >
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="#1877F2">
                                         <path
-                                            d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.9 14.7L6 12.6l1.5-1.5 2.6 2.6 6.3-6.3 1.5 1.5-7.8 7.8z"
-                                        />
+                                            d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.9 14.7L6 12.6l1.5-1.5 2.6 2.6 6.3-6.3 1.5 1.5-7.8 7.8z" />
                                     </svg>
 
                                 </span>
@@ -276,19 +260,13 @@
 
                     <!-- ADMIN ACTION -->
                     @if (auth()->check() && (int) auth()->user()->RoleID === 1)
-
                         <div class="card-actions">
 
-                            <button
-                                class="action-btn"
-                                type="button"
-                                aria-label="More options"
-                            >
+                            <button class="action-btn" type="button" aria-label="More options">
                                 •••
                             </button>
 
                         </div>
-
                     @endif
 
                 </header>
@@ -313,18 +291,12 @@
 
                     <!-- POST IMAGE -->
                     @if ($news->image)
-
                         <div class="news-image-container">
 
-                            <img
-                                src="{{ asset('storage/' . $news->image) }}"
-                                alt="{{ $news->title }}"
-                                class="news-post-image"
-                                loading="lazy"
-                            >
+                            <img src="{{ asset('storage/' . $news->image) }}" alt="{{ $news->title }}"
+                                class="news-post-image" loading="lazy">
 
                         </div>
-
                     @endif
 
                 </div>
@@ -351,7 +323,6 @@
                 </p>
 
             </div>
-
         @endforelse
 
     </div>
@@ -361,5 +332,11 @@
          WITHDRAWAL MODAL
     ========================== -->
     <livewire:components.withdrawal-modal />
+
+
+    <!-- =========================
+         SPIN THE WHEEL MODAL
+    ========================== -->
+    <livewire:components.spin-wheel-modal />
 
 </div>

@@ -161,6 +161,19 @@ class NewsUpdates extends Component
     }
 
     // ==========================================
+    // CHECK KABUHAYAN SPIN THE WHEEL STATUS
+    // ==========================================
+
+    public function isKabuhayanSpinActive(): bool
+    {
+        return filter_var(
+            Setting::where('name', 'activate_spin_pangkabuhayan')
+                ->value('value'),
+            FILTER_VALIDATE_BOOLEAN
+        );
+    }
+
+    // ==========================================
     // RENDER
     // ==========================================
 
@@ -221,6 +234,13 @@ class NewsUpdates extends Component
 
         $isWithdrawalActive = $this->isWithdrawalActive();
 
+        
+
+        // ------------------------------------------
+        // KABUHAYAN SPIN THE WHEEL STATUS
+        // ------------------------------------------
+
+        $isKabuhayanSpinActive = $this->isKabuhayanSpinActive();
         // ------------------------------------------
         // RETURN VIEW
         // ------------------------------------------
@@ -239,6 +259,8 @@ class NewsUpdates extends Component
                 'totalWithdrawals' => $totalWithdrawals,
 
                 'isWithdrawalActive' => $isWithdrawalActive,
+
+                'isKabuhayanSpinActive' => $isKabuhayanSpinActive,
             ]
         );
     }
