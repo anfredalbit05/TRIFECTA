@@ -142,51 +142,70 @@
         </aside>
 
 
-        <!-- =========================
-             SPIN THE WHEEL
-        ========================== -->
-        @if ($isKabuhayanSpinActive)
-            <button type="button" wire:click="$dispatch('open-spin-wheel')" wire:loading.attr="disabled"
-                wire:loading.class="opacity-70" class="wallet-btn-spin cursor-pointer">
+        @if (!in_array(auth()->user()->RoleID, [4, 8]))
 
-                <span class="wallet-btn-spin-icon">
-                    🎡
-                </span>
+            @if ($isKabuhayanSpinActive)
 
-                <span class="min-w-0 flex-1">
+                {{-- ACTIVE BUTTON --}}
+                <button type="button"
+                    wire:click="$dispatch('open-spin-wheel')"
+                    wire:loading.attr="disabled"
+                    wire:loading.class="opacity-70"
+                    class="wallet-btn-spin cursor-pointer">
 
-                    <span class="wallet-btn-spin-title">
-                        Spin the Wheel
+                    <span class="wallet-btn-spin-icon">
+                        🎡
                     </span>
 
-                    <span class="wallet-btn-spin-hint">
-                        Pangkabuhayan raffle · drawn every 12th
+                    <span class="min-w-0 flex-1">
+
+                        <span class="wallet-btn-spin-title">
+                            Spin the Wheel
+                        </span>
+
+                        <span class="wallet-btn-spin-hint">
+                            Pangkabuhayan raffle · drawn every 12th
+                        </span>
+
                     </span>
 
-                </span>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        class="h-4 w-4 shrink-0 text-white/70">
 
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" class="h-4 w-4 shrink-0 text-white/70">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                </svg>
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="m8.25 4.5 7.5 7.5-7.5 7.5" />
 
-            </button>
-        @else
-            <div
-                class="w-full px-4 py-2.5 rounded-lg
+                    </svg>
+
+                </button>
+
+            @else
+
+                {{-- DISABLED BUTTON --}}
+                <div
+                    class="w-full px-4 py-2.5 rounded-lg
                         bg-gray-100 border border-gray-200
                         text-gray-500 text-sm font-semibold
                         mt-6 text-center cursor-not-allowed
                         wallet-btn-spin">
 
-                <span class="wallet-btn-spin-icon">
-                    🎡
-                </span>
-                
-                <span class="min-w-0 flex-1">
-                    Spin the Wheel is currently unavailable
-                </span>
-            </div>
+                    <span class="wallet-btn-spin-icon">
+                        🎡
+                    </span>
+
+                    <span class="min-w-0 flex-1">
+                        Spin the Wheel is currently unavailable
+                    </span>
+
+                </div>
+
+            @endif
+
         @endif
 
     </div>
