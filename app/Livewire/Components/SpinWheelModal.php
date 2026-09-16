@@ -23,7 +23,7 @@ use Throwable;
 class SpinWheelModal extends Component
 {
     /** Admin roles allowed to spin. */
-    private const ADMIN_ROLES = [1, 2];
+    private const ADMIN_ROLES = [1, 2, 5, 6, 7];
 
     public bool $open = false;
 
