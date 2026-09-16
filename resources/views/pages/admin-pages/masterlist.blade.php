@@ -32,12 +32,10 @@
                 <span class="masterlist-tab-label">Members</span>
             </a>
 
-             {{-- @if(auth()->user()->RoleID == 1)
-            <a href="#" @click.prevent="tab = 'satellite-members'" :class="tab === 'satellite-members' ? 'active' : ''">
+            {{-- <a href="#" @click.prevent="tab = 'satellite-members'" :class="tab === 'satellite-members' ? 'active' : ''">
                 <span class="masterlist-tab-icon">◉</span>
                 <span class="masterlist-tab-label">Satellite Members</span>
-            </a>
-            @endif --}}
+            </a> --}}
 
             <a href="#" @click.prevent="tab = 'branches'" :class="tab === 'branches' ? 'active' : ''">
                 <span class="masterlist-tab-icon">⌖</span>
@@ -112,12 +110,10 @@
                 <span class="masterlist-mobile-label">Members</span>
             </a>
 
-            {{-- @if(auth()->user()->RoleID == 1)
-            <a href="#" @click.prevent="tab = 'satellite-members'" :class="tab === 'satellite-members' ? 'active' : ''" aria-label="Satellite Members">
+            {{-- <a href="#" @click.prevent="tab = 'satellite-members'" :class="tab === 'satellite-members' ? 'active' : ''" aria-label="Satellite Members">
                 <span class="masterlist-mobile-icon">◉</span>
                 <span class="masterlist-mobile-label">Satellite Members</span>
-            </a>
-            @endif --}}
+            </a> --}}
 
             <a href="#" @click.prevent="tab = 'branches'" :class="tab === 'branches' ? 'active' : ''" aria-label="Branches">
                 <span class="masterlist-mobile-icon">⌖</span>
