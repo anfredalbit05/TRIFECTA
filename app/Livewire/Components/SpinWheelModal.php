@@ -7,7 +7,6 @@ use App\Models\SpinWinner;
 use App\Services\SpinWheelAnnouncer;
 use App\Services\SpinWheelService;
 use Carbon\Carbon;
-use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
@@ -44,6 +43,24 @@ class SpinWheelModal extends Component
     /** @var array<int, array<string, mixed>> */
     public array $winners = [];
 
+    /**
+     * Everyone who qualified for the displayed cycle: uplines whose invited
+     * member(s) had a Pangkabuhayan share collected inside the window — the
+     * pool the wheel is spun from.
+     *
+     * @var array<int, array<string, mixed>>
+     */
+    public array $qualified = [];
+
+    /** Name / referral-code filter for the qualified-members card. */
+    public string $memberSearch = '';
+
+    /** Name / referral-code filter for the winners card. */
+    public string $winnerNameFilter = '';
+
+    /** Claim-status filter for the winners card: all | claimed | pending. */
+    public string $winnerStatus = 'all';
+
     /** Index / size of the wheel the last spin must land on. */
     public ?int $spinIndex = null;
 
@@ -78,10 +95,18 @@ class SpinWheelModal extends Component
         $this->lastWin = null;
         $this->spinIndex = null;
         $this->spinTotal = null;
+        $this->memberSearch = '';
+        $this->winnerNameFilter = '';
+        $this->winnerStatus = 'all';
 
-        $this->drawDate = $this->service()
-            ->activeDrawDate()
-            ->toDateString();
+        // Only cycles that collected Pangkabuhayan are offered; when the
+        // active cycle's pool is empty, land on the newest cycle that did.
+        $collected = $this->service()->collectedCycles();
+        $active = $this->service()->activeDrawDate()->toDateString();
+
+        $this->drawDate = $collected->contains(fn (array $cycle) => $cycle['date']->toDateString() === $active)
+            ? $active
+            : ($collected->first()['date']->toDateString() ?? $active);
 
         $this->load();
 
@@ -105,8 +130,9 @@ class SpinWheelModal extends Component
 
     public function selectCycle(string $date): void
     {
-        $allowed = collect($this->service()->recentDrawDates())
-            ->map(fn (CarbonInterface $d) => $d->toDateString());
+        // Only cycles that actually collected may be picked.
+        $allowed = $this->service()->collectedCycles()
+            ->map(fn (array $cycle) => $cycle['date']->toDateString());
 
         if (! $allowed->contains($date)) {
             return;
@@ -117,6 +143,9 @@ class SpinWheelModal extends Component
         $this->spinIndex = null;
         $this->spinTotal = null;
         $this->errorMessage = null;
+        $this->memberSearch = '';
+        $this->winnerNameFilter = '';
+        $this->winnerStatus = 'all';
 
         $this->load();
     }
@@ -497,6 +526,55 @@ class SpinWheelModal extends Component
     }
 
     // ==========================================
+    // CARD FILTERS
+    // ==========================================
+
+    /** Qualified members after the card's name / referral-code filter. */
+    public function filteredQualified(): array
+    {
+        $search = mb_strtolower(trim($this->memberSearch));
+
+        if ($search === '') {
+            return $this->qualified;
+        }
+
+        return array_values(array_filter(
+            $this->qualified,
+            fn (array $member) => str_contains(
+                mb_strtolower($member['name'].' '.$member['code']),
+                $search
+            )
+        ));
+    }
+
+    /** Winners after the card's name / referral-code + claim-status filters. */
+    public function filteredWinners(): array
+    {
+        $search = mb_strtolower(trim($this->winnerNameFilter));
+        $status = $this->winnerStatus;
+
+        return array_values(array_filter(
+            $this->winners,
+            function (array $winner) use ($search, $status) {
+                $claimed = ($winner['claim_status'] ?? 'Pending') === 'Completed';
+
+                if ($status === 'claimed' && ! $claimed) {
+                    return false;
+                }
+
+                if ($status === 'pending' && $claimed) {
+                    return false;
+                }
+
+                return $search === '' || str_contains(
+                    mb_strtolower($winner['name'].' '.($winner['code'] ?? '')),
+                    $search
+                );
+            }
+        ));
+    }
+
+    // ==========================================
     // DATA
     // ==========================================
 
@@ -546,10 +624,32 @@ class SpinWheelModal extends Component
             ->values()
             ->all();
 
+        // The qualified-members card: everyone who earned a wheel spot this
+        // cycle, cross-referenced with the drawn winners so the card can flag
+        // who already won (and how many times).
+        $wonByMember = SpinWinner::where('DrawID', $draw->DrawID)
+            ->pluck('UserID')
+            ->countBy(fn ($userID) => (int) $userID);
+
+        $this->qualified = $service->eligibleMembers(
+            $draw->period_start->copy()->startOfDay(),
+            $draw->period_end->copy()->endOfDay()
+        )
+            ->map(fn ($row) => [
+                'uid' => $row['user']->UserID,
+                'name' => $service->displayName($row['user']),
+                'code' => (string) ($row['user']->referralCode ?? ''),
+                'invites' => (int) $row['invites'],
+                'wins' => (int) ($wonByMember[$row['user']->UserID] ?? 0),
+            ])
+            ->values()
+            ->all();
+
         $this->winners = $service->winnersOf($draw)
             ->map(fn (SpinWinner $winner) => [
                 'WinnerID' => $winner->WinnerID,
                 'name' => $service->displayName($winner->user),
+                'code' => (string) ($winner->user->referralCode ?? ''),
                 'invites' => (int) $winner->qualified_invites,
                 'prize_name' => (string) $winner->prize_name,
                 'prize_amount' => (float) $winner->prize_amount,
@@ -575,27 +675,30 @@ class SpinWheelModal extends Component
     }
 
     /**
+     * The cycle picker's options: only cycles whose coverage window actually
+     * collected Pangkabuhayan (see SpinWheelService::collectedCycles()).
+     *
      * @return array<int, array<string, mixed>>
      */
     private function buildCycles(SpinWheelService $service): array
     {
         $active = $service->activeDrawDate()->toDateString();
 
-        return collect($service->recentDrawDates())
-            ->map(function (CarbonInterface $date) use ($service, $active) {
-                [$start, $end] = $service->periodFor($date);
-
-                $draw = SpinDraw::where('draw_date', $date->toDateString())->first();
+        return $service->collectedCycles()
+            ->map(function (array $cycle) use ($active) {
+                $draw = $cycle['draw'];
 
                 return [
-                    'date' => $date->toDateString(),
-                    'label' => $date->format('F j, Y'),
-                    'period' => $start->format('M j').' – '.$end->format('M j, Y'),
+                    'date' => $cycle['date']->toDateString(),
+                    'label' => $cycle['date']->format('F j, Y'),
+                    'period' => $cycle['start']->format('M j')
+                        .' – '.$cycle['end']->format('M j, Y'),
+                    'collected' => $cycle['collected'],
                     'winners' => $draw
                         ? SpinWinner::where('DrawID', $draw->DrawID)->count()
                         : 0,
                     'target' => $draw?->winners_target,
-                    'is_current' => $date->toDateString() === $active,
+                    'is_current' => $cycle['date']->toDateString() === $active,
                 ];
             })
             ->all();

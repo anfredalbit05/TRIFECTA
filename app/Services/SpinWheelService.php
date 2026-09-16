@@ -251,6 +251,39 @@ class SpinWheelService
         return $dates;
     }
 
+    /**
+     * Recent cycles whose coverage window actually collected Pangkabuhayan,
+     * newest first — the cycles shown in the fund report table and offered in
+     * the wheel's cycle picker. Cycles with an empty pool are hidden from both.
+     *
+     * For cycles that already have a draw row the stored snapshot is used, so
+     * the amounts agree with the fund report table; otherwise the window's
+     * collection is computed from the ledgers.
+     *
+     * @return Collection<int, array{date: CarbonInterface, start: CarbonInterface, end: CarbonInterface, collected: float, draw: ?SpinDraw}>
+     */
+    public function collectedCycles(?CarbonInterface $now = null, int $count = self::RECENT_CYCLES): Collection
+    {
+        return collect($this->recentDrawDates($now, $count))
+            ->map(function (CarbonInterface $date) {
+                [$start, $end] = $this->periodFor($date);
+
+                $draw = SpinDraw::where('draw_date', $date->toDateString())->first();
+
+                return [
+                    'date' => $date->copy(),
+                    'start' => $start,
+                    'end' => $end,
+                    'collected' => $draw
+                        ? round((float) $draw->pangkabuhayan_total, 2)
+                        : round($this->pangkabuhayanTotal($start, $end), 2),
+                    'draw' => $draw,
+                ];
+            })
+            ->filter(fn (array $cycle) => $cycle['collected'] > 0)
+            ->values();
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Pangkabuhayan pool + the members it elects
@@ -822,6 +855,9 @@ class SpinWheelService
      * has not been promised as rice yet. Derived entirely from ledgers +
      * spin_draws, so nothing new is stored.
      *
+     * Only cycles that actually collected Pangkabuhayan in their window are
+     * listed — empty cycles carry no fund movement.
+     *
      * @return array{rows: Collection, unrecorded: Collection, totals: array{collected: float, booked: float, claimed: float, pending: float, balance: float}}
      */
     public function fundReport(): array
@@ -865,6 +901,9 @@ class SpinWheelService
         // their Pangkabuhayan collection exists but no prizes were booked.
         $recorded = $draws->pluck('draw_date')->map->toDateString()->all();
 
+        // Empty cycles carry no fund movement, so they are not reported.
+        $rows = $rows->filter(fn (array $row) => $row['collected'] > 0)->values();
+
         $unrecorded = collect($this->recentDrawDates(null, 12))
             ->filter(fn (CarbonInterface $date) => ! in_array($date->toDateString(), $recorded, true))
             ->map(function (CarbonInterface $date) {
@@ -876,6 +915,7 @@ class SpinWheelService
                     'collected' => round($this->pangkabuhayanTotal($start, $end), 2),
                 ];
             })
+            ->filter(fn (array $cycle) => $cycle['collected'] > 0)
             ->values();
 
         $totals = [

@@ -97,7 +97,7 @@
                         wire:change="selectCycle($event.target.value)"
                         class="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:ring-2 focus:ring-[#D79B10]"
                     >
-                        @foreach ($cycles as $cycle)
+                        @forelse ($cycles as $cycle)
                             <option
                                 value="{{ $cycle['date'] }}"
                                 @selected($cycle['date'] === $drawDate)
@@ -105,9 +105,12 @@
                             >
                                 {{ $cycle['label'] }}
                                 @if ($cycle['is_current']) (current) @endif
+                                · ₱{{ number_format($cycle['collected'], 2) }}
                                 @if ($cycle['winners'] > 0) · {{ $cycle['winners'] }} won @endif
                             </option>
-                        @endforeach
+                        @empty
+                            <option value="">No cycle has collected Pangkabuhayan yet</option>
+                        @endforelse
                     </select>
 
                     <button
@@ -127,7 +130,7 @@
             {{-- ==========================================
                  BODY
             ========================================== --}}
-            <div class="grid gap-6 p-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+            <div class="grid gap-6 px-6 pt-6 lg:grid-cols-[minmax(0,1fr)_340px]">
 
                 {{-- ======================================
                      LEFT · THE WHEEL
@@ -522,132 +525,244 @@
 
                     @endif
 
-                    {{-- WINNERS --}}
-                    <div class="rounded-2xl border border-gray-100 bg-white p-4">
+                </div>
+            </div>
 
-                        <div class="flex items-center justify-between gap-2">
-                            <h4 class="text-[11px] font-bold uppercase tracking-wider text-gray-500">
-                                Winners
-                            </h4>
+            {{-- ==========================================
+                 QUALIFIED MEMBERS (30%) + WINNERS (70%)
+                 — one row, each with its own filters
+            ========================================== --}}
+            <div class="grid gap-6 px-6 pb-6 lg:grid-cols-[3fr_7fr]">
 
-                            <span class="rounded-full bg-[#0C2C6B]/10 px-2 py-0.5 text-[10px] font-bold text-[#0C2C6B]">
-                                {{ count($winners) }}
-                            </span>
-                        </div>
+                {{-- ======================================
+                     LEFT · QUALIFIED MEMBERS (30%)
+                ======================================= --}}
+                <div class="rounded-2xl border border-gray-100 bg-white p-4">
 
-                        @if (count($winners) === 0)
+                    <div class="flex items-center justify-between gap-2">
+                        <h4 class="text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                            🎟️ Qualified members
+                        </h4>
 
-                            <p class="mt-3 text-[11px] text-gray-400">
-                                No winners drawn for this cycle yet.
-                            </p>
+                        <span class="rounded-full bg-[#0C2C6B]/10 px-2 py-0.5 text-[10px] font-bold text-[#0C2C6B]">
+                            {{ count($this->filteredQualified()) }} / {{ count($qualified) }}
+                        </span>
+                    </div>
 
-                        @else
+                    <p class="mt-1 text-[10px] text-gray-400">
+                        The pool this wheel is spun from — uplines whose invited
+                        member(s) had a Pangkabuhayan share collected in the window.
+                    </p>
 
-                            <ul class="mt-3 max-h-64 space-y-2 overflow-y-auto pr-1">
-                                @foreach ($winners as $winner)
-                                    <li class="flex items-start gap-2.5 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2">
-                                        <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#D79B10] text-[10px] font-bold text-white">
-                                            {{ $winner['spin_order'] }}
+                    <input
+                        type="text"
+                        wire:model.live.debounce.300ms="memberSearch"
+                        placeholder="Filter by name or referral code…"
+                        class="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2 text-[11px] text-slate-800 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                    >
+
+                    @if (count($qualified) === 0)
+
+                        <p class="mt-3 text-[11px] text-gray-400">
+                            No members qualified for this cycle yet.
+                        </p>
+
+                    @elseif (count($this->filteredQualified()) === 0)
+
+                        <p class="mt-3 text-[11px] text-gray-400">
+                            No members match “{{ $memberSearch }}”.
+                        </p>
+
+                    @else
+
+                        <ul class="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">
+                            @foreach ($this->filteredQualified() as $member)
+                                <li class="flex items-start gap-2.5 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2">
+                                    <span
+                                        class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0C2C6B] text-[10px] font-bold text-white"
+                                        title="{{ $member['invites'] }} qualified invite(s) this cycle"
+                                    >
+                                        {{ $member['invites'] }}
+                                    </span>
+
+                                    <div class="min-w-0 flex-1">
+                                        <p class="truncate text-xs font-bold text-gray-800">
+                                            {{ $member['name'] }}
+                                        </p>
+
+                                        <p class="text-[10px] text-gray-500">
+                                            {{ $member['code'] }}
+                                            · {{ $member['invites'] }} invite(s)
+                                        </p>
+                                    </div>
+
+                                    @if ($member['wins'] > 0)
+                                        <span
+                                            class="shrink-0 rounded-full bg-[#D79B10]/10 px-2 py-0.5 text-[10px] font-bold text-[#D79B10]"
+                                            title="Already drawn {{ $member['wins'] }} time(s) this cycle"
+                                        >
+                                            🏆 {{ $member['wins'] }}×
                                         </span>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
 
-                                        <div class="min-w-0 flex-1">
-                                            <p class="truncate text-xs font-bold text-gray-800">
-                                                {{ $winner['name'] }}
-                                            </p>
+                    @endif
+                </div>
 
-                                            <p class="text-[10px] text-gray-500">
-                                                {{ $winner['prize_name'] }}
-                                                · ₱{{ number_format($winner['prize_amount'], 2) }}
-                                                · {{ $winner['invites'] }} invite(s)
-                                            </p>
+                {{-- ======================================
+                     RIGHT · WINNERS (70%)
+                ======================================= --}}
+                <div class="rounded-2xl border border-gray-100 bg-white p-4">
 
-                                            <p class="text-[10px] text-gray-400">
-                                                {{ $winner['drawn_at'] }}
-                                            </p>
+                    <div class="flex items-center justify-between gap-2">
+                        <h4 class="text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                            🏆 Winners
+                        </h4>
 
-                                            <p class="mt-1 flex flex-wrap items-center gap-1.5">
-                                                @if (($winner['claim_status'] ?? 'Pending') === 'Completed')
-                                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">
-                                                        ✅ Claimed{{ $winner['claimed_at'] ? ' · '.$winner['claimed_at'] : '' }}
-                                                    </span>
-                                                @else
-                                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">
-                                                        ⏳ Pending claim
-                                                    </span>
-                                                @endif
+                        <span class="rounded-full bg-[#0C2C6B]/10 px-2 py-0.5 text-[10px] font-bold text-[#0C2C6B]">
+                            {{ count($this->filteredWinners()) }} / {{ count($winners) }}
+                        </span>
+                    </div>
 
-                                                @if ($canSpin && $winner['ledger_id'])
-                                                    <span class="text-[10px] text-gray-400">
-                                                        PK ledger #{{ $winner['ledger_id'] }}
-                                                    </span>
-                                                @endif
-                                            </p>
-                                        </div>
+                    {{-- FILTERS: name + claim status (default all) --}}
+                    <div class="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_150px]">
+                        <input
+                            type="text"
+                            wire:model.live.debounce.300ms="winnerNameFilter"
+                            placeholder="Filter by name or referral code…"
+                            class="w-full rounded-lg border border-slate-300 px-3 py-2 text-[11px] text-slate-800 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                        >
 
-                                        @if ($canSpin)
-                                            <div class="flex shrink-0 flex-col items-end gap-1">
-                                                @if (($winner['claim_status'] ?? 'Pending') !== 'Completed')
-                                                    <button
-                                                        type="button"
-                                                        wire:click="markClaimed({{ $winner['WinnerID'] }})"
-                                                        wire:confirm="Tag this prize as claimed? Its ₱{{ number_format($winner['prize_amount'], 2) }} Pangkabuhayan ledger entry becomes Completed."
-                                                        title="Tag this prize as claimed"
-                                                        class="whitespace-nowrap rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700 transition hover:bg-emerald-100"
-                                                    >
-                                                        ✅ Mark claimed
-                                                    </button>
-                                                @endif
+                        <select
+                            wire:model.live="winnerStatus"
+                            title="Filter winners by claim status"
+                            class="w-full rounded-lg border border-slate-300 px-3 py-2 text-[11px] font-semibold text-slate-800 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                        >
+                            <option value="all">All claims</option>
+                            <option value="claimed">✅ Claimed</option>
+                            <option value="pending">⏳ Pending claim</option>
+                        </select>
+                    </div>
 
+                    @if (count($winners) === 0)
+
+                        <p class="mt-3 text-[11px] text-gray-400">
+                            No winners drawn for this cycle yet.
+                        </p>
+
+                    @elseif (count($this->filteredWinners()) === 0)
+
+                        <p class="mt-3 text-[11px] text-gray-400">
+                            No winners match the current filters.
+                        </p>
+
+                    @else
+
+                        <ul class="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">
+                            @foreach ($this->filteredWinners() as $winner)
+                                <li class="flex items-start gap-2.5 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2">
+                                    <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#D79B10] text-[10px] font-bold text-white">
+                                        {{ $winner['spin_order'] }}
+                                    </span>
+
+                                    <div class="min-w-0 flex-1">
+                                        <p class="truncate text-xs font-bold text-gray-800">
+                                            {{ $winner['name'] }}
+                                            <span class="ml-1 text-[10px] font-medium text-gray-400">{{ $winner['code'] }}</span>
+                                        </p>
+
+                                        <p class="text-[10px] text-gray-500">
+                                            {{ $winner['prize_name'] }}
+                                            · ₱{{ number_format($winner['prize_amount'], 2) }}
+                                            · {{ $winner['invites'] }} invite(s)
+                                        </p>
+
+                                        <p class="text-[10px] text-gray-400">
+                                            {{ $winner['drawn_at'] }}
+                                        </p>
+
+                                        <p class="mt-1 flex flex-wrap items-center gap-1.5">
+                                            @if (($winner['claim_status'] ?? 'Pending') === 'Completed')
+                                                <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">
+                                                    ✅ Claimed{{ $winner['claimed_at'] ? ' · '.$winner['claimed_at'] : '' }}
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">
+                                                    ⏳ Pending claim
+                                                </span>
+                                            @endif
+
+                                            @if ($canSpin && $winner['ledger_id'])
+                                                <span class="text-[10px] text-gray-400">
+                                                    PK ledger #{{ $winner['ledger_id'] }}
+                                                </span>
+                                            @endif
+                                        </p>
+                                    </div>
+
+                                    @if ($canSpin)
+                                        <div class="flex shrink-0 flex-col items-end gap-1">
+                                            @if (($winner['claim_status'] ?? 'Pending') !== 'Completed')
                                                 <button
                                                     type="button"
-                                                    wire:click="resendWinnerEmail({{ $winner['WinnerID'] }})"
-                                                    title="Email this winner again (prize + claim instructions)"
-                                                    class="rounded-lg border border-gray-200 bg-white px-2 py-1 text-[11px] text-gray-500 transition hover:border-[#0C2C6B] hover:text-[#0C2C6B]"
+                                                    wire:click="markClaimed({{ $winner['WinnerID'] }})"
+                                                    wire:confirm="Tag this prize as claimed? Its ₱{{ number_format($winner['prize_amount'], 2) }} Pangkabuhayan ledger entry becomes Completed."
+                                                    title="Tag this prize as claimed"
+                                                    class="whitespace-nowrap rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700 transition hover:bg-emerald-100"
                                                 >
-                                                    ✉️
+                                                    ✅ Mark claimed
                                                 </button>
-                                            </div>
-                                        @endif
-                                    </li>
-                                @endforeach
-                            </ul>
+                                            @endif
 
-                            @if ($canSpin)
-                                @if (($summary['pending_count'] ?? 0) > 0)
-                                    <button
-                                        type="button"
-                                        wire:click="markAllClaimed"
-                                        wire:confirm="Tag all {{ $summary['pending_count'] }} pending prize(s) in this cycle as claimed?"
-                                        class="mt-3 w-full rounded-lg bg-emerald-600 px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-emerald-700"
-                                    >
-                                        ✅ Mark all {{ $summary['pending_count'] }} pending as claimed
-                                    </button>
-                                @endif
+                                            <button
+                                                type="button"
+                                                wire:click="resendWinnerEmail({{ $winner['WinnerID'] }})"
+                                                title="Email this winner again (prize + claim instructions)"
+                                                class="rounded-lg border border-gray-200 bg-white px-2 py-1 text-[11px] text-gray-500 transition hover:border-[#0C2C6B] hover:text-[#0C2C6B]"
+                                            >
+                                                ✉️
+                                            </button>
+                                        </div>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
 
+                        @if ($canSpin)
+                            @if (($summary['pending_count'] ?? 0) > 0)
                                 <button
                                     type="button"
-                                    wire:click="undoLast"
-                                    wire:confirm="Remove the most recent winner from this cycle?"
-                                    class="mt-3 w-full rounded-lg border border-red-200 px-3 py-2 text-[11px] font-semibold text-red-600 transition hover:bg-red-50"
+                                    wire:click="markAllClaimed"
+                                    wire:confirm="Tag all {{ $summary['pending_count'] }} pending prize(s) in this cycle as claimed?"
+                                    class="mt-3 w-full rounded-lg bg-emerald-600 px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-emerald-700"
                                 >
-                                    ↩︎ Undo last spin
+                                    ✅ Mark all {{ $summary['pending_count'] }} pending as claimed
                                 </button>
                             @endif
 
-                            @if ($canSpin)
-                                <p class="mt-3 border-t border-gray-100 pt-3 text-[10px] leading-relaxed text-gray-400">
-                                    Every winner is booked in the ledger as a
-                                    <strong>₱{{ number_format($summary['prize_amount'] ?? 0, 2) }}</strong>
-                                    Pangkabuhayan expense (<strong>Source PK</strong>, RefID = member ID,
-                                    DrawID = this cycle) and stays <strong>Pending</strong> until the prize is
-                                    claimed — only then does it count against the books.
-                                    Claimed ₱{{ number_format($summary['claimed_cost'] ?? 0, 2) }}
-                                    · pending ₱{{ number_format($summary['pending_cost'] ?? 0, 2) }}.
-                                </p>
-                            @endif
+                            <button
+                                type="button"
+                                wire:click="undoLast"
+                                wire:confirm="Remove the most recent winner from this cycle?"
+                                class="mt-3 w-full rounded-lg border border-red-200 px-3 py-2 text-[11px] font-semibold text-red-600 transition hover:bg-red-50"
+                            >
+                                ↩︎ Undo last spin
+                            </button>
 
+                            <p class="mt-3 border-t border-gray-100 pt-3 text-[10px] leading-relaxed text-gray-400">
+                                Every winner is booked in the ledger as a
+                                <strong>₱{{ number_format($summary['prize_amount'] ?? 0, 2) }}</strong>
+                                Pangkabuhayan expense (<strong>Source PK</strong>, RefID = member ID,
+                                DrawID = this cycle) and stays <strong>Pending</strong> until the prize is
+                                claimed — only then does it count against the books.
+                                Claimed ₱{{ number_format($summary['claimed_cost'] ?? 0, 2) }}
+                                · pending ₱{{ number_format($summary['pending_cost'] ?? 0, 2) }}.
+                            </p>
                         @endif
-                    </div>
+
+                    @endif
                 </div>
             </div>
         </div>

@@ -153,7 +153,7 @@
                 @empty
                     <tr>
                         <td colspan="9" class="px-4 py-8 text-center text-gray-400">
-                            No Spin the Wheel cycles recorded yet.
+                            No Spin the Wheel cycle has collected Pangkabuhayan yet.
                         </td>
                     </tr>
                 @endforelse
