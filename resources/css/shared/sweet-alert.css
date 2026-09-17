@@ -1,0 +1,116 @@
+/* ==========================================================================
+   SweetAlert2 — TRUELIFE brand palette alignment
+   --------------------------------------------------------------------------
+   Swal2 injects its base styles at runtime (after this sheet), so overrides
+   below use a .swal2-container prefix (higher specificity) and, for the
+   internal icon strokes, !important to guarantee they always win.
+
+   Brand tokens (see @theme in app.css):
+     navy  #0B2A5B   buttons, titles, accents
+     gold  #D79B10   cancel buttons, warnings
+   Derived (same saturation family as the brand):
+     green #2E8B57   success icon
+     red   #B03A2E   error icon
+   ========================================================================== */
+
+:root {
+    --swal-brand-navy: #0B2A5B;
+    --swal-brand-gold: #D79B10;
+    --swal-brand-success: #2E8B57;
+    --swal-brand-danger: #B03A2E;
+    --swal-brand-info: #2563EB;
+    --swal-brand-warning: #D79B10;
+    --swal-brand-question: #0B2A5B;
+}
+
+/* ---------- POPUP SHELL ---------- */
+
+.swal2-container .swal2-popup {
+    border-radius: 14px;
+    font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+.swal2-container .swal2-title {
+    color: var(--swal-brand-navy);
+    font-weight: 700;
+}
+
+.swal2-container .swal2-html-container {
+    color: #475569;
+}
+
+/* ---------- ICONS (aligned to palette) ---------- */
+
+/* Success — brand green */
+.swal2-container .swal2-icon.swal2-success {
+    border-color: var(--swal-brand-success) !important;
+    color: var(--swal-brand-success) !important;
+}
+
+.swal2-container .swal2-icon.swal2-success [class^="swal2-success-line"] {
+    background-color: var(--swal-brand-success) !important;
+}
+
+.swal2-container .swal2-success-ring {
+    border-color: rgba(46, 139, 87, 0.35) !important;
+}
+
+.swal2-container .swal2-success-fix,
+.swal2-container .swal2-icon.swal2-success .swal2-success-circular-line {
+    background-color: transparent !important;
+}
+
+/* Error — brand red */
+.swal2-container .swal2-icon.swal2-error {
+    border-color: var(--swal-brand-danger) !important;
+    color: var(--swal-brand-danger) !important;
+}
+
+.swal2-container .swal2-icon.swal2-error [class^="swal2-x-mark-line"] {
+    background-color: var(--swal-brand-danger) !important;
+}
+
+/* Warning — brand gold */
+.swal2-container .swal2-icon.swal2-warning {
+    border-color: var(--swal-brand-gold) !important;
+    color: var(--swal-brand-gold) !important;
+}
+
+/* Info — brand blue */
+.swal2-container .swal2-icon.swal2-info {
+    border-color: var(--swal-brand-info) !important;
+    color: var(--swal-brand-info) !important;
+}
+
+/* Question — brand navy */
+.swal2-container .swal2-icon.swal2-question {
+    border-color: var(--swal-brand-navy) !important;
+    color: var(--swal-brand-navy) !important;
+}
+
+/* ---------- VALIDATION / INPUT ---------- */
+
+.swal2-container .swal2-validation-message {
+    background: #FDF3F2;
+    color: var(--swal-brand-danger);
+}
+
+.swal2-container .swal2-input,
+.swal2-container .swal2-textarea {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    color: var(--swal-brand-navy);
+}
+
+.swal2-container .swal2-input:focus,
+.swal2-container .swal2-textarea:focus {
+    border-color: var(--swal-brand-navy);
+    box-shadow: 0 0 0 3px rgba(11, 42, 91, 0.15);
+    outline: none;
+}
+
+/* ---------- TIMER PROGRESS BAR (toasts) ---------- */
+
+.swal2-container .swal2-timer-progress-bar {
+    background: var(--swal-brand-gold);
+}

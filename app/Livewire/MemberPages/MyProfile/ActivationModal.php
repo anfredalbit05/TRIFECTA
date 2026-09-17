@@ -3,27 +3,34 @@
 namespace App\Livewire\MemberPages\MyProfile;
 
 use App\Models\Activation;
+use App\Models\ActivationHistory;
 use App\Models\Beneficiary;
-use App\Models\User;
+use App\Models\MembershipFee;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use App\Models\ActivationHistory;
-use App\Models\MembershipFee;
-use Illuminate\Support\Facades\Mail;
-
 
 class ActivationModal extends Component
 {
     public bool $open = false;
+
     public $activationData;
+
     public bool $isReactivation = false;
 
+    // Renewal mode: the member's previous activation EXPIRED. Filing
+    // creates a brand-new Pending activation instead of resubmitting
+    // a rejected one.
+    public bool $isRenewal = false;
+
     public ?string $rejectionRemarks = null;
+
     public ?User $selectedUserRecord = null;
 
     /*
@@ -39,23 +46,36 @@ class ActivationModal extends Component
     |--------------------------------------------------------------------------
     */
     public string $payment_method = ''; // Cash, GCash, Maya, Bank Transfer
+
     public string $amount = '';          // Dynamic activation amount
+
     public string $upline_code = ''; // User-entered referral/upline code
-    public string $reference_code = '';// GCash, Maya, or Bank transaction reference
+
+    public string $reference_code = ''; // GCash, Maya, or Bank transaction reference
 
     // Display-only: pulled from settings when GCash/Bank is selected
     public string $gcashName = '';
+
     public string $gcashNumber = '';
+
     public string $paymayaName = '';
+
     public string $paymayaNumber = '';
+
     public string $bankName = '';
+
     public string $bankAccountName = '';
+
     public string $bankAccountNumber = '';
 
     public bool $gcashEnabled = false;
+
     public bool $paymayaEnabled = false;
+
     public bool $bankEnabled = false;
+
     public bool $gcashConvenienceFeeEnabled = false;
+
     public bool $paymayaConvenienceFeeEnabled = false;
 
     public float $totalMembershipFeesCost = 0.00;
@@ -92,7 +112,6 @@ class ActivationModal extends Component
             FILTER_VALIDATE_BOOLEAN
         );
 
-
         $this->bankEnabled = filter_var(
             Setting::where('name', 'bank_payment_enabled')->value('value'),
             FILTER_VALIDATE_BOOLEAN
@@ -108,7 +127,6 @@ class ActivationModal extends Component
             FILTER_VALIDATE_BOOLEAN
         );
 
-        
         $this->totalMembershipFeesCost = (float) MembershipFee::sum('Cost');
     }
 
@@ -118,9 +136,10 @@ class ActivationModal extends Component
     |--------------------------------------------------------------------------
     */
     #[On('open-activation-modal')]
-    public function openModal($UserID = null): void
+    public function openModal($UserID = null, bool $renew = false): void
     {
         $this->isReactivation = false;
+        $this->isRenewal = $renew;
         $UserID = $UserID ?? Auth::id();
 
         Log::info('Activation modal opened', [
@@ -134,7 +153,6 @@ class ActivationModal extends Component
         $this->loadPaymentSettings();
         $this->activationData = null;
         $this->resetValidation();
-
         $this->payment_method = '';
         $this->amount = $this->getMembershipFee();
         $this->upline_code = $this->selectedUserRecord?->uplineCode ?? '';
@@ -215,8 +233,9 @@ class ActivationModal extends Component
         /** @var User|null $user */
         $user = User::find($this->selectedUserID);
 
-        if (!$user) {
+        if (! $user) {
             $this->beneficiaries = $this->emptyBeneficiaryRows();
+
             return;
         }
 
@@ -298,7 +317,7 @@ class ActivationModal extends Component
             $this->gcashNumber = Setting::where('name', 'gcash_number1')->value('value') ?? '';
             $this->gcashName = Setting::where('name', 'gcash_number1_name')->value('value') ?? '';
 
-        } elseif ($this->payment_method === 'Paymaya') {
+        } elseif ($this->payment_method === 'Maya') {
             $this->paymayaNumber = Setting::where('name', 'paymaya_account_number')->value('value') ?? '';
             $this->paymayaName = Setting::where('name', 'paymaya_account_name')->value('value') ?? '';
 
@@ -316,6 +335,8 @@ class ActivationModal extends Component
     */
     public function closeModal(): void
     {
+        $this->isRenewal = false;
+
         $this->reset([
             'beneficiaries',
             'payment_method',
@@ -379,6 +400,7 @@ class ActivationModal extends Component
 
         if (! $activation) {
             Log::error('Approval failed: activation not found.');
+
             return;
         }
 
@@ -435,9 +457,9 @@ class ActivationModal extends Component
 
             try {
                 Mail::raw(
-                    "Congratulations!\n\n" .
-                    "Your account has been activated successfully.\n\n" .
-                    "You can now log in and access all features.",
+                    "Congratulations!\n\n".
+                    "Your account has been activated successfully.\n\n".
+                    'You can now log in and access all features.',
                     function ($message) use ($user) {
                         $message->to($user->email)
                             ->subject('Account Activated');
@@ -535,7 +557,7 @@ class ActivationModal extends Component
 
         if ($user && filled($user->email)) {
             Mail::raw(
-                "Unfortunately, your activation request has been rejected.",
+                'Unfortunately, your activation request has been rejected.',
                 function ($message) use ($user) {
                     $message->to($user->email)
                         ->subject('Activation Rejected');
@@ -565,6 +587,12 @@ class ActivationModal extends Component
     #[On('activate')]
     public function activate(): void
     {
+        // Guard: a stale/ghost instance (e.g. from a duplicated mount listening
+        // to the same global events) must never run the submission flow.
+        if (! $this->open || $this->selectedUserID === null) {
+            return;
+        }
+
         $this->loadPaymentSettings();
         $membershipFee = $this->getMembershipFee();
 
@@ -579,41 +607,8 @@ class ActivationModal extends Component
         ]);
 
         try {
-            $this->validate([
-                'payment_method' => ['required', 'in:Cash,GCash,Maya,Bank Transfer'],
-                'amount' => ['required', 'numeric', 'in:' . $membershipFee],
-                'upline_code' => ['required', 'string', 'max:100'],
-                'reference_code' => ['nullable', 'string', 'max:100', 'required_unless:payment_method,Cash'],
-                'beneficiaries' => ['required', 'array', 'max:3'],
-                'beneficiaries.*.fullname' => ['nullable', 'string', 'max:150'],
-                'beneficiaries.*.birthdate' => ['nullable', 'date'],
-                'beneficiaries.*.relationship' => ['nullable', 'string', 'max:50'],
-            ]);
-
-                // Check payment availability from settings
-            if ($this->payment_method === 'GCash' && !$this->gcashEnabled) {
-                $this->addError(
-                    'payment_method',
-                    'GCash payment is currently unavailable.'
-                );
-                return;
-            }
-            if ($this->payment_method === 'PayMaya' && !$this->paymayaEnabled) {
-                $this->addError(
-                    'payment_method',
-                    'PayMaya payment is currently unavailable.'
-                );
-                return;
-            }
-
-            if ($this->payment_method === 'Bank Transfer' && !$this->bankEnabled) {
-                $this->addError(
-                    'payment_method',
-                    'Bank Transfer is currently unavailable.'
-                );
-                return;
-            }
-
+            $this->validate($this->activationRules($membershipFee));
+            $this->assertPaymentMethodAvailable();
         } catch (ValidationException $e) {
             $this->dispatch('swal:close');
             throw $e;
@@ -622,18 +617,30 @@ class ActivationModal extends Component
         $currentUser = Auth::user();
         $selectedUser = User::find($this->selectedUserID);
 
-        if (!$currentUser || !$selectedUser) {
+        if (! $currentUser || ! $selectedUser) {
             $this->dispatch('swal:close');
             $this->dispatch('toast', type: 'error', message: 'Authentication or user error occurred.');
+
             return;
         }
 
         $cleanUplineCode = trim($this->upline_code);
         $referralUser = User::where('referralCode', $cleanUplineCode)->first();
 
-        if (!$referralUser) {
+        if (! $referralUser) {
             $this->dispatch('swal:close');
             $this->addError('upline_code', 'The referral/upline code is invalid.');
+
+            return;
+        }
+
+        if ($referralUser->status !== 'Active') {
+            $this->dispatch('swal:close');
+            $this->addError(
+                'upline_code',
+                'This upline account is Inactive/Suspended and cannot be used.'
+            );
+
             return;
         }
 
@@ -649,8 +656,13 @@ class ActivationModal extends Component
                 message: 'This account already has an active or pending activation request.'
             );
             $this->dispatch('activation-rejected');
+
             return;
         }
+
+        // In renewal mode the guard above already passed: the member's
+        // latest activation is Expired (or Rejected), so filing a fresh
+        // one is legitimate. The expired row is kept untouched as history.
 
         $activationType = $this->payment_method === 'Cash' ? 'W' : 'O';
         $paymentReference = $this->payment_method === 'Cash' ? null : trim($this->reference_code);
@@ -711,11 +723,13 @@ class ActivationModal extends Component
                 }
             }
 
-            if ($rejectedActivation) {
+            // A renewal NEVER resubmits the expired row — it files a
+            // brand-new activation so the expired one stays as history.
+            if ($rejectedActivation && ! $this->isRenewal) {
                 $rejectedActivation->update([
                     'amount' => (float) $membershipFee,
                     'type' => $activationType,
-                    'payment_method' => $this->payment_method,
+                    'payment_method' => $this->payment_method === 'Maya' ? 'Maya' : $this->payment_method,
                     'upline_code' => $cleanUplineCode,
                     'payment_reference' => $paymentReference,
                     'ProcessedBy' => $currentUser->UserID,
@@ -731,17 +745,21 @@ class ActivationModal extends Component
                     'UserID' => $selectedUser->UserID,
                     'amount' => (float) $membershipFee,
                     'type' => $activationType,
-                    'payment_method' => $this->payment_method,
+                    'payment_method' => $this->payment_method === 'Maya' ? 'Maya' : $this->payment_method,
                     'upline_code' => $cleanUplineCode,
                     'payment_reference' => $paymentReference,
                     'ProcessedBy' => $currentUser->UserID,
                     'status' => 'Pending',
                 ]);
 
-                $actionLabel = 'submitted successfully';
-                $userSubject = 'Activation Request Submitted';
-                $uplineSubject = 'New Downline Activation Request';
-                $adminSubject = 'New Activation Request Submitted (Admin Notice)';
+                $actionLabel = $this->isRenewal
+                    ? 'renewed successfully — a new activation has been filed'
+                    : 'submitted successfully';
+                $userSubject = $this->isRenewal ? 'Membership Renewal Submitted' : 'Activation Request Submitted';
+                $uplineSubject = $this->isRenewal ? 'Downline Membership Renewal' : 'New Downline Activation Request';
+                $adminSubject = $this->isRenewal
+                    ? 'Membership Renewal Submitted (Admin Notice)'
+                    : 'New Activation Request Submitted (Admin Notice)';
             }
 
             // Store/Update uplineCode on the User table column upon submission
@@ -760,7 +778,7 @@ class ActivationModal extends Component
             ];
 
             if (filled($selectedUser->email)) {
-                $mailData['emailTitle'] = "Activation Request Status";
+                $mailData['emailTitle'] = 'Activation Request Status';
                 $mailData['introMessage'] = "Your activation request has been {$actionLabel}. Below are your complete details:";
 
                 Mail::send('emails.activation-request', $mailData, function ($message) use ($selectedUser, $userSubject) {
@@ -769,8 +787,8 @@ class ActivationModal extends Component
             }
 
             if ($referralUser && filled($referralUser->email)) {
-                $mailData['emailTitle'] = "Downline Activation Notice";
-                $mailData['introMessage'] = "Hello " . ($referralUser->firstname ?? $referralUser->username) . ", your downline (" . $selectedUser->username . ") has {$actionLabel} an activation request.";
+                $mailData['emailTitle'] = 'Downline Activation Notice';
+                $mailData['introMessage'] = 'Hello '.($referralUser->firstname ?? $referralUser->username).', your downline ('.$selectedUser->username.") has {$actionLabel} an activation request.";
 
                 Mail::send('emails.activation-request', $mailData, function ($message) use ($referralUser, $uplineSubject) {
                     $message->to($referralUser->email)->subject($uplineSubject);
@@ -778,7 +796,7 @@ class ActivationModal extends Component
             }
 
             if (filled($adminEmail)) {
-                $mailData['emailTitle'] = "Admin Notice: Activation Request";
+                $mailData['emailTitle'] = 'Admin Notice: Activation Request';
                 $mailData['introMessage'] = "An activation request has been {$actionLabel} with the following comprehensive details:";
 
                 Mail::send('emails.activation-request', $mailData, function ($message) use ($adminEmail, $adminSubject) {
@@ -787,8 +805,8 @@ class ActivationModal extends Component
             }
 
             if ($currentUser && filled($currentUser->email) && $currentUser->UserID !== $selectedUser->UserID) {
-                $mailData['emailTitle'] = "Action Notice: Activation Submission";
-                $mailData['introMessage'] = "You have successfully submitted an activation request for " . $selectedUser->username . ". Here are the details:";
+                $mailData['emailTitle'] = 'Action Notice: Activation Submission';
+                $mailData['introMessage'] = 'You have successfully submitted an activation request for '.$selectedUser->username.'. Here are the details:';
 
                 Mail::send('emails.activation-request', $mailData, function ($message) use ($currentUser) {
                     $message->to($currentUser->email)->subject('Activation Request Submitted on Behalf');
@@ -797,20 +815,29 @@ class ActivationModal extends Component
 
             DB::commit();
 
-            $this->dispatch('swal:close');
-            $this->closeModal();
-            $this->dispatch('account-activated');
-
-            $this->dispatch('swal:success', [
-                'title' => 'Success!',
-                'text' => 'Activation request submitted successfully.',
+            Log::info('✅ ACTIVATION COMMITTED SUCCESSFULLY', [
+                'selected_user_id' => $selectedUser->UserID,
+                'payment_method' => $this->payment_method,
             ]);
 
+            // Close the Livewire modal
+            $this->closeModal();
+
+            // Tell JavaScript to replace the loading alert with success
+            $this->dispatch('swal:success', [
+                'title' => 'Success!',
+                'text' => $this->isRenewal
+                    ? 'Membership renewal submitted successfully. A new activation has been filed for review.'
+                    : 'Activation request submitted successfully.',
+            ]);
+
+            // Refresh other components
+            $this->dispatch('account-activated');
             $this->dispatch('members-refresh');
-            $this->dispatch('close-activation-modal');
 
         } catch (ValidationException $e) {
             DB::rollBack();
+
             $this->dispatch('swal:close');
             throw $e;
         } catch (\Throwable $e) {
@@ -829,52 +856,85 @@ class ActivationModal extends Component
         }
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Shared Activation Validation + Payment Availability
+    |--------------------------------------------------------------------------
+    */
+    /**
+     * @return array<string, array<int, string>>
+     */
+    private function activationRules(string $membershipFee): array
+    {
+        return [
+            'payment_method' => ['required', 'in:Cash,GCash,Maya,Bank Transfer'],
+            'amount' => ['required', 'numeric', 'in:'.$membershipFee],
+            'upline_code' => ['required', 'string', 'max:100'],
+            'reference_code' => ['nullable', 'string', 'max:100', 'required_unless:payment_method,Cash'],
+            'beneficiaries' => ['required', 'array', 'max:3'],
+            'beneficiaries.*.fullname' => ['nullable', 'string', 'max:150'],
+            'beneficiaries.*.birthdate' => ['nullable', 'date'],
+            'beneficiaries.*.relationship' => ['nullable', 'string', 'max:50'],
+        ];
+    }
+
+    private function assertPaymentMethodAvailable(): void
+    {
+        $unavailable = match ($this->payment_method) {
+            'GCash' => $this->gcashEnabled ? null : 'GCash payment',
+            'Maya' => $this->paymayaEnabled ? null : 'Maya payment',
+            'Bank Transfer' => $this->bankEnabled ? null : 'Bank Transfer',
+            default => null,
+        };
+
+        if ($unavailable !== null) {
+            $this->addError('payment_method', "{$unavailable} is currently unavailable.");
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Step 1: Validate inputs, then ask for the typed SweetAlert confirmation
+    |--------------------------------------------------------------------------
+    */
     public function confirmActivate(): void
     {
         $this->loadPaymentSettings();
+
         $membershipFee = $this->getMembershipFee();
 
         try {
-            $this->validate([
-                'payment_method' => ['required', 'in:Cash,GCash,Maya,Bank Transfer'],
-                'amount' => ['required', 'numeric', 'in:' . $membershipFee],
-                'upline_code' => ['required', 'string', 'max:100'],
-                'reference_code' => ['nullable', 'string', 'max:100', 'required_unless:payment_method,Cash'],
-                'beneficiaries' => ['required', 'array', 'max:3'],
-                'beneficiaries.*.fullname' => ['nullable', 'string', 'max:150'],
-                'beneficiaries.*.birthdate' => ['nullable', 'date'],
-                'beneficiaries.*.relationship' => ['nullable', 'string', 'max:50'],
+            $this->validate($this->activationRules($membershipFee));
+            $this->assertPaymentMethodAvailable();
+        } catch (ValidationException $e) {
+            $this->dispatch('swal:close');
+
+            Log::warning('Activation validation failed', [
+                'errors' => $e->errors(),
+                'selected_user_id' => $this->selectedUserID,
             ]);
 
-             // Check payment availability
-            if ($this->payment_method === 'GCash' && !$this->gcashEnabled) {
-                $this->addError(
-                    'payment_method',
-                    'GCash payment is currently unavailable.'
-                );
-
-                return;
-            }
-
-            if ($this->payment_method === 'Bank Transfer' && !$this->bankEnabled) {
-                $this->addError(
-                    'payment_method',
-                    'Bank Transfer is currently unavailable.'
-                );
-
-                return;
-            }
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         }
 
+        if ($this->isRenewal) {
+            $action = 'Renew';
+        } elseif ($this->isReactivation) {
+            $action = 'Reactivate';
+        } else {
+            $action = 'Activate';
+        }
+
         $this->dispatch('swal:confirm', [
-            'title' => 'Submit Activation?',
-            'text' => 'Please review your details before submitting your activation.',
+            'title' => "{$action} Account?",
+            'html' => 'This will submit the activation request for admin review.'
+                .'<br><br>Type <strong>ACTIVATE</strong> to confirm.',
             'icon' => 'question',
+            'requireConfirmWord' => 'ACTIVATE',
+            'confirmText' => "Yes, {$action}!",
             'method' => 'activate',
-            'showLoading' => true
+            'loadingTitle' => 'Processing Activation...',
+            'loadingText' => 'Please wait while we process your request.',
         ]);
     }
 

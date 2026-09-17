@@ -18,6 +18,23 @@
                         <p class="mt-0.5 text-[11px] sm:text-xs text-slate-500">
                             TRUELIFE • Membership Activation
                         </p>
+
+                        @if ($isRenewal)
+                            {{-- RENEWAL NOTICE — the member's previous activation expired --}}
+                            <div class="mt-3 flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2">
+                                <span class="text-lg leading-none">⟳</span>
+                                <div class="min-w-0">
+                                    <p class="text-[10px] font-semibold uppercase tracking-wide text-amber-700">
+                                        Renewal Mode
+                                    </p>
+                                    <p class="text-[11px] sm:text-xs text-amber-800">
+                                        This member's previous activation has <strong>expired</strong>.
+                                        Submitting will file a <strong>new activation</strong> for review —
+                                        the expired record stays as history.
+                                    </p>
+                                </div>
+                            </div>
+                        @endif
                         <div
                             class="mt-3 flex items-center gap-2.5 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2">
                             <div
@@ -175,12 +192,12 @@
                                         {{ $paymayaEnabled
                                             ? 'cursor-pointer bg-white border-slate-300 hover:border-[#0B2A5B] hover:bg-slate-50'
                                             : 'cursor-not-allowed bg-slate-100 border-slate-200 opacity-60' }}">
-                                    <input type="radio" wire:model.live="payment_method" value="Paymaya"
+                                    <input type="radio" wire:model.live="payment_method" value="Maya"
                                         @disabled(!$paymayaEnabled) class="w-4 h-4 text-[#0B2A5B] shrink-0">
 
                                     <div>
                                         <span class="block text-sm font-bold text-slate-700">
-                                            Paymaya
+                                            Maya
                                             @if (!$paymayaEnabled)
                                                 <span class="text-[10px] text-red-500">(Unavailable)</span>
                                             @endif
@@ -259,7 +276,7 @@
                         @endif
 
                         <!-- ONLINE PAYMENT REFERENCE -->
-                        @if ($payment_method === 'GCash' || $payment_method === 'Paymaya' || $payment_method === 'Bank Transfer')
+                        @if ($payment_method === 'GCash' || $payment_method === 'Maya' || $payment_method === 'Bank Transfer')
                             <div class="space-y-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
                                 <div>
                                     <p class="text-sm font-bold text-blue-800">Online Payment</p>
@@ -356,7 +373,7 @@
                                     </div>
                                 @endif
                                 {{-- PAYMAYA DETAILS --}}
-                                @if ($payment_method === 'Paymaya')
+                                @if ($payment_method === 'Maya')
                                     <div class="rounded-lg border border-blue-200 bg-white p-3 text-sm space-y-3">
 
                                         <!-- PAYMAYA ACCOUNT -->
@@ -495,8 +512,9 @@
                         </h3>
                         <div
                             class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs sm:text-sm text-slate-600">
-                            Please verify all beneficiary information and payment details before activating your
-                            account.
+                            Please verify all beneficiary information and payment details before
+                            @if ($isRenewal) renewing @else activating @endif
+                            your account.
                         </div>
                     </section>
                 </div>
@@ -521,7 +539,13 @@
                         <button type="button" wire:click="confirmActivate" wire:loading.attr="disabled"
                             class="w-full sm:w-auto px-6 py-2.5 bg-[#0B2A5B] hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center cursor-pointer">
                             <span wire:loading.remove wire:target="confirmActivate">
-                                {{ $isReactivation ? 'Reactivate Account' : 'Activate Account' }}
+                                @if ($isRenewal)
+                                    Renew Activation
+                                @elseif ($isReactivation)
+                                    Reactivate Account
+                                @else
+                                    Activate Account
+                                @endif
                             </span>
                             <span wire:loading wire:target="confirmActivate">
                                 Processing...
@@ -533,62 +557,4 @@
             </div>
         </div>
     @endif
-
-    <script>
-        window.addEventListener('swal:confirm', event => {
-            Swal.fire({
-                title: event.detail[0].title,
-                text: event.detail[0].text,
-                icon: event.detail[0].icon,
-                showCancelButton: true,
-                confirmButtonColor: '#0B2A5B',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, proceed!',
-                allowOutsideClick: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Processing Activation...',
-                        text: 'Please wait while we process your request.',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-
-                    Livewire.dispatch(event.detail[0].method);
-                }
-            });
-        });
-
-        window.addEventListener('swal:loading', event => {
-            Swal.fire({
-                title: event.detail[0].title,
-                text: event.detail[0].text,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-        });
-
-        window.addEventListener('swal:success', event => {
-            Swal.fire({
-                icon: 'success',
-                title: event.detail[0].title,
-                text: event.detail[0].text,
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#0B2A5B',
-                allowOutsideClick: false
-            }).then(() => {
-                Livewire.dispatch('members-refresh');
-            });
-        });
-
-        window.addEventListener('swal:close', event => {
-            Swal.close();
-        });
-    </script>
 </div>

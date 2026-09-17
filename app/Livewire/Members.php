@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Mail\PasswordResetConfirmation;
+use App\Models\Activation;
 use App\Models\Ledger;
 use App\Models\Privilege;
 use App\Models\Setting;
@@ -180,6 +181,11 @@ class Members extends Component
 
     public function render()
     {
+        // Mark any approval that has passed its validity period as
+        // 'Expired' BEFORE reading the table, so the action buttons
+        // and status badges reflect reality on every load.
+        $this->expireLapsedActivations();
+
         [$dateFrom, $dateTo] = $this->parsedDateRange();
 
         $members = User::query()
@@ -191,10 +197,8 @@ class Members extends Component
                 'withdrawals as has_pending_withdrawal' => function ($query) {
                     $query->where('status', 'Pending');
                 },
-            ])
-            ->withExists([
-                'activations as has_pending_activation' => function ($query) {
-                    $query->where('status', 'Pending');
+                'activations as has_expired_activation' => function ($query) {
+                    $query->where('status', 'Expired');
                 },
             ])
             ->when(filled($this->search), function ($query) {
@@ -215,10 +219,20 @@ class Members extends Component
             ->latest()
             ->paginate(10);
 
+        $isSatelliteApplicationActive = Setting::where(
+            'name',
+            'activate_satellite_application'
+        )->value('value');
+
+        $isSatelliteApplicationActive = filter_var(
+            $isSatelliteApplicationActive,
+            FILTER_VALIDATE_BOOLEAN
+        );
+
         return view('components.admin-pages.masterlist.members', [
             'members' => $members,
-
             'isWithdrawalActive' => $this->isWithdrawalActive(),
+            'isSatelliteApplicationActive' => $isSatelliteApplicationActive,
         ]);
     }
 
@@ -252,6 +266,30 @@ class Members extends Component
 
     /*
     |--------------------------------------------------------------------------
+    | Auto-Expire Lapsed Memberships
+    |
+    | An Approved activation older than the configured validity period
+    | (membership_validity_months, SettingsID 5 — default 12) is marked
+    | 'Expired'. The member stays 'Inactive' in users, and the Members
+    | table then offers "Renew" instead of "Deactivate".
+    |
+    | Idempotent and cheap — a single UPDATE, safe to call on every render.
+    |--------------------------------------------------------------------------
+    */
+    public function expireLapsedActivations(): void
+    {
+        $validityMonths = max(1, (int) (
+            Setting::where('SettingsID', 5)->value('value') ?: 12
+        ));
+
+        Activation::query()
+            ->where('status', 'Approved')
+            ->where('created_at', '<', now()->subMonths($validityMonths))
+            ->update(['status' => 'Expired']);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Open Activation Review Modal
     |--------------------------------------------------------------------------
     */
@@ -275,7 +313,7 @@ class Members extends Component
         $this->dispatch('open-activation-review', UserID: $member->UserID);
     }
 
-        /*
+    /*
     |--------------------------------------------------------------------------
     | Satellite Subscription Modal
     |--------------------------------------------------------------------------
@@ -332,9 +370,24 @@ class Members extends Component
             return;
         }
 
-        $action = strtolower($member->status) === 'active' ? 'deactivate' : 'activate';
+        $action = match (strtolower($member->status)) {
+            // Active → Suspend (replaces the old Deactivate)
+            'active' => 'suspend',
 
-        $this->dispatch('confirm-status', id: $member->UserID, action: $action);
+            // Suspended → allowed to come back via the same dialog
+            'suspended' => 'activate',
+
+            default => 'activate',
+        };
+
+        $this->dispatch(
+            'members-confirm-status',
+            id: $member->UserID,
+            action: $action,
+            name: collect([$member->firstname, $member->middlename, $member->lastname])
+                ->filter()
+                ->implode(' '),
+        );
     }
 
     /*
@@ -359,21 +412,63 @@ class Members extends Component
             return;
         }
 
-        $isActivating = strtolower($member->status) !== 'active';
+        $current = strtolower($member->status);
 
-        $member->status = strtolower($member->status) === 'active' ? 'Inactive' : 'Active';
+        // Active → Suspended (admin suspension).
+        // Suspended → back to Active (unsuspend via the same dialog).
+        // Anything else (Inactive) → Active.
+        $member->status = $current === 'active' ? 'Suspended' : 'Active';
         $member->save();
+
+        $fullName = collect([$member->firstname, $member->middlename, $member->lastname])
+            ->filter()
+            ->implode(' ');
 
         Log::info('Member status updated successfully', ['UserID' => $member->UserID, 'new_status' => $member->status]);
 
+        $text = match ($member->status) {
+            'Suspended' => "{$fullName} has been suspended successfully.",
+            'Active' => $current === 'suspended'
+                ? "{$fullName}'s account has been reactivated successfully."
+                : "{$fullName} has been activated successfully.",
+            default => "{$fullName}'s status has been updated successfully.",
+        };
+
         $this->dispatch('swal:success', [
             'title' => 'Success!',
-            'text' => $isActivating
-                ? 'Member has been activated successfully.'
-                : 'Member has been deactivated successfully.',
+            'text' => $text,
         ]);
 
         $this->dispatch('members-refresh');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Open Renewal Modal
+    |
+    | A member whose activation has EXPIRED renews from here: the
+    | ActivationModal opens pre-filled and files a brand-new
+    | activation (Pending) once confirmed — the expired row is
+    | kept as history, never overwritten.
+    |--------------------------------------------------------------------------
+    */
+    public function openRenewal($id): void
+    {
+        if (! $this->canUpdate) {
+            return;
+        }
+
+        Log::info('Admin renewal clicked', ['target_UserID' => $id, 'opened_by' => Auth::id()]);
+
+        $member = User::find($id);
+
+        if (! $member) {
+            Log::warning('Renewal failed. Member not found.', ['target_UserID' => $id]);
+
+            return;
+        }
+
+        $this->dispatch('open-activation-modal', UserID: $member->UserID, renew: true);
     }
 
     /*

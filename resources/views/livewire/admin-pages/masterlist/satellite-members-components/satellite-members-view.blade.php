@@ -70,30 +70,6 @@
                 {{-- ======================== 2. BODY (scrollable) ======================== --}}
                 <div class="space-y-7 overflow-y-auto p-4 sm:p-6">
 
-                {{-- =================================================
-                    2b. POLICY INFORMATION
-                ================================================== --}}
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
-                        <div>
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
-                                Policy Information
-                            </h3>
-                            <p class="mt-0.5 text-[10px] font-normal normal-case tracking-normal text-slate-200">
-                                Membership policy details and expiration information.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2 lg:grid-cols-3">
-                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                            <p class="text-xs font-bold uppercase text-slate-400">Policy Number</p>
-                            <p class="mt-1 text-sm font-semibold text-slate-800">{{ $policy_number ?: 'N/A' }}</p>
-                        </div>
-                    </div>
-                </div>
-
-
                     {{-- =================================================
                          2c. ADDRESS & PINPOINT LOCATION
                     ================================================== --}}

@@ -135,6 +135,15 @@ class LoginModal extends Component
             return;
         }
 
+        // Suspended accounts are locked out by an administrator decision
+        // and cannot log in until reactivated from the Members masterlist.
+        if (strcasecmp($user->status ?? '', 'Suspended') === 0) {
+            $this->dispatch('swal:close');
+            $this->addError('email', 'Your account has been suspended. Please contact an administrator.');
+
+            return;
+        }
+
         Auth::login($user, $this->remember);
         session()->regenerate();
 

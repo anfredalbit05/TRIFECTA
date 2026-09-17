@@ -7,9 +7,10 @@ use App\Mail\ActivationRejectedMail;
 use App\Mail\InviteeApprovedMail;
 use App\Models\Activation;
 use App\Models\ActivationHistory;
-use App\Models\Beneficiary;
 use App\Models\Ledger;
 use App\Models\MembershipFee;
+use App\Models\Satellite;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Support\Facades\Auth;
@@ -18,8 +19,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use App\Models\Setting;
-use App\Models\Satellite;
 
 class SatelliteMembersActivationReview extends Component
 {
@@ -492,7 +491,7 @@ class SatelliteMembersActivationReview extends Component
         /** @var User|null $activatedUser */
         $activatedUser = null;
 
-        //Total Membership Fees (MF) Cost for the Activation
+        // Total Membership Fees (MF) Cost for the Activation
         // $totalAmount = (float) MembershipFee::sum('Cost');
 
         // 2. Atomic Database Operations (Database Changes Only)
@@ -564,11 +563,11 @@ class SatelliteMembersActivationReview extends Component
                 $cfAmount = round($totalAmount * 0.01, 2);
 
                 Ledger::create([
-                    'RefID'        => $this->selectedUserID,
-                    'amount'       => $cfAmount,
-                    'Source'       => 'CF',
+                    'RefID' => $this->selectedUserID,
+                    'amount' => $cfAmount,
+                    'Source' => 'CF',
                     'ActivationID' => $this->activation->ActivationID,
-                    'status'       => 'Completed',
+                    'status' => 'Completed',
                 ]);
 
                 Log::info('GCash | Paymaya CF ledger entry created.', [
@@ -678,7 +677,7 @@ class SatelliteMembersActivationReview extends Component
             try {
 
                 Mail::to($activatedUser->email)
-                    ->send(new ActivationApprovedMail($activatedUser, $this->activation,  $this->totalMembershipFeesCost));
+                    ->send(new ActivationApprovedMail($activatedUser, $this->activation, $this->totalMembershipFeesCost));
             } catch (\Throwable $e) {
                 Log::error('Failed to send approval email to user.', ['error' => $e->getMessage()]);
             }
@@ -772,6 +771,7 @@ class SatelliteMembersActivationReview extends Component
                 }
             });
 
+            $this->dispatch('members-refresh');
             $this->dispatch('swal:success', title: 'Rejected!', message: 'Activation rejected successfully.');
             $this->closeModal();
         } finally {
@@ -802,6 +802,6 @@ class SatelliteMembersActivationReview extends Component
 
     public function render()
     {
-          return view('livewire.admin-pages.masterlist.satellite-members-components.satellite-members-activation-review');
+        return view('livewire.admin-pages.masterlist.satellite-members-components.satellite-members-activation-review');
     }
 }

@@ -3,13 +3,14 @@
 ========================================================= */
 
 @import "tailwindcss";
-
-
 /* =========================================================
    THIRD-PARTY LIBRARIES
 ========================================================= */
 
 @import "flatpickr/dist/flatpickr.min.css";
+
+/* SweetAlert2 — brand palette alignment */
+@import "./shared/sweet-alert.css";
 
 
 /* =========================================================

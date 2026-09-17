@@ -377,89 +377,43 @@
 
     @script
         <script>
+            /* swal:close and swal:success are handled globally by the shared sweet-alert-handler component */
+
+            {{-- Typed confirmation (shared SwalFlow) — REJECT with required remarks --}}
             window.confirmReject = function() {
-                Swal.fire({
+                SwalFlow.prompt({
                     title: 'Reject Activation?',
                     icon: 'warning',
                     input: 'textarea',
                     inputLabel: 'Rejection remarks',
                     inputPlaceholder: 'Enter the reason for rejection...',
-                    inputAttributes: {
-                        maxlength: 1000,
-                        rows: 5
-                    },
-                    showCancelButton: true,
-                    cancelButtonText: 'Cancel',
-                    confirmButtonText: 'Reject',
-                    cancelButtonColor: '#D79B10',
-                    confirmButtonColor: '#0B2A5B',
-                    reverseButtons: false,
-                    inputValidator: (value) => {
-                        if (!value || value.trim() === '') {
-                            return 'Remarks are required.';
-                        }
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Rejecting activation...',
-                            text: 'Sending email and updating records.',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            showConfirmButton: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
-
-                        $wire.set('remarks', result.value);
-                        $wire.rejectActivation();
-                    }
+                    maxLength: 1000,
+                    rows: 5,
+                    required: true,
+                    requiredMessage: 'Remarks are required.',
+                    confirmText: 'Reject',
+                    cancelText: 'Cancel',
+                    loadingTitle: 'Rejecting activation...',
+                    loadingText: 'Sending email and updating records.',
+                }, (value) => {
+                    $wire.set('remarks', value);
+                    $wire.rejectActivation();
                 });
             };
 
+            {{-- Typed confirmation (shared SwalFlow) — APPROVE --}}
             window.confirmApprove = function() {
-                Swal.fire({
-                    title: 'Approve activation?',
-                    text: 'This will activate the member account and send email notifications.',
+                SwalFlow.confirm({
+                    title: 'Approve Activation?',
+                    html: 'This will activate the member account and send email notifications.<br><br>Type <strong>APPROVE</strong> to confirm.',
                     icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Approve',
-                    cancelButtonText: 'Cancel',
-                    confirmButtonColor: '#0B2A5B',
-                    cancelButtonColor: '#D79B10',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Approving activation...',
-                            text: 'Sending emails and updating records.',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            showConfirmButton: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
-
-                        $wire.approve();
-                    }
-                });
+                    requireConfirmWord: 'APPROVE',
+                    confirmText: 'Yes, approve!',
+                    cancelText: 'Cancel',
+                    loadingTitle: 'Approving activation...',
+                    loadingText: 'Sending emails and updating records.',
+                }, () => $wire.approve());
             };
-
-            window.addEventListener('swal:close', () => {
-                Swal.close();
-            });
-
-            window.addEventListener('swal:success', (event) => {
-                Swal.fire({
-                    icon: 'success',
-                    title: event.detail.title,
-                    text: event.detail.message,
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0B2A5B',
-                    allowOutsideClick: false
-                });
-            });
         </script>
     @endscript
 </div>

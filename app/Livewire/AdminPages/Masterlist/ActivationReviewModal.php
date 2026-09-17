@@ -650,6 +650,7 @@ class ActivationReviewModal extends Component
                 }
             });
 
+            $this->dispatch('members-refresh');
             $this->dispatch('swal:success', title: 'Rejected!', message: 'Activation rejected successfully.');
             $this->closeModal();
         } finally {

@@ -32,10 +32,10 @@
                 <span class="masterlist-tab-label">Members</span>
             </a>
 
-            {{-- <a href="#" @click.prevent="tab = 'satellite-members'" :class="tab === 'satellite-members' ? 'active' : ''">
+            <a href="#" @click.prevent="tab = 'satellite-members'" :class="tab === 'satellite-members' ? 'active' : ''">
                 <span class="masterlist-tab-icon">◉</span>
                 <span class="masterlist-tab-label">Satellite Members</span>
-            </a> --}}
+            </a>
 
             <a href="#" @click.prevent="tab = 'branches'" :class="tab === 'branches' ? 'active' : ''">
                 <span class="masterlist-tab-icon">⌖</span>
@@ -110,10 +110,10 @@
                 <span class="masterlist-mobile-label">Members</span>
             </a>
 
-            {{-- <a href="#" @click.prevent="tab = 'satellite-members'" :class="tab === 'satellite-members' ? 'active' : ''" aria-label="Satellite Members">
+            <a href="#" @click.prevent="tab = 'satellite-members'" :class="tab === 'satellite-members' ? 'active' : ''" aria-label="Satellite Members">
                 <span class="masterlist-mobile-icon">◉</span>
                 <span class="masterlist-mobile-label">Satellite Members</span>
-            </a> --}}
+            </a>
 
             <a href="#" @click.prevent="tab = 'branches'" :class="tab === 'branches' ? 'active' : ''" aria-label="Branches">
                 <span class="masterlist-mobile-icon">⌖</span>
@@ -140,6 +140,12 @@
     <!-- MODALS -->
     <livewire:admin-pages.masterlist.activation-review-modal />
     <livewire:view-member-modal />
+
+    {{-- Shared modals — mounted ONCE here so global Livewire events
+         (open-activation-modal, open-satellite-modal, confirm submits)
+         never hit duplicated ghost instances from the tab components. --}}
+    <livewire:member-pages.my-profile.activation-modal />
+    <livewire:admin-pages.masterlist.members-components.satellite-modal />
 
 </div>
 @endsection

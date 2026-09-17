@@ -182,23 +182,10 @@
             style.innerHTML = '.swal2-container { z-index: 999999 !important; }';
             document.head.appendChild(style);
 
-            $wire.on('swal:close', () => {
-                Swal.close();
-            });
+            {{-- swal:close is handled globally by <x-shared.sweet-alert-handler /> --}}
 
-            $wire.on('swal:error', (event) => {
-                Swal.close();
-                // Livewire 3 passes parameters inside an array or detail object
-                const data = Array.isArray(event) ? event[0] : event;
-                const message = data?.message || 'An error occurred.';
-
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Login Failed',
-                    text: message,
-                    confirmButtonColor: '#0B2A5B'
-                });
-            });
+            {{-- swal:error was dead code here (LoginModal never dispatches it) —
+                 removed; global handler covers it if it ever fires. --}}
 
             $wire.on('password-reset-link-sent', (event) => {
                 Swal.close();

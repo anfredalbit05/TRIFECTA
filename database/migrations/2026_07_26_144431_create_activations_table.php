@@ -129,6 +129,7 @@ return new class extends Migration
                 'Pending',
                 'Approved',
                 'Rejected',
+                'Expired',
             ])->default('Pending');
 
 

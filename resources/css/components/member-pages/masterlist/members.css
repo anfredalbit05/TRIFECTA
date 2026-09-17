@@ -276,18 +276,33 @@
     @apply bg-slate-600;
 }
 
+.status-expired {
+    @apply bg-[#D79B10];
+}
+
+.status-suspended {
+    @apply bg-red-700;
+}
+
+
 
 /* =========================================================
    MEMBER ACTIONS
 ========================================================= */
 
 .member-actions-cell {
-    @apply text-center;
+    @apply text-left;
 }
 
 .member-actions {
     @apply flex min-w-max flex-nowrap
         items-center justify-center gap-2;
+}
+
+.member-action-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .member-action {
@@ -304,6 +319,7 @@
 .member-action-view,
 .member-action-edit,
 .member-action-password,
+.member-action-withdraw,
 .member-action-satellite {
     @apply h-9 w-9 px-0;
 }
@@ -363,11 +379,20 @@
 ========================================================= */
 
 .member-action-deactivate,
+.member-action-suspend,
 .member-action-pending,
+.member-action-reapply,
+.member-action-renew,
 .member-action-activate,
-.member-action-withdraw,
 .member-action-off {
-    @apply min-w-[95px] px-3 py-2;
+    @apply h-9 w-[150px] shrink-0
+        items-center justify-center
+        px-3 py-2;
+}
+
+/* "Suspend" — Active member put on hold (replaces Deactivate) */
+.member-action-suspend {
+    @apply bg-red-600 text-white hover:bg-red-700;
 }
 
 .member-action-deactivate {
@@ -380,6 +405,16 @@
 
 .member-action-activate,
 .member-action-withdraw {
+    @apply bg-[#0C2C6B] text-white hover:bg-[#09204f];
+}
+
+/* "Renew" — an EXPIRED activation files a brand-new one */
+.member-action-renew {
+    @apply bg-[#D79B10] text-white hover:bg-[#b7810c];
+}
+
+/* "Reapply" — a REJECTED satellite user resubmits their own account */
+.member-action-reapply {
     @apply bg-[#0C2C6B] text-white hover:bg-[#09204f];
 }
 

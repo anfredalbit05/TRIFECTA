@@ -180,6 +180,12 @@ class SatelliteMembers extends Component
                     $query->where('status', 'Pending');
                 },
 
+                // Satellite user whose latest application was REJECTED — drives
+                // the "Reapply" button label in the table.
+                'activations as has_rejected_activation' => function ($query) {
+                    $query->where('status', 'Rejected');
+                },
+
                 'withdrawals as has_pending_withdrawal' => function ($query) {
                     $query->where('status', 'Pending');
                 },
@@ -441,9 +447,12 @@ class SatelliteMembers extends Component
                 : 'activate';
 
         $this->dispatch(
-            'confirm-status',
+            'satellite-confirm-status',
             id: $member->UserID,
-            action: $action
+            action: $action,
+            name: collect([$member->firstname, $member->middlename, $member->lastname])
+                ->filter()
+                ->implode(' '),
         );
     }
 
@@ -504,6 +513,10 @@ class SatelliteMembers extends Component
 
         $member->save();
 
+        $fullName = collect([$member->firstname, $member->middlename, $member->lastname])
+            ->filter()
+            ->implode(' ');
+
         Log::info(
             'Satellite member status updated successfully',
             [
@@ -514,9 +527,7 @@ class SatelliteMembers extends Component
 
         $this->dispatch('swal:success', [
             'title' => 'Success!',
-            'text' => $isActivating
-                ? 'Member has been activated successfully.'
-                : 'Member has been deactivated successfully.',
+            'text' => ($isActivating ? "{$fullName} has been activated" : "{$fullName} has been deactivated").' successfully.',
         ]);
 
         $this->dispatch('members-refresh');
@@ -559,58 +570,98 @@ class SatelliteMembers extends Component
             return;
         }
 
+        // Has a Pending application → open the review modal (approve / reject).
+        $hasPending = $member->activations()->where('status', 'Pending')->exists();
+
+        if ($hasPending) {
+            $this->dispatch(
+                'open-satellite-activation-review',
+                UserID: $member->UserID
+            );
+
+            return;
+        }
+
+        // Has a REJECTED activation → REAPPLY mode: reopen the wizard pre-filled
+        // with this satellite user's own info + last application, so the admin can
+        // correct it and resubmit WITHOUT creating a new user ("RESUBMIT APPLICATION").
+        $hasRejected = $member->activations()->where('status', 'Rejected')->exists();
+
+        if ($hasRejected) {
+            Log::info('Satellite admin activation → reapply', [
+                'target_UserID' => $member->UserID,
+                'mode' => 'reapply',
+                'processed_by' => Auth::id(),
+            ]);
+
+            $this->dispatch(
+                'open-satellite-reapply',
+                UserID: $member->UserID
+            );
+
+            return;
+        }
+
+        // No application history at all → open the plain NEW-application wizard
+        // (defensive fallback; shouldn't normally occur in this table).
+        Log::info('Satellite admin activation → new application (no history)', [
+            'target_UserID' => $member->UserID,
+            'mode' => 'new-application',
+            'processed_by' => Auth::id(),
+        ]);
+
         $this->dispatch(
-            'open-activation-modal',
+            'open-satellite-modal',
             UserID: $member->UserID
         );
     }
 
-// =====================================================
-// EDIT SATELLITE MEMBER
-// =====================================================
+    // =====================================================
+    // EDIT SATELLITE MEMBER
+    // =====================================================
 
-public function editMember($id): void
-{
-    if (! $this->canUpdate) {
-        return;
-    }
+    public function editMember($id): void
+    {
+        if (! $this->canUpdate) {
+            return;
+        }
 
-    Log::info(
-        'Edit satellite member clicked',
-        [
-            'UserID' => $id,
-            'updated_by' => Auth::id(),
-        ]
-    );
-
-    // IMPORTANT:
-    // Only allow RoleID 8 members to be edited here.
-    $member = User::where('UserID', $id)
-        ->where('RoleID', 8)
-        ->first();
-
-    if (! $member) {
-        Log::warning(
-            'Edit satellite member blocked: member not found or invalid role.',
+        Log::info(
+            'Edit satellite member clicked',
             [
                 'UserID' => $id,
+                'updated_by' => Auth::id(),
             ]
         );
 
-        $this->dispatch('swal:error', [
-            'title' => 'Invalid Member',
-            'text' => 'This user is not a satellite member.',
-        ]);
+        // IMPORTANT:
+        // Only allow RoleID 8 members to be edited here.
+        $member = User::where('UserID', $id)
+            ->where('RoleID', 8)
+            ->first();
 
-        return;
+        if (! $member) {
+            Log::warning(
+                'Edit satellite member blocked: member not found or invalid role.',
+                [
+                    'UserID' => $id,
+                ]
+            );
+
+            $this->dispatch('swal:error', [
+                'title' => 'Invalid Member',
+                'text' => 'This user is not a satellite member.',
+            ]);
+
+            return;
+        }
+
+        // Open SatelliteMembersEdit
+        $this->dispatch(
+            'open-satellite-member-edit',
+            UserID: $member->UserID
+        );
     }
-
-    // Open SatelliteMembersEdit
-    $this->dispatch(
-        'open-satellite-member-edit',
-        UserID: $member->UserID
-    );
-}
 
     // =====================================================
     // VIEW MEMBER
@@ -745,8 +796,8 @@ public function editMember($id): void
             id: $member->UserID,
 
             name: trim(
-                ($member->firstname ?? '') .
-                ' ' .
+                ($member->firstname ?? '').
+                ' '.
                 ($member->lastname ?? '')
             ),
 
@@ -862,8 +913,8 @@ public function editMember($id): void
             }
 
             $name = trim(
-                ($member->firstname ?? '') .
-                ' ' .
+                ($member->firstname ?? '').
+                ' '.
                 ($member->lastname ?? '')
             );
 
@@ -1124,7 +1175,7 @@ public function editMember($id): void
             report($e);
 
             Log::error(
-                'Satellite withdrawal rejection failed: ' .
+                'Satellite withdrawal rejection failed: '.
                 $e->getMessage()
             );
 
@@ -1223,11 +1274,9 @@ public function editMember($id): void
                 Wallet::create([
                     'UserID' => $withdrawal->UserID,
 
-                    'withdrawID' =>
-                        $withdrawal->WithdrawID,
+                    'withdrawID' => $withdrawal->WithdrawID,
 
-                    'amount' =>
-                        -abs($requestedAmount),
+                    'amount' => -abs($requestedAmount),
 
                     'source' => 'WD',
 
@@ -1239,14 +1288,11 @@ public function editMember($id): void
                 // =================================================
 
                 Ledger::create([
-                    'RefID' =>
-                        $withdrawal->UserID,
+                    'RefID' => $withdrawal->UserID,
 
-                    'WithdrawID' =>
-                        $withdrawal->WithdrawID,
+                    'WithdrawID' => $withdrawal->WithdrawID,
 
-                    'amount' =>
-                        -abs($withdrawalAmount),
+                    'amount' => -abs($withdrawalAmount),
 
                     'Source' => 'WD',
 
@@ -1260,14 +1306,11 @@ public function editMember($id): void
                 // =================================================
 
                 Ledger::create([
-                    'RefID' =>
-                        $withdrawal->UserID,
+                    'RefID' => $withdrawal->UserID,
 
-                    'WithdrawID' =>
-                        $withdrawal->WithdrawID,
+                    'WithdrawID' => $withdrawal->WithdrawID,
 
-                    'amount' =>
-                        $taxAmount,
+                    'amount' => $taxAmount,
 
                     'Source' => 'TX',
 
@@ -1291,7 +1334,7 @@ public function editMember($id): void
             report($e);
 
             Log::error(
-                'Satellite withdrawal approval failed: ' .
+                'Satellite withdrawal approval failed: '.
                 $e->getMessage()
             );
 

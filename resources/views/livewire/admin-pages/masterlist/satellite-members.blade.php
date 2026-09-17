@@ -7,11 +7,11 @@
 
         <div class="members-header-content">
             <h2 class="masterlist-title">
-                Members
+                Satellite Members
             </h2>
 
             <p class="masterlist-description">
-                Member management content and directory.
+                Satellite Member management content and directory.
             </p>
         </div>
 
@@ -373,7 +373,7 @@
                                         @endif
 
                                         {{-- SATELLITE --}}
-                                    @if ($this->canUpdate)
+                                    {{-- @if ($this->canUpdate)
                                         <button
                                             type="button"
                                             wire:click="openSatellite({{ $member->UserID }})"
@@ -386,7 +386,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 20a8 8 0 0 0 12-12" />
                                             </svg>
                                         </button>
-                                    @endif
+                                    @endif --}}
 
 
                                         {{-- STATUS --}}
@@ -400,7 +400,7 @@
                                                     title="Deactivate Member"
                                                     class="member-action member-action-deactivate"
                                                 >
-                                                    Deactivate
+                                                    Suspend Account
                                                 </button>
 
                                             @elseif($member->has_pending_activation)
@@ -411,18 +411,21 @@
                                                     title="Review Activation"
                                                     class="member-action member-action-pending"
                                                 >
-                                                    Pending
+                                                    Pending Membership
                                                 </button>
-
                                             @else
 
+                                                {{-- REJECTED satellite user → Reapply:
+                                                     reopens the wizard pre-filled with
+                                                     their own info, resubmits the SAME
+                                                     user (RESUBMIT APPLICATION). --}}
                                                 <button
                                                     type="button"
                                                     wire:click="openActivation({{ $member->UserID }})"
-                                                    title="Activate Member"
-                                                    class="member-action member-action-activate"
+                                                    title="Reapply for Activation"
+                                                    class="member-action member-action-reapply"
                                                 >
-                                                    Activate
+                                                    {{ $member->has_rejected_activation ? 'Resubmit Application' : 'Activate Membership' }}
                                                 </button>
 
                                             @endif
@@ -779,9 +782,7 @@
     {{-- ============================================================ --}}
     {{-- LIVEWIRE COMPONENTS --}}
     {{-- ============================================================ --}}
-    <livewire:member-pages.my-profile.activation-modal />
-    <livewire:admin-pages.masterlist.members-components.satellite-modal />
-       {{-- Satellite Member Edit Modal --}}
+    {{-- activation-modal + satellite-modal are mounted once at page level (masterlist.blade.php) --}}
     <livewire:admin-pages.masterlist.satellite-members-components.satellite-members-edit />
     <livewire:admin-pages.masterlist.satellite-members-components.satellite-members-view />
     <livewire:admin-pages.masterlist.satellite-members-components.satellite-members-activation-review />
@@ -793,89 +794,30 @@
 
         <script>
 
-            $wire.on('swal:error', (data) => {
+            /* swal:error is handled globally by the shared sweet-alert-handler component */
 
-                Swal.fire({
-                    icon: 'error',
-                    title: data.title ?? 'Error',
-                    text: data.text ?? 'Something went wrong.',
-                    confirmButtonColor: '#0C2C6B',
-                });
+            $wire.on('satellite-confirm-status', (data) => {
 
-            });
-
-
-            $wire.on('confirm-status', (data) => {
+                const d = Array.isArray(data) ? data[0] : data;
 
                 const actionText =
-                    data.action === 'deactivate'
+                    d.action === 'deactivate'
                         ? "I'm sure to deactivate"
                         : "I'm sure to activate";
 
-
-                Swal.fire({
-
-                    title: 'Are you sure?',
-                    text: 'Type the confirmation text below to continue.',
+                // Uses the shared SwalFlow typed-confirmation dialog
+                SwalFlow.confirm({
+                    title: (d.action === 'deactivate' ? 'Deactivate' : 'Activate') + ' Member?',
+                    html: 'You are about to <strong>' + d.action + '</strong> the account of '
+                        + '<strong style="color: #0B2A5B;">' + (d.name || 'this member') + '</strong>.'
+                        + '<br><br>Type the confirmation text below to continue.',
                     icon: 'warning',
-
-                    input: 'text',
-
+                    requireConfirmWord: actionText,
                     inputPlaceholder: actionText,
-
-                    inputAttributes: {
-                        autocapitalize: 'off'
-                    },
-
-                    showCancelButton: true,
-
-                    confirmButtonColor: '#0B2A5B',
-                    cancelButtonColor: '#D79B10',
-
-                    confirmButtonText: 'Confirm ' + data.action,
-                    cancelButtonText: 'Cancel',
-
-                    preConfirm: (value) => {
-
-                        if (value !== actionText) {
-
-                            Swal.showValidationMessage(
-                                'Please type: ' + actionText
-                            );
-
-                            return false;
-                        }
-
-                        return true;
-                    }
-
-                }).then((result) => {
-
-                    if (result.isConfirmed) {
-
-                        Swal.fire({
-
-                            title: 'Updating...',
-                            text: 'Please wait.',
-
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-
-                            showConfirmButton: false,
-
-                            didOpen: () => {
-
-                                Swal.showLoading();
-
-                            }
-
-                        });
-
-                        $wire.updateStatus(data.id);
-
-                    }
-
-                });
+                    confirmText: 'Yes, ' + d.action + ' member',
+                    loadingTitle: 'Updating...',
+                    loadingText: 'Please wait.',
+                }, () => $wire.updateStatus(d.id));
 
             });
 
@@ -1252,15 +1194,6 @@
 
             });
 
-        </script>
-
-    @endscript
-
-
-
-    @script
-
-        <script>
 
             // =====================================================
             // DATE RANGE PICKER

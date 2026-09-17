@@ -302,28 +302,7 @@
 
 @script
 <script>
-    // Listen for custom success alerts
-    $wire.on('swal:success', (event) => {
-        const data = event[0] || event;
-        Swal.fire({
-            title: data.title,
-            text: data.text,
-            icon: 'success',
-            timer: 1500,
-            showConfirmButton: false
-        });
-    });
-
-    // Listen for custom error alerts with HTML support
-    $wire.on('swal:error', (event) => {
-        const data = event[0] || event;
-        Swal.fire({
-            title: data.title,
-            html: data.text,
-            icon: 'error',
-            confirmButtonColor: '#0C2C6B'
-        });
-    });
+    {{-- swal:success and swal:error are handled globally by <x-shared.sweet-alert-handler /> --}}
 
     // Listen for update confirmation prompt
     $wire.on('confirm-update', () => {

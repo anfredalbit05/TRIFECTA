@@ -75,7 +75,7 @@
     <div class="account-detail-cell">
         <p class="account-detail-label">Account Status</p>
         <div class="mt-3">
-            @if (auth()->user()->RoleID != 4)
+            @if (auth()->user()->RoleID == 1)
                 <select wire:model="status" class="status-select">
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>

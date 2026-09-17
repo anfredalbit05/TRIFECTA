@@ -313,26 +313,7 @@
 
     @script
         <script>
-            $wire.on('swal:success', (event) => {
-                const data = event[0] || event;
-                Swal.fire({
-                    title: data.title,
-                    text: data.text,
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-            });
-
-            $wire.on('swal:error', (event) => {
-                const data = event[0] || event;
-                Swal.fire({
-                    title: data.title,
-                    html: data.text,
-                    icon: 'error',
-                    confirmButtonColor: '#0C2C6B'
-                });
-            });
+            {{-- swal:success and swal:error are handled globally by <x-shared.sweet-alert-handler /> --}}
 
             $wire.on('confirm-update', () => {
                 Swal.fire({

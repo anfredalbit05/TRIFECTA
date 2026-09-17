@@ -313,31 +313,6 @@
                         </div>
                     </div>
 
-                    {{-- POLICY INFORMATION --}}
-                    <div class="space-y-4">
-                        <div class="rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
-                                Policy Information
-                            </h3>
-                            <p class="mt-0.5 text-[10px] text-slate-200">
-                                Membership policy details and expiration information.
-                            </p>
-                        </div>
-
-                        <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2 lg:grid-cols-3">
-
-                            {{-- POLICY NUMBER --}}
-                            <div>
-                                <label class="mb-1 block text-xs font-bold text-slate-700">Policy Number</label>
-                                <input wire:model.live="policy_number" type="text"
-                                    placeholder="Enter policy number"
-                                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
-                            </div>
-
-
-                        </div>
-                    </div>
-
                     {{-- ADDRESS & LOCATION --}}
                     <div class="space-y-4">
                         <div class="rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">

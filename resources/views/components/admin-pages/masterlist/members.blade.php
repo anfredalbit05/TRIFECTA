@@ -265,7 +265,15 @@
                             {{-- STATUS --}}
                             <td>
 
-                                @if (strtolower($member->status) === 'active')
+
+
+                                @if (strtolower($member->status) === 'suspended')
+
+                                    <span class="status-badge status-suspended" title="Account suspended by an administrator">
+                                        Suspended
+                                    </span>
+
+                                @elseif (strtolower($member->status) === 'active')
 
                                     <span class="status-badge status-active">
                                         Active
@@ -373,34 +381,92 @@
                                         @endif
 
                                         {{-- SATELLITE --}}
-                                    {{-- @if ($this->canUpdate)
+                                        @if ($isSatelliteApplicationActive)
+                                        {{-- SATELLITE --}}
                                         <button
                                             type="button"
                                             wire:click="openSatellite({{ $member->UserID }})"
-                                            title="Manage Satellite Subscription"
-                                            class="member-action member-action-satellite"
+                                            title="{{ $isSatelliteApplicationActive && strtolower(trim((string) $member->status)) === 'active'
+                                                ? 'Manage Satellite Subscription'
+                                                : 'Satellite Subscription Unavailable' }}"
+                                            class="member-action member-action-satellite
+                                                {{ !($isSatelliteApplicationActive && strtolower(trim((string) $member->status)) === 'active')
+                                                    ? 'member-action-disabled'
+                                                    : '' }}"
+                                            @disabled(!(
+                                                strtolower(trim((string) $member->status)) === 'active'
+                                            ))
                                         >
                                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.5 6.5l4 4m-7.5 7.5 4-4" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6.5 10.5l7-7 4 4-7 7-4-4Z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 20a8 8 0 0 0 12-12" />
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="1.8"
+                                                    d="M13.5 6.5l4 4m-7.5 7.5 4-4"
+                                                />
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="1.8"
+                                                    d="M6.5 10.5l7-7 4 4-7 7-4-4Z"
+                                                />
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="1.8"
+                                                    d="M8 20a8 8 0 0 0 12-12"
+                                                />
                                             </svg>
                                         </button>
-                                    @endif --}}
+                                        @endif
+
+
+                                        @if($isWithdrawalActive)
+
+                                            @if ($this->canCreate)
+
+                                                <button type="button" wire:click="openWithdrawalModal({{ $member->UserID }})"
+                                                    title="Create Withdrawal Request"
+                                                    class="member-action member-action-withdraw" >
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="1.8"
+                                                        d="M13.5 6.5l4 4m-7.5 7.5 4-4"
+                                                    />
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="1.8"
+                                                        d="M6.5 10.5l7-7 4 4-7 7-4-4Z"
+                                                    />
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="1.8"
+                                                        d="M8 20a8 8 0 0 0 12-12"
+                                                    />
+                                                </svg>
+                                                </button>
+                                                 @endif
+                                            @endif
+
 
 
                                         {{-- STATUS --}}
                                         @if ($this->canUpdate)
 
-                                            @if (strtolower($member->status) === 'active')
+                                            @if ($member->has_expired_activation)
 
+                                                {{-- Latest activation EXPIRED → file a brand-new one (Renew) --}}
                                                 <button
                                                     type="button"
-                                                    wire:click="confirmStatus({{ $member->UserID }})"
-                                                    title="Deactivate Member"
-                                                    class="member-action member-action-deactivate"
+                                                    wire:click="openRenewal({{ $member->UserID }})"
+                                                    title="Renew Membership"
+                                                    class="member-action member-action-renew"
                                                 >
-                                                    Deactivate
+                                                    Renew Membership
                                                 </button>
 
                                             @elseif($member->has_pending_activation)
@@ -411,10 +477,22 @@
                                                     title="Review Activation"
                                                     class="member-action member-action-pending"
                                                 >
-                                                    Pending
+                                                    Approve Membership
                                                 </button>
 
-                                            @else
+                                            @elseif (strtolower($member->status) === 'suspended')
+
+                                                {{-- Suspended → unsuspend via the same confirmation dialog --}}
+                                                <button
+                                                    type="button"
+                                                    wire:click="confirmStatus({{ $member->UserID }})"
+                                                    title="Reactivate Suspended Account"
+                                                    class="member-action member-action-activate"
+                                                >
+                                                    Activate Account
+                                                </button>
+
+                                            @elseif (strtolower($member->status) === 'inactive')
 
                                                 <button
                                                     type="button"
@@ -422,7 +500,19 @@
                                                     title="Activate Member"
                                                     class="member-action member-action-activate"
                                                 >
-                                                    Activate
+                                                    Activate Membership
+                                                </button>
+
+                                            @else
+
+                                                {{-- Active → Suspend (replaces Deactivate) --}}
+                                                <button
+                                                    type="button"
+                                                    wire:click="confirmStatus({{ $member->UserID }})"
+                                                    title="Suspend Member"
+                                                    class="member-action member-action-suspend"
+                                                >
+                                                    Suspend Account
                                                 </button>
 
                                             @endif
@@ -442,20 +532,7 @@
                                                 Pending
                                             </button>
 
-                                        @elseif ($isWithdrawalActive)
 
-                                            @if ($this->canCreate)
-
-                                                <button
-                                                    type="button"
-                                                    wire:click="openWithdrawalModal({{ $member->UserID }})"
-                                                    title="Create Withdrawal Request"
-                                                    class="member-action member-action-withdraw"
-                                                >
-                                                    Withdraw
-                                                </button>
-
-                                            @endif
 
                                         @else
                                         @endif
@@ -776,676 +853,153 @@
     </div>
 
 
-    {{-- ============================================================ --}}
-    {{-- LIVEWIRE COMPONENTS --}}
-    {{-- ============================================================ --}}
-    <livewire:member-pages.my-profile.activation-modal />
-    <livewire:components.withdrawal-modal />
-   <livewire:admin-pages.masterlist.members-components.satellite-modal />
+{{-- ============================================================ --}}
+{{-- LIVEWIRE COMPONENTS --}}
+{{-- ============================================================ --}}
 
-    {{-- ============================================================ --}}
-    {{-- SWEETALERT --}}
-    {{-- ============================================================ --}}
-    @script
+<livewire:components.withdrawal-modal />
+{{-- activation-modal + satellite-modal are mounted once at page level (masterlist.blade.php) --}}
 
-        <script>
 
-            $wire.on('swal:error', (data) => {
+{{-- ============================================================ --}}
+{{-- DATE RANGE PICKER --}}
+{{-- ============================================================ --}}
 
-                Swal.fire({
-                    icon: 'error',
-                    title: data.title ?? 'Error',
-                    text: data.text ?? 'Something went wrong.',
-                    confirmButtonColor: '#0C2C6B',
-                });
+@script
+<script>
 
-            });
+    const dateInput = $wire.$el.querySelector('#memberDateRange');
 
+    if (dateInput) {
 
-            $wire.on('confirm-status', (data) => {
+        const picker = flatpickr(dateInput, {
 
-                const actionText =
-                    data.action === 'deactivate'
-                        ? "I'm sure to deactivate"
-                        : "I'm sure to activate";
+            mode: 'range',
 
+            dateFormat: 'Y-m-d',
 
-                Swal.fire({
+            altInput: true,
 
-                    title: 'Are you sure?',
-                    text: 'Type the confirmation text below to continue.',
-                    icon: 'warning',
+            altFormat: 'M d, Y',
 
-                    input: 'text',
+            maxDate: 'today',
 
-                    inputPlaceholder: actionText,
+            defaultDate: @js(
+                $dateRange
+                    ? explode(' to ', $dateRange)
+                    : []
+            ),
 
-                    inputAttributes: {
-                        autocapitalize: 'off'
-                    },
+            onChange: (
+                selectedDates,
+                dateStr,
+                instance
+            ) => {
 
-                    showCancelButton: true,
+                if (selectedDates.length === 2) {
 
-                    confirmButtonColor: '#0B2A5B',
-                    cancelButtonColor: '#D79B10',
+                    const start = instance.formatDate(
+                        selectedDates[0],
+                        'Y-m-d'
+                    );
 
-                    confirmButtonText: 'Confirm ' + data.action,
-                    cancelButtonText: 'Cancel',
+                    const end = instance.formatDate(
+                        selectedDates[1],
+                        'Y-m-d'
+                    );
 
-                    preConfirm: (value) => {
+                    $wire.set(
+                        'dateRange',
+                        `${start} to ${end}`
+                    );
 
-                        if (value !== actionText) {
+                } else if (selectedDates.length === 0) {
 
-                            Swal.showValidationMessage(
-                                'Please type: ' + actionText
-                            );
-
-                            return false;
-                        }
-
-                        return true;
-                    }
-
-                }).then((result) => {
-
-                    if (result.isConfirmed) {
-
-                        Swal.fire({
-
-                            title: 'Updating...',
-                            text: 'Please wait.',
-
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-
-                            showConfirmButton: false,
-
-                            didOpen: () => {
-
-                                Swal.showLoading();
-
-                            }
-
-                        });
-
-                        $wire.updateStatus(data.id);
-
-                    }
-
-                });
-
-            });
-
-
-            $wire.on('status-updated', () => {
-
-                Swal.fire({
-
-                    title: 'Updated!',
-                    text: 'Member status has been updated.',
-
-                    icon: 'success',
-
-                    timer: 1500,
-                    showConfirmButton: false
-
-                });
-
-            });
-
-
-            $wire.on('set-member-password', (data) => {
-
-                const name =
-                    data?.name || 'this member';
-
-                const policy =
-                    data?.policy || {
-                        min: 8,
-                        mixedCase: false,
-                        letters: false,
-                        numbers: false,
-                        symbols: false
-                    };
-
-                const hint =
-                    data?.hint ||
-                    'Must contain at least ' +
-                    policy.min +
-                    ' characters.';
-
-
-                Swal.fire({
-
-                    title: 'Set New Password',
-
-                    width: 460,
-
-                    padding: '1.25rem 1.5rem 1.5rem',
-
-                    html:
-
-                        '<div style="text-align: left;">' +
-
-                            '<p style="margin: 0 0 14px; font-size: 13px; line-height: 1.5; color: #475569;">' +
-
-                                'Setting a new password for ' +
-
-                                '<b style="color: #0B2A5B;">' +
-
-                                    name +
-
-                                '</b>.' +
-
-                            '</p>' +
-
-
-                            '<div style="margin-bottom: 12px;">' +
-
-                                '<label for="swal-new-password" style="display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; color: #334155;">' +
-
-                                    'New Password' +
-
-                                '</label>' +
-
-                                '<div class="relative">' +
-
-                                    '<input id="swal-new-password" type="password" autocomplete="new-password" ' +
-
-                                        'placeholder="••••••••" ' +
-
-                                        'style="width: 100%; box-sizing: border-box; margin: 0;" ' +
-
-                                        'class="w-full border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:border-[#0B2A5B] focus:outline-none transition">' +
-
-                                    '<button type="button" class="swal-pw-toggle absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer" ' +
-
-                                        'data-target="swal-new-password" tabindex="-1" aria-label="Show or hide password">' +
-
-                                        '<svg data-ico="show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">' +
-
-                                            '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />' +
-
-                                            '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />' +
-
-                                        '</svg>' +
-
-                                        '<svg data-ico="hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" style="display: none;">' +
-
-                                            '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 0 1-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L9.88 9.88" />' +
-
-                                        '</svg>' +
-
-                                    '</button>' +
-
-                                '</div>' +
-
-                            '</div>' +
-
-
-                            '<div style="margin-bottom: 14px;">' +
-
-                                '<label for="swal-confirm-password" style="display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; color: #334155;">' +
-
-                                    'Confirm New Password' +
-
-                                '</label>' +
-
-                                '<div class="relative">' +
-
-                                    '<input id="swal-confirm-password" type="password" autocomplete="new-password" ' +
-
-                                        'placeholder="••••••••" ' +
-
-                                        'style="width: 100%; box-sizing: border-box; margin: 0;" ' +
-
-                                        'class="w-full border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:border-[#0B2A5B] focus:outline-none transition">' +
-
-                                    '<button type="button" class="swal-pw-toggle absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer" ' +
-
-                                        'data-target="swal-confirm-password" tabindex="-1" aria-label="Show or hide password">' +
-
-                                        '<svg data-ico="show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">' +
-
-                                            '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />' +
-
-                                            '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />' +
-
-                                        '</svg>' +
-
-                                        '<svg data-ico="hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" style="display: none;">' +
-
-                                            '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 0 1-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L9.88 9.88" />' +
-
-                                        '</svg>' +
-
-                                    '</button>' +
-
-                                '</div>' +
-
-                            '</div>' +
-
-
-                            '<p style="margin: 0; font-size: 11px; line-height: 1.5; color: #64748b;">' +
-
-                                hint +
-
-                            '</p>' +
-
-                        '</div>',
-
-
-                    showCancelButton: true,
-
-                    confirmButtonText: 'Update Password',
-
-                    confirmButtonColor: '#0B2A5B',
-
-                    cancelButtonColor: '#D79B10',
-
-                    focusConfirm: false,
-
-                    allowOutsideClick: false,
-
-
-                    didOpen: (modal) => {
-
-                        modal
-                            .querySelectorAll('.swal-pw-toggle')
-                            .forEach((btn) => {
-
-                                btn.addEventListener('click', () => {
-
-                                    const input =
-                                        modal.querySelector(
-                                            '#' +
-                                            btn.getAttribute(
-                                                'data-target'
-                                            )
-                                        );
-
-                                    const show =
-                                        input.type === 'password';
-
-                                    input.type =
-                                        show
-                                            ? 'text'
-                                            : 'password';
-
-
-                                    const showIcon =
-                                        btn.querySelector(
-                                            '[data-ico="show"]'
-                                        );
-
-                                    const hideIcon =
-                                        btn.querySelector(
-                                            '[data-ico="hide"]'
-                                        );
-
-
-                                    if (showIcon) {
-                                        showIcon.style.display =
-                                            show
-                                                ? 'none'
-                                                : '';
-                                    }
-
-
-                                    if (hideIcon) {
-                                        hideIcon.style.display =
-                                            show
-                                                ? ''
-                                                : 'none';
-                                    }
-
-                                });
-
-                            });
-
-                    },
-
-
-                    preConfirm: () => {
-
-                        const password =
-                            document.getElementById(
-                                'swal-new-password'
-                            ).value;
-
-                        const confirmation =
-                            document.getElementById(
-                                'swal-confirm-password'
-                            ).value;
-
-
-                        const messages = [];
-
-
-                        if (!password) {
-
-                            messages.push(
-                                'Please enter a new password.'
-                            );
-
-                        } else {
-
-                            if (password.length < policy.min) {
-
-                                messages.push(
-                                    'Password must be at least ' +
-                                    policy.min +
-                                    ' characters long.'
-                                );
-
-                            }
-
-
-                            if (
-                                policy.mixedCase &&
-                                !(
-                                    /[a-z]/.test(password) &&
-                                    /[A-Z]/.test(password)
-                                )
-                            ) {
-
-                                messages.push(
-                                    'Include both uppercase and lowercase letters.'
-                                );
-
-                            } else if (
-                                policy.letters &&
-                                !/[a-zA-Z]/.test(password)
-                            ) {
-
-                                messages.push(
-                                    'Include at least one letter.'
-                                );
-
-                            }
-
-
-                            if (
-                                policy.numbers &&
-                                !/\d/.test(password)
-                            ) {
-
-                                messages.push(
-                                    'Include at least one number.'
-                                );
-
-                            }
-
-
-                            if (
-                                policy.symbols &&
-                                !/[^A-Za-z0-9]/.test(password)
-                            ) {
-
-                                messages.push(
-                                    'Include at least one symbol.'
-                                );
-
-                            }
-
-                        }
-
-
-                        if (confirmation !== password) {
-
-                            messages.push(
-                                'Passwords do not match.'
-                            );
-
-                        }
-
-
-                        if (messages.length > 0) {
-
-                            Swal.showValidationMessage(
-                                messages.join(' ')
-                            );
-
-                            return false;
-
-                        }
-
-
-                        return password;
-
-                    }
-
-                }).then((result) => {
-
-                    if (result.isConfirmed && result.value) {
-
-                        Swal.fire({
-
-                            title: 'Updating...',
-                            text: 'Please wait.',
-
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-
-                            showConfirmButton: false,
-
-                            didOpen: () => {
-
-                                Swal.showLoading();
-
-                            }
-
-                        });
-
-
-                        $wire.resetMemberPassword(
-                            data.id,
-                            result.value
-                        );
-
-                    }
-
-                });
-
-            });
-
-        </script>
-
-    @endscript
-
-
-    @script
-
-        <script>
-
-            // =====================================================
-            // DATE RANGE PICKER
-            // =====================================================
-
-            const dateInput =
-                $wire.$el.querySelector(
-                    '#memberDateRange'
-                );
-
-
-            const picker = flatpickr(
-                dateInput,
-                {
-
-                    mode: 'range',
-
-                    dateFormat: 'Y-m-d',
-
-                    altInput: true,
-
-                    altFormat: 'M d, Y',
-
-                    maxDate: 'today',
-
-                    defaultDate:
-                        @js(
-                            $dateRange
-                                ? explode(' to ', $dateRange)
-                                : []
-                        ),
-
-
-                    onChange:
-                        (
-                            selectedDates,
-                            dateStr,
-                            instance
-                        ) => {
-
-                            if (selectedDates.length === 2) {
-
-                                const start =
-                                    instance.formatDate(
-                                        selectedDates[0],
-                                        'Y-m-d'
-                                    );
-
-                                const end =
-                                    instance.formatDate(
-                                        selectedDates[1],
-                                        'Y-m-d'
-                                    );
-
-
-                                $wire.set(
-                                    'dateRange',
-                                    `${start} to ${end}`
-                                );
-
-                            } else if (
-                                selectedDates.length === 0
-                            ) {
-
-                                $wire.set(
-                                    'dateRange',
-                                    ''
-                                );
-
-                            }
-
-                        },
-
-
-                    onClose:
-                        (
-                            selectedDates,
-                            dateStr,
-                            instance
-                        ) => {
-
-                            if (selectedDates.length === 1) {
-
-                                const day =
-                                    instance.formatDate(
-                                        selectedDates[0],
-                                        'Y-m-d'
-                                    );
-
-
-                                instance.setDate(
-                                    [
-                                        selectedDates[0],
-                                        selectedDates[0]
-                                    ],
-                                    true
-                                );
-
-
-                                $wire.set(
-                                    'dateRange',
-                                    `${day} to ${day}`
-                                );
-
-                            }
-
-                        }
+                    $wire.set(
+                        'dateRange',
+                        ''
+                    );
 
                 }
-            );
 
+            },
 
-            // =====================================================
-            // RESET DATE RANGE
-            // =====================================================
+            onClose: (
+                selectedDates,
+                dateStr,
+                instance
+            ) => {
 
-            $wire.on(
-                'ranges-reset',
-                () => {
+                if (selectedDates.length === 1) {
 
-                    picker.clear();
+                    const day = instance.formatDate(
+                        selectedDates[0],
+                        'Y-m-d'
+                    );
 
-                }
-            );
+                    instance.setDate(
+                        [
+                            selectedDates[0],
+                            selectedDates[0]
+                        ],
+                        true
+                    );
 
-
-            // =====================================================
-            // REJECT WITHDRAWAL
-            // =====================================================
-
-            $wire.on(
-                'confirm-withdrawal-rejection',
-                () => {
-
-                    Swal.fire({
-
-                        title: 'Reject Withdrawal?',
-
-                        text:
-                            'This withdrawal request will be rejected. This action cannot be undone.',
-
-                        icon: 'warning',
-
-                        showCancelButton: true,
-
-                        confirmButtonColor: '#0B2A5B',
-
-                        cancelButtonColor: '#D79B10',
-
-                        confirmButtonText: 'Yes, Reject',
-
-                        cancelButtonText: 'Cancel',
-
-                    }).then((result) => {
-
-                        if (result.isConfirmed) {
-
-                            Swal.fire({
-
-                                title: 'Rejecting...',
-
-                                text: 'Please wait.',
-
-                                allowOutsideClick: false,
-
-                                allowEscapeKey: false,
-
-                                showConfirmButton: false,
-
-                                didOpen: () => {
-
-                                    Swal.showLoading();
-
-                                }
-
-                            });
-
-
-                            $wire.rejectWithdrawal();
-
-                        }
-
-                    });
+                    $wire.set(
+                        'dateRange',
+                        `${day} to ${day}`
+                    );
 
                 }
-            );
 
-        </script>
+            }
 
-    @endscript
+        });
+
+
+        // RESET DATE RANGE
+        $wire.on('ranges-reset', () => {
+
+            picker.clear();
+
+        });
+
+    }
+
+
+    {{-- STATUS CONFIRMATION (activate / deactivate) — alert shows the member's full name --}}
+    $wire.on('members-confirm-status', (data) => {
+
+        const d = Array.isArray(data) ? data[0] : data;
+
+        // Three verbs: suspend (Active), activate (Suspended → back), activate (Inactive)
+        const isSuspend = d.action === 'suspend';
+        const actionText = isSuspend
+            ? "I'm sure to suspend"
+            : "I'm sure to activate";
+
+        // Uses the shared SwalFlow typed-confirmation dialog
+        SwalFlow.confirm({
+            title: (isSuspend ? 'Suspend' : 'Activate') + ' Member?',
+            html: isSuspend
+                ? 'You are about to <strong>suspend</strong> the account of '
+                    + '<strong style="color: #0B2A5B;">' + (d.name || 'this member') + '</strong>.'
+                    + ' They will lose access until an administrator reactivates them.'
+                    + '<br><br>Type the confirmation text below to continue.'
+                : 'You are about to <strong>activate</strong> the account of '
+                    + '<strong style="color: #0B2A5B;">' + (d.name || 'this member') + '</strong>.'
+                    + '<br><br>Type the confirmation text below to continue.',
+            icon: 'warning',
+            requireConfirmWord: actionText,
+            inputPlaceholder: actionText,
+            confirmText: 'Yes, ' + (isSuspend ? 'suspend member' : 'activate member'),
+            loadingTitle: 'Updating...',
+            loadingText: 'Please wait.',
+        }, () => $wire.updateStatus(d.id));
+
+    });
+
+</script>
+@endscript
 
 </div>
