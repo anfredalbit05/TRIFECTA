@@ -35,10 +35,10 @@
                     <span>Security</span>
                 </a>
 
-                <a href="#" @click.prevent="tab='activity'" :class="{active:tab==='activity'}">
+                {{-- <a href="#" @click.prevent="tab='activity'" :class="{active:tab==='activity'}">
                     <span class="my-profile-tab-icon">◷</span>
                     <span>Activity</span>
-                </a>
+                </a> --}}
 
                 <a href="#" @click.prevent="tab='certificate'" :class="{active:tab==='certificate'}">
                     <span class="my-profile-tab-icon">▣</span>
