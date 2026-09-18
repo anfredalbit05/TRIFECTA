@@ -116,24 +116,13 @@ class WithdrawalModal extends Component
     #[On('check-pending-withdrawal')]
     public function checkPendingWithdrawal(): void
     {
-        // The regular dashboard flow always acts on
-        // the logged-in user, never admin mode.
         if (!$this->isAdminMode) {
             $this->targetUserID = null;
         }
 
-        Log::info('WithdrawalModal: check-pending-withdrawal event received.', [
-            'auth_user_id' => Auth::id(),
-            'admin_mode' => $this->isAdminMode,
-            'target_user_id' => $this->targetUserID,
-        ]);
-
         $this->refreshBalance();
 
         if (!$this->isWithdrawalActive()) {
-
-            Log::warning('WithdrawalModal: withdrawals are currently inactive.');
-
             $this->dispatch(
                 'withdrawal-error',
                 message: 'Withdrawals are currently unavailable. Please try again later.'
@@ -145,9 +134,6 @@ class WithdrawalModal extends Component
         $user = $this->resolveActingUser();
 
         if (!$user) {
-
-            Log::warning('WithdrawalModal: no acting user resolved.');
-
             $this->dispatch(
                 'withdrawal-error',
                 message: 'You must be logged in.'
@@ -156,34 +142,12 @@ class WithdrawalModal extends Component
             return;
         }
 
-        Log::info('WithdrawalModal: checking pending withdrawal.', [
-            'user_id' => $user->UserID,
-        ]);
-
-        $pendingWithdrawal = Withdrawal::where(
-            'UserID',
-            $user->UserID
-        )
+        $pendingWithdrawal = Withdrawal::where('UserID', $user->UserID)
             ->where('status', 'Pending')
             ->latest('WithdrawID')
             ->first();
 
         if ($pendingWithdrawal) {
-
-            Log::info('WithdrawalModal: pending withdrawal found.', [
-                'withdraw_id' => $pendingWithdrawal->WithdrawID,
-            ]);
-
-            // ==========================================
-            // RESOLVE WHO PROCESSED / CREATED THIS
-            // WITHDRAWAL REQUEST
-            //
-            // ProcessedBy stores the UserID of whoever
-            // took the action — the member themself on
-            // the dashboard, or the admin who created it
-            // on the member's behalf via Admin Users.
-            // ==========================================
-
             $processedByUser = $pendingWithdrawal->ProcessedBy
                 ? User::where('UserID', $pendingWithdrawal->ProcessedBy)->first()
                 : null;
@@ -194,11 +158,9 @@ class WithdrawalModal extends Component
 
             $this->dispatch(
                 'pending-withdrawal',
-                amount: number_format(
-                    (float) $pendingWithdrawal->amount,
-                    2
-                ),
+                amount: number_format((float) $pendingWithdrawal->amount, 2),
                 method: $pendingWithdrawal->withdrawal_method,
+                bankName: $pendingWithdrawal->bank_name ?? 'N/A',
                 accountName: $pendingWithdrawal->account_name ?? 'N/A',
                 accountNumber: $pendingWithdrawal->account_number ?? 'N/A',
                 reference: $pendingWithdrawal->payment_reference ?? 'N/A',
@@ -212,11 +174,22 @@ class WithdrawalModal extends Component
             return;
         }
 
-        Log::info('WithdrawalModal: no pending withdrawal. Opening modal.');
+        $minimumWithdrawal = $this->getMinimumWithdrawalAmount();
+
+        if ($this->totalAmount < $minimumWithdrawal) {
+            $this->dispatch(
+                'withdrawal-error',
+                message: 'You do not have enough balance to make a withdrawal. Your available balance is ₱' .
+                    number_format($this->totalAmount, 2) .
+                    ', while the minimum withdrawal amount is ₱' .
+                    number_format($minimumWithdrawal, 2) .
+                    '.'
+            );
+
+            return;
+        }
 
         $this->dispatch('open-withdraw-modal');
-
-        Log::info('WithdrawalModal: open-withdraw-modal dispatched.');
     }
 
     // ==========================================

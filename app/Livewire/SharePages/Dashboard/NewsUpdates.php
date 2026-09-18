@@ -142,9 +142,41 @@ class NewsUpdates extends Component
         );
     }
 
-    public function openWithdrawalModal(): void
+public function openWithdrawalModal(): void
 {
+    $user = Auth::user();
+
+    if (!$user) {
+        return;
+    }
+
+    $totalAmount = Wallet::where('UserID', $user->UserID)
+        ->where('status', 'Active')
+        ->where('source', '!=', 'PF')
+        ->sum('amount');
+
+    $minimumWithdrawal = $this->getMinimumWithdrawalAmount();
+
+    if ((float) $totalAmount < $minimumWithdrawal) {
+        $this->dispatch(
+            'insufficient-withdrawal-balance',
+            balance: number_format((float) $totalAmount, 2),
+            minimum: number_format($minimumWithdrawal, 2)
+        );
+
+        return;
+    }
+
     $this->dispatch('check-pending-withdrawal');
+}
+
+public function getMinimumWithdrawalAmount(): float
+{
+    return (float) (
+        Setting::where('name', 'minimum_withdraw_amount')
+            ->value('value')
+        ?? 500
+    );
 }
 
     // ==========================================
@@ -234,7 +266,7 @@ class NewsUpdates extends Component
 
         $isWithdrawalActive = $this->isWithdrawalActive();
 
-        
+
 
         // ------------------------------------------
         // KABUHAYAN SPIN THE WHEEL STATUS
