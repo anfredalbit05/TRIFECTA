@@ -1,360 +1,713 @@
+<!-- =========================================================
+     TRUELIFE NAVBAR
+========================================================= -->
+
 <nav
-    x-data="{ open: false }"
-    class="sticky top-0 z-50 border-b border-[#E5B83B]/20 bg-[#0C2C6B]/95 backdrop-blur-xl shadow-lg shadow-black/10">
+    class="fixed inset-x-0 top-0 z-[1000] border-b border-[#E5B83B]/20 bg-[#0C2C6B]/95 shadow-lg shadow-black/10 backdrop-blur-xl lg:sticky lg:top-0">
 
     <!-- Gold Accent Line -->
-    <div class="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-[#D79B10] to-transparent"></div>
+    <div
+        class="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-[#D79B10] to-transparent">
+    </div>
 
-    <div class="max-w-7xl mx-auto px-6">
 
-        <div class="flex h-20 items-center justify-between">
+    <!-- =====================================================
+         NAVBAR CONTAINER
+    ====================================================== -->
 
-            <!-- Logo -->
-            <a href="{{ route('home') }}" class="flex items-center gap-3 group">
+    <div class="mx-auto max-w-7xl px-3 sm:px-6">
 
-                <div class="rounded-full bg-white p-1 shadow-lg transition duration-300 group-hover:scale-105">
+        <div class="flex h-16 items-center justify-between lg:h-20">
+
+
+            <!-- =================================================
+                 LOGO
+            ================================================== -->
+
+            <a
+                href="{{ route('home') }}"
+                class="group flex shrink-0 items-center gap-2 lg:gap-3">
+
+                <div
+                    class="rounded-full bg-white p-1 shadow-lg transition duration-300 group-hover:scale-105">
+
                     <img
                         src="{{ asset('images/truelife-logo.png') }}"
                         alt="TRUELIFE Logo"
-                        class="h-12 w-12 object-contain">
+                        class="h-9 w-9 object-contain lg:h-12 lg:w-12">
+
                 </div>
 
-                <div>
-
-                    <h1 class="text-xl font-black tracking-wide text-white">
-                        TRUELIFE
-                    </h1>
-                </div>
+                <h1 class="text-lg font-black tracking-wide text-white lg:text-xl">
+                    TRUELIFE
+                </h1>
 
             </a>
 
-            <!-- Desktop Menu -->
-            <div class="hidden lg:flex items-center rounded-full bg-white/5 p-1.5 backdrop-blur-md border border-white/10">
 
-                <!-- Home Link -->
-                <a href="{{ route('home') }}"
-                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('/') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+            <!-- =================================================
+                 DESKTOP NAVIGATION
+            ================================================== -->
+
+            <div
+                class="hidden items-center rounded-full border border-white/10 bg-white/5 p-1.5 backdrop-blur-md lg:flex">
+
+                <!-- HOME -->
+                <a
+                    href="{{ route('home') }}"
+                    class="rounded-full px-5 py-2 text-sm transition-all duration-200
+                    {{ request()->is('/')
+                        ? 'bg-[#D79B10] font-bold text-white shadow-md'
+                        : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     Home
                 </a>
 
-                <!-- About Link -->
-                <a href="{{ route('about') }}"
-                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('about*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+
+                <!-- ABOUT -->
+                <a
+                    href="{{ route('about') }}"
+                    class="rounded-full px-5 py-2 text-sm transition-all duration-200
+                    {{ request()->is('about*')
+                        ? 'bg-[#D79B10] font-bold text-white shadow-md'
+                        : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     About
                 </a>
 
-                <!-- Team Link -->
-                <a href="{{ route('team') }}"
-                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('team*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+
+                <!-- TEAM -->
+                <a
+                    href="{{ route('team') }}"
+                    class="rounded-full px-5 py-2 text-sm transition-all duration-200
+                    {{ request()->is('team*')
+                        ? 'bg-[#D79B10] font-bold text-white shadow-md'
+                        : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     Team
                 </a>
 
-                <!-- How It Works Link -->
-                <a href="{{ route('how-it-works') }}"
-                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('how-it-works*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+
+                <!-- HOW IT WORKS -->
+                <a
+                    href="{{ route('how-it-works') }}"
+                    class="rounded-full px-5 py-2 text-sm transition-all duration-200
+                    {{ request()->is('how-it-works*')
+                        ? 'bg-[#D79B10] font-bold text-white shadow-md'
+                        : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     How It Works
                 </a>
 
-                <!-- Testimonials Link -->
-                <a href="{{ route('testimonials') }}"
-                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('testimonials*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+
+                <!-- TESTIMONIALS -->
+                <a
+                    href="{{ route('testimonials') }}"
+                    class="rounded-full px-5 py-2 text-sm transition-all duration-200
+                    {{ request()->is('testimonials*')
+                        ? 'bg-[#D79B10] font-bold text-white shadow-md'
+                        : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     Testimonials
                 </a>
 
-                <!-- News Link -->
-                <a href="{{ route('news') }}"
-                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('news*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+
+                <!-- NEWS -->
+                <a
+                    href="{{ route('news') }}"
+                    class="rounded-full px-5 py-2 text-sm transition-all duration-200
+                    {{ request()->is('news*')
+                        ? 'bg-[#D79B10] font-bold text-white shadow-md'
+                        : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     News & Updates
                 </a>
 
-                <!-- Contact Link -->
-                <a href="{{ route('contact') }}"
-                   class="rounded-full px-5 py-2 text-sm transition-all duration-200 {{ request()->is('contact*') ? 'bg-[#D79B10] font-bold text-white shadow-md' : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
+
+                <!-- CONTACT -->
+                <a
+                    href="{{ route('contact') }}"
+                    class="rounded-full px-5 py-2 text-sm transition-all duration-200
+                    {{ request()->is('contact*')
+                        ? 'bg-[#D79B10] font-bold text-white shadow-md'
+                        : 'font-semibold text-white hover:bg-white/10 hover:text-[#E5B83B]' }}">
                     Contact Us
                 </a>
 
             </div>
 
-            <!-- Right CTA & Auth Controls (Desktop) -->
-            <div class="hidden lg:flex items-center gap-3">
 
-                @guest
+            <!-- =================================================
+                 AUTHENTICATION
+                 ONE SINGLE AUTH SECTION
+            ================================================== -->
 
+            @guest
+
+                <!-- =============================================
+                     GUEST
+                ============================================== -->
+
+                <div class="flex items-center gap-2 lg:gap-3">
+
+                    <!-- JOIN -->
                     <button
                         type="button"
                         onclick="Livewire.dispatch('open-application-modal')"
-                        class="rounded-full bg-[#D79B10] px-6 py-2.5 text-sm font-extrabold text-white shadow-lg shadow-[#D79B10]/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#E5B83B] hover:shadow-xl cursor-pointer">
+                        class="cursor-pointer rounded-full bg-[#D79B10] px-3 py-1.5 text-[10px] font-extrabold text-white shadow-md transition hover:bg-[#E5B83B] lg:px-6 lg:py-2.5 lg:text-sm">
+
                         JOIN
+
                     </button>
 
+
+                    <!-- LOGIN -->
                     <button
                         type="button"
                         onclick="Livewire.dispatch('open-login-modal')"
-                        class="rounded-full border border-[#D79B10]/60 bg-white/5 px-6 py-2.5 text-sm font-bold text-[#E5B83B] backdrop-blur transition-all duration-300 hover:border-[#E5B83B] hover:bg-[#D79B10] hover:text-[#0C2C6B] cursor-pointer">
+                        class="cursor-pointer rounded-full border border-[#D79B10]/70 bg-white/5 px-3 py-1.5 text-[10px] font-bold text-[#E5B83B] transition hover:bg-[#D79B10] hover:text-[#0C2C6B] lg:px-6 lg:py-2.5 lg:text-sm">
+
                         Login
+
                     </button>
 
-                @else
+                </div>
 
-                    @php
-                        $u = Auth::user();
-                        $fullName = $u->username;
-                        if (empty($fullName)) {
-                            $fullName = $u->username ?? 'User';
-                        }
 
-                        $roleID = (int)($u->RoleID ?? $u->roleID ?? 0);
-                        $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($fullName) . '&background=D79B10&color=fff';
-                    @endphp
+            @else
 
-                    <!-- User Profile Dropdown -->
-                    <div x-data="{ profileMenu: false }"
-                         @keydown.escape.window="profileMenu = false"
-                         class="relative">
+                <!-- =============================================
+                     LOGGED-IN USER
+                ============================================== -->
 
-                        <!-- Trigger Button -->
-                        <button
-                            @click="profileMenu = !profileMenu"
-                            :aria-expanded="profileMenu"
-                            type="button"
-                            class="flex items-center gap-3 rounded-full bg-white/10 px-3.5 py-2 border border-white/10 hover:bg-white/15 transition w-auto max-w-xs focus:outline-none focus:ring-2 focus:ring-[#D79B10]">
+                @php
 
-                            <img
-                                src="{{ $avatarUrl }}"
-                                alt="{{ $fullName }}'s Avatar"
-                                class="w-9 h-9 rounded-full border-2 border-[#D79B10] object-cover shrink-0">
+                    $user = Auth::user();
 
-                            <div class="hidden xl:block text-left min-w-0 pr-1">
-                                <p class="text-white text-sm font-bold leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
-                                    {{ $fullName }}
-                                </p>
-                            </div>
+                    $displayName = trim(
+                        ($user->firstname ?? '') . ' ' .
+                        ($user->lastname ?? '')
+                    );
 
-                            <svg class="w-4 h-4 text-white transition-transform duration-200 shrink-0"
-                                 :class="{ 'rotate-180': profileMenu }"
-                                 xmlns="http://www.w3.org/2000/svg"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke="currentColor">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="2"
-                                      d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </button>
+                    if (empty($displayName)) {
+                        $displayName = $user->username ?? 'User';
+                    }
 
-                        <!-- Dropdown Menu -->
+                    $avatarUrl =
+                        'https://ui-avatars.com/api/?name=' .
+                        urlencode($displayName) .
+                        '&background=D79B10&color=fff';
+
+                @endphp
+
+
+                <!-- =============================================
+                     PROFILE DROPDOWN
+                     WORKS ON MOBILE + DESKTOP
+                ============================================== -->
+
+                <div
+                    x-data="{ profileOpen: false }"
+                    @click.away="profileOpen = false"
+                    @keydown.escape.window="profileOpen = false"
+                    class="relative">
+
+                    <!-- PROFILE BUTTON -->
+                    <button
+                        type="button"
+                        @click="profileOpen = !profileOpen"
+                        :aria-expanded="profileOpen"
+                        aria-label="Open profile menu"
+                        class="flex cursor-pointer items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-2 py-1.5 transition hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-[#D79B10] lg:gap-3 lg:px-3.5 lg:py-2">
+
+                        <!-- Avatar -->
+                        <img
+                            src="{{ $avatarUrl }}"
+                            alt="{{ $displayName }}"
+                            class="h-7 w-7 shrink-0 rounded-full border-2 border-[#D79B10] object-cover lg:h-9 lg:w-9">
+
+
+                        <!-- Name -->
+                        <span
+                            class="hidden max-w-[130px] truncate text-[10px] font-bold text-white sm:block lg:max-w-[160px] lg:text-sm">
+
+                            {{ $displayName }}
+
+                        </span>
+
+
+                        <!-- Arrow -->
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            class="h-3.5 w-3.5 shrink-0 text-[#E5B83B] transition-transform duration-200 lg:h-4 lg:w-4"
+                            :class="{ 'rotate-180': profileOpen }">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7" />
+
+                        </svg>
+
+                    </button>
+
+
+                    <!-- =========================================
+                         PROFILE DROPDOWN
+                    ========================================== -->
+
+                    <div
+                        x-show="profileOpen"
+                        x-cloak
+                        x-transition:enter="transition ease-out duration-150"
+                        x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                        x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                        x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
+                        class="absolute right-0 top-full z-[1100] mt-3 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl lg:w-64">
+
+
+                        <!-- USER HEADER -->
                         <div
-                            x-show="profileMenu"
-                            @click.away="profileMenu = false"
-                            x-transition:enter="transition ease-out duration-100"
-                            x-transition:enter-start="transform opacity-0 scale-95"
-                            x-transition:enter-end="transform opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-75"
-                            x-transition:leave-start="transform opacity-100 scale-100"
-                            x-transition:leave-end="transform opacity-0 scale-95"
-                            x-cloak
-                            class="absolute right-0 mt-3 w-64 rounded-2xl bg-white shadow-2xl overflow-hidden border border-slate-200 z-50">
+                            class="border-b border-slate-100 bg-slate-50 px-4 py-3 lg:px-5 lg:py-4">
 
-                            <!-- User Header -->
-                            <div class="px-5 py-4 bg-slate-50 border-b border-slate-100">
-                                <div class="flex items-center gap-3">
-                                    <img
-                                        src="{{ $avatarUrl }}"
-                                        alt="{{ $fullName }}"
-                                        class="w-11 h-11 rounded-full object-cover shrink-0 border border-slate-200">
+                            <div class="flex items-center gap-3">
 
-                                    <div class="min-w-0">
-                                        <p class="font-bold text-slate-800 text-sm truncate">
-                                            {{ $fullName }}
-                                        </p>
-                                        <p class="text-xs text-slate-500 truncate">
-                                            {{ $u->email }}
-                                        </p>
-                                    </div>
+                                <img
+                                    src="{{ $avatarUrl }}"
+                                    alt="{{ $displayName }}"
+                                    class="h-10 w-10 shrink-0 rounded-full border-2 border-[#D79B10] object-cover lg:h-11 lg:w-11">
+
+
+                                <div class="min-w-0">
+
+                                    <p class="truncate text-sm font-bold text-slate-800">
+                                        {{ $displayName }}
+                                    </p>
+
+                                    <p class="truncate text-xs text-slate-500">
+                                        {{ $user->email }}
+                                    </p>
+
                                 </div>
+
                             </div>
 
-                            <!-- Links -->
-                            <div class="py-1">
+                        </div>
 
 
-                                <a href="{{ route('dashboard') }}"
-                                   class="flex items-center gap-3 px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-100 transition">
-                                    <span></span>
-                                    <span>My Dashboard</span>
-                                </a>
-                            </div>
+                        <!-- MENU -->
+                        <div class="p-2">
 
-                            <!-- Logout Form -->
-                            <div class="border-t border-slate-100 py-1">
-                            <form id="navbarLogoutForm" action="{{ route('logout') }}" method="POST">
+                            <!-- DASHBOARD -->
+                            <a
+                                href="{{ route('dashboard') }}"
+                                @click="profileOpen = false"
+                                class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
+
+                                <!-- Dashboard Icon -->
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-5 w-5 text-[#0C2C6B]"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor">
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M3 10.5L12 3l9 7.5M5 9.5V21h14V9.5M9 21v-6h6v6" />
+
+                                </svg>
+
+                                <span>
+                                    My Dashboard
+                                </span>
+
+                            </a>
+
+
+                            <!-- LOGOUT -->
+                            <form
+                                id="navbarLogoutForm"
+                                action="{{ route('logout') }}"
+                                method="POST">
+
                                 @csrf
 
                                 <button
                                     type="button"
-                                    onclick="confirmNavbarLogout()"
-                                    class="flex w-full items-center gap-3 px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition cursor-pointer cursor-pointer">
-                                    <span></span>
-                                    <span>Logout</span>
+                                    @click="profileOpen = false"
+                                    onclick="showLogoutConfirmation('navbarLogoutForm')"
+                                    class="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50">
+
+                                    <!-- Logout Icon -->
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-5 w-5"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor">
+
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M15 12H3m0 0l4-4m-4 4l4 4m5-9V5a2 2 0 012-2h5a2 2 0 012 2v14a2 2 0 01-2 2h-5a2 2 0 01-2-2v-2" />
+
+                                    </svg>
+
+                                    <span>
+                                        Logout
+                                    </span>
+
                                 </button>
+
                             </form>
-                            </div>
 
                         </div>
 
                     </div>
 
-                @endguest
+                </div>
 
-            </div>
-
-            <!-- Mobile Menu Toggle Button -->
-            <button
-                type="button"
-                @click="open = !open"
-                class="rounded-lg p-2 text-[#E5B83B] transition hover:bg-white/10 lg:hidden focus:outline-none">
-
-                <svg x-show="!open"
-                     xmlns="http://www.w3.org/2000/svg"
-                     class="h-8 w-8"
-                     fill="none"
-                     viewBox="0 0 24 24"
-                     stroke="currentColor">
-                    <path stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-
-                <svg x-show="open"
-                     x-cloak
-                     xmlns="http://www.w3.org/2000/svg"
-                     class="h-8 w-8"
-                     fill="none"
-                     viewBox="0 0 24 24"
-                     stroke="currentColor">
-                    <path stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-
-            </button>
+            @endguest
 
         </div>
 
-        <!-- Mobile Drawer -->
+    </div>
+
+</nav>
+
+
+<!-- =========================================================
+     MOBILE BOTTOM NAVIGATION
+     ALL LINKS ALWAYS VISIBLE
+========================================================= -->
+
+<div class="lg:hidden">
+
+    <div
+        class="fixed inset-x-0 bottom-0 z-[9999] px-1 pb-[calc(env(safe-area-inset-bottom)+5px)]">
+
         <div
-            x-show="open"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 -translate-y-2"
-            x-transition:enter-end="opacity-100 translate-y-0"
-            x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="opacity-100 translate-y-0"
-            x-transition:leave-end="opacity-0 -translate-y-2"
-            x-cloak
-            class="pb-6 lg:hidden">
+            class="relative mx-auto w-full rounded-2xl border border-white/10 bg-[#071D3F]/98 px-0.5 py-1 shadow-2xl shadow-black/40 backdrop-blur-xl">
 
-            <div class="mt-2 space-y-2 rounded-3xl border border-white/10 bg-[#071D3F]/90 p-4 backdrop-blur-xl">
+            <!-- Gold Accent -->
+            <div
+                class="absolute inset-x-8 -top-px h-px bg-gradient-to-r from-transparent via-[#D79B10] to-transparent">
+            </div>
 
-                <a href="{{ route('home') }}"
-                   class="block rounded-xl py-3 text-center transition {{ request()->is('/') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
-                    Home
+
+            <div class="flex w-full items-stretch">
+
+
+                <!-- =========================================
+                     HOME
+                ========================================== -->
+
+                <a
+                    href="{{ route('home') }}"
+                    class="group flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-0.5 py-1 transition">
+
+                    <div
+                        class="flex h-6 w-6 items-center justify-center rounded-lg transition
+                        {{ request()->is('/')
+                            ? 'bg-[#D79B10] text-white'
+                            : 'text-slate-400 group-hover:bg-white/10 group-hover:text-[#E5B83B]' }}">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-3.5 w-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M3 11l9-8 9 8M5 10v10h14V10" />
+
+                        </svg>
+
+                    </div>
+
+                    <span
+                        class="mt-0.5 w-full truncate text-center text-[8px] font-semibold leading-tight
+                        {{ request()->is('/')
+                            ? 'text-[#E5B83B]'
+                            : 'text-slate-400' }}">
+
+                        Home
+
+                    </span>
+
                 </a>
 
-                <a href="{{ route('about') }}"
-                   class="block rounded-xl py-3 text-center transition {{ request()->is('about*') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
-                    About Us
+
+                <!-- =========================================
+                     ABOUT
+                ========================================== -->
+
+                <a
+                    href="{{ route('about') }}"
+                    class="group flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-0.5 py-1 transition">
+
+                    <div
+                        class="flex h-6 w-6 items-center justify-center rounded-lg transition
+                        {{ request()->is('about*')
+                            ? 'bg-[#D79B10] text-white'
+                            : 'text-slate-400 group-hover:bg-white/10 group-hover:text-[#E5B83B]' }}">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-3.5 w-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-8a9 9 0 110 18 9 9 0 010-18zm0 4h.01" />
+
+                        </svg>
+
+                    </div>
+
+                    <span
+                        class="mt-0.5 w-full truncate text-center text-[8px] font-semibold leading-tight
+                        {{ request()->is('about*')
+                            ? 'text-[#E5B83B]'
+                            : 'text-slate-400' }}">
+
+                        About
+
+                    </span>
+
                 </a>
 
-                <a href="{{ route('team') }}"
-                   class="block rounded-xl py-3 text-center transition {{ request()->is('team*') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
-                    Team
+
+                <!-- =========================================
+                     TEAM
+                ========================================== -->
+
+                <a
+                    href="{{ route('team') }}"
+                    class="group flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-0.5 py-1 transition">
+
+                    <div
+                        class="flex h-6 w-6 items-center justify-center rounded-lg transition
+                        {{ request()->is('team*')
+                            ? 'bg-[#D79B10] text-white'
+                            : 'text-slate-400 group-hover:bg-white/10 group-hover:text-[#E5B83B]' }}">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-3.5 w-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m4-8a4 4 0 110 8 4 4 0 010-8zm6 1a3 3 0 11-6 0 3 3 0 016 0z" />
+
+                        </svg>
+
+                    </div>
+
+                    <span
+                        class="mt-0.5 w-full truncate text-center text-[8px] font-semibold leading-tight
+                        {{ request()->is('team*')
+                            ? 'text-[#E5B83B]'
+                            : 'text-slate-400' }}">
+
+                        Team
+
+                    </span>
+
                 </a>
 
-                <a href="{{ route('how-it-works') }}"
-                   class="block rounded-xl py-3 text-center transition {{ request()->is('how-it-works*') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
-                    How It Works
+
+                <!-- =========================================
+                     HOW IT WORKS
+                ========================================== -->
+
+                <a
+                    href="{{ route('how-it-works') }}"
+                    class="group flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-0.5 py-1 transition">
+
+                    <div
+                        class="flex h-6 w-6 items-center justify-center rounded-lg transition
+                        {{ request()->is('how-it-works*')
+                            ? 'bg-[#D79B10] text-white'
+                            : 'text-slate-400 group-hover:bg-white/10 group-hover:text-[#E5B83B]' }}">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-3.5 w-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-8a9 9 0 110 18 9 9 0 010-18zm0 4h.01" />
+
+                        </svg>
+
+                    </div>
+
+                    <span
+                        class="mt-0.5 w-full truncate text-center text-[8px] font-semibold leading-tight
+                        {{ request()->is('how-it-works*')
+                            ? 'text-[#E5B83B]'
+                            : 'text-slate-400' }}">
+
+                        How It Works
+
+                    </span>
+
                 </a>
 
-                <a href="{{ route('testimonials') }}"
-                   class="block rounded-xl py-3 text-center transition {{ request()->is('testimonials*') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
-                    Testimonials
+
+                <!-- =========================================
+                     TESTIMONIALS
+                ========================================== -->
+
+                <a
+                    href="{{ route('testimonials') }}"
+                    class="group flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-0.5 py-1 transition">
+
+                    <div
+                        class="flex h-6 w-6 items-center justify-center rounded-lg transition
+                        {{ request()->is('testimonials*')
+                            ? 'bg-[#D79B10] text-white'
+                            : 'text-slate-400 group-hover:bg-white/10 group-hover:text-[#E5B83B]' }}">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-3.5 w-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M8 10h8M8 14h5m-8 6l3-3h7a5 5 0 005-5V7a5 5 0 00-5-5H6a5 5 0 00-5 5v5a5 5 0 005 5v3z" />
+
+                        </svg>
+
+                    </div>
+
+                    <span
+                        class="mt-0.5 w-full truncate text-center text-[8px] font-semibold leading-tight
+                        {{ request()->is('testimonials*')
+                            ? 'text-[#E5B83B]'
+                            : 'text-slate-400' }}">
+
+                        Testimonials
+
+                    </span>
+
                 </a>
 
-                <a href="{{ route('news') }}"
-                   class="block rounded-xl py-3 text-center transition {{ request()->is('news*') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
-                    News & Updates
+
+                <!-- =========================================
+                     NEWS
+                ========================================== -->
+
+                <a
+                    href="{{ route('news') }}"
+                    class="group flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-0.5 py-1 transition">
+
+                    <div
+                        class="flex h-6 w-6 items-center justify-center rounded-lg transition
+                        {{ request()->is('news*')
+                            ? 'bg-[#D79B10] text-white'
+                            : 'text-slate-400 group-hover:bg-white/10 group-hover:text-[#E5B83B]' }}">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-3.5 w-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2zM7 8h10M7 12h10M7 16h6" />
+
+                        </svg>
+
+                    </div>
+
+                    <span
+                        class="mt-0.5 w-full truncate text-center text-[8px] font-semibold leading-tight
+                        {{ request()->is('news*')
+                            ? 'text-[#E5B83B]'
+                            : 'text-slate-400' }}">
+
+                        News
+
+                    </span>
+
                 </a>
 
-                <a href="{{ route('contact') }}"
-                   class="block rounded-xl py-3 text-center transition {{ request()->is('contact*') ? 'bg-[#D79B10] font-bold text-white' : 'font-semibold text-white hover:bg-white/10' }}">
-                    Contact Us
+
+                <!-- =========================================
+                     CONTACT
+                ========================================== -->
+
+                <a
+                    href="{{ route('contact') }}"
+                    class="group flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-0.5 py-1 transition">
+
+                    <div
+                        class="flex h-6 w-6 items-center justify-center rounded-lg transition
+                        {{ request()->is('contact*')
+                            ? 'bg-[#D79B10] text-white'
+                            : 'text-slate-400 group-hover:bg-white/10 group-hover:text-[#E5B83B]' }}">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-3.5 w-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5v10a2 2 0 002 2h14" />
+
+                        </svg>
+
+                    </div>
+
+                    <span
+                        class="mt-0.5 w-full truncate text-center text-[8px] font-semibold leading-tight
+                        {{ request()->is('contact*')
+                            ? 'text-[#E5B83B]'
+                            : 'text-slate-400' }}">
+
+                        Contact
+
+                    </span>
+
                 </a>
-
-                <div class="pt-3 border-t border-white/10 flex flex-col gap-2">
-
-                    @guest
-
-                        <button
-                            type="button"
-                            onclick="Livewire.dispatch('open-application-modal')"
-                            class="w-full rounded-xl bg-[#D79B10] py-3 font-bold text-white transition hover:bg-[#E5B83B] cursor-pointer">
-                            JOIN
-                        </button>
-
-                        <button
-                            type="button"
-                            onclick="Livewire.dispatch('open-login-modal')"
-                            class="w-full rounded-xl border border-[#D79B10] py-3 font-bold text-[#E5B83B] transition hover:bg-[#D79B10] hover:text-[#0C2C6B] cursor-pointer">
-                            Login
-                        </button>
-
-                    @else
-
-                        @php
-                            $mUser = Auth::user();
-                            $mFullName = trim(($mUser->firstname ?? '') . ' ' . ($mUser->lastname ?? ''));
-                            if (empty($mFullName)) {
-                                $mFullName = $mUser->name ?? $mUser->username ?? 'User';
-                            }
-
-                            $mRoleID = (int)($mUser->RoleID ?? $mUser->roleID ?? 0);
-
-                            $mAvatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($mFullName) . '&background=D79B10&color=fff';
-                        @endphp
-
-                        <!-- Mobile User Info Block -->
-                        <div class="flex items-center gap-3 px-3 py-2.5 bg-white/5 rounded-xl border border-white/10 mb-2">
-                            <img src="{{ $mAvatarUrl }}" alt="{{ $mFullName }}" class="w-10 h-10 rounded-full border border-[#D79B10] shrink-0">
-                            <div class="min-w-0">
-                                <p class="text-white font-bold text-sm truncate">{{ $mFullName }}</p>
-                                <p class="text-xs text-slate-300 truncate">{{ $mUser->email }}</p>
-                            </div>
-                        </div>
-
-
-                            <a href="{{ route('dashboard') }}"
-                               class="block rounded-xl bg-[#D79B10] py-3 text-center font-bold text-white hover:bg-[#E5B83B] transition">
-                                My Dashboard
-                            </a>
-
-
-                    <form id="mobileLogoutForm" action="{{ route('logout') }}" method="POST">
-                        @csrf
-
-                        <button
-                            type="button"
-                            onclick="confirmMobileLogout()"
-                            class="w-full rounded-xl border border-red-400/50 py-3 font-bold text-red-300 transition hover:bg-red-500/20 hover:text-white cursor-pointer">
-                            Logout
-                        </button>
-                    </form>
-
-                    @endguest
-
-                </div>
 
             </div>
 
@@ -362,8 +715,16 @@
 
     </div>
 
+</div>
+
+
+<!-- =========================================================
+     LOGOUT CONFIRMATION
+========================================================= -->
+
 <script>
 function showLogoutConfirmation(formId) {
+
     Swal.fire({
         title: 'Logout?',
         text: 'Are you sure you want to logout?',
@@ -373,25 +734,19 @@ function showLogoutConfirmation(formId) {
         cancelButtonColor: '#D79B10',
         confirmButtonText: 'Yes, Logout',
         cancelButtonText: 'Cancel'
-        // Removed reverseButtons: true
     }).then((result) => {
+
         if (result.isConfirmed) {
-            document.getElementById(formId).submit();
+
+            const form = document.getElementById(formId);
+
+            if (form) {
+                form.submit();
+            }
+
         }
+
     });
-}
 
-function confirmSidebarLogout() {
-    showLogoutConfirmation('sidebarLogoutForm');
-}
-
-function confirmNavbarLogout() {
-    showLogoutConfirmation('navbarLogoutForm');
-}
-
-function confirmMobileLogout() {
-    showLogoutConfirmation('mobileLogoutForm');
 }
 </script>
-
-</nav>

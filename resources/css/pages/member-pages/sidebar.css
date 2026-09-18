@@ -1,205 +1,511 @@
-    /* MAIN */
-    .sidebar-wrapper {
-        @apply relative
-    }
+/* =========================================================
+   MEMBER SIDEBAR
+========================================================= */
 
+.sidebar-wrapper{position:relative;}
+
+
+/* =========================================================
+   MOBILE HEADER
+========================================================= */
+
+.mobile-header{display:none;}
+
+.mobile-profile{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+    text-decoration:none;
+}
+
+.mobile-profile-image-box{
+    width:42px;
+    height:42px;
+    flex:0 0 42px;
+    overflow:hidden;
+    border:2px solid #0C2C6B;
+    border-radius:50%;
+    background:#F3F4F6;
+}
+
+.mobile-profile-image{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.mobile-profile-info{
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+    max-width:calc(100vw - 150px);
+}
+
+.mobile-profile-name{
+    display:block;
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#111827;
+    font-size:14px;
+    font-weight:800;
+    line-height:1.2;
+}
+
+.mobile-profile-status{
+    display:block;
+    margin-top:3px;
+    color:#6B7280;
+    font-size:9px;
+    font-weight:600;
+    line-height:1.2;
+}
+
+.mobile-truelife{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+    margin-left:auto;
+    text-decoration:none;
+}
+
+.mobile-truelife-logo{
+    width:42px;
+    height:42px;
+    object-fit:contain;
+}
+
+
+/* =========================================================
+   DESKTOP SIDEBAR
+========================================================= */
+
+.sidebar{
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:50;
+    display:flex;
+    width:18rem;
+    height:100vh;
+    flex-direction:column;
+    background:#fff;
+    border-right:1px solid #E5E7EB;
+    transition:transform .3s;
+}
+
+.sidebar-logo{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    border-bottom:1px solid #E5E7EB;
+}
+
+.logo-image{
+    height:10rem;
+    object-fit:contain;
+}
+
+.sidebar-content{
+    flex:1;
+    overflow:hidden;
+    padding:20px;
+}
+
+.profile-card{
+    height:100%;
+    overflow-y:auto;
+}
+
+.sidebar-scroll{
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+}
+
+.sidebar-scroll::-webkit-scrollbar{
+    display:none;
+}
+
+.profile-section{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.profile-image-box{
+    width:6rem;
+    height:6rem;
+    overflow:hidden;
+    border:4px solid #fff;
+    border-radius:50%;
+    box-shadow:0 1px 3px rgba(0,0,0,.15);
+}
+
+.profile-image{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.profile-name{
+    display:flex;
+    flex-direction:column;
+    margin-top:1rem;
+    color:#111827;
+    font-size:clamp(1.125rem,2vw,1.5rem);
+    font-weight:700;
+    text-align:center;
+}
+
+.profile-status{
+    margin-top:4px;
+    color:#6B7280;
+    font-size:14px;
+    text-align:center;
+}
+
+.menu-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-top:32px;
+}
+
+.menu-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 16px;
+    border-radius:12px;
+    color:#374151;
+    text-decoration:none;
+    transition:.2s;
+}
+
+.menu-item:hover{
+    background:#F3F4F6;
+    color:#0C2C6B;
+}
+
+.menu-icon{
+    width:20px;
+    height:20px;
+    flex-shrink:0;
+}
+
+.active-menu{
+    background:#0C2C6B;
+    color:#fff;
+    font-weight:600;
+    box-shadow:0 1px 3px rgba(0,0,0,.1);
+}
+
+.active-menu:hover{
+    background:#0C2C6B;
+    color:#fff;
+}
+
+.logout-area{
+    margin-top:auto;
+    padding:20px;
+}
+
+.logout-area .logout-button{
+    width:100%;
+    padding:12px;
+    border:0;
+    border-radius:12px;
+    background:#D79B10;
+    color:#fff;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.logout-area .logout-button:hover{
+    background:#B8830D;
+}
+
+
+/* =========================================================
+   MOBILE BOTTOM NAV
+========================================================= */
+
+.member-mobile-nav{
+    display:none;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media screen and (max-width:1023px){
 
     /* MOBILE HEADER */
-    .mobile-header {
-        @apply fixed top-0 left-0 right-0 z-40
-        flex items-center justify-between
-        bg-white px-4 py-3 shadow-sm;
+
+    .mobile-header{
+        position:fixed;
+        inset:0 0 auto;
+        z-index:2147483000;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        width:100%;
+        height:64px;
+        padding:7px 12px;
+        background:rgba(255,255,255,.98);
+        border-bottom:1px solid #E5E7EB;
+        box-shadow:0 3px 12px rgba(0,0,0,.08);
+        backdrop-filter:blur(16px);
+    }
+
+    .mobile-profile{
+        width:auto;
+        max-width:calc(100% - 52px);
+        gap:10px;
+    }
+
+    .mobile-profile-info{
+        max-width:100%;
+    }
+
+    .mobile-truelife{
+        margin-left:auto;
+    }
+
+    .mobile-truelife-logo{
+        width:42px;
+        height:42px;
     }
 
 
-    .menu-button {
-        @apply rounded-lg p-2 text-[#0C2C6B];
+    /* HIDE DESKTOP SIDEBAR */
+
+    .sidebar{
+        display:none!important;
     }
 
 
-    .menu-icon {
-        @apply h-6 w-6;
-    }
+    /* MOBILE NAV */
 
-
-    .mobile-logo {
-        @apply h-12 object-contain;
-    }
-
-
-
-    /* OVERLAY */
-
-    .sidebar-overlay {
-        @apply fixed inset-0 z-40 bg-black/40;
-    }
-
-
-
-    /* SIDEBAR */
-
-    .sidebar {
-        @apply fixed top-0 left-0 z-50
-        flex h-screen w-72 flex-col
-        bg-white
-        transition-transform duration-300;
-    }
-
-
-    .sidebar-open {
-        @apply translate-x-0;
-    }
-
-
-    .sidebar-close {
-        @apply -translate-x-full;
-    }
-
-
-
-    /* LOGO */
-
-    .sidebar-logo {
-        @apply flex justify-center
-        border-b border-gray-200
-        p-5;
-    }
-
-
-    .logo-image {
-        @apply h-40 object-contain;
-    }
-
-
-
-    /* CONTENT */
-
-    .sidebar-content {
-        @apply flex-1 overflow-hidden p-5;
-    }
-
-
-
-    .profile-card {
-        @apply h-full overflow-y-auto
-
-    }
-
-
-
-
-
-    /* HIDE SCROLLBAR */
-
-    .sidebar-scroll {
+    .member-mobile-nav{
+        position:fixed!important;
+        left:0!important;
+        right:0!important;
+        bottom:0!important;
+        z-index:2147483647!important;
+        display:flex!important;
+        width:100%!important;
+        max-width:100%!important;
+        min-height:72px;
+        margin:0!important;
+        padding:4px 2px calc(4px + env(safe-area-inset-bottom))!important;
+        gap:0;
+        overflow-x:auto!important;
+        overflow-y:hidden!important;
+        background:rgba(255,255,255,.98);
+        border-top:1px solid #EEE;
+        box-shadow:0 -5px 24px rgba(0,0,0,.12);
+        backdrop-filter:blur(18px);
         scrollbar-width:none;
         -ms-overflow-style:none;
     }
 
-
-    .sidebar-scroll::-webkit-scrollbar {
+    .member-mobile-nav::-webkit-scrollbar{
         display:none;
     }
 
 
+    /* NAV ITEMS */
 
-    /* PROFILE */
+    .member-mobile-nav-item,
+    .member-mobile-logout{
+        position:relative;
+        display:flex!important;
+        flex:1 0 52px!important;
+        min-width:52px!important;
+        height:62px!important;
+        margin:0!important;
+        padding:4px 2px!important;
+        flex-direction:column!important;
+        align-items:center!important;
+        justify-content:center!important;
+        gap:3px!important;
+        border:0!important;
+        border-radius:10px!important;
+        background:transparent!important;
+        color:#777!important;
+        font-size:8px!important;
+        font-weight:600!important;
+        line-height:1.05!important;
+        text-align:center!important;
+        text-decoration:none!important;
+        white-space:nowrap!important;
+        transition:.2s ease;
+    }
 
-    .profile-section {
-        @apply flex flex-col items-center;
+    .member-mobile-nav-item:hover{
+        background:rgba(12,44,107,.05)!important;
+        color:#0C2C6B!important;
+    }
+
+    .member-mobile-nav-item.active{
+        background:rgba(12,44,107,.06)!important;
+        color:#0C2C6B!important;
+        font-weight:700!important;
+    }
+
+    .member-mobile-nav-item.active::before{
+        content:"";
+        position:absolute;
+        top:0;
+        left:50%;
+        width:24px;
+        height:3px;
+        transform:translateX(-50%);
+        background:#D79B10;
+        border-radius:0 0 5px 5px;
+    }
+
+    .member-mobile-nav-item.active .member-mobile-nav-icon{
+        transform:translateY(-1px);
+    }
+
+    .member-mobile-nav-icon{
+        display:block;
+        width:19px!important;
+        height:19px!important;
+        flex-shrink:0;
+        transition:.2s ease;
     }
 
 
-    .profile-image-box {
-        @apply h-24 w-24 overflow-hidden
-        rounded-full
-        border-4 border-white
-        shadow;
+    /* =====================================================
+       MOBILE LOGOUT
+       SVG ICON IS APPLIED THROUGH CSS
+    ====================================================== */
+
+    .member-mobile-logout .logout-button{
+        position:relative!important;
+        display:flex!important;
+        width:100%!important;
+        height:62px!important;
+        margin:0!important;
+        padding:27px 2px 4px!important;
+        align-items:center!important;
+        justify-content:center!important;
+        flex-direction:column!important;
+        background:transparent!important;
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23777777' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='M16 17l5-5-5-5'/%3E%3Cpath d='M21 12H9'/%3E%3C/svg%3E")!important;
+        background-repeat:no-repeat!important;
+        background-position:center 9px!important;
+        background-size:20px 20px!important;
+        color:#777!important;
+        border:0!important;
+        border-radius:10px!important;
+        font-size:8px!important;
+        font-weight:600!important;
+        line-height:1.05!important;
+        cursor:pointer!important;
+        box-shadow:none!important;
+        transition:color .2s ease,background-color .2s ease!important;
     }
 
-
-    .profile-image {
-        @apply h-full w-full object-cover;
+    .member-mobile-logout .logout-button:hover{
+        color:#DC2626!important;
+        background-color:rgba(220,38,38,.06)!important;
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23DC2626' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='M16 17l5-5-5-5'/%3E%3Cpath d='M21 12H9'/%3E%3C/svg%3E")!important;
     }
 
-
-    .profile-name {
-        @apply mt-4 text-lg sm:text-xl md:text-2xl font-bold;
+    /* Hide any Livewire-generated logout SVG because CSS
+       now supplies the logout icon */
+    .member-mobile-logout .logout-button svg{
+        display:none!important;
     }
 
+    .sidebar-overlay{
+        display:none!important;
+    }
+}
 
-    .profile-status {
-        @apply text-gray-500;
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media screen and (max-width:380px){
+
+    .mobile-header{
+        padding-left:9px;
+        padding-right:9px;
     }
 
-
-
-    /* MENU */
-
-    .menu-list {
-        @apply mt-8 flex flex-col gap-2;
+    .mobile-profile{
+        max-width:calc(100% - 48px);
+        gap:8px;
     }
 
-
-
-    .menu-item {
-        @apply flex items-center
-        rounded-xl
-        px-4 py-3
-        text-gray-700
-        transition;
+    .mobile-profile-image-box,
+    .mobile-truelife-logo{
+        width:36px;
+        height:36px;
     }
 
-
-
-
-
-    .active-menu {
-        @apply bg-[#0C2C6B]
-        font-semibold
-        text-white
-        shadow;
+    .mobile-profile-image-box{
+        flex-basis:36px;
     }
 
-
-    /* LOGOUT */
-
-    .logout-area {
-        @apply p-5 mt-auto;
+    .mobile-profile-name{
+        font-size:12px;
     }
 
-
-    .logout-area .logout-button {
-        @apply w-full rounded-xl
-        py-3
-        font-semibold
-        text-white
-        transition
-        cursor-pointer;
-
-        background-color: #D79B10;
+    .mobile-profile-status{
+        font-size:8px;
     }
 
-
-    .logout-area .logout-button:hover {
-        background-color: #B8830D;
+    .member-mobile-nav-item,
+    .member-mobile-logout{
+        flex-basis:47px!important;
+        min-width:47px!important;
     }
 
-
-    /* DESKTOP */
-
-    @media (min-width:1024px){
-
-        .sidebar {
-            @apply translate-x-0;
-        }
-
-
-        .mobile-header,
-        .sidebar-overlay {
-
-            @apply hidden;
-
-        }
-
+    .member-mobile-nav-item,
+    .member-mobile-logout .logout-button{
+        font-size:7px!important;
     }
+
+    .member-mobile-nav-icon{
+        width:18px!important;
+        height:18px!important;
+    }
+
+    .member-mobile-logout .logout-button{
+        background-size:18px 18px!important;
+        background-position:center 9px!important;
+    }
+}
+
+
+/* =========================================================
+   DESKTOP
+========================================================= */
+
+@media screen and (min-width:1024px){
+
+    .mobile-header,
+    .member-mobile-nav,
+    .sidebar-overlay{
+        display:none!important;
+    }
+
+    .sidebar{
+        transform:translateX(0);
+    }
+}
+

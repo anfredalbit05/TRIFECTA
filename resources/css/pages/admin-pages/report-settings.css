@@ -1,398 +1,109 @@
-/* =========================================================
-   REPORT & SETTINGS
-========================================================= */
+/* REPORT & SETTINGS */
 
+.report-settings-container{position:relative;width:100%;max-width:100%;min-width:0;min-height:100vh;box-sizing:border-box;overflow-x:clip;}
+.report-settings-container *,.report-settings-container *::before,.report-settings-container *::after{box-sizing:border-box;min-width:0;}
 
-/* =========================================================
-   CONTAINER
-========================================================= */
+/* HEADER */
 
-.report-settings-container {
-    @apply w-full min-h-screen;
+.report-settings-header{position:sticky;top:0;z-index:900;width:100%;margin:0;}
+.report-settings-header-title{display:flex;align-items:center;justify-content:center;width:100%;height:46px;padding:12px 16px;background:#0C2C6B;}
+.report-settings-header-title h1{margin:0;color:#fff;font-size:20px;font-weight:700;line-height:1.2;text-align:center;}
+
+/* LAYOUT */
+
+.report-settings-layout{display:flex;flex-direction:column;width:100%;max-width:100%;min-width:0;gap:16px;padding:16px 48px 24px;overflow:visible;}
+
+/* TABS */
+
+.report-settings-desktop-nav{position:sticky;top:54px;z-index:800;display:flex;align-items:center;flex-wrap:wrap;gap:6px;width:100%;max-width:100%;margin:0;padding:10px 14px;background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08);}
+.report-settings-desktop-nav a{display:flex;flex:0 0 auto;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:8px 14px;border-radius:8px;color:#6B7280;font-size:13px;font-weight:600;line-height:1;text-decoration:none;white-space:nowrap;transition:.2s ease;}
+.report-settings-desktop-nav a:hover{background:#F3F4F6;color:#0C2C6B;}
+.report-settings-desktop-nav a.active{background:#0C2C6B;color:#fff;}
+.report-settings-desktop-nav a:focus{outline:none;}
+
+.report-settings-tab-icon{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex:0 0 20px;font-size:16px;line-height:1;}
+
+/* MAIN CARD */
+
+.report-settings-main-card{width:100%;max-width:100%;min-width:0;min-height:500px;margin:0;padding:20px;background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08);}
+
+[x-cloak]{display:none!important;}
+
+/* MOBILE */
+
+@media(max-width:1023px){
+
+    .report-settings-container{padding-top:64px!important;padding-bottom:88px!important;overflow-x:clip!important;}
+
+    .report-settings-header{display:none!important;}
+
+    /* FIXED MOBILE TABS */
+
+    .report-settings-desktop-nav{position:fixed!important;top:64px!important;left:0!important;right:0!important;z-index:900!important;display:flex!important;align-items:center!important;flex-wrap:nowrap!important;width:100%!important;max-width:100%!important;height:54px!important;min-height:54px!important;margin:0!important;padding:5px 8px!important;gap:5px!important;background:#fff!important;border:0!important;border-bottom:1px solid #E5E7EB!important;border-radius:0!important;box-shadow:0 2px 8px rgba(0,0,0,.08)!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none;-ms-overflow-style:none;}
+
+    .report-settings-desktop-nav::-webkit-scrollbar{display:none;}
+
+    .report-settings-desktop-nav a{flex:0 0 auto!important;min-height:40px!important;padding:8px 12px!important;gap:5px!important;border-radius:9px!important;font-size:11px!important;}
+
+    .report-settings-tab-icon{width:18px!important;height:18px!important;flex-basis:18px!important;font-size:15px!important;}
+
+    /* CONTENT BELOW FIXED TABS */
+
+    .report-settings-layout{gap:12px!important;margin:0!important;padding:78px 12px 20px!important;overflow:visible!important;}
+
+    .report-settings-main-card{width:100%!important;max-width:100%!important;min-width:0!important;min-height:auto!important;margin:0!important;padding:14px!important;border-radius:10px;overflow:visible!important;}
+
+    .report-settings-mobile-nav{display:none!important;}
 }
 
+/* SMALL PHONES */
 
-/* =========================================================
-   HEADER
-========================================================= */
+@media(max-width:600px){
 
-.report-settings-header {
-    @apply sticky top-0 z-30 w-full overflow-hidden;
-    margin-bottom: 8px;
+    .report-settings-layout{padding-left:10px!important;padding-right:10px!important;padding-top:78px!important;}
+
+    .report-settings-desktop-nav{padding-left:7px!important;padding-right:7px!important;}
+
+    .report-settings-desktop-nav a{padding:7px 10px!important;font-size:10px!important;}
+
+    .report-settings-tab-icon{width:16px!important;height:16px!important;flex-basis:16px!important;font-size:14px!important;}
+
+    .report-settings-main-card{padding:12px!important;}
 }
 
+/* VERY SMALL PHONES */
 
-.report-settings-header-title {
-    @apply flex items-center justify-center w-full px-4 py-3;
-    background: #0C2C6B;
+@media(max-width:380px){
+
+    .report-settings-layout{padding-left:8px!important;padding-right:8px!important;padding-top:78px!important;}
+
+    .report-settings-desktop-nav{gap:4px!important;padding:5px 6px!important;}
+
+    .report-settings-desktop-nav a{min-height:38px!important;padding:7px 8px!important;gap:4px!important;font-size:9px!important;}
+
+    .report-settings-tab-icon{width:15px!important;height:15px!important;flex-basis:15px!important;font-size:13px!important;}
+
+    .report-settings-main-card{padding:10px!important;}
 }
 
+/* DESKTOP */
 
-.report-settings-header-title h1 {
-    @apply m-0 text-center text-xl font-bold leading-tight text-white;
+@media(min-width:1024px){
+
+    .report-settings-container{padding-top:0;padding-bottom:0;}
+
+    .report-settings-header{position:sticky;top:0;z-index:900;margin:0;}
+
+    /* 46px HEADER + 8px SPACE */
+
+    .report-settings-layout{padding:16px 48px 24px;}
+
+    .report-settings-desktop-nav{position:sticky;top:54px;z-index:800;}
 }
 
+/* LARGE DESKTOP */
 
-/* =========================================================
-   MAIN LAYOUT
-========================================================= */
+@media(min-width:1280px){
 
-.report-settings-layout {
-    @apply flex w-full flex-col gap-4 px-12 py-4;
-}
-
-
-/* =========================================================
-   DESKTOP TAB NAVIGATION
-========================================================= */
-
-.report-settings-desktop-nav {
-    @apply sticky z-20 flex w-full flex-wrap items-center
-           justify-start gap-3 rounded-xl bg-white
-           px-5 py-3;
-
-    top: 78px;
-
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-
-/* =========================================================
-   DESKTOP TAB LINKS
-========================================================= */
-
-.report-settings-desktop-nav a {
-    @apply relative flex items-center justify-center
-           gap-1.5 rounded-lg px-4 py-2
-           text-sm font-semibold leading-tight
-           no-underline transition-all duration-200;
-
-    color: #6b7280;
-}
-
-
-.report-settings-desktop-nav a:hover {
-    @apply bg-gray-100;
-
-    color: #0C2C6B;
-}
-
-
-.report-settings-desktop-nav a.active {
-    @apply text-white;
-
-    background: #0C2C6B;
-}
-
-
-.report-settings-desktop-nav a:focus {
-    @apply outline-none;
-}
-
-
-/* =========================================================
-   DESKTOP TAB ICON
-========================================================= */
-
-.report-settings-tab-icon {
-    @apply inline-flex h-5 w-5 shrink-0
-           items-center justify-center;
-
-    font-size: 17px;
-    line-height: 1;
-}
-
-
-/* =========================================================
-   DESKTOP TAB LABEL
-========================================================= */
-
-.report-settings-tab-label {
-    @apply inline-block;
-}
-
-
-/* =========================================================
-   MAIN CARD
-========================================================= */
-
-.report-settings-main-card {
-    @apply w-full min-h-[500px] rounded-xl
-           bg-white p-5;
-
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-
-/* =========================================================
-   ALPINE CLOAK
-========================================================= */
-
-[x-cloak] {
-    display: none !important;
-}
-
-
-/* =========================================================
-   MOBILE BOTTOM NAVIGATION
-========================================================= */
-
-.report-settings-mobile-nav {
-    display: none;
-}
-
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media screen and (max-width: 768px) {
-
-
-    /* =====================================================
-       PAGE
-    ===================================================== */
-
-    .report-settings-container {
-        @apply relative w-full min-h-screen;
-
-        padding-bottom: 80px !important;
-
-        overflow: visible !important;
-    }
-
-
-    /* =====================================================
-       HEADER
-    ===================================================== */
-
-    .report-settings-header {
-        @apply sticky top-0 z-30 w-full;
-
-        margin: 0;
-
-        overflow: hidden;
-    }
-
-
-    .report-settings-header-title {
-        @apply px-4 py-3;
-    }
-
-
-    .report-settings-header-title h1 {
-        @apply text-lg;
-    }
-
-
-    /* =====================================================
-       CONTENT
-    ===================================================== */
-
-    .report-settings-layout {
-        @apply relative flex w-full flex-col gap-3;
-
-        margin-top: 25px;
-        padding:
-            12px
-            16px
-            100px
-            16px !important;
-
-        height: auto !important;
-
-        min-height: 100vh !important;
-
-        overflow: visible !important;
-    }
-
-
-    /* =====================================================
-       HIDE DESKTOP NAVIGATION
-    ===================================================== */
-
-    .report-settings-desktop-nav {
-        display: none !important;
-    }
-
-
-    /* =====================================================
-       MAIN CARD
-    ===================================================== */
-
-    .report-settings-main-card {
-        @apply w-full rounded-lg p-4;
-
-        max-width: 100% !important;
-
-        min-height: auto !important;
-
-        margin: 0 !important;
-
-        overflow: visible !important;
-    }
-
-
-    /* =====================================================
-       MOBILE BOTTOM NAVIGATION
-    ===================================================== */
-
-    .report-settings-mobile-nav {
-        position: fixed !important;
-
-        display: grid !important;
-
-        grid-template-columns:
-            repeat(4, minmax(0, 1fr)) !important;
-
-        align-items: stretch;
-
-        gap: 0;
-
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-
-        width: 100vw !important;
-        max-width: 100vw !important;
-
-        height: 72px !important;
-
-        margin: 0 !important;
-
-        padding:
-            4px
-            2px
-            calc(4px + env(safe-area-inset-bottom))
-            2px !important;
-
-        background: #ffffff !important;
-
-        border: none !important;
-
-        border-top:
-            1px solid #eeeeee !important;
-
-        border-radius: 0 !important;
-
-        box-shadow:
-            0 -4px 20px rgba(0, 0, 0, 0.12) !important;
-
-        z-index: 2147483647 !important;
-
-        overflow: hidden !important;
-
-        box-sizing: border-box !important;
-    }
-
-
-    /* =====================================================
-       MOBILE TAB
-    ===================================================== */
-
-    .report-settings-mobile-nav a {
-        @apply relative flex h-full w-full
-               min-w-0 max-w-none flex-col
-               items-center justify-center
-               gap-[3px] bg-transparent
-               px-[1px] py-[3px]
-               text-center no-underline;
-
-        margin: 0 !important;
-
-        color: #777777 !important;
-
-        font-size: 9px !important;
-
-        font-weight: 600 !important;
-
-        line-height: 1.1 !important;
-
-        white-space: normal !important;
-
-        overflow: hidden !important;
-
-        box-sizing: border-box !important;
-
-        border: none !important;
-
-        border-radius: 0 !important;
-    }
-
-
-    /* =====================================================
-       MOBILE ICON
-    ===================================================== */
-
-    .report-settings-mobile-icon {
-        @apply flex h-[22px] w-[22px]
-               shrink-0 items-center
-               justify-center;
-
-        font-size: 18px !important;
-
-        line-height: 1 !important;
-    }
-
-
-    /* =====================================================
-       MOBILE LABEL
-    ===================================================== */
-
-    .report-settings-mobile-label {
-        @apply block w-full max-w-full
-               m-0 p-0 text-center;
-
-        overflow: hidden !important;
-
-        text-overflow: ellipsis !important;
-
-        white-space: nowrap !important;
-    }
-
-
-    /* =====================================================
-       ACTIVE MOBILE TAB
-    ===================================================== */
-
-    .report-settings-mobile-nav a.active {
-        @apply bg-transparent;
-
-        color: #0C2C6B !important;
-    }
-
-
-    .report-settings-mobile-nav a.active
-    .report-settings-mobile-icon {
-        transform: translateY(-1px);
-    }
-
-
-    /* =====================================================
-       ACTIVE INDICATOR
-    ===================================================== */
-
-    .report-settings-mobile-nav a.active::before {
-        content: "";
-
-        position: absolute;
-
-        top: 0;
-
-        left: 50%;
-
-        width: 24px;
-
-        height: 3px;
-
-        transform: translateX(-50%);
-
-        background: #0C2C6B;
-
-        border-radius:
-            0 0 4px 4px;
-    }
-
+    .report-settings-layout{padding-left:56px;padding-right:56px;}
 }

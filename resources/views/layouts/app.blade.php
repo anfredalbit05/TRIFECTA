@@ -1,107 +1,167 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>
-        @yield('title', 'TrueLife - Solidaritas')
-    </title>
+<title>
+    @yield('title', 'TrueLife - Solidaritas')
+</title>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+@vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    @livewireStyles
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <!-- SweetAlert2 High Z-Index Fix -->
-    <style>
-        .swal2-container {
-            z-index: 99999 !important;
+@livewireStyles
+
+<!-- SweetAlert2 High Z-Index Fix -->
+<style>
+    .swal2-container {
+        z-index: 99999 !important;
+    }
+
+    /*
+     * Mobile bottom navigation spacing.
+     * The navbar is fixed at the bottom, so we reserve space
+     * for it to prevent content from being hidden underneath.
+     */
+    @media (max-width: 1023px) {
+        main {
+            padding-bottom: calc(100px + env(safe-area-inset-bottom));
         }
-    </style>
-</head>
 
+        footer {
+            padding-bottom: calc(100px + env(safe-area-inset-bottom));
+        }
+    }
+</style>
+
+
+</head>
 
 <body class="bg-gray-50 text-gray-900">
 
-    <x-navbar />
 
-    <main>
-        {{ $slot }}
-    </main>
+<!-- Navbar -->
+<x-navbar />
 
-    <x-footer />
+<!-- Page Content -->
+<main class="min-h-screen pt-16 pb-24 lg:pt-0 lg:pb-0">
+    {{ $slot }}
+</main>
 
-    <!-- Livewire Modal -->
-    <livewire:application-modal />
-    <livewire:login-modal />
-    <livewire:context-editor />
-
-    @livewireScripts
+<!-- Footer -->
+<x-footer />
 
 
-    <!-- SweetAlert2 (single shared, reusable handler) -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <x-shared.sweet-alert-handler />
+<!-- Livewire Modals -->
+<livewire:application-modal />
+<livewire:login-modal />
+<livewire:context-editor />
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+@livewireScripts
 
-    <script>
-        let mapInstance = null;
 
-        function initMapIfVisible() {
-            const mapElement = document.getElementById('map');
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-            // Your default coordinates
-            const defaultLat = 7.446819564242066;
-            const defaultLng = 125.80932758793946;
+<x-shared.sweet-alert-handler />
 
-            if (mapElement) {
-                // Fix: Clean up old map instance if it exists to prevent "already initialized" crash
-                if (mapInstance) {
-                    mapInstance.remove();
-                    mapInstance = null;
-                }
 
-                mapInstance = L.map('map').setView([defaultLat, defaultLng], 15);
+<!-- Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+<script>
+    let mapInstance = null;
+
+    function initMapIfVisible() {
+        const mapElement = document.getElementById('map');
+
+        // Default coordinates
+        const defaultLat = 7.446819564242066;
+        const defaultLng = 125.80932758793946;
+
+        if (mapElement) {
+
+            // Remove previous map instance
+            if (mapInstance) {
+                mapInstance.remove();
+                mapInstance = null;
+            }
+
+            mapInstance = L.map('map').setView(
+                [defaultLat, defaultLng],
+                15
+            );
+
+            L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                {
                     attribution: '&copy; OpenStreetMap'
-                }).addTo(mapInstance);
+                }
+            ).addTo(mapInstance);
 
-                // Add a draggable marker initialized at your default coordinates
-                let marker = L.marker([defaultLat, defaultLng], {
+
+            // Draggable marker
+            let marker = L.marker(
+                [defaultLat, defaultLng],
+                {
                     draggable: true
-                }).addTo(mapInstance);
+                }
+            ).addTo(mapInstance);
 
-                marker.on('dragend', function(e) {
-                    const latlng = marker.getLatLng();
-                    Livewire.dispatch('set-coordinates', {
+
+            marker.on('dragend', function () {
+
+                const latlng = marker.getLatLng();
+
+                Livewire.dispatch(
+                    'set-coordinates',
+                    {
                         lat: latlng.lat,
                         lng: latlng.lng
-                    });
-                });
+                    }
+                );
 
-                mapInstance.on('click', function(e) {
-                    marker.setLatLng(e.latlng);
-                    Livewire.dispatch('set-coordinates', {
+            });
+
+
+            // Click map to move marker
+            mapInstance.on('click', function (e) {
+
+                marker.setLatLng(e.latlng);
+
+                Livewire.dispatch(
+                    'set-coordinates',
+                    {
                         lat: e.latlng.lat,
                         lng: e.latlng.lng
-                    });
-                });
-            } else {
-                if (mapInstance) {
-                    mapInstance.remove();
-                    mapInstance = null;
-                }
-            }
-        }
+                    }
+                );
 
-        document.addEventListener('DOMContentLoaded', function() {
+            });
+
+        } else {
+
+            if (mapInstance) {
+                mapInstance.remove();
+                mapInstance = null;
+            }
+
+        }
+    }
+
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        function () {
             initMapIfVisible();
-        });
-    </script>
+        }
+    );
+</script>
+
 
 </body>
 
