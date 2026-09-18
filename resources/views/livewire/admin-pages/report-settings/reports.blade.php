@@ -139,6 +139,7 @@
                     class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">Source</th>
+                    <th class="py-3 px-4">Name</th>
                     <th class="py-3 px-4">Activation ID</th>
                     <th class="py-3 px-4">Ref ID</th>
                     <th class="py-3 px-4">Amount</th>
@@ -148,6 +149,16 @@
             </thead>
             <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
                 @forelse($ledgers as $index => $ledger)
+                    @php
+                        // Human-readable name for the row:
+                        //  - MF rows  → the fee name the RefID points to
+                        //  - otherwise → the member behind the activation,
+                        //    falling back to the user carried in RefID
+                        //    (DR / OV / PF / CF / WD / TX / PK store a UserID there)
+                        $displayName = $ledger->Source === 'MF'
+                            ? ($ledger->fee_name ?: 'N/A')
+                            : (trim((string) ($ledger->member_name ?: $ledger->ref_user_name)) ?: 'N/A');
+                    @endphp
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="py-4 px-4 font-medium text-slate-500">
                             {{ $ledgers->firstItem() + $index }}
@@ -156,8 +167,12 @@
                         <td class="py-4 px-4 font-semibold text-slate-900">
                             <span
                                 class="px-2.5 py-1 text-xs font-semibold rounded-full bg-[#0C2C6B]/10 text-[#0C2C6B] border border-[#0C2C6B]/30">
-                                {{ $ledger->Source }}
+                                {{ $this->sourceLabel($ledger->Source) }}
                             </span>
+                        </td>
+
+                        <td class="py-4 px-4 text-slate-700 font-medium">
+                            {{ $displayName }}
                         </td>
 
                         <td class="py-4 px-4 text-slate-600">
@@ -187,7 +202,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center py-8 text-slate-500">
+                        <td colspan="8" class="text-center py-8 text-slate-500">
                             No ledger entries available.
                         </td>
                     </tr>
@@ -259,6 +274,7 @@
                 <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[22px]">
                     <th class="border border-slate-900 p-1">#</th>
                     <th class="border border-slate-900 p-1">Source</th>
+                    <th class="border border-slate-900 p-1">Name</th>
                     <th class="border border-slate-900 p-1">Activation ID</th>
                     <th class="border border-slate-900 p-1">Ref ID</th>
                     <th class="border border-slate-900 p-1">Amount</th>
@@ -268,9 +284,15 @@
             </thead>
             <tbody>
                 @forelse ($printLedgers as $index => $ledger)
+                    @php
+                        $displayName = $ledger->Source === 'MF'
+                            ? ($ledger->fee_name ?: 'N/A')
+                            : (trim((string) ($ledger->member_name ?: $ledger->ref_user_name)) ?: 'N/A');
+                    @endphp
                     <tr>
                         <td class="border border-slate-900 p-1 text-center">{{ $index + 1 }}</td>
-                        <td class="border border-slate-900 p-1 text-center font-bold">{{ $ledger->Source }}</td>
+                        <td class="border border-slate-900 p-1 text-center font-bold">{{ $this->sourceLabel($ledger->Source) }}</td>
+                        <td class="border border-slate-900 p-1 text-center">{{ $displayName }}</td>
                         <td class="border border-slate-900 p-1 text-center">{{ $ledger->ActivationID ?? 'N/A' }}</td>
                         <td class="border border-slate-900 p-1 text-center">{{ $ledger->RefID ?? 'N/A' }}</td>
                         <td class="border border-slate-900 p-1 text-right">{{ number_format($ledger->amount, 2) }}</td>
@@ -280,7 +302,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="border border-slate-900 p-2.5 text-center">
+                        <td colspan="8" class="border border-slate-900 p-2.5 text-center">
                             No ledger entries found for the selected filters.
                         </td>
                     </tr>
