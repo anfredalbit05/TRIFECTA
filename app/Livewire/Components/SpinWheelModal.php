@@ -45,8 +45,8 @@ class SpinWheelModal extends Component
 
     /**
      * Everyone who qualified for the displayed cycle: uplines whose invited
-     * member(s) had a Pangkabuhayan share collected inside the window — the
-     * pool the wheel is spun from.
+     * member(s) had a Pangkabuhayan share collected inside the window, plus
+     * the activated downlines themselves — the pool the wheel is spun from.
      *
      * @var array<int, array<string, mixed>>
      */
@@ -277,8 +277,8 @@ class SpinWheelModal extends Component
             'text' => $this->lastWin['prize_name']
                 .' worth ₱'.number_format((float) $this->lastWin['prize_amount'], 2)
                 .' · spin #'.$this->lastWin['spin_order']
-                .' · invited '.$this->lastWin['invites']
-                .' member'.((int) $this->lastWin['invites'] === 1 ? '' : 's')
+                .' · '.$this->lastWin['invites']
+                .' qualifying activation'.((int) $this->lastWin['invites'] === 1 ? '' : 's')
                 .'\n'.$this->lastWin['notice'],
         ]);
     }

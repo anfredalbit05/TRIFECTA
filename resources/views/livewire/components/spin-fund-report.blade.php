@@ -265,7 +265,7 @@
                                         <p class="text-[11px] text-gray-500">
                                             {{ $winner->prize_name }}
                                             · <span class="font-semibold text-[#D79B10]">₱{{ number_format($winner->prize_amount, 2) }}</span>
-                                            · invited {{ $winner->qualified_invites }} member(s)
+                                            · {{ $winner->qualified_invites }} qualifying activation(s)
                                             · drawn {{ $winner->created_at?->format('M j, Y g:i A') }}
                                         </p>
                                     </div>
@@ -356,7 +356,7 @@
                         <th class="border border-slate-900 p-1">Referral Code</th>
                         <th class="border border-slate-900 p-1">Prize</th>
                         <th class="border border-slate-900 p-1">Amount</th>
-                        <th class="border border-slate-900 p-1">Invites</th>
+                        <th class="border border-slate-900 p-1">Qualifying Activations</th>
                         <th class="border border-slate-900 p-1">Claim Status</th>
                         <th class="border border-slate-900 p-1">Date Drawn</th>
                     </tr>

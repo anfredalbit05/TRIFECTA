@@ -211,7 +211,7 @@ class SpinWheelAnnouncer
                 .$this->wheel->displayName($winner->user)
                 .' — '.$winner->prize_name
                 .' (₱'.number_format((float) $winner->prize_amount, 2).')'
-                .' · invited '.(int) $winner->qualified_invites.' member(s)';
+                .' · '.(int) $winner->qualified_invites.' qualifying activation(s)';
         }
 
         $lines[] = '';
@@ -224,7 +224,7 @@ class SpinWheelAnnouncer
 
         $lines[] = 'Winners are notified by email. '.$this->wheel->claimInstructions();
         $lines[] = '';
-        $lines[] = 'Congratulations to our winners — and thank you to everyone who invited new members this cycle!';
+        $lines[] = 'Congratulations to our winners — and thank you to everyone who invited new members and to our newly activated members this cycle!';
 
         return implode("\n", $lines);
     }

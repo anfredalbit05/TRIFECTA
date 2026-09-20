@@ -24,7 +24,9 @@ use RuntimeException;
  *  - Number of winners = floor(pool ÷ prize amount), e.g. ₱11,350 ÷ ₱275 = 41.
  *  - Members on the wheel are the uplines of the activations whose
  *    Pangkabuhayan share was collected inside the window — the same rows that
- *    fund the pool, so the prizes are always backed by that cycle's income.
+ *    fund the pool, so the prizes are always backed by that cycle's income —
+ *    plus the activated downlines themselves, who earn a spot for their own
+ *    collected activation.
  *  - Every winner is booked as an expense in `ledgers`: Source 'PK', the
  *    member's UserID as RefID, a negative amount and DrawID pointing at the
  *    cycle. The row is 'Pending' until an administrator tags the prize as
@@ -304,10 +306,15 @@ class SpinWheelService
     }
 
     /**
-     * Members who invited inside the window, in wheel order.
+     * Members who qualified inside the window, in wheel order: the uplines of
+     * the activations whose Pangkabuhayan share was collected, plus the
+     * activated downlines themselves — the same collected rows that fund the
+     * pool, so a wheel spot always traces back to that cycle's income.
      *
-     * Each entry is ['user' => User, 'invites' => int] where holds the number
-     * of activations that member brought in during the window.
+     * Each entry is ['user' => User, 'invites' => int] where invites counts
+     * the member's qualifying activations in the window: the collected
+     * activations they invited plus their own activation(s). A member who
+     * both invited and was activated gets a single entry with both summed.
      *
      * @return Collection<int, array{user: User, invites: int}>
      */
@@ -316,7 +323,11 @@ class SpinWheelService
         CarbonInterface $end,
         ?bool $membersOnly = null
     ): Collection {
-        $query = DB::table('ledgers as l')
+        $membersOnly ??= $this->membersOnly();
+
+        // Uplines of the collected activations — the original qualification
+        // rule. Self-referrals earn the upline nothing.
+        $uplineQuery = DB::table('ledgers as l')
             ->join('activations as a', 'a.ActivationID', '=', 'l.ActivationID')
             ->join('users as u', 'u.referralCode', '=', 'a.upline_code')
             ->where('l.Source', 'MF')
@@ -325,31 +336,52 @@ class SpinWheelService
             ->whereBetween('l.created_at', [$start, $end])
             ->whereColumn('a.UserID', '!=', 'u.UserID'); // ignore self-referrals
 
-        if ($membersOnly ?? $this->membersOnly()) {
-            $query->where('u.RoleID', self::MEMBER_ROLE_ID);
+        // Activated downlines — the new members themselves also earn a wheel
+        // spot for their own collected activation.
+        $downlineQuery = DB::table('ledgers as l')
+            ->join('activations as a', 'a.ActivationID', '=', 'l.ActivationID')
+            ->join('users as u', 'u.UserID', '=', 'a.UserID')
+            ->where('l.Source', 'MF')
+            ->where('l.RefID', self::PANGKABUHAYAN_FEE_ID)
+            ->where('l.status', 'Completed')
+            ->whereBetween('l.created_at', [$start, $end]);
+
+        if ($membersOnly) {
+            $uplineQuery->where('u.RoleID', self::MEMBER_ROLE_ID);
+            $downlineQuery->where('u.RoleID', self::MEMBER_ROLE_ID);
         }
 
-        $rows = $query
-            ->selectRaw('u.UserID as uid, COUNT(*) as invites')
-            ->groupBy('u.UserID')
-            ->get();
+        // A member can qualify through both routes (they invited someone AND
+        // were activated themselves), so their credits are merged into a
+        // single wheel entry.
+        $credits = [];
 
-        if ($rows->isEmpty()) {
+        foreach ($uplineQuery
+            ->selectRaw('u.UserID as uid, COUNT(*) as credits')
+            ->groupBy('u.UserID')
+            ->get() as $row) {
+            $credits[(int) $row->uid] = (int) $row->credits;
+        }
+
+        foreach ($downlineQuery
+            ->selectRaw('u.UserID as uid, COUNT(*) as credits')
+            ->groupBy('u.UserID')
+            ->get() as $row) {
+            $credits[(int) $row->uid] = ($credits[(int) $row->uid] ?? 0) + (int) $row->credits;
+        }
+
+        if ($credits === []) {
             return collect();
         }
 
-        $users = User::whereIn('UserID', $rows->pluck('uid'))
+        $users = User::whereIn('UserID', array_keys($credits))
             ->get()
             ->keyBy('UserID');
 
-        return $rows
-            ->map(function ($row) use ($users) {
-                $user = $users->get($row->uid);
-
-                return $user
-                    ? ['user' => $user, 'invites' => (int) $row->invites]
-                    : null;
-            })
+        return collect($credits)
+            ->map(fn (int $count, int $uid) => $users->has($uid)
+                ? ['user' => $users->get($uid), 'invites' => $count]
+                : null)
             ->filter()
             ->sortBy(fn ($row) => mb_strtoupper(
                 trim(($row['user']->lastname ?? '').' '.($row['user']->firstname ?? ''))

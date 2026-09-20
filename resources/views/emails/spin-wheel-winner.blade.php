@@ -99,8 +99,8 @@
                                             </tr>
                                             <tr>
                                                 <td style="padding: 2px 0;">
-                                                    You invited {{ $winner->qualified_invites }}
-                                                    member(s) during this cycle.
+                                                    You had {{ $winner->qualified_invites }}
+                                                    qualifying activation(s) during this cycle.
                                                 </td>
                                             </tr>
                                         </table>

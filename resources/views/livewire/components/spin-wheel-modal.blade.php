@@ -77,7 +77,7 @@ x-on:close-spin-wheel.window="showModal=false">
                     </span>
                 </div>
                 <p class="mt-1 text-[10px] text-gray-400">
-                    Uplines whose invited member(s) had a Pangkabuhayan share collected in the window.
+                    Uplines whose invited member(s) had a Pangkabuhayan share collected in the window, plus the activated downlines themselves.
                 </p>
                 <input type="text" wire:model.live.debounce.300ms="memberSearch"
                     placeholder="Filter by name or referral code…"
@@ -92,12 +92,12 @@ x-on:close-spin-wheel.window="showModal=false">
                         @foreach($this->filteredQualified() as $member)
                             <li class="flex items-start gap-2.5 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2">
                                 <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0C2C6B] text-[10px] font-bold text-white"
-                                    title="{{ $member['invites'] }} qualified invite(s) this cycle">
+                                    title="{{ $member['invites'] }} qualifying activation(s) this cycle">
                                     {{ $member['invites'] }}
                                 </span>
                                 <div class="min-w-0 flex-1">
                                     <p class="truncate text-xs font-bold text-gray-800">{{ $member['name'] }}</p>
-                                    <p class="text-[10px] text-gray-500">{{ $member['code'] }} · {{ $member['invites'] }} invite(s)</p>
+                                    <p class="text-[10px] text-gray-500">{{ $member['code'] }} · {{ $member['invites'] }} activation(s)</p>
                                 </div>
                                 @if($member['wins']>0)
                                     <span class="shrink-0 rounded-full bg-[#D79B10]/10 px-2 py-0.5 text-[10px] font-bold text-[#D79B10]"
@@ -186,7 +186,7 @@ x-on:close-spin-wheel.window="showModal=false">
                                 x-text="'Spin #'+($wire.lastWin?.spin_order??'')+' · '+($wire.lastWin?.prize_name??'')+' · ₱'+Number($wire.lastWin?.prize_amount??0).toFixed(2)">
                             </p>
                             <p class="mt-1 text-[11px] text-white/60"
-                                x-text="'Invited '+($wire.lastWin?.invites??0)+' member(s) this cycle'"></p>
+                                x-text="($wire.lastWin?.invites??0)+' qualifying activation(s) this cycle'"></p>
                             <p class="mt-2 text-[10px] font-semibold"
                                 :class="$wire.lastWin?.emailed?'text-emerald-300':'text-amber-300'"
                                 x-text="($wire.lastWin?.emailed?'📧 ':'⚠️ ')+($wire.lastWin?.notice??'')"></p>
@@ -386,7 +386,7 @@ x-on:close-spin-wheel.window="showModal=false">
                                         <span class="ml-1 text-[10px] font-medium text-gray-400">{{ $winner['code'] }}</span>
                                     </p>
                                     <p class="text-[10px] text-gray-500">
-                                        {{ $winner['prize_name'] }} · ₱{{ number_format($winner['prize_amount'],2) }} · {{ $winner['invites'] }} invite(s)
+                                        {{ $winner['prize_name'] }} · ₱{{ number_format($winner['prize_amount'],2) }} · {{ $winner['invites'] }} activation(s)
                                     </p>
                                     <p class="text-[10px] text-gray-400">{{ $winner['drawn_at'] }}</p>
 

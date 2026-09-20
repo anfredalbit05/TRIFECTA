@@ -119,7 +119,7 @@ class SpinFundReport extends Component
 
             fputcsv($csv, [
                 '#', 'Winner', 'Referral Code', 'Prize',
-                'Amount (PHP)', 'Invites', 'Claim Status',
+                'Amount (PHP)', 'Qualifying Activations', 'Claim Status',
                 'Date Drawn', 'Date Claimed', 'PK Ledger #',
             ]);
 
