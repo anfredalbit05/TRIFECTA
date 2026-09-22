@@ -2,15 +2,14 @@
 
 namespace App\Livewire;
 
-use App\Models\Beneficiary;
+use Livewire\Component;
+use Livewire\Attributes\On;
 use App\Models\User;
-use Carbon\Carbon;
+use App\Models\Beneficiary;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
-use Livewire\Attributes\On;
-use Livewire\Component;
 
 class ApplicationModal extends Component
 {
@@ -22,39 +21,24 @@ class ApplicationModal extends Component
     |--------------------------------------------------------------------------
     */
     public $surname = '';
-
     public $first_name = '';
-
     public $middle_name = '';
-
     public $occupation = '';
-
     public $gender = '';
-
     public $civil_status = '';
-
     public $birthdate = '';
-
     public $address = '';
-
     public ?float $latitude = null;
-
     public ?float $longitude = null;
-
     public bool $showMapModal = false;
-
     public bool $isSubmitting = false;
 
     public bool $isViewMode = false;
-
     public bool $isEditMode = false;
 
     public ?int $userId = null;
-
     public $policy_number = null;
-
     public $policy_effectivity_date = null;
-
     public $policy_expiration_date = null;
 
     public $upline = '';
@@ -91,13 +75,9 @@ class ApplicationModal extends Component
     |--------------------------------------------------------------------------
     */
     public $mobile = '';
-
     public $email = '';
-
     public $username = '';
-
     public $password = '';
-
     public $password_confirmation = '';
 
     /*
@@ -149,7 +129,6 @@ class ApplicationModal extends Component
                         </div>
                     "
                 );
-
                 return false;
             }
 
@@ -165,7 +144,6 @@ class ApplicationModal extends Component
                         </div>
                     "
                 );
-
                 return false;
             }
 
@@ -181,7 +159,6 @@ class ApplicationModal extends Component
                         </div>
                     "
                 );
-
                 return false;
             }
         }
@@ -193,18 +170,18 @@ class ApplicationModal extends Component
     {
         if ($property === 'mobile') {
             if (str_starts_with($value, '+63')) {
-                $value = '09'.substr($value, 3);
+                $value = '09' . substr($value, 3);
             } elseif (str_starts_with($value, '63') && strlen($value) === 12) {
-                $value = '0'.substr($value, 2);
+                $value = '0' . substr($value, 2);
             }
 
             $value = preg_replace('/\D/', '', $value);
 
-            if (strlen($value) > 0 && ! str_starts_with($value, '0')) {
-                $value = '0'.$value;
+            if (strlen($value) > 0 && !str_starts_with($value, '0')) {
+                $value = '0' . $value;
             }
             if (strlen($value) > 1 && $value[1] !== '9') {
-                $value = '09'.substr($value, 2);
+                $value = '09' . substr($value, 2);
             }
 
             $this->mobile = substr($value, 0, 11);
@@ -233,16 +210,16 @@ class ApplicationModal extends Component
     {
         $beneficiary = $this->beneficiaries[$index] ?? [];
         $hasData =
-            ! empty(trim($beneficiary['fullname'] ?? '')) ||
-            ! empty($beneficiary['birthdate'] ?? '') ||
-            ! empty(trim($beneficiary['relationship'] ?? ''));
+            !empty(trim($beneficiary['fullname'] ?? '')) ||
+            !empty($beneficiary['birthdate'] ?? '') ||
+            !empty(trim($beneficiary['relationship'] ?? ''));
 
         // Nothing typed and nothing saved — no need to confirm anything.
-        if (! $hasData) {
+        if (!$hasData) {
             return;
         }
 
-        $isPersisted = ! empty($this->beneficiaryIds[$index]);
+        $isPersisted = !empty($this->beneficiaryIds[$index]);
 
         $this->dispatch(
             'confirm-delete-beneficiary',
@@ -261,11 +238,11 @@ class ApplicationModal extends Component
     */
     public function deleteBeneficiary($index)
     {
-        if (! isset($this->beneficiaries[$index])) {
+        if (!isset($this->beneficiaries[$index])) {
             return;
         }
 
-        $wasPersisted = ! empty($this->beneficiaryIds[$index]);
+        $wasPersisted = !empty($this->beneficiaryIds[$index]);
 
         if ($wasPersisted) {
             Beneficiary::destroy($this->beneficiaryIds[$index]);
@@ -336,7 +313,7 @@ class ApplicationModal extends Component
             'longitude',
             'policy_number',
             'policy_effectivity_date',
-            'policy_expiration_date',
+            'policy_expiration_date'
         ]);
 
         $this->showMapModal = false;
@@ -352,7 +329,7 @@ class ApplicationModal extends Component
     */
     public function submit()
     {
-        if (! $this->validateBeneficiaries()) {
+        if (!$this->validateBeneficiaries()) {
             return;
         }
 
@@ -391,7 +368,7 @@ class ApplicationModal extends Component
 
         } catch (ValidationException $e) {
             Log::warning('VALIDATION FAILED', [
-                'errors' => $e->errors(),
+                'errors' => $e->errors()
             ]);
 
             $errors = $e->validator->errors()->all();
@@ -422,171 +399,545 @@ class ApplicationModal extends Component
     |--------------------------------------------------------------------------
     */
     #[On('confirmed-save-application')]
-    public function saveApplication()
-    {
+    /*
+|--------------------------------------------------------------------------
+| Save Application (Called after confirmation)
+|--------------------------------------------------------------------------
+*/
+#[On('confirmed-save-application')]
+public function saveApplication()
+{
+    try {
+
+        /*
+        |--------------------------------------------------------------------------
+        | START DATABASE TRANSACTION
+        |--------------------------------------------------------------------------
+        */
         DB::beginTransaction();
 
+        Log::info('=== SAVE APPLICATION STARTED ===', [
+            'username' => $this->username,
+            'email' => $this->email,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Generate Unique Referral Code
+        |--------------------------------------------------------------------------
+        */
+        do {
+            $referralCode = $this->generateUplineCode();
+            $exists = User::where('referralCode', $referralCode)->exists();
+        } while ($exists);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Create User
+        |--------------------------------------------------------------------------
+        */
+        $user = User::create([
+            'username' => $this->username,
+            'password' => bcrypt($this->password),
+            'referralCode' => $referralCode,
+            'uplineCode' => $this->upline,
+            'lastname' => $this->surname,
+            'firstname' => $this->first_name,
+            'middlename' => $this->middle_name,
+            'gender' => $this->gender,
+            'civilstatus' => $this->civil_status,
+            'birthdate' => $this->birthdate,
+            'occupation' => $this->occupation,
+            'policy_number' => $this->policy_number ?: null,
+            'policy_effectivity_date' => $this->policy_effectivity_date ?: null,
+            'policy_expiration_date' => $this->policy_expiration_date ?: null,
+            'contactno' => $this->mobile,
+            'email' => filled($this->email) ? $this->email : null,
+            'address' => $this->address,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'RoleID' => 4,
+            'status' => 'Inactive',
+        ]);
+
+        Log::info('User created successfully', [
+            'UserID' => $user->UserID,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Save Beneficiaries
+        |--------------------------------------------------------------------------
+        */
+        Log::info('Saving beneficiaries');
+
+        foreach ($this->beneficiaries as $beneficiary) {
+
+            Log::info('Beneficiary data', $beneficiary);
+
+            if (
+                !empty($beneficiary['fullname']) &&
+                !empty($beneficiary['birthdate'])
+            ) {
+                Beneficiary::create([
+                    'UserID' => $user->UserID,
+                    'fullname' => $beneficiary['fullname'],
+                    'birthdate' => $beneficiary['birthdate'],
+                    'relationship' => $beneficiary['relationship'] ?? null,
+                    'status' => true,
+                ]);
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Prepare Application Details
+        |--------------------------------------------------------------------------
+        */
+        $applicationDetails = [
+            'surname' => $this->surname,
+            'first_name' => $this->first_name,
+            'middle_name' => $this->middle_name,
+            'occupation' => $this->occupation,
+            'gender' => $this->gender,
+            'civil_status' => $this->civil_status,
+            'birthdate' => $this->birthdate,
+            'policy_number' => $this->policy_number,
+            'policy_effectivity_date' => $this->policy_effectivity_date,
+            'policy_expiration_date' => $this->policy_expiration_date,
+            'address' => $this->address,
+            'mobile' => $this->mobile,
+            'email' => $this->email,
+            'username' => $this->username,
+            'beneficiaries' => $this->beneficiaries,
+        ];
+
+        /*
+        |--------------------------------------------------------------------------
+        | COMMIT DATABASE FIRST
+        |--------------------------------------------------------------------------
+        |
+        | IMPORTANT:
+        | Do NOT put Mail::send() before this commit.
+        |
+        */
+        DB::commit();
+
+        Log::info('=== DATABASE TRANSACTION COMMITTED ===', [
+            'UserID' => $user->UserID,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | SEND EMAILS AFTER DATABASE COMMIT
+        |--------------------------------------------------------------------------
+        |
+        | Email failure will NOT rollback the saved application.
+        |
+        */
+
+        $emailErrors = [];
+
+        /*
+        |--------------------------------------------------------------------------
+        | Send Admin Notification Emails
+        |--------------------------------------------------------------------------
+        */
         try {
-            Log::info('=== SAVE APPLICATION STARTED ===', [
-                'username' => $this->username,
-                'email' => $this->email,
-            ]);
-
-            do {
-                $referralCode = $this->generateUplineCode();
-                $exists = User::where('referralCode', $referralCode)->exists();
-            } while ($exists);
-
-            $user = User::create([
-                'username' => $this->username,
-                'password' => bcrypt($this->password),
-                'referralCode' => $referralCode,
-                'uplineCode' => $this->upline,
-                'lastname' => $this->surname,
-                'firstname' => $this->first_name,
-                'middlename' => $this->middle_name,
-                'gender' => $this->gender,
-                'civilstatus' => $this->civil_status,
-                'birthdate' => $this->birthdate,
-                'occupation' => $this->occupation,
-                'policy_number' => $this->policy_number ?: null,
-                'policy_effectivity_date' => $this->policy_effectivity_date ?: null,
-                'policy_expiration_date' => $this->policy_expiration_date ?: null,
-                'contactno' => $this->mobile,
-                'email' => filled($this->email) ? $this->email : null,
-                'address' => $this->address,
-                'latitude' => $this->latitude,
-                'longitude' => $this->longitude,
-                'RoleID' => 4,
-                'status' => 'Inactive',
-            ]);
-
-            Log::info('User created successfully', [
-                'UserID' => $user->UserID,
-            ]);
-
-            Log::info('Saving beneficiaries');
-
-            foreach ($this->beneficiaries as $beneficiary) {
-                Log::info('Beneficiary data', $beneficiary);
-            }
-
-            Log::info('Sending emails');
-
-            foreach ($this->beneficiaries as $beneficiary) {
-                if (! empty($beneficiary['fullname']) && ! empty($beneficiary['birthdate'])) {
-                    Beneficiary::create([
-                        'UserID' => $user->UserID,
-                        'fullname' => $beneficiary['fullname'],
-                        'birthdate' => $beneficiary['birthdate'],
-                        'relationship' => $beneficiary['relationship'] ?? null,
-                        'status' => true,
-                    ]);
-                }
-            }
-
-            $applicationDetails = [
-                'surname' => $this->surname,
-                'first_name' => $this->first_name,
-                'middle_name' => $this->middle_name,
-                'occupation' => $this->occupation,
-                'gender' => $this->gender,
-                'civil_status' => $this->civil_status,
-                'birthdate' => $this->birthdate,
-                'policy_number' => $this->policy_number,
-                'policy_effectivity_date' => $this->policy_effectivity_date,
-                'policy_expiration_date' => $this->policy_expiration_date,
-                'address' => $this->address,
-                'mobile' => $this->mobile,
-                'email' => $this->email,
-                'username' => $this->username,
-                'beneficiaries' => $this->beneficiaries,
-            ];
 
             $admins = User::whereIn('RoleID', [1])
                 ->whereNotNull('email')
                 ->get();
 
             foreach ($admins as $admin) {
-                $adminData = array_merge($applicationDetails, [
-                    'title' => 'New Member Application Notice (Admin)',
-                    'includeCredentials' => false,
-                ]);
 
-                Mail::send('emails.new-application', $adminData, function ($message) use ($admin) {
-                    $message->to($admin->email)
-                        ->subject('New Member Application Submitted');
-                });
+                try {
+
+                    $adminData = array_merge($applicationDetails, [
+                        'title' => 'New Member Application Notice (Admin)',
+                        'includeCredentials' => false,
+                    ]);
+
+                    Mail::send(
+                        'emails.new-application',
+                        $adminData,
+                        function ($message) use ($admin) {
+
+                            $message->to($admin->email)
+                                ->subject('New Member Application Submitted');
+                        }
+                    );
+
+                    Log::info('Admin application email sent successfully', [
+                        'admin_email' => $admin->email,
+                        'UserID' => $user->UserID,
+                    ]);
+
+                } catch (\Throwable $e) {
+
+                    $emailErrors[] = [
+                        'type' => 'admin',
+                        'email' => $admin->email,
+                        'error' => $e->getMessage(),
+                    ];
+
+                    Log::error('Failed to send admin application email', [
+                        'admin_email' => $admin->email,
+                        'UserID' => $user->UserID,
+                        'message' => $e->getMessage(),
+                    ]);
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | IMPORTANT:
+                    | Continue processing instead of throwing the exception.
+                    |--------------------------------------------------------------------------
+                    */
+                    continue;
+                }
             }
 
-            if (filled($this->email)) {
+        } catch (\Throwable $e) {
+
+            Log::error('Admin email process failed', [
+                'UserID' => $user->UserID,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Send Applicant Email
+        |--------------------------------------------------------------------------
+        */
+        if (filled($this->email)) {
+
+            try {
+
                 $userData = array_merge($applicationDetails, [
                     'title' => 'Welcome to True Life - Application Details',
                     'password' => $this->password,
                     'includeCredentials' => true,
                 ]);
 
-                Mail::send('emails.new-application', $userData, function ($message) use ($userData) {
-                    $message->to($userData['email'])
-                        ->subject('Your Application Details & Credentials');
+                Mail::send(
+                    'emails.new-application',
+                    $userData,
+                    function ($message) use ($userData) {
 
-                    $benefitsPath = public_path('images/benefits.jpeg');
-                    if (file_exists($benefitsPath)) {
-                        $message->attach($benefitsPath, [
-                            'as' => 'benefits.png',
-                            'mime' => 'image/png',
-                        ]);
-                    }
+                        $message->to($userData['email'])
+                            ->subject('Your Application Details & Credentials');
 
-                    $secondPath = public_path('images/second-image.jpeg');
-                    if (file_exists($secondPath)) {
-                        $message->attach($secondPath, [
-                            'as' => 'benefits.png',
-                            'mime' => 'image/png',
-                        ]);
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Attach Benefits Image
+                        |--------------------------------------------------------------------------
+                        */
+                        $benefitsPath = public_path('images/benefits.jpeg');
+
+                        if (file_exists($benefitsPath)) {
+
+                            $message->attach($benefitsPath, [
+                                'as' => 'benefits.png',
+                                'mime' => 'image/png',
+                            ]);
+                        }
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Attach Second Image
+                        |--------------------------------------------------------------------------
+                        */
+                        $secondPath = public_path('images/second-image.jpeg');
+
+                        if (file_exists($secondPath)) {
+
+                            $message->attach($secondPath, [
+                                'as' => 'second-image.png',
+                                'mime' => 'image/png',
+                            ]);
+                        }
                     }
-                });
+                );
+
+                Log::info('Applicant email sent successfully', [
+                    'email' => $this->email,
+                    'UserID' => $user->UserID,
+                ]);
+
+            } catch (\Throwable $e) {
+
+                $emailErrors[] = [
+                    'type' => 'applicant',
+                    'email' => $this->email,
+                    'error' => $e->getMessage(),
+                ];
+
+                Log::error('Failed to send applicant email', [
+                    'email' => $this->email,
+                    'UserID' => $user->UserID,
+                    'message' => $e->getMessage(),
+                ]);
+
+                /*
+                |--------------------------------------------------------------------------
+                | DO NOT THROW THE ERROR
+                |--------------------------------------------------------------------------
+                |
+                | The application has already been successfully saved.
+                |
+                */
             }
-
-            DB::commit();
-
-            Log::info('=== SAVE APPLICATION FINISHED ===');
-
-            $this->dispatch('swal-close');
-
-            $this->dispatch(
-                'show-success-after-close',
-                title: 'Success!',
-                text: 'Application submitted successfully.'
-            );
-
-            $this->dispatch(
-                'show-toast',
-                title: 'Application submitted successfully!',
-                icon: 'success'
-            );
-
-            $this->dispatch('refresh-members');
-            $this->close();
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-
-            Log::error('APPLICATION FAILED', [
-                'message' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            $this->dispatch('swal-close');
-
-            $this->dispatch('validation-error',
-                title: 'Error',
-                html: 'Something went wrong: '.htmlspecialchars($e->getMessage())
-            );
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Application Successfully Saved
+        |--------------------------------------------------------------------------
+        */
+
+        Log::info('=== SAVE APPLICATION FINISHED ===', [
+            'UserID' => $user->UserID,
+            'email_errors' => count($emailErrors),
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Close Confirmation Dialog
+        |--------------------------------------------------------------------------
+        */
+        $this->dispatch('swal-close');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Show Success Message
+        |--------------------------------------------------------------------------
+        */
+        $this->dispatch(
+            'show-success-after-close',
+            title: 'Success!',
+            text: 'Application submitted successfully.'
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Toast Notification
+        |--------------------------------------------------------------------------
+        */
+        $this->dispatch(
+            'show-toast',
+            title: 'Application submitted successfully!',
+            icon: 'success'
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Refresh Members
+        |--------------------------------------------------------------------------
+        */
+        $this->dispatch('refresh-members');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Close Application Form
+        |--------------------------------------------------------------------------
+        */
+        $this->close();
+
+    } catch (\Throwable $e) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | ONLY DATABASE ERRORS SHOULD REACH THIS BLOCK
+        |--------------------------------------------------------------------------
+        */
+
+        if (DB::transactionLevel() > 0) {
+            DB::rollBack();
+        }
+
+        Log::error('APPLICATION DATABASE FAILED', [
+            'message' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        $this->dispatch('swal-close');
+
+        $this->dispatch(
+            'validation-error',
+            title: 'Error',
+            html: 'Something went wrong while saving the application. Please try again.'
+        );
     }
+}
+
+    // public function saveApplication()
+    // {
+    //     DB::beginTransaction();
+
+    //     try {
+    //         Log::info('=== SAVE APPLICATION STARTED ===', [
+    //             'username' => $this->username,
+    //             'email' => $this->email,
+    //         ]);
+
+    //         do {
+    //             $referralCode = $this->generateUplineCode();
+    //             $exists = User::where('referralCode', $referralCode)->exists();
+    //         } while ($exists);
+
+    //         $user = User::create([
+    //             'username' => $this->username,
+    //             'password' => bcrypt($this->password),
+    //             'referralCode' => $referralCode,
+    //             'uplineCode' => $this->upline,
+    //             'lastname' => $this->surname,
+    //             'firstname' => $this->first_name,
+    //             'middlename' => $this->middle_name,
+    //             'gender' => $this->gender,
+    //             'civilstatus' => $this->civil_status,
+    //             'birthdate' => $this->birthdate,
+    //             'occupation' => $this->occupation,
+    //             'policy_number' => $this->policy_number ?: null,
+    //             'policy_effectivity_date' => $this->policy_effectivity_date ?: null,
+    //             'policy_expiration_date' => $this->policy_expiration_date ?: null,
+    //             'contactno' => $this->mobile,
+    //             'email' => filled($this->email) ? $this->email : null,
+    //             'address' => $this->address,
+    //             'latitude' => $this->latitude,
+    //             'longitude' => $this->longitude,
+    //             'RoleID' => 4,
+    //             'status' => 'Inactive',
+    //         ]);
+
+    //         Log::info('User created successfully', [
+    //             'UserID' => $user->UserID,
+    //         ]);
+
+    //         Log::info('Saving beneficiaries');
+
+    //         foreach ($this->beneficiaries as $beneficiary) {
+    //             Log::info('Beneficiary data', $beneficiary);
+    //         }
+
+    //         Log::info('Sending emails');
+
+    //         foreach ($this->beneficiaries as $beneficiary) {
+    //             if (!empty($beneficiary['fullname']) && !empty($beneficiary['birthdate'])) {
+    //                 Beneficiary::create([
+    //                     'UserID' => $user->UserID,
+    //                     'fullname' => $beneficiary['fullname'],
+    //                     'birthdate' => $beneficiary['birthdate'],
+    //                     'relationship' => $beneficiary['relationship'] ?? null,
+    //                     'status' => true,
+    //                 ]);
+    //             }
+    //         }
+
+    //         $applicationDetails = [
+    //             'surname' => $this->surname,
+    //             'first_name' => $this->first_name,
+    //             'middle_name' => $this->middle_name,
+    //             'occupation' => $this->occupation,
+    //             'gender' => $this->gender,
+    //             'civil_status' => $this->civil_status,
+    //             'birthdate' => $this->birthdate,
+    //             'policy_number' => $this->policy_number,
+    //             'policy_effectivity_date' => $this->policy_effectivity_date,
+    //             'policy_expiration_date' => $this->policy_expiration_date,
+    //             'address' => $this->address,
+    //             'mobile' => $this->mobile,
+    //             'email' => $this->email,
+    //             'username' => $this->username,
+    //             'beneficiaries' => $this->beneficiaries,
+    //         ];
+
+    //         $admins = User::whereIn('RoleID', [1])
+    //             ->whereNotNull('email')
+    //             ->get();
+
+    //         foreach ($admins as $admin) {
+    //             $adminData = array_merge($applicationDetails, [
+    //                 'title' => 'New Member Application Notice (Admin)',
+    //                 'includeCredentials' => false,
+    //             ]);
+
+    //             Mail::send('emails.new-application', $adminData, function ($message) use ($admin) {
+    //                 $message->to($admin->email)
+    //                         ->subject('New Member Application Submitted');
+    //             });
+    //         }
+
+    //         if (filled($this->email)) {
+    //             $userData = array_merge($applicationDetails, [
+    //                 'title' => 'Welcome to True Life - Application Details',
+    //                 'password' => $this->password,
+    //                 'includeCredentials' => true,
+    //             ]);
+
+    //             Mail::send('emails.new-application', $userData, function ($message) use ($userData) {
+    //                 $message->to($userData['email'])
+    //                         ->subject('Your Application Details & Credentials');
+
+    //                 $benefitsPath = public_path('images/benefits.jpeg');
+    //                 if (file_exists($benefitsPath)) {
+    //                     $message->attach($benefitsPath, [
+    //                         'as' => 'benefits.png',
+    //                         'mime' => 'image/png',
+    //                     ]);
+    //                 }
+
+    //                 $secondPath = public_path('images/second-image.jpeg');
+    //                 if (file_exists($secondPath)) {
+    //                     $message->attach($secondPath, [
+    //                         'as' => 'benefits.png',
+    //                         'mime' => 'image/png',
+    //                     ]);
+    //                 }
+    //             });
+    //         }
+
+    //         DB::commit();
+
+    //         Log::info('=== SAVE APPLICATION FINISHED ===');
+
+    //         $this->dispatch('swal-close');
+
+    //         $this->dispatch(
+    //             'show-success-after-close',
+    //             title: 'Success!',
+    //             text: 'Application submitted successfully.'
+    //         );
+
+    //         $this->dispatch(
+    //             'show-toast',
+    //             title: 'Application submitted successfully!',
+    //             icon: 'success'
+    //         );
+
+    //         $this->dispatch('refresh-members');
+    //         $this->close();
+
+    //     } catch (\Throwable $e) {
+    //         DB::rollBack();
+
+    //         Log::error('APPLICATION FAILED', [
+    //             'message' => $e->getMessage(),
+    //             'line' => $e->getLine(),
+    //             'file' => $e->getFile(),
+    //             'trace' => $e->getTraceAsString(),
+    //         ]);
+
+    //         $this->dispatch('swal-close');
+
+    //         $this->dispatch('validation-error',
+    //             title: 'Error',
+    //             html: 'Something went wrong: ' . htmlspecialchars($e->getMessage())
+    //         );
+    //     }
+    // }
 
     /*
     |--------------------------------------------------------------------------
@@ -595,7 +946,7 @@ class ApplicationModal extends Component
     */
     public function confirmUpdate()
     {
-        if (! $this->validateBeneficiaries()) {
+        if (!$this->validateBeneficiaries()) {
             return;
         }
 
@@ -612,6 +963,7 @@ class ApplicationModal extends Component
             ? null
             : trim($this->policy_expiration_date);
 
+
         try {
             $this->validate([
                 'surname' => 'required|string|max:255',
@@ -624,9 +976,9 @@ class ApplicationModal extends Component
 
                 'mobile' => 'required|digits:11',
 
-                'email' => 'nullable|email|unique:users,email,'.$this->userId.',UserID',
+                'email' => 'nullable|email|unique:users,email,' . $this->userId . ',UserID',
 
-                'username' => 'required|string|max:100|unique:users,username,'.$this->userId.',UserID',
+                'username' => 'required|string|max:100|unique:users,username,' . $this->userId . ',UserID',
 
                 'policy_number' => 'nullable|string|max:100',
                 'policy_effectivity_date' => 'nullable|date',
@@ -715,8 +1067,7 @@ class ApplicationModal extends Component
             if (empty($b['fullname']) && empty($b['birthdate']) && empty($b['relationship'])) {
                 return '—';
             }
-
-            return trim(($b['fullname'] ?? '').' – '.($b['relationship'] ?? '').' ('.($b['birthdate'] ?? '').')');
+            return trim(($b['fullname'] ?? '') . ' – ' . ($b['relationship'] ?? '') . ' (' . ($b['birthdate'] ?? '') . ')');
         };
 
         foreach ($this->beneficiaries as $i => $beneficiary) {
@@ -732,7 +1083,7 @@ class ApplicationModal extends Component
             }
 
             $changes[] = [
-                'field' => 'Beneficiary '.($i + 1),
+                'field' => 'Beneficiary ' . ($i + 1),
                 'old' => $formatBeneficiary($old),
                 'new' => $formatBeneficiary($beneficiary),
             ];
@@ -762,6 +1113,7 @@ class ApplicationModal extends Component
         ? null
         : trim($this->policy_expiration_date);
 
+
         $this->validate([
             'surname' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',
@@ -776,8 +1128,8 @@ class ApplicationModal extends Component
             'beneficiaries.*.relationship' => 'nullable|string|max:50',
 
             'mobile' => 'required|digits:11',
-            'email' => 'nullable|email|unique:users,email,'.$this->userId.',UserID',
-            'username' => 'required|string|max:100|unique:users,username,'.$this->userId.',UserID',
+            'email' => 'nullable|email|unique:users,email,' . $this->userId . ',UserID',
+            'username' => 'required|string|max:100|unique:users,username,' . $this->userId . ',UserID',
             'policy_number' => 'nullable|string|max:100',
             'policy_effectivity_date' => 'nullable|date',
             'policy_expiration_date' => 'nullable|date',
@@ -820,7 +1172,7 @@ class ApplicationModal extends Component
                     continue;
                 }
 
-                if (! empty($fullname) && ! empty($birthdate)) {
+                if (!empty($fullname) && !empty($birthdate)) {
                     Beneficiary::create([
                         'UserID' => $user->UserID,
                         'fullname' => $fullname,
@@ -912,7 +1264,7 @@ class ApplicationModal extends Component
         $this->latitude = (float) $lat;
         $this->longitude = (float) $lng;
 
-        if (! empty($address)) {
+        if (!empty($address)) {
             $this->address = ucwords(strtolower($address));
         }
 
@@ -946,7 +1298,7 @@ class ApplicationModal extends Component
         $this->civil_status = $user->civilstatus ?? '';
 
         $this->birthdate = $user->birthdate
-            ? Carbon::parse($user->birthdate)->format('Y-m-d')
+            ? \Carbon\Carbon::parse($user->birthdate)->format('Y-m-d')
             : '';
 
         $this->address = $user->address ?? '';
@@ -959,12 +1311,13 @@ class ApplicationModal extends Component
         $this->policy_number = $user->policy_number ?: null;
 
         $this->policy_effectivity_date = $user->policy_effectivity_date
-            ? Carbon::parse($user->policy_effectivity_date)->format('Y-m-d')
+            ? \Carbon\Carbon::parse($user->policy_effectivity_date)->format('Y-m-d')
             : null;
 
         $this->policy_expiration_date = $user->policy_expiration_date
-            ? Carbon::parse($user->policy_expiration_date)->format('Y-m-d')
+            ? \Carbon\Carbon::parse($user->policy_expiration_date)->format('Y-m-d')
             : null;
+
 
         // Reset both the form slots and the "which slot is a saved DB row" tracker.
         $this->beneficiaries = [
@@ -981,7 +1334,7 @@ class ApplicationModal extends Component
             $this->beneficiaries[$index] = [
                 'fullname' => $beneficiary->fullname ?? '',
                 'birthdate' => $beneficiary->birthdate
-                    ? Carbon::parse($beneficiary->birthdate)->format('Y-m-d')
+                    ? \Carbon\Carbon::parse($beneficiary->birthdate)->format('Y-m-d')
                     : '',
                 'relationship' => $beneficiary->relationship ?? '',
             ];
