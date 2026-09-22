@@ -2,14 +2,15 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use Livewire\Attributes\On;
-use App\Models\User;
 use App\Models\Beneficiary;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\On;
+use Livewire\Component;
 
 class ApplicationModal extends Component
 {
@@ -21,24 +22,39 @@ class ApplicationModal extends Component
     |--------------------------------------------------------------------------
     */
     public $surname = '';
+
     public $first_name = '';
+
     public $middle_name = '';
+
     public $occupation = '';
+
     public $gender = '';
+
     public $civil_status = '';
+
     public $birthdate = '';
+
     public $address = '';
+
     public ?float $latitude = null;
+
     public ?float $longitude = null;
+
     public bool $showMapModal = false;
+
     public bool $isSubmitting = false;
 
     public bool $isViewMode = false;
+
     public bool $isEditMode = false;
 
     public ?int $userId = null;
+
     public $policy_number = null;
+
     public $policy_effectivity_date = null;
+
     public $policy_expiration_date = null;
 
     public $upline = '';
@@ -75,9 +91,13 @@ class ApplicationModal extends Component
     |--------------------------------------------------------------------------
     */
     public $mobile = '';
+
     public $email = '';
+
     public $username = '';
+
     public $password = '';
+
     public $password_confirmation = '';
 
     /*
@@ -129,6 +149,7 @@ class ApplicationModal extends Component
                         </div>
                     "
                 );
+
                 return false;
             }
 
@@ -144,6 +165,7 @@ class ApplicationModal extends Component
                         </div>
                     "
                 );
+
                 return false;
             }
 
@@ -159,6 +181,7 @@ class ApplicationModal extends Component
                         </div>
                     "
                 );
+
                 return false;
             }
         }
@@ -170,18 +193,18 @@ class ApplicationModal extends Component
     {
         if ($property === 'mobile') {
             if (str_starts_with($value, '+63')) {
-                $value = '09' . substr($value, 3);
+                $value = '09'.substr($value, 3);
             } elseif (str_starts_with($value, '63') && strlen($value) === 12) {
-                $value = '0' . substr($value, 2);
+                $value = '0'.substr($value, 2);
             }
 
             $value = preg_replace('/\D/', '', $value);
 
-            if (strlen($value) > 0 && !str_starts_with($value, '0')) {
-                $value = '0' . $value;
+            if (strlen($value) > 0 && ! str_starts_with($value, '0')) {
+                $value = '0'.$value;
             }
             if (strlen($value) > 1 && $value[1] !== '9') {
-                $value = '09' . substr($value, 2);
+                $value = '09'.substr($value, 2);
             }
 
             $this->mobile = substr($value, 0, 11);
@@ -210,16 +233,16 @@ class ApplicationModal extends Component
     {
         $beneficiary = $this->beneficiaries[$index] ?? [];
         $hasData =
-            !empty(trim($beneficiary['fullname'] ?? '')) ||
-            !empty($beneficiary['birthdate'] ?? '') ||
-            !empty(trim($beneficiary['relationship'] ?? ''));
+            ! empty(trim($beneficiary['fullname'] ?? '')) ||
+            ! empty($beneficiary['birthdate'] ?? '') ||
+            ! empty(trim($beneficiary['relationship'] ?? ''));
 
         // Nothing typed and nothing saved — no need to confirm anything.
-        if (!$hasData) {
+        if (! $hasData) {
             return;
         }
 
-        $isPersisted = !empty($this->beneficiaryIds[$index]);
+        $isPersisted = ! empty($this->beneficiaryIds[$index]);
 
         $this->dispatch(
             'confirm-delete-beneficiary',
@@ -238,11 +261,11 @@ class ApplicationModal extends Component
     */
     public function deleteBeneficiary($index)
     {
-        if (!isset($this->beneficiaries[$index])) {
+        if (! isset($this->beneficiaries[$index])) {
             return;
         }
 
-        $wasPersisted = !empty($this->beneficiaryIds[$index]);
+        $wasPersisted = ! empty($this->beneficiaryIds[$index]);
 
         if ($wasPersisted) {
             Beneficiary::destroy($this->beneficiaryIds[$index]);
@@ -313,7 +336,7 @@ class ApplicationModal extends Component
             'longitude',
             'policy_number',
             'policy_effectivity_date',
-            'policy_expiration_date'
+            'policy_expiration_date',
         ]);
 
         $this->showMapModal = false;
@@ -329,7 +352,7 @@ class ApplicationModal extends Component
     */
     public function submit()
     {
-        if (!$this->validateBeneficiaries()) {
+        if (! $this->validateBeneficiaries()) {
             return;
         }
 
@@ -368,7 +391,7 @@ class ApplicationModal extends Component
 
         } catch (ValidationException $e) {
             Log::warning('VALIDATION FAILED', [
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ]);
 
             $errors = $e->validator->errors()->all();
@@ -451,7 +474,7 @@ class ApplicationModal extends Component
             Log::info('Sending emails');
 
             foreach ($this->beneficiaries as $beneficiary) {
-                if (!empty($beneficiary['fullname']) && !empty($beneficiary['birthdate'])) {
+                if (! empty($beneficiary['fullname']) && ! empty($beneficiary['birthdate'])) {
                     Beneficiary::create([
                         'UserID' => $user->UserID,
                         'fullname' => $beneficiary['fullname'],
@@ -492,7 +515,7 @@ class ApplicationModal extends Component
 
                 Mail::send('emails.new-application', $adminData, function ($message) use ($admin) {
                     $message->to($admin->email)
-                            ->subject('New Member Application Submitted');
+                        ->subject('New Member Application Submitted');
                 });
             }
 
@@ -505,7 +528,7 @@ class ApplicationModal extends Component
 
                 Mail::send('emails.new-application', $userData, function ($message) use ($userData) {
                     $message->to($userData['email'])
-                            ->subject('Your Application Details & Credentials');
+                        ->subject('Your Application Details & Credentials');
 
                     $benefitsPath = public_path('images/benefits.jpeg');
                     if (file_exists($benefitsPath)) {
@@ -560,7 +583,7 @@ class ApplicationModal extends Component
 
             $this->dispatch('validation-error',
                 title: 'Error',
-                html: 'Something went wrong: ' . htmlspecialchars($e->getMessage())
+                html: 'Something went wrong: '.htmlspecialchars($e->getMessage())
             );
         }
     }
@@ -572,7 +595,7 @@ class ApplicationModal extends Component
     */
     public function confirmUpdate()
     {
-        if (!$this->validateBeneficiaries()) {
+        if (! $this->validateBeneficiaries()) {
             return;
         }
 
@@ -589,7 +612,6 @@ class ApplicationModal extends Component
             ? null
             : trim($this->policy_expiration_date);
 
-
         try {
             $this->validate([
                 'surname' => 'required|string|max:255',
@@ -602,9 +624,9 @@ class ApplicationModal extends Component
 
                 'mobile' => 'required|digits:11',
 
-                'email' => 'nullable|email|unique:users,email,' . $this->userId . ',UserID',
+                'email' => 'nullable|email|unique:users,email,'.$this->userId.',UserID',
 
-                'username' => 'required|string|max:100|unique:users,username,' . $this->userId . ',UserID',
+                'username' => 'required|string|max:100|unique:users,username,'.$this->userId.',UserID',
 
                 'policy_number' => 'nullable|string|max:100',
                 'policy_effectivity_date' => 'nullable|date',
@@ -693,7 +715,8 @@ class ApplicationModal extends Component
             if (empty($b['fullname']) && empty($b['birthdate']) && empty($b['relationship'])) {
                 return '—';
             }
-            return trim(($b['fullname'] ?? '') . ' – ' . ($b['relationship'] ?? '') . ' (' . ($b['birthdate'] ?? '') . ')');
+
+            return trim(($b['fullname'] ?? '').' – '.($b['relationship'] ?? '').' ('.($b['birthdate'] ?? '').')');
         };
 
         foreach ($this->beneficiaries as $i => $beneficiary) {
@@ -709,7 +732,7 @@ class ApplicationModal extends Component
             }
 
             $changes[] = [
-                'field' => 'Beneficiary ' . ($i + 1),
+                'field' => 'Beneficiary '.($i + 1),
                 'old' => $formatBeneficiary($old),
                 'new' => $formatBeneficiary($beneficiary),
             ];
@@ -739,7 +762,6 @@ class ApplicationModal extends Component
         ? null
         : trim($this->policy_expiration_date);
 
-
         $this->validate([
             'surname' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',
@@ -754,8 +776,8 @@ class ApplicationModal extends Component
             'beneficiaries.*.relationship' => 'nullable|string|max:50',
 
             'mobile' => 'required|digits:11',
-            'email' => 'nullable|email|unique:users,email,' . $this->userId . ',UserID',
-            'username' => 'required|string|max:100|unique:users,username,' . $this->userId . ',UserID',
+            'email' => 'nullable|email|unique:users,email,'.$this->userId.',UserID',
+            'username' => 'required|string|max:100|unique:users,username,'.$this->userId.',UserID',
             'policy_number' => 'nullable|string|max:100',
             'policy_effectivity_date' => 'nullable|date',
             'policy_expiration_date' => 'nullable|date',
@@ -798,7 +820,7 @@ class ApplicationModal extends Component
                     continue;
                 }
 
-                if (!empty($fullname) && !empty($birthdate)) {
+                if (! empty($fullname) && ! empty($birthdate)) {
                     Beneficiary::create([
                         'UserID' => $user->UserID,
                         'fullname' => $fullname,
@@ -890,7 +912,7 @@ class ApplicationModal extends Component
         $this->latitude = (float) $lat;
         $this->longitude = (float) $lng;
 
-        if (!empty($address)) {
+        if (! empty($address)) {
             $this->address = ucwords(strtolower($address));
         }
 
@@ -924,7 +946,7 @@ class ApplicationModal extends Component
         $this->civil_status = $user->civilstatus ?? '';
 
         $this->birthdate = $user->birthdate
-            ? \Carbon\Carbon::parse($user->birthdate)->format('Y-m-d')
+            ? Carbon::parse($user->birthdate)->format('Y-m-d')
             : '';
 
         $this->address = $user->address ?? '';
@@ -937,13 +959,12 @@ class ApplicationModal extends Component
         $this->policy_number = $user->policy_number ?: null;
 
         $this->policy_effectivity_date = $user->policy_effectivity_date
-            ? \Carbon\Carbon::parse($user->policy_effectivity_date)->format('Y-m-d')
+            ? Carbon::parse($user->policy_effectivity_date)->format('Y-m-d')
             : null;
 
         $this->policy_expiration_date = $user->policy_expiration_date
-            ? \Carbon\Carbon::parse($user->policy_expiration_date)->format('Y-m-d')
+            ? Carbon::parse($user->policy_expiration_date)->format('Y-m-d')
             : null;
-
 
         // Reset both the form slots and the "which slot is a saved DB row" tracker.
         $this->beneficiaries = [
@@ -960,7 +981,7 @@ class ApplicationModal extends Component
             $this->beneficiaries[$index] = [
                 'fullname' => $beneficiary->fullname ?? '',
                 'birthdate' => $beneficiary->birthdate
-                    ? \Carbon\Carbon::parse($beneficiary->birthdate)->format('Y-m-d')
+                    ? Carbon::parse($beneficiary->birthdate)->format('Y-m-d')
                     : '',
                 'relationship' => $beneficiary->relationship ?? '',
             ];
