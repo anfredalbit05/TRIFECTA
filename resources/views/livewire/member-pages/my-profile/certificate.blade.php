@@ -121,4 +121,103 @@
         </div>
     </div>
 
+
+{{-- =============== 4. ACTIVATION RECEIPT DOWNLOAD PORTAL =============== --}}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Activation Receipt</h3>
+        <p class="card-subtitle">
+            Download your official membership activation receipt.
+        </p>
+    </div>
+
+    <div class="certificate-row">
+        <div class="certificate-info">
+            <div class="certificate-title-row">
+                <span class="card-title">
+                    Official Activation Receipt
+                </span>
+
+                @if($latestApprovedActivation)
+                    <span class="status-badge-sm status-badge--active">
+                        Available
+                    </span>
+                @else
+                    <span class="status-badge-sm status-badge--inactive">
+                        Unavailable
+                    </span>
+                @endif
+            </div>
+
+            <p class="certificate-desc">
+                @if($latestApprovedActivation)
+                    Your membership activation has been approved.
+                    You can securely download your official receipt.
+                @else
+                    Your official activation receipt is not available yet.
+                    A receipt will appear here once your membership activation
+                    has been approved.
+                @endif
+            </p>
+        </div>
+
+        <div class="card-header-action">
+            @if($latestApprovedActivation)
+
+                <a
+                    href="{{ route('activation.receipt.download', [
+                        'activation' => $latestApprovedActivation->ActivationID
+                    ]) }}"
+                    class="btn-dark"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="btn-icon-dark"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                        />
+                    </svg>
+
+                    Download Receipt
+                </a>
+
+            @else
+
+                <button
+                    type="button"
+                    disabled
+                    class="btn-locked-lg"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="btn-icon-dark"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                        />
+                    </svg>
+
+                    Receipt Unavailable
+                </button>
+
+            @endif
+        </div>
+    </div>
+</div>
+
+
+
 </div>

@@ -92,6 +92,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/members/{userId}/receipt/download', [ReceiptController::class, 'adminDownload'])
         ->name('admin.member.receipt.download');
 
+    Route::get(
+        '/my-profile/activation-receipt/download',
+        [ReceiptController::class, 'memberDownload']
+    )->name('activation.receipt.download');
+
+
     Route::get('/admin/members/{userId}/policy/download', [PolicyController::class, 'adminDownload'])
         ->name('admin.member.policy.download');
 
