@@ -586,96 +586,106 @@ public function saveApplication()
         */
         try {
 
-            $admins = User::whereIn('RoleID', [1])
-                ->whereNotNull('email')
-                ->get();
+    $admins = User::whereIn('RoleID', [1])
+        ->whereNotNull('email')
+        ->get();
 
-            foreach ($admins as $admin) {
+    foreach ($admins as $admin) {
 
-                try {
+        try {
 
-                    $adminData = array_merge($applicationDetails, [
-                        'title' => 'New Member Application Notice (Admin)',
-                        'includeCredentials' => false,
+            $adminData = array_merge($applicationDetails, [
+                'title' => 'New Member Application Notice (Admin)',
+                'includeCredentials' => false,
+            ]);
+
+            Mail::send('emails.new-application', $adminData, function ($message) use ($admin) {
+                $message->to($admin->email)
+                    ->subject('New Member Application Submitted');
+            });
+
+        } catch (\Throwable $e) {
+
+            $emailErrors[] = [
+                'type' => 'admin',
+                'email' => $admin->email,
+                'error' => $e->getMessage(),
+            ];
+
+            Log::error('Failed to send admin email', [
+                'email' => $admin->email,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Send Applicant Email
+    |--------------------------------------------------------------------------
+    */
+
+    if (filled($this->email)) {
+
+        try {
+
+            $userData = array_merge($applicationDetails, [
+                'title' => 'Welcome to True Life - Application Details',
+                'password' => $this->password,
+                'includeCredentials' => true,
+            ]);
+
+            Mail::send('emails.new-application', $userData, function ($message) use ($userData) {
+
+                $message->to($userData['email'])
+                    ->subject('Your Application Details & Credentials');
+
+                $benefitsPath = public_path('images/benefits.jpeg');
+
+                if (file_exists($benefitsPath)) {
+                    $message->attach($benefitsPath, [
+                        'as' => 'benefits.png',
+                        'mime' => 'image/png',
                     ]);
+                }
 
-                Mail::send('emails.new-application', $adminData, function ($message) use ($admin) {
-                    $message->to($admin->email)
-                            ->subject('New Member Application Submitted');
-                });
-            }
+                $secondPath = public_path('images/second-image.jpeg');
 
-            if (filled($this->email)) {
-                $userData = array_merge($applicationDetails, [
-                    'title' => 'Welcome to True Life - Application Details',
-                    'password' => $this->password,
-                    'includeCredentials' => true,
-                ]);
+                if (file_exists($secondPath)) {
+                    $message->attach($secondPath, [
+                        'as' => 'second-image.png',
+                        'mime' => 'image/png',
+                    ]);
+                }
+            });
 
-                Mail::send('emails.new-application', $userData, function ($message) use ($userData) {
-                    $message->to($userData['email'])
-                            ->subject('Your Application Details & Credentials');
+            Log::info('Applicant email sent successfully', [
+                'email' => $this->email,
+                'UserID' => $user->UserID,
+            ]);
 
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Attach Benefits Image
-                        |--------------------------------------------------------------------------
-                        */
-                        $benefitsPath = public_path('images/benefits.jpeg');
+        } catch (\Throwable $e) {
 
-                        if (file_exists($benefitsPath)) {
+            $emailErrors[] = [
+                'type' => 'applicant',
+                'email' => $this->email,
+                'error' => $e->getMessage(),
+            ];
 
-                            $message->attach($benefitsPath, [
-                                'as' => 'benefits.png',
-                                'mime' => 'image/png',
-                            ]);
-                        }
+            Log::error('Failed to send applicant email', [
+                'email' => $this->email,
+                'UserID' => $user->UserID,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
 
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Attach Second Image
-                        |--------------------------------------------------------------------------
-                        */
-                        $secondPath = public_path('images/second-image.jpeg');
+} catch (\Throwable $e) {
 
-                        if (file_exists($secondPath)) {
-
-                            $message->attach($secondPath, [
-                                'as' => 'second-image.png',
-                                'mime' => 'image/png',
-                            ]);
-                        }
-                    }
-                );
-
-                Log::info('Applicant email sent successfully', [
-                    'email' => $this->email,
-                    'UserID' => $user->UserID,
-                ]);
-
-            } catch (\Throwable $e) {
-
-                $emailErrors[] = [
-                    'type' => 'applicant',
-                    'email' => $this->email,
-                    'error' => $e->getMessage(),
-                ];
-
-                Log::error('Failed to send applicant email', [
-                    'email' => $this->email,
-                    'UserID' => $user->UserID,
-                    'message' => $e->getMessage(),
-                ]);
-
-                /*
-                |--------------------------------------------------------------------------
-                | DO NOT THROW THE ERROR
-                |--------------------------------------------------------------------------
-                |
-                | The application has already been successfully saved.
-                |
-                */
-            }
+    Log::error('Email notification process failed', [
+        'message' => $e->getMessage(),
+    ]);
+}
         }
 
         /*
@@ -1260,3 +1270,4 @@ public function saveApplication()
         ];
     }
 }
+
