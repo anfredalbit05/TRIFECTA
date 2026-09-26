@@ -318,101 +318,37 @@
                 <div class="id-card-viewport">
 
                     {{-- FRONT SIDE --}}
-                    <div id="id-card-front" class="id-card id-card-front">
-                        <div class="id-card-top">
-                            <div class="id-org-name">TRUELIFE</div>
-                            <div class="id-badge">PRIMARY MEMBER</div>
+                    <div id="id-card-front" class="id-card-front-new">
+                        {{-- Template artwork --}}
+                        <img src="{{ asset('images/certificate/id-front.png') }}" class="id-template-img" alt="ID Front">
+
+                        {{-- Photo overlay (fills the framed portrait area) --}}
+                        <div class="idn-photo">
+                            @if ($profilepic && is_object($profilepic))
+                                <img src="{{ $profilepic->temporaryUrl() }}">
+                            @elseif (auth()->user()->profilepic && auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
+                                <img src="{{ asset('storage/' . auth()->user()->profilepic) }}">
+                            @endif
                         </div>
 
-                        <div class="id-card-mid">
-                            <div class="id-photo-box">
-                                @if ($profilepic && is_object($profilepic))
-                                    <img src="{{ $profilepic->temporaryUrl() }}" class="avatar-img">
-                                @elseif ($profilePic && $profilePic !== 'images/profiles/default-avatar.png')
-                                    <img src="{{ Str::startsWith($profilePic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic) }}" class="avatar-img">
-                                @else
-                                    PHOTO
-                                @endif
-                            </div>
+                        {{-- Data overlays --}}
+                        <div class="idn-field idn-name">{{ strtoupper(trim("$firstname $middlename $lastname") ?: 'NAME HERE') }}</div>
+                        <div class="idn-field idn-membership">{{ $membershipNo }}</div>
+                        <div class="idn-field idn-issue">{{ $dateOfIssue }}</div>
+                        <div class="idn-field idn-valid">{{ $validUntil }}</div>
 
-                            <div class="id-details">
-                                <p><strong>ID No.:</strong> UL-{{ str_pad(auth()->id(), 5, '0', STR_PAD_LEFT) }}</p>
-                                <p><strong>FULL NAME:</strong>
-                                    {{ strtoupper(trim("$firstname $middlename $lastname") ?: 'NAME HERE') }}</p>
-                                <p><strong>ADDRESS:</strong> {{ strtoupper($address ?: 'N/A') }}</p>
-                                <p><strong>SEX:</strong> {{ strtoupper($sex) }} &nbsp;&nbsp;&nbsp;
-                                    <strong>STATUS:</strong> {{ strtoupper($civilStatus) }}
-                                </p>
-                                <p><strong>BIRTH DATE:</strong>
-                                    {{ $birthdate ? \Carbon\Carbon::parse($birthdate)->format('F d, Y') : 'N/A' }}</p>
-                                <p><strong>DATE JOINED:</strong>
-                                    {{ auth()->user()->created_at?->format('F d, Y') ?? 'N/A' }}</p>
-                                <p>
-                                <strong>EXPIRATION DATE:</strong>
-                                {{ auth()->user()->policy_expiration_date
-                                    ? \Carbon\Carbon::parse(auth()->user()->policy_expiration_date)->format('F d, Y')
-                                    : 'N/A'
-                                }}
-                            </p>
-
-                            </div>
-
-                            <div class="id-qr">
-                                {!! $qrCode !!}
-                            </div>
-                        </div>
-
-                        <div class="id-card-bottom">
-                            <div class="id-beneficiaries">
-                                <p class="id-beneficiaries-title">BENEFICIARIES:</p>
-                                @forelse($beneficiaries->take(3) as $b)
-                                    <p class="id-beneficiary-line">• {{ $b->fullname }}</p>
-                                @empty
-                                    <p class="id-beneficiary-empty">No beneficiaries added</p>
-                                @endforelse
-                            </div>
-
-                            <div class="id-signature-block">
-                                <div class="id-signature-line">
-                                    @if ($signature)
-                                        <img src="{{ asset('storage/' . $signature) }}" class="id-signature-img">
-                                    @else
-                                        <span class="id-signature-empty">No Signature</span>
-                                    @endif
-                                </div>
-                                <span class="id-signature-label">SIGNATURE</span>
-                            </div>
+                        {{-- Member signature on a white card below the QR/barcode area --}}
+                        <div class="idn-signature">
+                            @if ($signature)
+                                <img src="{{ asset('storage/' . $signature) }}">
+                            @endif
                         </div>
                     </div>
 
                     {{-- BACK SIDE --}}
-                    <div id="id-card-back" class="id-card id-card-back hidden">
-                        <div>
-                            <h5 class="id-back-title">TRUELIFE TERM AND TERMINATION</h5>
-                            <p class="id-back-text">TRUELIFE may terminate this MEMBERSHIP, for the following grounds:</p>
-                            <ul class="id-back-list">
-                                <li>Fraud or misrepresentation</li>
-                                <li>Misuse of TRUELIFE name and materials</li>
-                                <li>Violation of company rules or applicable laws</li>
-                            </ul>
-                            <p class="id-back-note">Termination shall be without prejudice to any liabilities incurred prior to termination.</p>
-                        </div>
-
-                        <div class="id-back-bottom">
-                            <div class="id-ice-block">
-                                <p class="id-ice-title">IN CASE OF EMERGENCY:</p>
-                                <p class="id-ice-line"><strong>NAME:</strong> {{ strtoupper($emergencyName ?: '____________________') }}</p>
-                                <p class="id-ice-line"><strong>ADDRESS:</strong> {{ strtoupper($emergencyAddress ?: '____________________') }}</p>
-                                <p class="id-ice-line"><strong>RELATIONSHIP:</strong> {{ strtoupper($emergencyRelationship ?: '____________________') }}</p>
-                                <p class="id-ice-line"><strong>CONTACT NO.:</strong> {{ strtoupper($emergencyContactno ?: '____________________') }}</p>
-                            </div>
-                            <div class="id-signatory-block">
-                                <div class="id-signatory-script"></div>
-                                <div class="id-signatory-divider"></div>
-                                <p class="id-signatory-name">RENANTE SUAYBAGUIO-ROBLES, MPA, LFA</p>
-                                <p class="id-signatory-role">CEO</p>
-                            </div>
-                        </div>
+                    <div id="id-card-back" class="id-card-back-new hidden">
+                        {{-- Template artwork --}}
+                        <img src="{{ asset('images/certificate/id-back.png') }}" class="id-template-img" alt="ID Back">
                     </div>
                 </div>
 

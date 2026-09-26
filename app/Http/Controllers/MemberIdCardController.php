@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activation;
 use App\Models\User;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Barryvdh\DomPDF\Facade\Pdf;
-
-use BaconQrCode\Writer;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 
 class MemberIdCardController extends Controller
 {
@@ -19,7 +20,6 @@ class MemberIdCardController extends Controller
         $user = User::with('beneficiaries')->findOrFail(Auth::id());
 
         $beneficiaries = $user->beneficiaries;
-
 
         /*
         |--------------------------------------------------------------------------
@@ -39,7 +39,7 @@ class MemberIdCardController extends Controller
         $profilePicBase64 = null;
 
         if (
-            !empty($user->profilepic) &&
+            ! empty($user->profilepic) &&
             Storage::disk('public')->exists($user->profilepic)
         ) {
             $profilePicPath = Storage::disk('public')->path(
@@ -49,12 +49,11 @@ class MemberIdCardController extends Controller
             $mimeType = mime_content_type($profilePicPath);
 
             $profilePicBase64 =
-                'data:' . $mimeType . ';base64,' .
+                'data:'.$mimeType.';base64,'.
                 base64_encode(
                     file_get_contents($profilePicPath)
                 );
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -70,7 +69,7 @@ class MemberIdCardController extends Controller
         $signatureBase64 = null;
 
         if (
-            !empty($user->signature) &&
+            ! empty($user->signature) &&
             Storage::disk('public')->exists($user->signature)
         ) {
             $signaturePath = Storage::disk('public')->path(
@@ -80,12 +79,11 @@ class MemberIdCardController extends Controller
             $mimeType = mime_content_type($signaturePath);
 
             $signatureBase64 =
-                'data:' . $mimeType . ';base64,' .
+                'data:'.$mimeType.';base64,'.
                 base64_encode(
                     file_get_contents($signaturePath)
                 );
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -95,17 +93,16 @@ class MemberIdCardController extends Controller
 
         $renderer = new ImageRenderer(
             new RendererStyle(80),
-            new SvgImageBackEnd()
+            new SvgImageBackEnd
         );
 
         $writer = new Writer($renderer);
 
         $referralUrl = url(
-            '/?ref=' . ($user->referral_code ?? '')
+            '/?ref='.($user->referral_code ?? '')
         );
 
         $qrCode = $writer->writeString($referralUrl);
-
 
         /*
         |--------------------------------------------------------------------------
@@ -123,7 +120,7 @@ class MemberIdCardController extends Controller
 
         if (
             $ceo &&
-            !empty($ceo->signature) &&
+            ! empty($ceo->signature) &&
             Storage::disk('public')->exists($ceo->signature)
         ) {
             $ceoSignaturePath = Storage::disk('public')->path($ceo->signature);
@@ -131,12 +128,41 @@ class MemberIdCardController extends Controller
             $mimeType = mime_content_type($ceoSignaturePath);
 
             $managerSignature =
-                'data:' . $mimeType . ';base64,' .
+                'data:'.$mimeType.';base64,'.
                 base64_encode(
                     file_get_contents($ceoSignaturePath)
                 );
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | ID DATA — membership no, date of issue, valid until
+        |--------------------------------------------------------------------------
+        |
+        | Membership no: TL + current year + zero-padded UserID (TL2026001).
+        | Date of issue: policy effectivity date, falling back to the
+        | approved activation's approval date. Valid until: policy
+        | expiration date.
+        |
+        */
+
+        $membershipNo = 'TL'.now()->year.str_pad((string) $user->UserID, 3, '0', STR_PAD_LEFT);
+
+        $approvedActivation = Activation::where('UserID', $user->UserID)
+            ->where('status', 'Approved')
+            ->latest('ActivationID')
+            ->first();
+
+        $issueDate = $user->policy_effectivity_date
+            ?: $approvedActivation?->updated_at;
+
+        $dateOfIssue = $issueDate
+            ? Carbon::parse($issueDate)->format('F d, Y')
+            : 'N/A';
+
+        $validUntil = $user->policy_expiration_date
+            ? Carbon::parse($user->policy_expiration_date)->format('F d, Y')
+            : 'N/A';
 
         /*
         |--------------------------------------------------------------------------
@@ -157,9 +183,13 @@ class MemberIdCardController extends Controller
 
                 // Manager
                 'managerSignature' => $managerSignature,
+
+                // ID data
+                'membershipNo' => $membershipNo,
+                'dateOfIssue' => $dateOfIssue,
+                'validUntil' => $validUntil,
             ]
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -180,9 +210,8 @@ class MemberIdCardController extends Controller
             0,
             0,
             $width,
-            $height
+            $height,
         ]);
-
 
         /*
         |--------------------------------------------------------------------------
@@ -191,10 +220,9 @@ class MemberIdCardController extends Controller
         */
 
         return $pdf->download(
-            'True-Life-Dayongan-ID-' .
-            str_pad($user->id, 5, '0', STR_PAD_LEFT) .
+            'True-Life-Dayongan-ID-'.
+            str_pad($user->id, 5, '0', STR_PAD_LEFT).
             '.pdf'
         );
     }
 }
-
