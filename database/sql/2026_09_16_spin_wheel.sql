@@ -98,14 +98,16 @@ ALTER TABLE `ledgers`
 
 
 -- ---------------------------------------------------------------------
--- OPTIONAL — prize and rules
--- The application falls back to 5 kls / ₱55 per kilo / members-only when
--- these rows do not exist, and an administrator can change all of them from
--- the wheel modal itself ("Prize & rules"). Only run this to pre-set them.
+-- OPTIONAL — draw day, prize and rules
+-- The application falls back to a 19th draw day, 5 kls / ₱55 per kilo /
+-- members-only when these rows do not exist, and an administrator can
+-- change all of them from the wheel modal itself ("Prize & rules").
+-- Only run this to pre-set them. The draw day must be 1–28.
 -- ---------------------------------------------------------------------
 
 -- INSERT INTO `settings` (`name`, `value`, `created_at`, `updated_at`)
 -- VALUES
+--   ('spin_draw_day', '19', NOW(), NOW()),
 --   ('spin_prize_kilos', '5', NOW(), NOW()),
 --   ('spin_prize_price_per_kilo', '55', NOW(), NOW()),
 --   ('spin_members_only', 'true', NOW(), NOW()),

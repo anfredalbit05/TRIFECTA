@@ -78,6 +78,9 @@ class SpinWheelModal extends Component
 
     public bool $membersOnly = true;
 
+    /** Day of the month the wheel is drawn (1–28), from the spin_draw_day setting. */
+    public string $drawDay = '19';
+
     public string $claimInstructions = '';
 
     public ?string $errorMessage = null;
@@ -453,6 +456,45 @@ class SpinWheelModal extends Component
         ]);
     }
 
+    /** Live schedule description computed from the edited draw day (blade calls $this->derivedSchedule). */
+    public function derivedSchedule(): string
+    {
+        return SpinWheelService::describeSchedule((int) $this->drawDay);
+    }
+
+    public function saveDrawDay(): void
+    {
+        if (! $this->userIsAdmin()) {
+            return;
+        }
+
+        if ($this->summary['has_winners'] ?? false) {
+            $this->errorMessage = 'The draw day can no longer be changed once the cycle has started spinning.';
+
+            return;
+        }
+
+        $this->validate([
+            'drawDay' => ['required', 'integer', 'min:1', 'max:28'],
+        ], [
+            'drawDay.required' => 'Please enter the day of the month the wheel is drawn.',
+            'drawDay.integer' => 'The draw day must be a whole number.',
+            'drawDay.min' => 'The draw day must be between 1 and 28.',
+            'drawDay.max' => 'The draw day must be between 1 and 28 — later days would break in short months.',
+        ]);
+
+        $this->service()->saveDrawDay((int) $this->drawDay);
+
+        $this->errorMessage = null;
+        $this->load();
+
+        $this->dispatch('swal:success', [
+            'title' => 'Draw day updated',
+            'text' => SpinWheelService::describeSchedule((int) $this->drawDay)
+                .' Applies immediately while no winner has been drawn; past draws keep their original windows.',
+        ]);
+    }
+
     public function setRepeatMode(bool $allowRepeat): void
     {
         if (! $this->userIsAdmin()) {
@@ -669,6 +711,7 @@ class SpinWheelModal extends Component
         $this->prizePerKilo = number_format((float) $prize['price_per_kilo'], 2, '.', '');
         $this->allowRepeat = (bool) $summary['allow_repeat_winners'];
         $this->membersOnly = $service->membersOnly();
+        $this->drawDay = (string) $service->drawDay();
         $this->claimInstructions = $service->claimInstructions();
         $this->canSpin = $this->userIsAdmin();
         $this->cycles = $this->buildCycles($service);

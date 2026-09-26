@@ -9,9 +9,10 @@ return new class extends Migration
     /**
      * One row per monthly Spin the Wheel cycle.
      *
-     * The cycle is identified by its draw date — the 12th of the month —
-     * and covers the Pangkabuhayan collections / invitations from the
-     * 12th of the previous month up to the day before the draw.
+     * The cycle is identified by its draw date — the configured draw day
+     * (`spin_draw_day` setting) of the month — and covers the Pangkabuhayan
+     * collections / invitations from that day of the previous month up to
+     * the day before the draw.
      */
     public function up(): void
     {

@@ -11,15 +11,17 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 use RuntimeException;
 
 /**
  * Spin the Wheel — the monthly Pangkabuhayan raffle.
  *
  * Rules implemented here:
- *  - A cycle is drawn on the 12th of the month and covers the window from the
- *    12th of the previous month up to the day before the draw (e.g. the
- *    September 12 draw covers August 12 – September 11).
+ *  - A cycle is drawn on the configured draw day (the `spin_draw_day`
+ *    setting, 1–28, editable before a cycle's first spin) and covers the
+ *    window from that day of the previous month up to the day before the
+ *    draw (e.g. the September 19 draw covers August 19 – September 18).
  *  - The prize pool is the Pangkabuhayan (FEE004) collection inside that window.
  *  - Number of winners = floor(pool ÷ prize amount), e.g. ₱11,350 ÷ ₱275 = 41.
  *  - Members on the wheel are the uplines of the activations whose
@@ -34,8 +36,11 @@ use RuntimeException;
  */
 class SpinWheelService
 {
-    /** Day of the month a cycle is drawn. */
-    public const DRAW_DAY = 12;
+    /** Day of the month a cycle is drawn — the `spin_draw_day` setting. */
+    public const DRAW_DAY_SETTING = 'spin_draw_day';
+
+    /** Draw day used when the setting is missing or out of range (1–28). */
+    public const DEFAULT_DRAW_DAY = 19;
 
     /** Membership fee row that represents the Pangkabuhayan share. */
     public const PANGKABUHAYAN_FEE_ID = 'FEE004';
@@ -74,14 +79,74 @@ class SpinWheelService
 
     public const DEFAULT_PRIZE_AMOUNT = 275.00;
 
-    /** How many past cycles the modal offers in its month selector. */
+    /*     * How many past cycles the modal offers in its month selector. */
     public const RECENT_CYCLES = 6;
 
     /*
     |--------------------------------------------------------------------------
-    | Prize configuration (stored as settings, editable from the modal)
+    | Configuration (stored as settings, editable from the modal)
     |--------------------------------------------------------------------------
     */
+
+    /**
+     * The day of the month a cycle is drawn, 1–28: the `spin_draw_day`
+     * setting, editable before a cycle's first spin. Days above 28 are
+     * never accepted because short months would push the draw into the
+     * next one.
+     */
+    public function drawDay(): int
+    {
+        $value = Setting::where('name', self::DRAW_DAY_SETTING)->value('value');
+
+        return is_numeric($value) && (int) $value >= 1 && (int) $value <= 28
+            ? (int) $value
+            : self::DEFAULT_DRAW_DAY;
+    }
+
+    public function saveDrawDay(int $day): void
+    {
+        if ($day < 1 || $day > 28) {
+            throw new InvalidArgumentException('The draw day must be between 1 and 28.');
+        }
+
+        Setting::updateOrCreate(
+            ['name' => self::DRAW_DAY_SETTING],
+            ['value' => (string) $day]
+        );
+    }
+
+    /**
+     * One-line schedule description for the admin UI, e.g. "The wheel is
+     * drawn every 19th — cycles cover the 19th of the previous month to
+     * the 18th." Out-of-range days are clamped to 1–28.
+     */
+    public static function describeSchedule(int $day): string
+    {
+        $day = max(1, min(28, $day));
+
+        if ($day === 1) {
+            return 'The wheel is drawn every 1st — cycles cover the whole previous month.';
+        }
+
+        return 'The wheel is drawn every '.self::ordinal($day)
+            .' — cycles cover the '.self::ordinal($day).' of the previous month to the '
+            .self::ordinal($day - 1).'.';
+    }
+
+    /** 1st, 2nd, 3rd, 4th … 11th/12th/13th, 21st … */
+    public static function ordinal(int $number): string
+    {
+        $suffix = in_array($number % 100, [11, 12, 13], true)
+            ? 'th'
+            : match ($number % 10) {
+                1 => 'st',
+                2 => 'nd',
+                3 => 'rd',
+                default => 'th',
+            };
+
+        return $number.$suffix;
+    }
 
     /**
      * The prize, derived from two dynamic inputs the admins edit as the rice
@@ -202,16 +267,18 @@ class SpinWheelService
     */
 
     /**
-     * The draw date (12th) currently in force: the latest 12th that has
-     * already happened. A cycle stays in force until the next 12th arrives.
+     * The draw date currently in force: the latest occurrence of the
+     * configured draw day that has already happened. A cycle stays in
+     * force until the next draw day arrives.
      */
     public function activeDrawDate(?CarbonInterface $now = null): CarbonInterface
     {
         $now = $now ? $now->copy() : Carbon::now();
+        $day = $this->drawDay();
 
-        return $now->day >= self::DRAW_DAY
-            ? $now->copy()->day(self::DRAW_DAY)->startOfDay()
-            : $now->copy()->subMonthNoOverflow()->day(self::DRAW_DAY)->startOfDay();
+        return $now->day >= $day
+            ? $now->copy()->day($day)->startOfDay()
+            : $now->copy()->subMonthNoOverflow()->day($day)->startOfDay();
     }
 
     /**
@@ -223,8 +290,8 @@ class SpinWheelService
     }
 
     /**
-     * Collection window for a draw date: 12th of the previous month 00:00:00
-     * through the day before the draw 23:59:59.
+     * Collection window for a draw date: the configured draw day of the
+     * previous month 00:00:00 through the day before the draw 23:59:59.
      *
      * @return array{0: CarbonInterface, 1: CarbonInterface}
      */
