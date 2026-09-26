@@ -10,6 +10,7 @@ use App\Models\ActivationHistory;
 use App\Models\Beneficiary;
 use App\Models\Ledger;
 use App\Models\MembershipFee;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +19,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use App\Models\Setting;
 
 class ActivationReviewModal extends Component
 {
@@ -370,7 +370,7 @@ class ActivationReviewModal extends Component
         /** @var User|null $activatedUser */
         $activatedUser = null;
 
-        //Total Membership Fees (MF) Cost for the Activation
+        // Total Membership Fees (MF) Cost for the Activation
         // $totalAmount = (float) MembershipFee::sum('Cost');
 
         // 2. Atomic Database Operations (Database Changes Only)
@@ -378,9 +378,24 @@ class ActivationReviewModal extends Component
 
             Log::info('Starting approval transaction for ActivationID: '.$this->activation->ActivationID);
 
-            // Update Activation Status
+            // Update Activation Status + issue the next sequential receipt
+            // number (generated INSIDE the transaction so concurrent approvals
+            // can't collide on the same number).
             $this->activation->update([
                 'status' => 'Approved',
+                'receipt_number' => Activation::nextReceiptNumber(),
+
+                // Snapshot the cashier identity from the settings table at
+                // approval time, so the receipt is reproducible later even
+                // if the settings change.
+                'cashier_name' => Setting::where('name', 'cashier_name')->value('value'),
+                'cashier_signature' => Setting::where('name', 'cashier_signature')->value('value'),
+            ]);
+
+            Log::info('Receipt number issued with cashier identity.', [
+                'activation_id' => $this->activation->ActivationID,
+                'receipt_number' => $this->activation->receipt_number,
+                'cashier_name' => $this->activation->cashier_name,
             ]);
 
             // Build Admin Name for Log History
@@ -442,11 +457,11 @@ class ActivationReviewModal extends Component
                 $cfAmount = round($totalAmount * 0.01, 2);
 
                 Ledger::create([
-                    'RefID'        => $this->selectedUserID,
-                    'amount'       => $cfAmount,
-                    'Source'       => 'CF',
+                    'RefID' => $this->selectedUserID,
+                    'amount' => $cfAmount,
+                    'Source' => 'CF',
                     'ActivationID' => $this->activation->ActivationID,
-                    'status'       => 'Completed',
+                    'status' => 'Completed',
                 ]);
 
                 Log::info('GCash | Paymaya CF ledger entry created.', [
@@ -556,7 +571,7 @@ class ActivationReviewModal extends Component
             try {
 
                 Mail::to($activatedUser->email)
-                    ->send(new ActivationApprovedMail($activatedUser, $this->activation,  $this->totalMembershipFeesCost));
+                    ->send(new ActivationApprovedMail($activatedUser, $this->activation, $this->totalMembershipFeesCost));
             } catch (\Throwable $e) {
                 Log::error('Failed to send approval email to user.', ['error' => $e->getMessage()]);
             }

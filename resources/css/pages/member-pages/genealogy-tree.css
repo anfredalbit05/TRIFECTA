@@ -108,6 +108,15 @@
     @apply -translate-y-1 border-blue-200 shadow-lg;
 }
 
+/* Search-filter match: gold accent bar + tinted ring */
+.member-card-highlighted {
+    @apply border-[#D4A017] ring-2 ring-[#D4A017]/30;
+}
+
+.member-card-highlighted::before {
+    @apply bg-[#D4A017] opacity-100;
+}
+
 .member-card::before {
     content: "";
     @apply absolute inset-x-0 top-0 z-10 h-1 bg-[#0C2C6B] opacity-0 transition-opacity duration-200;

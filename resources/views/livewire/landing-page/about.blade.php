@@ -212,12 +212,7 @@
             <!-- Vision -->
             <div class="about-vm-card-vision">
                 <div class="about-vm-icon">
-                    <x-editable-text
-                        key="about_vision_icon"
-                        :value="$contexts['about_vision_icon'] ?? '👁️'"
-                        tag="span"
-                        class="inline-block"
-                    />
+                    <flux:icon.eye class="w-12 h-12" />
                 </div>
 
                 <h2 class="about-vm-title">
@@ -242,12 +237,7 @@
             <!-- Mission -->
             <div class="about-vm-card-mission">
                 <div class="about-vm-icon">
-                    <x-editable-text
-                        key="about_mission_icon"
-                        :value="$contexts['about_mission_icon'] ?? '🎯'"
-                        tag="span"
-                        class="inline-block"
-                    />
+                    <flux:icon.flag class="w-12 h-12" />
                 </div>
 
                 <h2 class="about-vm-title">
@@ -312,7 +302,7 @@
 
             <div class="about-value-card">
                 <div class="about-value-icon-blue">
-                    <x-editable-text key="about_val_icon_1" :value="$contexts['about_val_icon_1'] ?? '🤝'" tag="span" class="inline-block" />
+                    <flux:icon.user-group class="w-8 h-8" />
                 </div>
                 <h3 class="about-value-title">
                     <x-editable-text key="about_val_title_1" :value="$contexts['about_val_title_1'] ?? 'Pagtutulungan'" tag="span" class="inline-block" />
@@ -324,7 +314,7 @@
 
             <div class="about-value-card">
                 <div class="about-value-icon-gold">
-                    <x-editable-text key="about_val_icon_2" :value="$contexts['about_val_icon_2'] ?? '🛡️'" tag="span" class="inline-block" />
+                    <flux:icon.shield-check class="w-8 h-8" />
                 </div>
                 <h3 class="about-value-title">
                     <x-editable-text key="about_val_title_2" :value="$contexts['about_val_title_2'] ?? 'Proteksyon'" tag="span" class="inline-block" />
@@ -336,7 +326,7 @@
 
             <div class="about-value-card">
                 <div class="about-value-icon-blue">
-                    <x-editable-text key="about_val_icon_3" :value="$contexts['about_val_icon_3'] ?? '👨‍👩‍👧‍👦'" tag="span" class="inline-block" />
+                    <flux:icon.home-modern class="w-8 h-8" />
                 </div>
                 <h3 class="about-value-title">
                     <x-editable-text key="about_val_title_3" :value="$contexts['about_val_title_3'] ?? 'Pamilya'" tag="span" class="inline-block" />
@@ -348,7 +338,7 @@
 
             <div class="about-value-card">
                 <div class="about-value-icon-gold">
-                    <x-editable-text key="about_val_icon_4" :value="$contexts['about_val_icon_4'] ?? '✔️'" tag="span" class="inline-block" />
+                    <flux:icon.check-badge class="w-8 h-8" />
                 </div>
                 <h3 class="about-value-title">
                     <x-editable-text key="about_val_title_4" :value="$contexts['about_val_title_4'] ?? 'Integridad'" tag="span" class="inline-block" />
@@ -360,7 +350,7 @@
 
             <div class="about-value-card">
                 <div class="about-value-icon-blue">
-                    <x-editable-text key="about_val_icon_5" :value="$contexts['about_val_icon_5'] ?? '❤️'" tag="span" class="inline-block" />
+                    <flux:icon.heart class="w-8 h-8" />
                 </div>
                 <h3 class="about-value-title">
                     <x-editable-text key="about_val_title_5" :value="$contexts['about_val_title_5'] ?? 'Pagkakaisa'" tag="span" class="inline-block" />
@@ -404,35 +394,35 @@
                 <div class="about-objectives-list">
 
                     <div class="about-objective-item">
-                        <div class="about-objective-check">✔</div>
+                        <div class="about-objective-check"><flux:icon.check class="w-6 h-6" /></div>
                         <p>
                             <x-editable-text key="about_obj_1" :value="$contexts['about_obj_1'] ?? 'Magbigay ng barato ug maabot nga serbisyo sa proteksyon alang sa ordinaryong pamilya Pilipino.'" tag="span" class="inline-block" />
                         </p>
                     </div>
 
                     <div class="about-objective-item">
-                        <div class="about-objective-check">✔</div>
+                        <div class="about-objective-check"><flux:icon.check class="w-6 h-6" /></div>
                         <p>
                             <x-editable-text key="about_obj_2" :value="$contexts['about_obj_2'] ?? 'Magtabang dayon sa panahon sa aksidente, pagkasakit, ug kamatayon.'" tag="span" class="inline-block" />
                         </p>
                     </div>
 
                     <div class="about-objective-item">
-                        <div class="about-objective-check">✔</div>
+                        <div class="about-objective-check"><flux:icon.check class="w-6 h-6" /></div>
                         <p>
                             <x-editable-text key="about_obj_3" :value="$contexts['about_obj_3'] ?? 'Magpahiug-ot sa panaghiusa, pagtinabangay, ug pag-amuma sa komunidad.'" tag="span" class="inline-block" />
                         </p>
                     </div>
 
                     <div class="about-objective-item">
-                        <div class="about-objective-check">✔</div>
+                        <div class="about-objective-check"><flux:icon.check class="w-6 h-6" /></div>
                         <p>
                             <x-editable-text key="about_obj_4" :value="$contexts['about_obj_4'] ?? 'Maghatag og paglaum ug seguridad sa mga kabus ug nanginahanglan.'" tag="span" class="inline-block" />
                         </p>
                     </div>
 
                     <div class="about-objective-item">
-                        <div class="about-objective-check">✔</div>
+                        <div class="about-objective-check"><flux:icon.check class="w-6 h-6" /></div>
                         <p>
                             <x-editable-text key="about_obj_5" :value="$contexts['about_obj_5'] ?? 'Magsiguro nga walay pamilya nga biyaan sa kalisod.'" tag="span" class="inline-block" />
                         </p>
@@ -491,7 +481,7 @@
         <div class="about-feature-grid">
 
             <div class="about-feature-card">
-                <div class="about-feature-icon-blue">🛡️</div>
+                <div class="about-feature-icon-blue"><flux:icon.shield-check class="w-8 h-8" /></div>
                 <h3 class="about-feature-title">
                     <x-editable-text key="about_feat_title_1" :value="$contexts['about_feat_title_1'] ?? 'Affordable Protection'" tag="span" class="inline-block" />
                 </h3>
@@ -501,7 +491,7 @@
             </div>
 
             <div class="about-feature-card">
-                <div class="about-feature-icon-gold">❤️</div>
+                <div class="about-feature-icon-gold"><flux:icon.heart class="w-8 h-8" /></div>
                 <h3 class="about-feature-title">
                     <x-editable-text key="about_feat_title_2" :value="$contexts['about_feat_title_2'] ?? 'Caring Community'" tag="span" class="inline-block" />
                 </h3>
@@ -511,7 +501,7 @@
             </div>
 
             <div class="about-feature-card">
-                <div class="about-feature-icon-blue">🤝</div>
+                <div class="about-feature-icon-blue"><flux:icon.user-group class="w-8 h-8" /></div>
                 <h3 class="about-feature-title">
                     <x-editable-text key="about_feat_title_3" :value="$contexts['about_feat_title_3'] ?? 'Community Solidarity'" tag="span" class="inline-block" />
                 </h3>
@@ -521,7 +511,7 @@
             </div>
 
             <div class="about-feature-card">
-                <div class="about-feature-icon-gold">🌱</div>
+                <div class="about-feature-icon-gold"><flux:icon.sparkles class="w-8 h-8" /></div>
                 <h3 class="about-feature-title">
                     <x-editable-text key="about_feat_title_4" :value="$contexts['about_feat_title_4'] ?? 'Hope for the Future'" tag="span" class="inline-block" />
                 </h3>
@@ -563,7 +553,7 @@
         <div class="about-highlights-grid">
 
             <div class="about-highlight-card">
-                <div class="about-highlight-icon">👨‍👩‍👧‍👦</div>
+                <div class="about-highlight-icon"><flux:icon.home-modern class="w-12 h-12" /></div>
                 <h3 class="about-highlight-title">
                     <x-editable-text key="about_high_title_1" :value="$contexts['about_high_title_1'] ?? 'Family'" tag="span" class="inline-block" />
                 </h3>
@@ -573,7 +563,7 @@
             </div>
 
             <div class="about-highlight-card">
-                <div class="about-highlight-icon">🛡️</div>
+                <div class="about-highlight-icon"><flux:icon.shield-check class="w-12 h-12" /></div>
                 <h3 class="about-highlight-title">
                     <x-editable-text key="about_high_title_2" :value="$contexts['about_high_title_2'] ?? 'Protection'" tag="span" class="inline-block" />
                 </h3>
@@ -583,7 +573,7 @@
             </div>
 
             <div class="about-highlight-card">
-                <div class="about-highlight-icon">🤝</div>
+                <div class="about-highlight-icon"><flux:icon.user-group class="w-12 h-12" /></div>
                 <h3 class="about-highlight-title">
                     <x-editable-text key="about_high_title_3" :value="$contexts['about_high_title_3'] ?? 'Unity'" tag="span" class="inline-block" />
                 </h3>
@@ -593,7 +583,7 @@
             </div>
 
             <div class="about-highlight-card">
-                <div class="about-highlight-icon">⭐</div>
+                <div class="about-highlight-icon"><flux:icon.star class="w-12 h-12" /></div>
                 <h3 class="about-highlight-title">
                     <x-editable-text key="about_high_title_4" :value="$contexts['about_high_title_4'] ?? 'Hope'" tag="span" class="inline-block" />
                 </h3>

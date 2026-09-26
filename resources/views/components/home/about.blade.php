@@ -51,8 +51,8 @@
             <!-- Mission -->
             <div class="group bg-white rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 p-8 border-t-4 border-amber-500 border-x border-b border-slate-200">
 
-                <div class="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center text-3xl shadow-sm border border-blue-100">
-                    🛡️
+                <div class="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center shadow-sm border border-blue-100">
+                    <flux:icon.shield-check class="w-8 h-8 text-[#0B2A5B]" />
                 </div>
 
                 <x-editable-text
@@ -74,8 +74,8 @@
             <!-- Vision -->
             <div class="group bg-white rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 p-8 border-t-4 border-amber-500 border-x border-b border-slate-200">
 
-                <div class="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center text-3xl shadow-sm border border-amber-100">
-                    🤝
+                <div class="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center shadow-sm border border-amber-100">
+                    <flux:icon.user-group class="w-8 h-8 text-amber-600" />
                 </div>
 
                 <x-editable-text

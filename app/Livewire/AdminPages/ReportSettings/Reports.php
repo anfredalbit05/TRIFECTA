@@ -3,16 +3,34 @@
 namespace App\Livewire\AdminPages\ReportSettings;
 
 use App\Models\Ledger;
-use Livewire\Component;
-use Livewire\WithPagination;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class Reports extends Component
 {
     use WithPagination;
 
     protected $paginationTheme = 'tailwind';
+
+    /**
+     * When true, the printable (unpaginated) report table is rendered into the
+     * DOM for printing. Kept false at all other times — rendering every ledger
+     * row on every page load made the page multi-megabyte and sluggish.
+     */
+    public bool $printing = false;
+
+    /**
+     * Build the printable report, then tell the browser to print it once the
+     * updated DOM has been applied.
+     */
+    public function preparePrint(): void
+    {
+        $this->printing = true;
+
+        $this->dispatch('print-ledgers');
+    }
 
     /**
      * Human-readable labels for the abbreviated ledger Source codes.
@@ -46,6 +64,7 @@ class Reports extends Component
     }
 
     public string $search = '';
+
     public string $dateRange = ''; // e.g. "2026-08-01 to 2026-08-16"
 
     public function mount()
@@ -60,7 +79,7 @@ class Reports extends Component
 
     protected function parsedDateRange(): array
     {
-        if (blank($this->dateRange) || !str_contains($this->dateRange, ' to ')) {
+        if (blank($this->dateRange) || ! str_contains($this->dateRange, ' to ')) {
             return [null, null];
         }
 
@@ -153,10 +172,11 @@ class Reports extends Component
             ->latest('TransactionID')
             ->paginate(10);
 
-        // Unpaginated set for the printable report, matching the same filters
-        $printLedgers = (clone $this->baseQuery())
-            ->latest('TransactionID')
-            ->get();
+        // Unpaginated set for the printable report, matching the same filters —
+        // only queried when the user actually prints (keeps the page light).
+        $printLedgers = $this->printing
+            ? (clone $this->baseQuery())->latest('TransactionID')->get()
+            : collect();
 
         return view('livewire.admin-pages.report-settings.reports', [
             'ledgers' => $ledgers,

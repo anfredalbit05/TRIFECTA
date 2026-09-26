@@ -151,7 +151,7 @@
 
                                     <div class="team-leadership-ceo-exp-icon-box team-leadership-ceo-exp-icon-blue">
 
-                                        🏛️
+                                        <flux:icon.building-library class="w-7 h-7 sm:w-8 sm:h-8" />
 
                                     </div>
 
@@ -196,7 +196,7 @@
 
                                     <div class="team-leadership-ceo-exp-icon-box team-leadership-ceo-exp-icon-yellow">
 
-                                        💼
+                                        <flux:icon.briefcase class="w-7 h-7 sm:w-8 sm:h-8" />
 
                                     </div>
 
@@ -241,7 +241,7 @@
 
                                 <div class="team-leadership-ceo-academic-icon">
 
-                                    🎓
+                                    <flux:icon.academic-cap class="w-7 h-7 sm:w-8 sm:h-8" />
 
                                 </div>
 
@@ -422,7 +422,7 @@
 
                                     <div class="team-leadership-coo-info-icon team-leadership-coo-info-icon-blue">
 
-                                        🛡️
+                                        <flux:icon.shield-check class="w-7 h-7 sm:w-8 sm:h-8" />
 
                                     </div>
 
@@ -454,7 +454,7 @@
 
                                     <div class="team-leadership-coo-info-icon team-leadership-coo-info-icon-blue">
 
-                                        👥
+                                        <flux:icon.user-group class="w-7 h-7 sm:w-8 sm:h-8" />
 
                                     </div>
 
@@ -487,7 +487,7 @@
 
                                     <div class="team-leadership-coo-info-icon team-leadership-coo-info-icon-yellow">
 
-                                        🏢
+                                        <flux:icon.building-office class="w-7 h-7 sm:w-8 sm:h-8" />
 
                                     </div>
 
@@ -697,7 +697,7 @@
                     <div class="team-field-card">
                         <div class="team-field-icon-box team-icon-blue">
                             <span class="inline-block">
-                                📍
+                                <flux:icon.map-pin class="w-8 h-8 sm:w-10 sm:h-10" />
                             </span>
                         </div>
                         <h3 class="team-field-card-title">

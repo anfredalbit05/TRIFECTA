@@ -37,7 +37,7 @@
                         <td style="padding: 40px; font-size: 15px; line-height: 1.6;">
                             <p style="margin: 0 0 16px 0;">Dear {{ $user->name }},</p>
 
-                            <p style="margin: 0 0 24px 0; color: #475569;">This serves as an acknowledgment receipt that your activation request/document has been received and processed successfully.</p>
+                            <p style="margin: 0 0 24px 0; color: #475569;">This serves as an acknowledgment receipt that your activation request/document has been received and processed successfully. A copy of your filled-out Acknowledgement Receipt (PDF-ready image) is attached to this email for your records.</p>
 
                             <!-- Receipt Card -->
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #0B2A5B; border-radius: 16px; margin-bottom: 24px;">

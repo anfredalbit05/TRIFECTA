@@ -109,6 +109,15 @@
                             <span>Masterlist</span>
                         </a>
 
+                        <a href="{{ route('transaction-list') }}"
+                           class="menu-item {{ request()->routeIs('transaction-list') ? 'active-menu' : '' }}">
+                            <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                      d="M3 6h18M3 12h18M3 18h18M7 3v2M12 3v2M17 3v2"/>
+                            </svg>
+                            <span>Transaction List</span>
+                        </a>
+
                         <a href="{{ route('post') }}"
                            class="menu-item {{ request()->routeIs('post') ? 'active-menu' : '' }}">
                             <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,6 +135,8 @@
                             </svg>
                             <span>Report & Settings</span>
                         </a>
+
+
 
                     @endif
 
@@ -190,6 +201,15 @@
                 <span>Masterlist</span>
             </a>
 
+            <a href="{{ route('transaction-list') }}"
+               class="member-mobile-nav-item {{ request()->routeIs('transaction-list') ? 'active' : '' }}">
+                <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                          d="M3 6h18M3 12h18M3 18h18M7 3v2M12 3v2M17 3v2"/>
+                </svg>
+                <span>Transactions</span>
+            </a>
+
             <a href="{{ route('post') }}"
                class="member-mobile-nav-item {{ request()->routeIs('post') ? 'active' : '' }}">
                 <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -207,6 +227,8 @@
                 </svg>
                 <span>Reports</span>
             </a>
+
+
 
         @endif
 

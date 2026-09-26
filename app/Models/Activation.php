@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
 
 class Activation extends Model
 {
@@ -31,13 +30,11 @@ class Activation extends Model
 
         'UserID',
 
-
         /*
         | Activation amount
         */
 
         'amount',
-
 
         /*
         | W = Walk-in
@@ -45,7 +42,6 @@ class Activation extends Model
         */
 
         'type',
-
 
         /*
         | Cash
@@ -55,14 +51,12 @@ class Activation extends Model
 
         'payment_method',
 
-
         /*
         | Referral code entered
         | by the activating member
         */
 
         'upline_code',
-
 
         /*
         | GCash or bank transaction reference
@@ -72,14 +66,12 @@ class Activation extends Model
 
         'payment_reference',
 
-
         /*
         | UserID of the user whose
         | uplineCode matches referral_code
         */
 
         'ProcessedBy',
-
 
         /*
         | Pending
@@ -89,8 +81,23 @@ class Activation extends Model
 
         'status',
 
-    ];
+        /*
+        | Acknowledgement receipt number
+        | (auto-generated on approval, e.g. 000550)
+        */
 
+        'receipt_number',
+
+
+        /*
+        | Cashier who signed the acknowledgement receipt
+        | (name + signature image path, snapshot at approval)
+        */
+
+        'cashier_name',
+        'cashier_signature',
+
+    ];
 
     /*
     |--------------------------------------------------------------------------
@@ -107,6 +114,31 @@ class Activation extends Model
         );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Receipt Number Generation
+    |
+    | Sequential 6-digit numbers (000550, 000551, ...) based on the HIGHEST
+    | control number in the activations table — regardless of which row or
+    | status holds it — so a number is never reused. When no number has
+    | been issued yet, the sequence starts at 000550.
+    |--------------------------------------------------------------------------
+    */
+
+    public static function nextReceiptNumber(): string
+    {
+        // Zero-padded 6-digit numbers sort identically as strings and ints,
+        // so MAX(receipt_number) is the highest number ever issued.
+        $highest = static::query()
+            ->whereNotNull('receipt_number')
+            ->max('receipt_number');
+
+        $next = ($highest === null)
+            ? 550
+            : ((int) $highest + 1);
+
+        return str_pad((string) $next, 6, '0', STR_PAD_LEFT);
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -123,14 +155,12 @@ class Activation extends Model
         );
     }
 
-
     public function histories()
-{
-    return $this->hasMany(
-        ActivationHistory::class,
-        'ActivationID',
-        'ActivationID'
-    );
-}
-
+    {
+        return $this->hasMany(
+            ActivationHistory::class,
+            'ActivationID',
+            'ActivationID'
+        );
+    }
 }

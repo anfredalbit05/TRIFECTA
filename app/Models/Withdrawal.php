@@ -10,8 +10,11 @@ class Withdrawal extends Model
     use HasFactory;
 
     protected $table = 'withdrawals';
+
     protected $primaryKey = 'WithdrawID';
+
     public $incrementing = true;
+
     protected $keyType = 'int';
 
     protected $fillable = [
@@ -27,7 +30,7 @@ class Withdrawal extends Model
         'payment_reference',
         'ProcessedBy',
         'status',
-        'confirmed_by'
+        'confirmed_by',
     ];
 
     protected $casts = [
@@ -35,4 +38,12 @@ class Withdrawal extends Model
         'amount' => 'decimal:2',
         'tax_amount' => 'decimal:2',
     ];
+
+    /**
+     * The member who requested this withdrawal.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'UserID', 'UserID');
+    }
 }

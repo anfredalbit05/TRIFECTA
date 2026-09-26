@@ -2,17 +2,18 @@
 
 namespace App\Livewire;
 
-use App\Models\User;
-use Livewire\Component;
-use Livewire\Attributes\On;
 use App\Models\Activation;
 use App\Models\ActivationHistory;
+use App\Models\User;
+use Livewire\Attributes\On;
+use Livewire\Component;
 
 class ViewMemberModal extends Component
 {
     public bool $open = false;
 
     public ?int $UserID = null;
+
     public ?string $status = null;
 
     /*
@@ -21,13 +22,21 @@ class ViewMemberModal extends Component
     |--------------------------------------------------------------------------
     */
     public $surname = '';
+
     public $first_name = '';
+
     public $middle_name = '';
+
     public $occupation = '';
+
     public $gender = '';
+
     public $civil_status = '';
+
     public $birthdate = '';
+
     public $referralCode = '';
+
     public $uplineCode = '';
 
     /*
@@ -36,8 +45,16 @@ class ViewMemberModal extends Component
     |--------------------------------------------------------------------------
     */
     public $policy_number = '';
+
     public $policy_expiration_date = '';
+
     public $policy_effectivity_date = '';
+
+    /**
+     * Control number from the member's LATEST approved activation
+     * (acknowledgement receipt number).
+     */
+    public $receipt_number = '';
 
     /*
     |--------------------------------------------------------------------------
@@ -45,7 +62,9 @@ class ViewMemberModal extends Component
     |--------------------------------------------------------------------------
     */
     public $address = '';
+
     public $latitude = null;
+
     public $longitude = null;
 
     /*
@@ -54,7 +73,9 @@ class ViewMemberModal extends Component
     |--------------------------------------------------------------------------
     */
     public $mobile = '';
+
     public $email = '';
+
     public $username = '';
 
     /*
@@ -63,7 +84,9 @@ class ViewMemberModal extends Component
     |--------------------------------------------------------------------------
     */
     public ?string $activationStatus = null;
+
     public ?string $activationDate = null;
+
     public ?string $activationLabel = null;
 
     /*
@@ -124,6 +147,13 @@ class ViewMemberModal extends Component
         $this->policy_number = $user->policy_number;
         $this->policy_expiration_date = $user->policy_expiration_date;
         $this->policy_effectivity_date = $user->policy_effectivity_date;
+
+        // Control number lives on the member's latest approved activation
+        $this->receipt_number = Activation::where('UserID', $user->UserID)
+            ->where('status', 'Approved')
+            ->whereNotNull('receipt_number')
+            ->latest('ActivationID')
+            ->value('receipt_number');
     }
 
     /*
@@ -161,10 +191,11 @@ class ViewMemberModal extends Component
             ->latest()
             ->first();
 
-        if (!$activation) {
+        if (! $activation) {
             $this->activationStatus = null;
             $this->activationDate = null;
             $this->activationLabel = null;
+
             return;
         }
 

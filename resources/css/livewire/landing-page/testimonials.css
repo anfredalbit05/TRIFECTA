@@ -117,7 +117,7 @@
 }
 
 .testimonial-highlight-icon{
-    @apply text-4xl font-black;
+    @apply text-4xl font-black flex items-center justify-center;
     color:#FFD54A;
 }
 

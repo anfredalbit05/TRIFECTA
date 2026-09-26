@@ -23,7 +23,7 @@
 
             @foreach($nodes as $node)
 
-                <article class="member-card">
+                <article class="member-card {{ ($node['highlighted'] ?? false) ? 'member-card-highlighted' : '' }}" wire:key="gen{{ $generation }}-node{{ $node['id'] }}">
 
                     <div class="member-card-top">
 

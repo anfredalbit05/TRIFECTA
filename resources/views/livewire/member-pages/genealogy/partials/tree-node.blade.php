@@ -10,6 +10,7 @@
         'is-root' => $isRoot,
     ])
 >
+    @php($highlighted = $node['highlighted'] ?? false)
 
     {{-- Connection coming from parent --}}
     @if (!$isRoot)
@@ -59,6 +60,12 @@
                 ring-2
                 ring-blue-100
             ' => ($node['status'] ?? '') === 'Active',
+
+            '
+                !border-[#D4A017]
+                !ring-2
+                !ring-[#D4A017]/40
+            ' => $highlighted,
         ])
     >
 

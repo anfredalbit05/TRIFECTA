@@ -83,7 +83,7 @@
             <div class="contact-details-grid">
                 <!-- Main Office -->
                 <div class="contact-detail-card">
-                    <div class="contact-card-icon">📍</div>
+                    <div class="contact-card-icon"><flux:icon.map-pin class="w-12 h-12" /></div>
                     <h3 class="contact-detail-title">
                         <x-editable-text
                             key="contact_main_office_title"
@@ -104,7 +104,7 @@
 
                 <!-- Sub Office -->
                 <div class="contact-detail-card">
-                    <div class="contact-card-icon">🏢</div>
+                    <div class="contact-card-icon"><flux:icon.building-office-2 class="w-12 h-12" /></div>
                     <h3 class="contact-detail-title">
                         <x-editable-text
                             key="contact_sub_office_title"
@@ -125,7 +125,7 @@
 
                 <!-- Contact Numbers -->
                 <div class="contact-detail-card">
-                    <div class="contact-card-icon">📞</div>
+                    <div class="contact-card-icon"><flux:icon.phone class="w-12 h-12" /></div>
                     <h3 class="contact-detail-title">
                         <x-editable-text
                             key="contact_phone_title"
@@ -154,7 +154,7 @@
 
                 <!-- Email -->
                 <div class="contact-detail-card">
-                    <div class="contact-card-icon">✉️</div>
+                    <div class="contact-card-icon"><flux:icon.envelope class="w-12 h-12" /></div>
                     <h3 class="contact-detail-title">
                         <x-editable-text
                             key="contact_email_title"
@@ -176,7 +176,7 @@
 
             <!-- Facebook Callout Banner -->
             <div class="contact-facebook-banner">
-                <div class="contact-facebook-icon">👍</div>
+                <div class="contact-facebook-icon"><flux:icon.hand-thumb-up class="w-14 h-14" /></div>
                 <h3 class="contact-facebook-title">
                     <x-editable-text
                         key="contact_fb_title"

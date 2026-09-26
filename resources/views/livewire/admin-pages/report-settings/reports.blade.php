@@ -62,8 +62,8 @@
                 </button>
             @endif
 
-             <!-- PRINT BUTTON -->
-            <button type="button" onclick="window.print()" title="Print Report"
+             <!-- PRINT BUTTON — builds the printable report, prints, then tears it down -->
+            <button type="button" wire:click="preparePrint" title="Print Report"
                 class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-[#0C2C6B] text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
                 <span>🖨️</span>
                 <span class="hidden sm:inline">Print</span>
@@ -246,7 +246,10 @@
         @endif
     </div>
 
-    <!-- PRINTABLE REPORT (hidden on screen, visible only when printing) -->
+    <!-- PRINTABLE REPORT (hidden on screen, visible only when printing).
+         Rendered ONLY while printing — an always-present unpaginated table of
+         every ledger row made the page multi-megabyte and laggy. -->
+    @if ($printing)
     <div id="printable-ledgers" class="hidden print:block font-sans">
         <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#0C2C6B]">
             <h1 class="m-0 text-2xl font-bold text-[#0C2C6B] font-serif">
@@ -310,6 +313,7 @@
             </tbody>
         </table>
     </div>
+    @endif
 
     <style>
         @media print {
@@ -386,6 +390,17 @@
 
             $wire.on('ranges-reset', () => {
                 picker.clear();
+            });
+        </script>
+    @endscript
+
+    @script
+        <script>
+            // The printable table is now in the DOM: print it, then remove it
+            // again so the page stays light.
+            $wire.on('print-ledgers', () => {
+                window.print();
+                $wire.set('printing', false);
             });
         </script>
     @endscript

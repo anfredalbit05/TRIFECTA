@@ -2,14 +2,18 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use Livewire\Attributes\On;
-use App\Models\User;
+use App\Models\Activation;
 use App\Models\Beneficiary;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
+use Livewire\Component;
 
 class ApplicationModal extends Component
 {
@@ -21,25 +25,52 @@ class ApplicationModal extends Component
     |--------------------------------------------------------------------------
     */
     public $surname = '';
+
     public $first_name = '';
+
     public $middle_name = '';
+
     public $occupation = '';
+
     public $gender = '';
+
     public $civil_status = '';
+
     public $birthdate = '';
+
     public $address = '';
+
     public ?float $latitude = null;
+
     public ?float $longitude = null;
+
     public bool $showMapModal = false;
+
     public bool $isSubmitting = false;
 
     public bool $isViewMode = false;
+
     public bool $isEditMode = false;
 
     public ?int $userId = null;
+
     public $policy_number = null;
+
     public $policy_effectivity_date = null;
+
     public $policy_expiration_date = null;
+
+    /**
+     * Control number of the member's APPROVED activation (read-only display),
+     * plus the editable field used to ADD one when the approved activation
+     * has none yet. Null activationControlNumber means there is no approved
+     * activation (or it already carries a number) and editing is disabled.
+     */
+    public $receipt_number = null;
+
+    public $activationControlNumber = null;
+
+    public ?int $activationId = null;
 
     public $upline = '';
 
@@ -75,9 +106,13 @@ class ApplicationModal extends Component
     |--------------------------------------------------------------------------
     */
     public $mobile = '';
+
     public $email = '';
+
     public $username = '';
+
     public $password = '';
+
     public $password_confirmation = '';
 
     /*
@@ -129,6 +164,7 @@ class ApplicationModal extends Component
                         </div>
                     "
                 );
+
                 return false;
             }
 
@@ -144,6 +180,7 @@ class ApplicationModal extends Component
                         </div>
                     "
                 );
+
                 return false;
             }
 
@@ -159,6 +196,7 @@ class ApplicationModal extends Component
                         </div>
                     "
                 );
+
                 return false;
             }
         }
@@ -170,18 +208,18 @@ class ApplicationModal extends Component
     {
         if ($property === 'mobile') {
             if (str_starts_with($value, '+63')) {
-                $value = '09' . substr($value, 3);
+                $value = '09'.substr($value, 3);
             } elseif (str_starts_with($value, '63') && strlen($value) === 12) {
-                $value = '0' . substr($value, 2);
+                $value = '0'.substr($value, 2);
             }
 
             $value = preg_replace('/\D/', '', $value);
 
-            if (strlen($value) > 0 && !str_starts_with($value, '0')) {
-                $value = '0' . $value;
+            if (strlen($value) > 0 && ! str_starts_with($value, '0')) {
+                $value = '0'.$value;
             }
             if (strlen($value) > 1 && $value[1] !== '9') {
-                $value = '09' . substr($value, 2);
+                $value = '09'.substr($value, 2);
             }
 
             $this->mobile = substr($value, 0, 11);
@@ -210,16 +248,16 @@ class ApplicationModal extends Component
     {
         $beneficiary = $this->beneficiaries[$index] ?? [];
         $hasData =
-            !empty(trim($beneficiary['fullname'] ?? '')) ||
-            !empty($beneficiary['birthdate'] ?? '') ||
-            !empty(trim($beneficiary['relationship'] ?? ''));
+            ! empty(trim($beneficiary['fullname'] ?? '')) ||
+            ! empty($beneficiary['birthdate'] ?? '') ||
+            ! empty(trim($beneficiary['relationship'] ?? ''));
 
         // Nothing typed and nothing saved — no need to confirm anything.
-        if (!$hasData) {
+        if (! $hasData) {
             return;
         }
 
-        $isPersisted = !empty($this->beneficiaryIds[$index]);
+        $isPersisted = ! empty($this->beneficiaryIds[$index]);
 
         $this->dispatch(
             'confirm-delete-beneficiary',
@@ -238,11 +276,11 @@ class ApplicationModal extends Component
     */
     public function deleteBeneficiary($index)
     {
-        if (!isset($this->beneficiaries[$index])) {
+        if (! isset($this->beneficiaries[$index])) {
             return;
         }
 
-        $wasPersisted = !empty($this->beneficiaryIds[$index]);
+        $wasPersisted = ! empty($this->beneficiaryIds[$index]);
 
         if ($wasPersisted) {
             Beneficiary::destroy($this->beneficiaryIds[$index]);
@@ -313,7 +351,10 @@ class ApplicationModal extends Component
             'longitude',
             'policy_number',
             'policy_effectivity_date',
-            'policy_expiration_date'
+            'policy_expiration_date',
+            'receipt_number',
+            'activationControlNumber',
+            'activationId',
         ]);
 
         $this->showMapModal = false;
@@ -329,7 +370,7 @@ class ApplicationModal extends Component
     */
     public function submit()
     {
-        if (!$this->validateBeneficiaries()) {
+        if (! $this->validateBeneficiaries()) {
             return;
         }
 
@@ -368,7 +409,7 @@ class ApplicationModal extends Component
 
         } catch (ValidationException $e) {
             Log::warning('VALIDATION FAILED', [
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ]);
 
             $errors = $e->validator->errors()->all();
@@ -451,7 +492,7 @@ class ApplicationModal extends Component
             Log::info('Sending emails');
 
             foreach ($this->beneficiaries as $beneficiary) {
-                if (!empty($beneficiary['fullname']) && !empty($beneficiary['birthdate'])) {
+                if (! empty($beneficiary['fullname']) && ! empty($beneficiary['birthdate'])) {
                     Beneficiary::create([
                         'UserID' => $user->UserID,
                         'fullname' => $beneficiary['fullname'],
@@ -492,7 +533,7 @@ class ApplicationModal extends Component
 
                 Mail::send('emails.new-application', $adminData, function ($message) use ($admin) {
                     $message->to($admin->email)
-                            ->subject('New Member Application Submitted');
+                        ->subject('New Member Application Submitted');
                 });
             }
 
@@ -505,7 +546,7 @@ class ApplicationModal extends Component
 
                 Mail::send('emails.new-application', $userData, function ($message) use ($userData) {
                     $message->to($userData['email'])
-                            ->subject('Your Application Details & Credentials');
+                        ->subject('Your Application Details & Credentials');
 
                     $benefitsPath = public_path('images/benefits.jpeg');
                     if (file_exists($benefitsPath)) {
@@ -560,7 +601,7 @@ class ApplicationModal extends Component
 
             $this->dispatch('validation-error',
                 title: 'Error',
-                html: 'Something went wrong: ' . htmlspecialchars($e->getMessage())
+                html: 'Something went wrong: '.htmlspecialchars($e->getMessage())
             );
         }
     }
@@ -572,7 +613,7 @@ class ApplicationModal extends Component
     */
     public function confirmUpdate()
     {
-        if (!$this->validateBeneficiaries()) {
+        if (! $this->validateBeneficiaries()) {
             return;
         }
 
@@ -589,6 +630,9 @@ class ApplicationModal extends Component
             ? null
             : trim($this->policy_expiration_date);
 
+        $this->receipt_number = blank($this->receipt_number)
+            ? null
+            : trim($this->receipt_number);
 
         try {
             $this->validate([
@@ -602,13 +646,15 @@ class ApplicationModal extends Component
 
                 'mobile' => 'required|digits:11',
 
-                'email' => 'nullable|email|unique:users,email,' . $this->userId . ',UserID',
+                'email' => 'nullable|email|unique:users,email,'.$this->userId.',UserID',
 
-                'username' => 'required|string|max:100|unique:users,username,' . $this->userId . ',UserID',
+                'username' => 'required|string|max:100|unique:users,username,'.$this->userId.',UserID',
 
                 'policy_number' => 'nullable|string|max:100',
                 'policy_effectivity_date' => 'nullable|date',
                 'policy_expiration_date' => 'nullable|date',
+                'receipt_number' => ['nullable', 'string', 'max:50', 'regex:/^\d{6}$/',
+                    Rule::unique('activations', 'receipt_number')->ignore($this->activationId, 'ActivationID')],
             ]);
         } catch (ValidationException $e) {
             $errors = $e->validator->errors()->all();
@@ -670,6 +716,7 @@ class ApplicationModal extends Component
             'policy_number' => 'Policy Number',
             'policy_effectivity_date' => 'Policy Effectivity Date',
             'policy_expiration_date' => 'Policy Expiration Date',
+            'receipt_number' => 'Receipt Number',
         ];
 
         $changes = [];
@@ -693,7 +740,8 @@ class ApplicationModal extends Component
             if (empty($b['fullname']) && empty($b['birthdate']) && empty($b['relationship'])) {
                 return '—';
             }
-            return trim(($b['fullname'] ?? '') . ' – ' . ($b['relationship'] ?? '') . ' (' . ($b['birthdate'] ?? '') . ')');
+
+            return trim(($b['fullname'] ?? '').' – '.($b['relationship'] ?? '').' ('.($b['birthdate'] ?? '').')');
         };
 
         foreach ($this->beneficiaries as $i => $beneficiary) {
@@ -709,7 +757,7 @@ class ApplicationModal extends Component
             }
 
             $changes[] = [
-                'field' => 'Beneficiary ' . ($i + 1),
+                'field' => 'Beneficiary '.($i + 1),
                 'old' => $formatBeneficiary($old),
                 'new' => $formatBeneficiary($beneficiary),
             ];
@@ -739,6 +787,9 @@ class ApplicationModal extends Component
         ? null
         : trim($this->policy_expiration_date);
 
+        $this->receipt_number = blank($this->receipt_number)
+        ? null
+        : trim($this->receipt_number);
 
         $this->validate([
             'surname' => 'required|string|max:255',
@@ -754,11 +805,13 @@ class ApplicationModal extends Component
             'beneficiaries.*.relationship' => 'nullable|string|max:50',
 
             'mobile' => 'required|digits:11',
-            'email' => 'nullable|email|unique:users,email,' . $this->userId . ',UserID',
-            'username' => 'required|string|max:100|unique:users,username,' . $this->userId . ',UserID',
+            'email' => 'nullable|email|unique:users,email,'.$this->userId.',UserID',
+            'username' => 'required|string|max:100|unique:users,username,'.$this->userId.',UserID',
             'policy_number' => 'nullable|string|max:100',
             'policy_effectivity_date' => 'nullable|date',
             'policy_expiration_date' => 'nullable|date',
+            'receipt_number' => ['nullable', 'string', 'max:50', 'regex:/^\d{6}$/',
+                Rule::unique('activations', 'receipt_number')->ignore($this->activationId, 'ActivationID')],
         ]);
 
         DB::beginTransaction();
@@ -785,6 +838,16 @@ class ApplicationModal extends Component
                 'policy_expiration_date' => $this->policy_expiration_date,
             ]);
 
+            /*
+            | Attach the control number to the member's APPROVED activation
+            | (only when the admin generated/entered a new one).
+            */
+            if ($this->activationId && filled($this->receipt_number)) {
+                Activation::where('ActivationID', $this->activationId)
+                    ->whereNull('receipt_number')
+                    ->update(['receipt_number' => $this->receipt_number]);
+            }
+
             // Delete old beneficiaries and re-create from the current form state.
             Beneficiary::where('UserID', $user->UserID)->delete();
 
@@ -798,7 +861,7 @@ class ApplicationModal extends Component
                     continue;
                 }
 
-                if (!empty($fullname) && !empty($birthdate)) {
+                if (! empty($fullname) && ! empty($birthdate)) {
                     Beneficiary::create([
                         'UserID' => $user->UserID,
                         'fullname' => $fullname,
@@ -890,7 +953,7 @@ class ApplicationModal extends Component
         $this->latitude = (float) $lat;
         $this->longitude = (float) $lng;
 
-        if (!empty($address)) {
+        if (! empty($address)) {
             $this->address = ucwords(strtolower($address));
         }
 
@@ -899,6 +962,54 @@ class ApplicationModal extends Component
             'longitude' => $this->longitude,
             'address' => $this->address,
         ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Generate Receipt Number
+    |
+    | Produces the next sequential number (e.g. last approved activation
+    | carries 000551 → generates 000552) and fills the editable field.
+    | Only available when the member HAS an approved activation WITHOUT
+    | a control number yet.
+    |--------------------------------------------------------------------------
+    */
+    /*
+    |--------------------------------------------------------------------------
+    | Preview of the NEXT control number (used as the input placeholder/hint
+    | so what the admin sees is exactly what Generate will fill).
+    | Recomputed on every request, so it stays current while editing.
+    |--------------------------------------------------------------------------
+    */
+    #[Computed]
+    public function previewControlNumber(): string
+    {
+        return Activation::nextReceiptNumber();
+    }
+
+    public function generateControlNumber(): void
+    {
+        if (! $this->activationId) {
+            $this->dispatch(
+                'validation-error',
+                title: 'No Approved Activation',
+                html: 'This member does not have an approved activation to attach a control number to.'
+            );
+
+            return;
+        }
+
+        if (filled($this->activationControlNumber)) {
+            $this->dispatch(
+                'validation-error',
+                title: 'Receipt Number Already Exists',
+                html: 'This member\'s approved activation already has control number <b>'.e($this->activationControlNumber).'</b>.'
+            );
+
+            return;
+        }
+
+        $this->receipt_number = Activation::nextReceiptNumber();
     }
 
     #[On('open-update-member')]
@@ -924,7 +1035,7 @@ class ApplicationModal extends Component
         $this->civil_status = $user->civilstatus ?? '';
 
         $this->birthdate = $user->birthdate
-            ? \Carbon\Carbon::parse($user->birthdate)->format('Y-m-d')
+            ? Carbon::parse($user->birthdate)->format('Y-m-d')
             : '';
 
         $this->address = $user->address ?? '';
@@ -937,13 +1048,22 @@ class ApplicationModal extends Component
         $this->policy_number = $user->policy_number ?: null;
 
         $this->policy_effectivity_date = $user->policy_effectivity_date
-            ? \Carbon\Carbon::parse($user->policy_effectivity_date)->format('Y-m-d')
+            ? Carbon::parse($user->policy_effectivity_date)->format('Y-m-d')
             : null;
 
         $this->policy_expiration_date = $user->policy_expiration_date
-            ? \Carbon\Carbon::parse($user->policy_expiration_date)->format('Y-m-d')
+            ? Carbon::parse($user->policy_expiration_date)->format('Y-m-d')
             : null;
 
+        // Control number lives on the member's APPROVED activation.
+        $approvedActivation = Activation::where('UserID', $user->UserID)
+            ->where('status', 'Approved')
+            ->latest('ActivationID')
+            ->first();
+
+        $this->activationId = $approvedActivation?->ActivationID;
+        $this->activationControlNumber = $approvedActivation?->receipt_number;
+        $this->receipt_number = null; // editable only when adding a missing one
 
         // Reset both the form slots and the "which slot is a saved DB row" tracker.
         $this->beneficiaries = [
@@ -960,7 +1080,7 @@ class ApplicationModal extends Component
             $this->beneficiaries[$index] = [
                 'fullname' => $beneficiary->fullname ?? '',
                 'birthdate' => $beneficiary->birthdate
-                    ? \Carbon\Carbon::parse($beneficiary->birthdate)->format('Y-m-d')
+                    ? Carbon::parse($beneficiary->birthdate)->format('Y-m-d')
                     : '',
                 'relationship' => $beneficiary->relationship ?? '',
             ];

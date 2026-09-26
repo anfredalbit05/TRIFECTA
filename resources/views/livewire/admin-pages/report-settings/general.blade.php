@@ -218,9 +218,13 @@
         @endif
     </div>
 
-    <!-- ADD/EDIT SETTING MODAL -->
-    @if ($isOpen)
-        <div class="modal-overlay">
+    <!-- ADD/EDIT SETTING MODAL --><!--
+      Rendered ALWAYS and toggled with x-show="$wire.isOpen" (same pattern as
+      the page tabs): inserting this subtree via a morph made Alpine skip its
+      x-show effects, so the value-type toggles stopped reacting. A static
+      subtree stays fully reactive no matter how often it is shown/hidden.
+    -->
+    <div class="modal-overlay" x-data="{ open: $wire.entangle('isOpen') }" :class="open ? '' : 'force-hidden'" x-cloak>
             <div class="modal-box">
 
                 <!-- MODAL HEADER -->
@@ -244,29 +248,35 @@
                         <div>
                             <label class="field-label">Setting
                                 Name</label>
-                            <input type="text" wire:model="name"
+                            <input type="text" wire:model.blur="name"
                                 class="field-input">
                             @error('name')
                                 <span class="field-error">{{ $message }}</span>
                             @enderror
                         </div>
 
-                        <!-- Value with Input Type Switcher -->
-                        <div x-data="{
-                            valueType: '{{ in_array(strtolower((string) $value), ['true', 'false', '1', '0']) ? 'boolean' : 'text' }}'
-                        }">
+                        <!-- Value with Input Type Switcher.
+                             valueType lives purely in Alpine; the component
+                             pushes the correct initial panel via the
+                             setting-modal-type browser event when it opens the
+                             modal (one-way: no entangle sync can clobber it). -->
+                        <div x-data="{ valueType: 'text' }" @setting-modal-type.window="valueType = $event.detail.type" x-cloak>
                             <div class="value-type-header">
                                 <label class="value-type-label">Value Type / Input</label>
                                 <div class="value-type-toggle">
                                     <span class="toggle-label">Select:</span>
                                     <button type="button" @click="valueType = 'boolean'" :class="valueType === 'boolean' ? 'toggle-btn-active' : 'toggle-btn-inactive'" class="toggle-btn">True/False</button>
                                     <button type="button" @click="valueType = 'text'" :class="valueType === 'text' ? 'toggle-btn-active' : 'toggle-btn-inactive'" class="toggle-btn">Custom Value</button>
+                                    <button type="button" @click="valueType = 'signature'" :class="valueType === 'signature' ? 'toggle-btn-active' : 'toggle-btn-inactive'" class="toggle-btn">Others</button>
                                 </div>
                             </div>
 
-                            <!-- Boolean Selector (Button-Like Style with Larger Height & Padding) -->
-                            <div x-show="valueType === 'boolean'" class="boolean-select-wrapper">
-                                <select wire:model="value"
+                            <!-- Boolean Selector (Button-Like Style with Larger Height & Padding).
+                                 Visibility is driven by :class instead of x-show:
+                                 x-show effects are unreliable on morph-touched
+                                 subtrees, :class bindings are not. -->
+                            <div :class="valueType === 'boolean' ? '' : 'force-hidden'" class="boolean-select-wrapper" x-cloak>
+                                <select wire:model.blur="value"
                                     class="boolean-select">
                                     <option value="true">True</option>
                                     <option value="false">False</option>
@@ -279,18 +289,121 @@
                             </div>
 
                             <!-- Custom Textarea Input -->
-                            <div x-show="valueType === 'text'">
-                                <textarea wire:model="value"
+                            <div :class="valueType === 'text' ? '' : 'force-hidden'" x-cloak>
+                                <textarea wire:model.blur="value"
                                     class="field-textarea"
                                     rows="3" placeholder="Enter configuration value..."></textarea>
                             </div>
 
-                            @error('value')
-                                <span class="field-error">{{ $message }}</span>
-                            @enderror
-                        </div>
+                            <!-- Others — Signature Upload (stores storage path as the value) -->
+                            <div :class="valueType === 'signature' ? '' : 'force-hidden'" x-cloak>
+                            <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4">
 
-                    </div>
+                                <label class="field-label">Cashier Signature</label>
+
+                                <p class="mb-3 text-xs text-slate-500">
+                                    Upload or draw the cashier signature. The image will be saved automatically
+                                    and its storage path will be placed into the Custom Value.
+                                </p>
+
+                                {{-- Automatically generated storage path --}}
+                                <div class="mb-3">
+                                    <label class="field-label">Custom Value</label>
+
+                                    <input
+                                        type="text"
+                                        wire:model="value"
+                                        readonly
+                                        class="field-input bg-slate-100"
+                                        placeholder="Signature path will appear here..."
+                                    >
+
+                                    @if ($value)
+                                        <p class="mt-1 text-xs text-emerald-600">
+                                            ✓ Signature path automatically generated
+                                        </p>
+                                    @endif
+                                </div>
+
+                                {{-- Existing signature preview --}}
+                                @if (str_contains((string) $value, 'SIG_'))
+                                    <div class="mb-3 flex items-center gap-4">
+                                        <img
+                                            src="{{ asset('storage/' . $value) }}"
+                                            alt="Current signature"
+                                            class="h-12 rounded border border-slate-200 bg-white px-3"
+                                        >
+
+                                        <span class="text-xs font-semibold text-emerald-600">
+                                            ✓ Current signature
+                                        </span>
+                                    </div>
+                                @endif
+
+                                {{-- Draw signature --}}
+                                <div
+                                    x-data="signaturePad()"
+                                    x-init="initPad()"
+                                    class="mb-3"
+                                >
+                                    <canvas
+                                        x-ref="pad"
+                                        width="520"
+                                        height="140"
+                                        class="w-full cursor-crosshair rounded-lg border border-slate-300 bg-white touch-none"
+                                    ></canvas>
+
+                                    <div class="mt-2 flex gap-2">
+
+                                        <button
+                                            type="button"
+                                            @click="clear"
+                                            class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:bg-slate-100"
+                                        >
+                                            Clear
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            @click="save($wire)"
+                                            class="rounded-lg bg-[#0B2A5B] px-3 py-1.5 text-xs font-bold text-white transition hover:bg-[#123c88]"
+                                        >
+                                            Use Drawn Signature
+                                        </button>
+
+                                    </div>
+                                </div>
+
+                                {{-- Upload signature --}}
+                                <label class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-600 transition hover:bg-slate-100">
+
+                                    Upload Signature Image
+
+                                    <input
+                                        type="file"
+                                        accept="image/png,image/jpeg"
+                                        class="hidden"
+                                        onchange="
+                                            const file = this.files[0];
+                                            if (!file) return;
+
+                                            const reader = new FileReader();
+
+                                            reader.onloadend = () => {
+                                                $wire.call(
+                                                    'saveSignatureSetting',
+                                                    reader.result.split(',')[1]
+                                                );
+                                            };
+
+                                            reader.readAsDataURL(file);
+                                        "
+                                    >
+
+                                </label>
+
+                            </div>
+                        </div>
 
                     <!-- MODAL FOOTER -->
                     <div class="modal-footer">
@@ -307,7 +420,6 @@
 
             </div>
         </div>
-    @endif
 
     {{-- All styles now live in general.css --}}
 
@@ -357,7 +469,112 @@
                     showConfirmButton: false
                 });
             });
+
+            // Bridge the server's value-type push (sent when the modal opens)
+            // to the Alpine scope inside the modal.
+            $wire.on('setting-modal-type', (event) => {
+                const detail = event && event.type ? event : (event && event[0]) || {};
+                window.dispatchEvent(new CustomEvent('setting-modal-type', { detail }));
+            });
+
+            function signaturePad() {
+    return {
+        canvas: null,
+        ctx: null,
+        drawing: false,
+
+        initPad() {
+            this.canvas = this.$refs.pad;
+            this.ctx = this.canvas.getContext('2d');
+
+            this.ctx.lineWidth = 2;
+            this.ctx.lineCap = 'round';
+            this.ctx.lineJoin = 'round';
+            this.ctx.strokeStyle = '#000';
+
+            this.canvas.addEventListener('pointerdown', (event) => {
+                this.drawing = true;
+
+                const rect = this.canvas.getBoundingClientRect();
+
+                const x =
+                    (event.clientX - rect.left) *
+                    (this.canvas.width / rect.width);
+
+                const y =
+                    (event.clientY - rect.top) *
+                    (this.canvas.height / rect.height);
+
+                this.ctx.beginPath();
+                this.ctx.moveTo(x, y);
+            });
+
+            this.canvas.addEventListener('pointermove', (event) => {
+                if (!this.drawing) {
+                    return;
+                }
+
+                const rect = this.canvas.getBoundingClientRect();
+
+                const x =
+                    (event.clientX - rect.left) *
+                    (this.canvas.width / rect.width);
+
+                const y =
+                    (event.clientY - rect.top) *
+                    (this.canvas.height / rect.height);
+
+                this.ctx.lineTo(x, y);
+                this.ctx.stroke();
+            });
+
+            this.canvas.addEventListener('pointerup', () => {
+                this.drawing = false;
+            });
+
+            this.canvas.addEventListener('pointerleave', () => {
+                this.drawing = false;
+            });
+
+            this.canvas.addEventListener('pointercancel', () => {
+                this.drawing = false;
+            });
+        },
+
+        clear() {
+            this.ctx.clearRect(
+                0,
+                0,
+                this.canvas.width,
+                this.canvas.height
+            );
+        },
+
+        save($wire) {
+            const dataUrl = this.canvas.toDataURL('image/png');
+
+            const base64 = dataUrl.split(',')[1];
+
+            if (!base64) {
+                Swal.fire({
+                    title: 'No Signature',
+                    text: 'Please draw a signature first.',
+                    icon: 'warning'
+                });
+
+                return;
+            }
+
+            // Send signature to Livewire.
+            // saveSignatureSetting() will save the image and
+            // automatically set $this->value to the storage path.
+            $wire.call('saveSignatureSetting', base64);
+        }
+    };
+}
+
         </script>
     @endscript
+
 
 </div>

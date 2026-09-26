@@ -83,7 +83,7 @@
 }
 
 .about-vm-icon {
-    @apply text-5xl mb-6;
+    @apply text-5xl mb-6 flex items-center;
 }
 
 .about-vm-title {
@@ -191,7 +191,7 @@
 }
 
 .about-highlight-icon {
-    @apply text-6xl mb-4;
+    @apply text-6xl mb-4 flex items-center justify-center;
 }
 
 .about-highlight-title {

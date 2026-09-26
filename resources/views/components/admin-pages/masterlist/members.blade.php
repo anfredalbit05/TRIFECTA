@@ -73,6 +73,18 @@
         {{-- FILTERS --}}
         <div class="members-toolbar-actions">
 
+            {{-- STATUS FILTER --}}
+            <select
+                wire:model.live="statusFilter"
+                title="Filter by status"
+                class="text-xs border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-slate-50 font-semibold text-slate-700 shadow-sm cursor-pointer"
+            >
+                <option value="all">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Suspended">Suspended</option>
+            </select>
+
             {{-- DATE RANGE --}}
             <div wire:ignore class="date-range-wrapper">
 

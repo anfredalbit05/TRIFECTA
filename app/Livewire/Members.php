@@ -31,6 +31,8 @@ class Members extends Component
 
     public string $summaryFilter = 'all';
 
+    public string $statusFilter = 'all';
+
     // Excel Export Filters
     public $exportYear = '';
 
@@ -216,6 +218,9 @@ class Members extends Component
                     Carbon::parse($dateTo)->endOfDay(),
                 ]);
             })
+            ->when($this->statusFilter !== 'all', function ($query) {
+                $query->where('status', $this->statusFilter);
+            })
             ->latest()
             ->paginate(10);
 
@@ -248,6 +253,11 @@ class Members extends Component
     }
 
     public function updatedDateRange()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedStatusFilter()
     {
         $this->resetPage();
     }
@@ -1143,6 +1153,7 @@ class Members extends Component
     {
         $this->search = '';
         $this->summaryFilter = 'all';
+        $this->statusFilter = 'all';
         $this->dateRange = '';           // Clear month filter
         $this->exportYear = '';
         $this->exportMonth = '';

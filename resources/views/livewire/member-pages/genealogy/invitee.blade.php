@@ -30,6 +30,36 @@
             </p>
         </div>
 
+        {{-- NAME SEARCH FILTER --}}
+        <div class="relative w-full sm:w-72">
+            <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+                </svg>
+            </span>
+
+            <input
+                type="text"
+                wire:model.live.debounce.300ms="search"
+                placeholder="Search member name..."
+                class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-9 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]/20"
+            >
+
+            @if (filled($search))
+                <button
+                    type="button"
+                    wire:click="clearSearch"
+                    title="Clear search"
+                    class="absolute inset-y-0 right-3 flex items-center text-slate-400 transition hover:text-slate-600"
+                >
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            @endif
+        </div>
+
         @if (isset($tree['id']) && $tree['id'] !== auth()->id())
             <button
                 wire:click="focusUser({{ auth()->id() }})"
@@ -572,6 +602,24 @@
     {{-- =========================================
         EMPTY STATE
     ========================================= --}}
+    @elseif (filled($search))
+
+        <div class="genealogy-empty">
+
+            <div class="genealogy-empty-icon">
+                🔍
+            </div>
+
+            <h3>
+                No members match "{{ $search }}"
+            </h3>
+
+            <p>
+                Try a different name or clear the search to see the full network.
+            </p>
+
+        </div>
+
     @else
 
         <div class="genealogy-empty">

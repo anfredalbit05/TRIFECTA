@@ -92,6 +92,11 @@
                         </div>
 
                         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-bold uppercase text-slate-400">Receipt Number</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-800">{{ $receipt_number ?: 'N/A' }}</p>
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                             <p class="text-xs font-bold uppercase text-slate-400">Policy Expiration Date</p>
                             <p class="mt-1 text-sm font-semibold text-slate-800">
                                 {{ $policy_expiration_date
@@ -356,6 +361,15 @@
                     <div class="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
 
                         @if ($status === 'Active')
+                            <a href="{{ route('admin.member.receipt.download', $UserID) }}"
+                                class="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-600 px-5 py-2.5 text-xs font-bold text-emerald-700 shadow-sm transition hover:bg-emerald-50 sm:w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Download Receipt
+                            </a>
+
                             <a href="{{ route('admin.member.policy.download', $UserID) }}" target="_blank"
                                 class="flex w-full items-center justify-center gap-2 rounded-xl border border-[#0B2A5B] px-5 py-2.5 text-xs font-bold text-[#0B2A5B] shadow-sm transition hover:bg-[#0B2A5B]/5 sm:w-auto">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -1,22 +1,20 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-use App\Livewire\LandingPage\Home;
-use App\Livewire\LandingPage\About;
-use App\Livewire\LandingPage\Team;
-use App\Livewire\LandingPage\How;
-use App\Livewire\LandingPage\Testimonials;
-use App\Livewire\LandingPage\NewsUpdates;
-use App\Livewire\LandingPage\Contact;
-use App\Models\Activation;
 use App\Http\Controllers\CertificateController;
-use App\Http\Controllers\PolicyController;
-use App\Livewire\LoginModal;
-use App\Livewire\MemberPages\MyProfile\MyProfile;
-use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\Setting;
 use App\Http\Controllers\MemberIdCardController;
+use App\Http\Controllers\PolicyController;
+use App\Http\Controllers\ReceiptController;
+use App\Livewire\LandingPage\About;
+use App\Livewire\LandingPage\Contact;
+use App\Livewire\LandingPage\Home;
+use App\Livewire\LandingPage\How;
+use App\Livewire\LandingPage\NewsUpdates;
+use App\Livewire\LandingPage\Team;
+use App\Livewire\LandingPage\Testimonials;
+use App\Models\Activation;
+use App\Models\Setting;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,14 +76,21 @@ Route::middleware(['auth'])->group(function () {
         return view('pages.admin-pages.report-settings');
     })->name('report-settings');
 
+    Route::get('/transaction-list', function () {
+        return view('pages.admin-pages.transaction-list');
+    })->name('transaction-list');
+
     Route::get('/certificate/download', [CertificateController::class, 'download'])
         ->name('certificate.download');
 
     Route::get('/policy/download', [PolicyController::class, 'download'])
         ->name('policy.download');
 
-     Route::get('/admin/members/{userId}/certificate/download', [CertificateController::class, 'adminDownload'])
+    Route::get('/admin/members/{userId}/certificate/download', [CertificateController::class, 'adminDownload'])
         ->name('admin.member.certificate.download');
+
+    Route::get('/admin/members/{userId}/receipt/download', [ReceiptController::class, 'adminDownload'])
+        ->name('admin.member.receipt.download');
 
     Route::get('/admin/members/{userId}/policy/download', [PolicyController::class, 'adminDownload'])
         ->name('admin.member.policy.download');
@@ -107,10 +112,11 @@ Route::middleware(['auth'])->group(function () {
         Auth::logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();
+
         return redirect()->route('home');
     })->name('logout');
 });
 
 Route::get('/secret-login', Home::class)->defaults('autoLogin', true)->name('secret.login');
 
-require __DIR__ . '/settings.php';
+require __DIR__.'/settings.php';

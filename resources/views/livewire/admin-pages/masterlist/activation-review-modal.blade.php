@@ -347,19 +347,21 @@
 
                         @if (!empty($beneficiaries) && count($beneficiaries) > 0)
                             <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-slate-200">
+                                {{-- w-full + table-fixed: the table ALWAYS spans the full
+                                     section width, columns share it evenly --}}
+                                <table class="w-full table-fixed divide-y divide-slate-200">
                                     <thead class="bg-slate-100">
                                         <tr>
                                             <th
-                                                class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
+                                                class="w-1/2 px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                                                 Full Name
                                             </th>
                                             <th
-                                                class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
+                                                class="w-1/4 px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                                                 Birthdate
                                             </th>
                                             <th
-                                                class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
+                                                class="w-1/4 px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                                                 Relationship
                                             </th>
                                         </tr>
@@ -367,8 +369,7 @@
                                     <tbody class="divide-y divide-slate-100 bg-white">
                                         @foreach ($beneficiaries as $beneficiary)
                                             <tr class="transition hover:bg-slate-50">
-                                                <td
-                                                    class="whitespace-nowrap px-5 py-4 text-sm font-bold text-slate-800">
+                                                <td class="break-words px-5 py-4 text-sm font-bold text-slate-800">
                                                     {{ is_array($beneficiary) ? $beneficiary['fullname'] ?? '-' : $beneficiary->fullname ?? '-' }}
                                                 </td>
                                                 <td class="whitespace-nowrap px-5 py-4 text-sm text-slate-600">

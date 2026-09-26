@@ -353,6 +353,48 @@
                                         class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
                                 </div>
 
+                                {{-- CONTROL NUMBER (acknowledgement receipt, lives on the APPROVED activation) --}}
+                                <div>
+                                    <label class="mb-1 block text-xs font-bold text-slate-700">
+                                        Receipt Number
+                                    </label>
+
+                                    @if (filled($activationControlNumber))
+                                        {{-- Already issued — read-only display --}}
+                                        <div
+                                            class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700">
+                                            <span>{{ $activationControlNumber }}</span>
+                                            <span class="text-[10px] font-bold uppercase tracking-wide text-emerald-600">
+                                                ✓ Issued
+                                            </span>
+                                        </div>
+                                    @elseif ($activationId)
+                                        {{-- Approved activation without a number — Generate button + editable field.
+                                             The placeholder/hint previews the REAL next number, so clicking
+                                             Generate fills exactly what the hint shows. --}}
+                                        <div class="flex gap-2">
+                                            <input wire:model.live="receipt_number" type="text"
+                                                placeholder="{{ $this->previewControlNumber }}"
+                                                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                            <button type="button" wire:click="generateControlNumber"
+                                                title="Generate the next receipt number based on the last issued"
+                                                class="shrink-0 rounded-xl bg-[#0B2A5B] px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123c88]">
+                                                Generate
+                                            </button>
+                                        </div>
+                                        <p class="mt-1 text-[10px] text-slate-400">
+                                            Next available: <span class="font-bold text-slate-600">{{ $this->previewControlNumber }}</span> — click Generate to use it.
+                                        </p>
+
+                                    @else
+                                        {{-- No approved activation — nothing to attach a number to --}}
+                                        <div
+                                            class="w-full rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-400">
+                                            No approved activation yet
+                                        </div>
+                                    @endif
+                                </div>
+
                                 {{-- POLICY EFFECTIVITY DATE (calendar picker, same as Birthdate) --}}
                                 <div wire:key="policy-effectivity-picker-{{ $userId ?? 'new' }}"
                                     x-data="{
@@ -558,7 +600,7 @@
                                     </div>
                                 </div>
 
-                                
+
                                 {{-- POLICY EXPIRATION DATE (calendar picker, same as Birthdate) --}}
                                 <div wire:key="policy-expiration-picker-{{ $userId ?? 'new' }}"
                                     x-data="{

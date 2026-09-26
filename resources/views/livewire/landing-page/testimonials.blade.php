@@ -173,7 +173,7 @@
         <div class="testimonials-highlights-grid">
 
             <div>
-                <div class="testimonial-highlight-icon">❤️</div>
+                <div class="testimonial-highlight-icon"><flux:icon.heart class="w-11 h-11" /></div>
                 <h3 class="testimonial-highlight-title">
                     <x-editable-text
                         key="testimonials_highlight_1"
@@ -185,7 +185,7 @@
             </div>
 
             <div>
-                <div class="testimonial-highlight-icon">🤝</div>
+                <div class="testimonial-highlight-icon"><flux:icon.user-group class="w-11 h-11" /></div>
                 <h3 class="testimonial-highlight-title">
                     <x-editable-text
                         key="testimonials_highlight_2"
@@ -197,7 +197,7 @@
             </div>
 
             <div>
-                <div class="testimonial-highlight-icon">🛡️</div>
+                <div class="testimonial-highlight-icon"><flux:icon.shield-check class="w-11 h-11" /></div>
                 <h3 class="testimonial-highlight-title">
                     <x-editable-text
                         key="testimonials_highlight_3"
@@ -209,7 +209,7 @@
             </div>
 
             <div>
-                <div class="testimonial-highlight-icon">⭐</div>
+                <div class="testimonial-highlight-icon"><flux:icon.star class="w-11 h-11" /></div>
                 <h3 class="testimonial-highlight-title">
                     <x-editable-text
                         key="testimonials_highlight_4"

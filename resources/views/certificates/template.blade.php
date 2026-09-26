@@ -43,7 +43,10 @@ body{
 
     position:absolute;
 
-    top:329px;
+    /* Sits exactly on the printed name line of the background
+       (line at 44.4% of image height → 362px of the 816px page) */
+
+    top:340px;
 
     left:0;
 

@@ -5,7 +5,7 @@
     </{{ $tag }}>
 
     @auth
-        @if(auth()->user()->RoleID == 1 || auth()->user()->RoleID == 2)
+        @if(auth()->user()->RoleID == 1 || auth()->user()->RoleID == 2 || auth()->user()->RoleID == 5 || auth()->user()->RoleID == 6 || auth()->user()->RoleID == 7)
 
             <button
                 type="button"

@@ -78,8 +78,8 @@
                 <div>
 
 
-                    <div class="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-3xl shadow-sm">
-                        🛡️
+                    <div class="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shadow-sm">
+                        <flux:icon.shield-check class="w-8 h-8 text-[#0B2A5B]" />
                     </div>
 
 
@@ -124,8 +124,8 @@
                 <div>
 
 
-                    <div class="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-3xl shadow-sm">
-                        👨‍👩‍👧‍👦
+                    <div class="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center shadow-sm">
+                        <flux:icon.home-modern class="w-8 h-8 text-amber-600" />
                     </div>
 
 
@@ -170,8 +170,8 @@
                 <div>
 
 
-                    <div class="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-3xl shadow-sm">
-                        🤝
+                    <div class="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shadow-sm">
+                        <flux:icon.user-group class="w-8 h-8 text-emerald-600" />
                     </div>
 
 
