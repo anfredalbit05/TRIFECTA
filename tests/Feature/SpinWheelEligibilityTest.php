@@ -15,10 +15,10 @@ class SpinWheelEligibilityTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** Cycle window of e.g. the September 12 draw. */
-    private const START = '2026-08-12 00:00:00';
+    /** Cycle window of e.g. the September 19 draw. */
+    private const START = '2026-08-19 00:00:00';
 
-    private const END = '2026-09-11 23:59:59';
+    private const END = '2026-09-18 23:59:59';
 
     private SpinWheelService $service;
 
@@ -111,8 +111,8 @@ class SpinWheelEligibilityTest extends TestCase
         $upline = $this->member('Uplineson', 'Uline', 'UP1');
         $downline = $this->member('Downson', 'Dline', 'DN1', 'UP1');
 
-        // One day before the window opens and one day after it closes.
-        $this->activate($downline, 'UP1', at: '2026-08-11 23:59:59');
+        // One day before the window opens (the window starts on the 19th).
+        $this->activate($downline, 'UP1', at: '2026-08-18 23:59:59');
 
         $this->assertSame(0, $this->eligible()->count());
     }

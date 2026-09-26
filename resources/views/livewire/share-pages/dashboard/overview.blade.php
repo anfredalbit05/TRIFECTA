@@ -62,7 +62,7 @@
                         </span>
 
                         <span class="wallet-btn-spin-hint">
-                            Pangkabuhayan raffle · drawn every 12th
+                            Pangkabuhayan raffle · drawn every {{ \App\Services\SpinWheelService::ordinal(app(\App\Services\SpinWheelService::class)->drawDay()) }}
                         </span>
 
                     </span>

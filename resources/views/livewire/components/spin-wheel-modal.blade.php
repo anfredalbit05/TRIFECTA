@@ -42,7 +42,7 @@ x-on:close-spin-wheel.window="showModal=false">
                 <h3 class="flex items-center gap-2 text-lg font-bold">
                     <span class="text-2xl">🎡</span>Spin the Wheel
                 </h3>
-                <p class="mt-1 text-xs text-white/70">Pangkabuhayan raffle · drawn every 12th of the month</p>
+                <p class="mt-1 text-xs text-white/70">Pangkabuhayan raffle · drawn every {{ \App\Services\SpinWheelService::ordinal((int) $this->drawDay) }} of the month</p>
             </div>
             <div class="flex items-center gap-3">
                 <label class="text-[10px] font-semibold uppercase tracking-wider text-white/60">Cycle</label>
@@ -238,6 +238,23 @@ x-on:close-spin-wheel.window="showModal=false">
 
                 @if($canSpin&&!($summary['has_winners']??false))
                     <div class="mt-3 space-y-3">
+                        <div>
+                            <label class="text-[11px] font-semibold text-gray-600">Draw day of the month</label>
+                            <input type="number" step="1" min="1" max="28"
+                                wire:model.live.debounce.300ms="drawDay"
+                                placeholder="19"
+                                class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-800 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]">
+                            @error('drawDay')<p class="mt-1 text-[11px] font-medium text-red-600">{{ $message }}</p>@enderror
+                            <p class="mt-1.5 rounded-lg bg-[#0C2C6B]/5 px-3 py-2 text-[11px] leading-relaxed text-[#0C2C6B]">
+                                📅 {{ $this->derivedSchedule() }}
+                                <span class="block text-gray-500">Days above 28 are not allowed — short months would push the draw into the next one.</span>
+                            </p>
+                            <button type="button" wire:click="saveDrawDay" wire:loading.attr="disabled"
+                                class="mt-2 w-full rounded-lg bg-[#0C2C6B] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#123A7A] disabled:opacity-60">
+                                Save draw day
+                            </button>
+                        </div>
+
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="text-[11px] font-semibold text-gray-600">Kilos per prize</label>
