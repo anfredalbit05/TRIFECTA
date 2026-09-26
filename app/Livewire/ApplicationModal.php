@@ -133,6 +133,51 @@ class ApplicationModal extends Component
         $this->deleteBeneficiary($index);
     }
 
+    #[Computed]
+public function previewPolicyNumber(): string
+{
+    $year = now()->year;
+
+    $policyNumbers = User::query()
+        ->whereNotNull('policy_number')
+        ->where('policy_number', 'like', 'TRI-%-TS' . $year . '-%')
+        ->pluck('policy_number');
+
+    $highest = 0;
+
+    foreach ($policyNumbers as $policyNumber) {
+        if (preg_match('/^TRI-(\d+)-TS\d{4}-(\d+)$/', $policyNumber, $matches)) {
+            // Use the final sequence number.
+            $number = (int) $matches[2];
+
+            if ($number > $highest) {
+                $highest = $number;
+            }
+        }
+    }
+
+    $next = $highest + 1;
+
+    return sprintf(
+        'TRI-%05d-TS%d-%d',
+        $next,
+        $year,
+        $next
+    );
+}
+
+public function generatePolicyNumber(): void
+{
+    // Don't overwrite an existing/generated value.
+    if (filled($this->policy_number)) {
+        return;
+    }
+
+    // Recalculate from the database at the exact moment
+    // the Generate button is clicked.
+    $this->policy_number = $this->previewPolicyNumber;
+}
+
     /*
     |--------------------------------------------------------------------------
     | Validate Beneficiaries

@@ -343,17 +343,55 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2 lg:grid-cols-3">
-                                <div>
-                                    <label class="mb-1 block text-xs font-bold text-slate-700">
-                                        Policy Number
-                                    </label>
-                                    <input wire:model.live="policy_number" type="text"
-                                        placeholder="Enter policy number"
-                                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
-                                </div>
+                            <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2 lg:grid-cols-2">
+{{-- POLICY NUMBER --}}
+<div>
+    <label class="mb-1 block text-xs font-bold text-slate-700">
+        Policy Number
+    </label>
 
-                                {{-- CONTROL NUMBER (acknowledgement receipt, lives on the APPROVED activation) --}}
+    @if (filled($policy_number))
+        {{-- Already generated/issued — read-only display --}}
+        <div
+            class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700">
+            <span>{{ $policy_number }}</span>
+
+            <span class="text-[10px] font-bold uppercase tracking-wide text-emerald-600">
+                ✓ Issued
+            </span>
+        </div>
+
+    @else
+        {{-- No policy number yet — Generate button + editable field --}}
+        <div class="flex gap-2">
+            <input
+                wire:model.live="policy_number"
+                type="text"
+                placeholder="{{ $this->previewPolicyNumber }}"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+            >
+
+            <button
+                type="button"
+                wire:click="generatePolicyNumber"
+                title="Generate the next policy number based on the last issued"
+                class="shrink-0 rounded-xl bg-[#0B2A5B] px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123c88]"
+            >
+                Generate
+            </button>
+        </div>
+
+        <p class="mt-1 text-[10px] text-slate-400">
+            Next available:
+            <span class="font-bold text-slate-600">
+                {{ $this->previewPolicyNumber }}
+            </span>
+            — click Generate to use it.
+        </p>
+    @endif
+</div>
+
+                                {{-- RECEIPT NUMBER (acknowledgement receipt, lives on the APPROVED activation) --}}
                                 <div>
                                     <label class="mb-1 block text-xs font-bold text-slate-700">
                                         Receipt Number
