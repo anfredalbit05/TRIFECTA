@@ -46,7 +46,7 @@ body{
     /* Sits exactly on the printed name line of the background
        (line at 44.4% of image height → 362px of the 816px page) */
 
-    top:340px;
+    top:350px;
 
     left:0;
 
@@ -95,7 +95,7 @@ body{
 <div class="page">
 
 <img
-    src="{{ public_path('images/certificate/certificate.jpeg') }}"
+    src="{{ public_path('images/certificate/certificate.jpg') }}"
     class="background">
 
 <div class="name">

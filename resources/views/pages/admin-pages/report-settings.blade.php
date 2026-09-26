@@ -68,6 +68,7 @@
             </div>
         @endif
 
+
         <div x-show="tab==='users'" x-cloak class="report-settings-main-card">
             <livewire:admin-pages.report-settings.user-accounts />
         </div>
