@@ -9,26 +9,33 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 class GeneralSettings extends Component
 {
     use WithPagination;
+    use WithFileUploads;
 
     public $isOpen = false;
 
     public $setting_id;
 
-    // Search Property
-    public string $search = '';    // Form fields
+    public string $search = '';
 
     public $name;
 
     public $value;
 
+    /**
+     * Uploaded cashier signature.
+     */
+    public $signatureUpload = null;
+
     protected $rules = [
         'name' => 'required|string|max:100',
         'value' => 'nullable|string',
+        'signatureUpload' => 'nullable|image|mimes:png,jpg,jpeg|max:5120',
     ];
 
     public function updatingSearch()
@@ -42,7 +49,9 @@ class GeneralSettings extends Component
         $this->resetPage();
     }
 
-    // Helper to check permissions dynamically
+    /**
+     * Check permissions.
+     */
     protected function hasPermission($action)
     {
         /** @var User|null $user */
@@ -52,12 +61,15 @@ class GeneralSettings extends Component
             return false;
         }
 
-        // Super Admin (RoleID 1) bypasses checks
+        // Super Admin
         if ((int) $user->RoleID === 1) {
             return true;
         }
 
-        $module = Module::where('modulename', 'Report & Settings - General')->first();
+        $module = Module::where(
+            'modulename',
+            'Report & Settings - General'
+        )->first();
 
         if (! $module) {
             return false;
@@ -73,10 +85,10 @@ class GeneralSettings extends Component
 
         return match ($action) {
             'create' => (bool) $privilege->can_create,
-            'read' => (bool) $privilege->can_read,
+            'read'   => (bool) $privilege->can_read,
             'update' => (bool) $privilege->can_update,
             'delete' => (bool) $privilege->can_delete,
-            default => false,
+            default  => false,
         };
     }
 
@@ -100,89 +112,150 @@ class GeneralSettings extends Component
         return $this->hasPermission('delete');
     }
 
+    /**
+     * Open create modal.
+     */
     public function openCreateModal()
     {
         if (! $this->canCreate) {
             session()->flash('message', 'Unauthorized action.');
-
             return;
         }
 
         $this->resetValidation();
-        $this->reset(['name', 'value', 'setting_id']);
 
-        // Show the plain-text panel for a brand-new setting (one-way push —
-        // the panel state itself lives in Alpine, so it can never be
-        // overwritten by a stale entangled value syncing back).
-        $this->dispatch('setting-modal-type', type: 'text');
+        $this->reset([
+            'name',
+            'value',
+            'setting_id',
+            'signatureUpload',
+        ]);
+
+        $this->dispatch(
+            'setting-modal-type',
+            type: 'text'
+        );
 
         $this->isOpen = true;
     }
 
+    /**
+     * Close modal.
+     */
     public function closeModal()
     {
         $this->isOpen = false;
+
         $this->resetValidation();
-        $this->reset(['name', 'value', 'setting_id']);
+
+        $this->reset([
+            'name',
+            'value',
+            'setting_id',
+            'signatureUpload',
+        ]);
     }
 
+    /**
+     * Edit setting.
+     */
     public function editSetting($id)
     {
         if (! $this->canUpdate) {
             session()->flash('message', 'Unauthorized action.');
-
             return;
         }
 
         $this->resetValidation();
+
         $setting = Setting::findOrFail($id);
 
         $this->setting_id = $setting->SettingsID;
         $this->name = $setting->name;
         $this->value = $setting->value;
+        $this->signatureUpload = null;
 
-        // Show the panel matching the stored value type (signature / boolean / text).
-        // Any stored images/...SIG_... path is a signature (covers CASHIER_SIG_
-        // files created here and profile-style SIG_ files used as a cashier sig).
-        $type = str_contains((string) $setting->value, 'SIG_')
-            ? 'signature'
-            : (in_array(strtolower((string) $setting->value), ['true', 'false', '1', '0']) ? 'boolean' : 'text');
+        $storedValue = (string) $setting->value;
 
-        $this->dispatch('setting-modal-type', type: $type);
+        /*
+        |--------------------------------------------------------------------------
+        | Determine input type
+        |--------------------------------------------------------------------------
+        */
+        if (
+            str_contains($storedValue, 'CASHIER_SIG_') ||
+            str_contains($storedValue, 'SIG_')
+        ) {
+            $type = 'signature';
+        } elseif (
+            in_array(
+                strtolower($storedValue),
+                ['true', 'false', '1', '0'],
+                true
+            )
+        ) {
+            $type = 'boolean';
+        } else {
+            $type = 'text';
+        }
+
+        $this->dispatch(
+            'setting-modal-type',
+            type: $type
+        );
 
         $this->isOpen = true;
     }
 
+    /**
+     * Save setting.
+     */
     public function saveSetting()
     {
         if ($this->setting_id && ! $this->canUpdate) {
             return;
         }
+
         if (! $this->setting_id && ! $this->canCreate) {
             return;
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | If a signature upload exists, save it first.
+        |--------------------------------------------------------------------------
+        */
+        if ($this->signatureUpload) {
+            $this->saveUploadedSignature();
+        }
+
         $emptyFields = [];
 
-        if (empty(trim($this->name))) {
+        if (empty(trim((string) $this->name))) {
             $emptyFields[] = 'Setting Name';
         }
 
-        if (empty(trim($this->value)) && $this->value !== '0') {
-            // Signature settings: the uploaded/drawn image becomes the value
-            // automatically — tell the user there is nothing to type.
-            $emptyFields[] = str_contains(strtolower((string) $this->name), 'signature')
-                ? 'Value (upload or draw the signature first — its storage path is saved as the value automatically, no typing needed)'
-                : 'Value';
+        if (
+            empty(trim((string) $this->value)) &&
+            $this->value !== '0'
+        ) {
+            $emptyFields[] =
+                str_contains(
+                    strtolower((string) $this->name),
+                    'signature'
+                )
+                    ? 'Value (upload or draw the signature first)'
+                    : 'Value';
         }
 
         if (! empty($emptyFields)) {
+
             $text = count($emptyFields) > 1
-                ? 'The following fields are empty:<br><br><b>• '.implode('</b><br><b>• ', $emptyFields).'</b>'
+                ? 'The following fields are empty:<br><br><b>• '
+                    . implode('</b><br><b>• ', $emptyFields)
+                    . '</b>'
                 : 'The <b>'.$emptyFields[0].'</b> field is empty.';
 
-            // Sent as html so the <b> tags render (the shared Swal handler
-            // only renders markup from the html key — text shows it raw).
             $this->dispatch('swal:error', [
                 'title' => 'Missing Fields',
                 'html' => $text,
@@ -191,14 +264,31 @@ class GeneralSettings extends Component
             return;
         }
 
-        $this->validate();
+        $this->validate([
+            'name' => 'required|string|max:100',
+            'value' => 'nullable|string',
+        ]);
 
-        $existingQuery = Setting::where('name', $this->name);
+        /*
+        |--------------------------------------------------------------------------
+        | Prevent duplicate setting names
+        |--------------------------------------------------------------------------
+        */
+        $existingQuery = Setting::where(
+            'name',
+            $this->name
+        );
+
         if ($this->setting_id) {
-            $existingQuery->where('SettingsID', '!=', $this->setting_id);
+            $existingQuery->where(
+                'SettingsID',
+                '!=',
+                $this->setting_id
+            );
         }
 
         if ($existingQuery->exists()) {
+
             $this->dispatch('swal:error', [
                 'title' => 'Duplicate Error',
                 'text' => 'A setting with this name already exists.',
@@ -207,12 +297,23 @@ class GeneralSettings extends Component
             return;
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Update
+        |--------------------------------------------------------------------------
+        */
         if ($this->setting_id) {
+
             $this->dispatch('confirm-update');
 
             return;
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Create
+        |--------------------------------------------------------------------------
+        */
         Setting::create([
             'name' => $this->name,
             'value' => $this->value,
@@ -226,16 +327,34 @@ class GeneralSettings extends Component
         ]);
     }
 
+    /**
+     * Perform confirmed update.
+     */
     public function performUpdate()
     {
         if (! $this->setting_id || ! $this->canUpdate) {
             return;
         }
 
-        $setting = Setting::findOrFail($this->setting_id);
+        /*
+        |--------------------------------------------------------------------------
+        | If a signature upload exists, save it before update.
+        |--------------------------------------------------------------------------
+        */
+        if ($this->signatureUpload) {
+            $this->saveUploadedSignature();
+        }
 
-        if ($setting->name === $this->name && $setting->value === $this->value) {
+        $setting = Setting::findOrFail(
+            $this->setting_id
+        );
+
+        if (
+            $setting->name === $this->name &&
+            $setting->value === $this->value
+        ) {
             $this->closeModal();
+
             $this->dispatch('swal:success', [
                 'title' => 'No Changes!',
                 'text' => 'Nothing was changed.',
@@ -258,9 +377,106 @@ class GeneralSettings extends Component
     }
 
     /**
-     * Store an uploaded or drawn cashier signature (raw base64 image data) on
-     * the public disk and use its storage path as the current setting value.
-     * The previous CASHIER_SIG file referenced by the value is deleted.
+     * Save uploaded cashier signature.
+     *
+     * Livewire handles the temporary upload instead of sending
+     * the entire image as a base64 method argument.
+     */
+    public function saveUploadedSignature(): void
+    {
+        if (! $this->canCreate && ! $this->canUpdate) {
+            return;
+        }
+
+        if (! $this->signatureUpload) {
+            return;
+        }
+
+        $this->validateOnly(
+            'signatureUpload',
+            [
+                'signatureUpload' =>
+                    'required|image|mimes:png,jpg,jpeg|max:5120',
+            ]
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Delete old CASHIER_SIG file only
+        |--------------------------------------------------------------------------
+        */
+        if (
+            is_string($this->value) &&
+            str_contains(
+                $this->value,
+                'images/CASHIER_SIG_'
+            ) &&
+            Storage::disk('public')->exists($this->value)
+        ) {
+            Storage::disk('public')->delete(
+                $this->value
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Generate unique filename
+        |--------------------------------------------------------------------------
+        */
+        $extension = strtolower(
+            $this->signatureUpload->getClientOriginalExtension()
+        );
+
+        if (! in_array(
+            $extension,
+            ['png', 'jpg', 'jpeg'],
+            true
+        )) {
+            $extension = 'png';
+        }
+
+        $filename =
+            'CASHIER_SIG_' .
+            now()->format('Ymd_His') .
+            '_' .
+            uniqid() .
+            '.' .
+            $extension;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Store in public disk
+        |--------------------------------------------------------------------------
+        */
+        $path = $this->signatureUpload->storeAs(
+            'images',
+            $filename,
+            'public'
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Set setting value
+        |--------------------------------------------------------------------------
+        */
+        $this->value = $path;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Clear temporary upload
+        |--------------------------------------------------------------------------
+        */
+        $this->signatureUpload = null;
+
+        $this->dispatch(
+            'signature-uploaded'
+        );
+    }
+
+    /**
+     * Save drawn signature.
+     *
+     * This keeps your existing canvas functionality.
      */
     public function saveSignatureSetting(?string $base64): void
     {
@@ -268,60 +484,143 @@ class GeneralSettings extends Component
             return;
         }
 
-        $base64 = preg_replace('/^data:image\/\w+;base64,/', '', (string) $base64);
-        $binary = base64_decode($base64, true);
+        $base64 = trim((string) $base64);
 
-        if ($binary === false) {
+        /*
+        |--------------------------------------------------------------------------
+        | Remove data URL prefix safely
+        |--------------------------------------------------------------------------
+        */
+        if (str_contains($base64, ',')) {
+            $base64 = explode(',', $base64, 2)[1];
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Decode
+        |--------------------------------------------------------------------------
+        */
+        $binary = base64_decode(
+            $base64,
+            true
+        );
+
+        if ($binary === false || empty($binary)) {
+
             $this->dispatch('swal:error', [
                 'title' => 'Invalid Signature',
-                'text' => 'The signature image could not be read. Please try again.',
+                'text' =>
+                    'The signature image could not be read. Please try again.',
             ]);
 
             return;
         }
 
-        $info = @getimagesizefromstring($binary);
+        /*
+        |--------------------------------------------------------------------------
+        | Validate image
+        |--------------------------------------------------------------------------
+        */
+        $info = @getimagesizefromstring(
+            $binary
+        );
 
-        $extension = match ($info === false ? null : $info['mime']) {
+        if ($info === false) {
+
+            $this->dispatch('swal:error', [
+                'title' => 'Invalid Image',
+                'text' =>
+                    'The signature image is not a valid image.',
+            ]);
+
+            return;
+        }
+
+        $mime = $info['mime'] ?? null;
+
+        $extension = match ($mime) {
             'image/png' => 'png',
-            'image/jpeg', 'image/jpg' => 'jpg',
+            'image/jpeg' => 'jpg',
             default => null,
         };
 
         if ($extension === null) {
+
             $this->dispatch('swal:error', [
                 'title' => 'Unsupported Image',
-                'text' => 'The signature must be a PNG or JPEG image.',
+                'text' =>
+                    'The signature must be a PNG or JPEG image.',
             ]);
 
             return;
         }
 
-        // Replace the previous cashier signature file, if the value points at one
-        // Only delete files this feature created (CASHIER_SIG_ prefix). A
-        // profile-style SIG_ path is shared with the member's profile — leave
-        // it alone, it simply stops being referenced here.
-        if (is_string($this->value)
-            && str_contains($this->value, 'images/CASHIER_SIG_')
-            && Storage::disk('public')->exists($this->value)) {
-            Storage::disk('public')->delete($this->value);
+        /*
+        |--------------------------------------------------------------------------
+        | Delete previous generated cashier signature
+        |--------------------------------------------------------------------------
+        */
+        if (
+            is_string($this->value) &&
+            str_contains(
+                $this->value,
+                'images/CASHIER_SIG_'
+            ) &&
+            Storage::disk('public')->exists($this->value)
+        ) {
+            Storage::disk('public')->delete(
+                $this->value
+            );
         }
 
-        $path = 'images/CASHIER_SIG_'.time().'.'.$extension;
+        /*
+        |--------------------------------------------------------------------------
+        | Store new signature
+        |--------------------------------------------------------------------------
+        */
+        $path =
+            'images/CASHIER_SIG_' .
+            now()->format('Ymd_His') .
+            '_' .
+            uniqid() .
+            '.' .
+            $extension;
 
-        Storage::disk('public')->put($path, $binary);
+        Storage::disk('public')->put(
+            $path,
+            $binary
+        );
 
+        /*
+        |--------------------------------------------------------------------------
+        | Update Livewire value
+        |--------------------------------------------------------------------------
+        */
         $this->value = $path;
+
+        $this->dispatch(
+            'signature-uploaded'
+        );
     }
 
+    /**
+     * Confirm delete.
+     */
     public function confirmDeleteSetting($id)
     {
         if (! $this->canDelete) {
             return;
         }
-        $this->dispatch('confirm-delete', id: $id);
+
+        $this->dispatch(
+            'confirm-delete',
+            id: $id
+        );
     }
 
+    /**
+     * Delete setting.
+     */
     public function deleteSetting($id)
     {
         if (! $this->canDelete) {
@@ -329,26 +628,72 @@ class GeneralSettings extends Component
         }
 
         $setting = Setting::findOrFail($id);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Delete generated signature file
+        |--------------------------------------------------------------------------
+        */
+        if (
+            is_string($setting->value) &&
+            str_contains(
+                $setting->value,
+                'images/CASHIER_SIG_'
+            ) &&
+            Storage::disk('public')->exists(
+                $setting->value
+            )
+        ) {
+            Storage::disk('public')->delete(
+                $setting->value
+            );
+        }
+
         $setting->delete();
 
-        $this->dispatch('setting-deleted');
+        $this->dispatch(
+            'setting-deleted'
+        );
     }
 
+    /**
+     * Render.
+     */
     public function render()
     {
         $settings = Setting::query()
-            ->when(filled($this->search), function ($query) {
-                $search = trim($this->search);
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('value', 'like', "%{$search}%");
-                });
-            })
+            ->when(
+                filled($this->search),
+                function ($query) {
+
+                    $search = trim(
+                        $this->search
+                    );
+
+                    $query->where(
+                        function ($q) use ($search) {
+
+                            $q->where(
+                                'name',
+                                'like',
+                                "%{$search}%"
+                            )->orWhere(
+                                'value',
+                                'like',
+                                "%{$search}%"
+                            );
+                        }
+                    );
+                }
+            )
             ->latest('SettingsID')
             ->paginate(10);
 
-        return view('livewire.admin-pages.report-settings.general', [
-            'settings' => $settings,
-        ]);
+        return view(
+            'livewire.admin-pages.report-settings.general',
+            [
+                'settings' => $settings,
+            ]
+        );
     }
 }

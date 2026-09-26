@@ -178,7 +178,7 @@ if (filled($cashierName)) {
         (string) $cashierName,
         530,
         772,
-        14,
+        16, // slightly larger
         self::FONT_BOLD,
         $ink,
         680,
@@ -461,15 +461,75 @@ private function pasteSignature($image, ?string $storagePath): void
             return;
         }
 
-        $srcWidth = imagesx($signature);
+        $srcWidth  = imagesx($signature);
         $srcHeight = imagesy($signature);
 
         /*
         |--------------------------------------------------------------------------
-        | Create transparent version of signature
+        | STEP 1: Find the white signature canvas
+        |--------------------------------------------------------------------------
+        |
+        | Some uploaded images contain a dark/black border around the actual
+        | white signature area. We must ignore that border completely.
+        |
+        */
+
+        $canvasLeft   = $srcWidth;
+        $canvasRight  = -1;
+        $canvasTop    = $srcHeight;
+        $canvasBottom = -1;
+
+        for ($y = 0; $y < $srcHeight; $y++) {
+            for ($x = 0; $x < $srcWidth; $x++) {
+
+                $rgb = imagecolorat($signature, $x, $y);
+
+                $r = ($rgb >> 16) & 0xFF;
+                $g = ($rgb >> 8) & 0xFF;
+                $b = $rgb & 0xFF;
+
+                /*
+                 * White / near-white pixels belong to the signature canvas.
+                 */
+                if ($r >= 245 && $g >= 245 && $b >= 245) {
+
+                    $canvasLeft = min($canvasLeft, $x);
+                    $canvasRight = max($canvasRight, $x);
+                    $canvasTop = min($canvasTop, $y);
+                    $canvasBottom = max($canvasBottom, $y);
+                }
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | No white canvas detected
         |--------------------------------------------------------------------------
         */
-        $clean = imagecreatetruecolor($srcWidth, $srcHeight);
+
+        if ($canvasRight < $canvasLeft || $canvasBottom < $canvasTop) {
+            Log::warning('Could not detect white signature canvas.', [
+                'path' => $storagePath,
+            ]);
+
+            imagedestroy($signature);
+
+            return;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | STEP 2: Crop to the actual white signature canvas
+        |--------------------------------------------------------------------------
+        */
+
+        $canvasWidth  = $canvasRight - $canvasLeft + 1;
+        $canvasHeight = $canvasBottom - $canvasTop + 1;
+
+        $clean = imagecreatetruecolor(
+            $canvasWidth,
+            $canvasHeight
+        );
 
         imagealphablending($clean, false);
         imagesavealpha($clean, true);
@@ -482,25 +542,22 @@ private function pasteSignature($image, ?string $storagePath): void
             127
         );
 
-        imagefill($clean, 0, 0, $transparent);
+        imagefill(
+            $clean,
+            0,
+            0,
+            $transparent
+        );
 
         /*
         |--------------------------------------------------------------------------
-        | Convert signature to dark ink
+        | STEP 3: Extract ONLY the actual signature ink
         |--------------------------------------------------------------------------
-        |
-        | IMPORTANT:
-        |
-        | GD alpha:
-        |   0   = fully visible
-        |   127 = fully transparent
-        |
-        | The old code had this backwards, causing the signature to become
-        | very faint.
-        |
         */
-        for ($y = 0; $y < $srcHeight; $y++) {
-            for ($x = 0; $x < $srcWidth; $x++) {
+
+        for ($y = $canvasTop; $y <= $canvasBottom; $y++) {
+
+            for ($x = $canvasLeft; $x <= $canvasRight; $x++) {
 
                 $rgb = imagecolorat($signature, $x, $y);
 
@@ -508,32 +565,23 @@ private function pasteSignature($image, ?string $storagePath): void
                 $g = ($rgb >> 8) & 0xFF;
                 $b = $rgb & 0xFF;
 
-                /*
-                 * Perceived brightness.
-                 */
-                $brightness = (
+                $brightness =
                     (0.299 * $r) +
                     (0.587 * $g) +
-                    (0.114 * $b)
-                );
+                    (0.114 * $b);
 
                 /*
-                 * White/light background becomes transparent.
+                 * Ignore white background.
                  */
                 if ($brightness >= 245) {
                     continue;
                 }
 
                 /*
-                 * Convert brightness to GD alpha.
+                 * Convert darkness into opacity.
                  *
-                 * Dark pixel:
-                 *   brightness ~ 0
-                 *   alpha ~ 0 = opaque
-                 *
-                 * White pixel:
-                 *   brightness ~ 255
-                 *   alpha ~ 127 = transparent
+                 * Dark pixels  = opaque
+                 * Light pixels = transparent
                  */
                 $alpha = (int) round(
                     ($brightness / 255) * 127
@@ -541,9 +589,6 @@ private function pasteSignature($image, ?string $storagePath): void
 
                 $alpha = max(0, min(127, $alpha));
 
-                /*
-                 * Force signature ink to the same dark color as the receipt.
-                 */
                 $inkColor = imagecolorallocatealpha(
                     $clean,
                     self::INK[0],
@@ -554,8 +599,8 @@ private function pasteSignature($image, ?string $storagePath): void
 
                 imagesetpixel(
                     $clean,
-                    $x,
-                    $y,
+                    $x - $canvasLeft,
+                    $y - $canvasTop,
                     $inkColor
                 );
             }
@@ -565,122 +610,117 @@ private function pasteSignature($image, ?string $storagePath): void
 
         /*
         |--------------------------------------------------------------------------
-        | Find actual visible signature bounds
+        | STEP 4: Find the actual signature ink bounds
         |--------------------------------------------------------------------------
         */
-        $left = $srcWidth;
-        $right = -1;
-        $top = $srcHeight;
+
+        $left   = $canvasWidth;
+        $right  = -1;
+        $top    = $canvasHeight;
         $bottom = -1;
 
-        for ($y = 0; $y < $srcHeight; $y++) {
-            for ($x = 0; $x < $srcWidth; $x++) {
+        for ($y = 0; $y < $canvasHeight; $y++) {
+
+            for ($x = 0; $x < $canvasWidth; $x++) {
 
                 $pixel = imagecolorat($clean, $x, $y);
 
-                /*
-                 * Alpha is stored in the top 7 bits.
-                 */
                 $alpha = ($pixel >> 24) & 0x7F;
 
+                /*
+                 * Anything with meaningful opacity is actual ink.
+                 */
                 if ($alpha < 120) {
-                    if ($x < $left) {
-                        $left = $x;
-                    }
 
-                    if ($x > $right) {
-                        $right = $x;
-                    }
-
-                    if ($y < $top) {
-                        $top = $y;
-                    }
-
-                    if ($y > $bottom) {
-                        $bottom = $y;
-                    }
+                    $left = min($left, $x);
+                    $right = max($right, $x);
+                    $top = min($top, $y);
+                    $bottom = max($bottom, $y);
                 }
             }
         }
 
         /*
         |--------------------------------------------------------------------------
-        | Nothing visible
+        | No signature found
         |--------------------------------------------------------------------------
         */
+
         if ($right < $left || $bottom < $top) {
+
             imagedestroy($clean);
 
-            Log::warning('Cashier signature contained no visible ink.', [
-                'path' => $storagePath,
-            ]);
+            Log::warning(
+                'Cashier signature contained no visible ink.',
+                ['path' => $storagePath]
+            );
 
             return;
         }
 
         /*
         |--------------------------------------------------------------------------
-        | Crop dimensions
+        | STEP 5: Actual signature dimensions
         |--------------------------------------------------------------------------
         */
-        $inkWidth = $right - $left + 1;
+
+        $inkWidth  = $right - $left + 1;
         $inkHeight = $bottom - $top + 1;
 
         /*
         |--------------------------------------------------------------------------
-        | SIGNATURE AREA
+        | STEP 6: Receipt signature area
         |--------------------------------------------------------------------------
         |
-        | Signature:
-        |   x = 530 → 1210
-        |   y = 728 → 757
-        |
-        | Cashier name:
-        |   baseline around y = 772
-        |
-        | This keeps the signature clearly ABOVE the name.
+        | Signature sits above cashier name.
         |
         */
+
         $bandX = 530;
         $bandY = 728;
 
-        $bandWidth = 680;
+        $bandWidth  = 680;
         $bandHeight = 29;
 
         /*
         |--------------------------------------------------------------------------
-        | Scale signature to fit the band
+        | STEP 7: Scale while maintaining aspect ratio
         |--------------------------------------------------------------------------
         */
+
         $scale = min(
             $bandWidth / $inkWidth,
             $bandHeight / $inkHeight
         );
 
-        $dstWidth = (int) max(
+        $dstWidth = max(
             1,
-            round($inkWidth * $scale)
+            (int) round($inkWidth * $scale)
         );
 
-        $dstHeight = (int) max(
+        $dstHeight = max(
             1,
-            round($inkHeight * $scale)
+            (int) round($inkHeight * $scale)
         );
 
         /*
         |--------------------------------------------------------------------------
-        | Center signature horizontally and vertically
+        | STEP 8: Center signature
         |--------------------------------------------------------------------------
         */
-        $dstX = $bandX + (int) (($bandWidth - $dstWidth) / 2);
 
-        $dstY = $bandY + (int) (($bandHeight - $dstHeight) / 2);
+        $dstX = $bandX +
+            (int) (($bandWidth - $dstWidth) / 2);
+
+        $dstY = $bandY +
+            (int) (($bandHeight - $dstHeight) / 2);
 
         /*
         |--------------------------------------------------------------------------
-        | Paste signature
+        | STEP 9: Paste signature
         |--------------------------------------------------------------------------
         */
+
         imagealphablending($image, true);
 
         imagecopyresampled(
@@ -700,13 +740,15 @@ private function pasteSignature($image, ?string $storagePath): void
 
     } catch (\Throwable $e) {
 
-        Log::error('Failed to paste cashier signature onto receipt.', [
-            'error' => $e->getMessage(),
-            'path' => $storagePath,
-        ]);
+        Log::error(
+            'Failed to paste cashier signature onto receipt.',
+            [
+                'error' => $e->getMessage(),
+                'path' => $storagePath,
+            ]
+        );
     }
 }
-
     /**
      * Draw the home address on a single centred line inside its 38px row
      * (673-711), auto-shrinking/truncating when too wide.
