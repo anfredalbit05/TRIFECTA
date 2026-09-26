@@ -164,12 +164,27 @@ class AcknowledgementReceiptService
             | name underneath, pre-printed caption below the divider.
             |----------------------------------------------------------------------
             */
-            $this->pasteSignature($image, $cashierSignature);
+/*
+|--------------------------------------------------------------------------
+| By: — signature ABOVE name
+|--------------------------------------------------------------------------
+*/
+$this->pasteSignature($image, $cashierSignature);
 
-            if (filled($cashierName)) {
-                // Centred over the signature band (x 530-1210, centre 870)
-                $this->text($image, (string) $cashierName, 530, 769, 14, self::FONT_BOLD, $ink, 680, 870);
-            }
+if (filled($cashierName)) {
+    // Name directly BELOW the signature
+    $this->text(
+        $image,
+        (string) $cashierName,
+        530,
+        772,
+        14,
+        self::FONT_BOLD,
+        $ink,
+        680,
+        870
+    );
+}
 
             /*
             |----------------------------------------------------------------------
@@ -279,128 +294,285 @@ class AcknowledgementReceiptService
      * trimmed to its bounding box and CENTRED in the band. Silently skipped
      * when the file is missing or unreadable.
      */
-    private function pasteSignature($image, ?string $storagePath): void
-    {
-        if (blank($storagePath)) {
+/**
+ * Paste cashier signature above the cashier name.
+ *
+ * The signature image may be JPEG/PNG and may have a white background.
+ * White/light pixels become transparent while the actual signature ink
+ * is converted to a dark ink color so it remains visible on Railway/PDF/etc.
+ */
+private function pasteSignature($image, ?string $storagePath): void
+{
+    if (blank($storagePath)) {
+        return;
+    }
+
+    try {
+        if (!Storage::disk('public')->exists($storagePath)) {
+            Log::warning('Cashier signature file missing; receipt signed without signature.', [
+                'path' => $storagePath,
+            ]);
+
             return;
         }
 
-        try {
-            if (! Storage::disk('public')->exists($storagePath)) {
-                Log::warning('Cashier signature file missing; receipt signed without signature.', [
-                    'path' => $storagePath,
-                ]);
+        $binary = Storage::disk('public')->get($storagePath);
 
-                return;
-            }
+        $signature = @imagecreatefromstring($binary);
 
-            $binary = Storage::disk('public')->get($storagePath);
-            $signature = @imagecreatefromstring($binary);
-
-            if ($signature === false) {
-                Log::warning('Cashier signature file could not be decoded; skipped.', [
-                    'path' => $storagePath,
-                ]);
-
-                return;
-            }
-
-            $srcWidth = imagesx($signature);
-            $srcHeight = imagesy($signature);
-
-            // 1) Background removal: the stored image is JPEG (no alpha), so
-            //    rebuild it with transparency — the darkest channel decides
-            //    how opaque a pixel is (white -> transparent, ink -> opaque).
-            $clean = imagecreatetruecolor($srcWidth, $srcHeight);
-            imagesavealpha($clean, true);
-            imagefill($clean, 0, 0, imagecolorallocatealpha($clean, 0, 0, 0, 127));
-
-            for ($y = 0; $y < $srcHeight; $y++) {
-                for ($x = 0; $x < $srcWidth; $x++) {
-                    $rgb = imagecolorat($signature, $x, $y);
-                    $r = ($rgb >> 16) & 0xFF;
-                    $g = ($rgb >> 8) & 0xFF;
-                    $b = $rgb & 0xFF;
-
-                    $ink = min($r, $g, $b);
-
-                    if ($ink > 245) {
-                        continue; // plain background — discard
-                    }
-
-                    $alpha = (int) min(127, max(0, round((255 - $ink) * 127 / 255)));
-
-                    imagesetpixel($clean, $x, $y, imagecolorallocatealpha($clean, $r, $g, $b, $alpha));
-                }
-            }
-
-            imagedestroy($signature);
-
-            // 2) Trim fully transparent margins so the ink itself is centred
-            $left = $srcWidth;
-            $right = -1;
-            $top = $srcHeight;
-            $bottom = -1;
-
-            for ($y = 0; $y < $srcHeight; $y++) {
-                for ($x = 0; $x < $srcWidth; $x++) {
-                    if ((imagecolorat($clean, $x, $y) >> 24 & 0x7F) < 127) {
-                        if ($x < $left) {
-                            $left = $x;
-                        }
-
-                        if ($x > $right) {
-                            $right = $x;
-                        }
-
-                        if ($y < $top) {
-                            $top = $y;
-                        }
-
-                        if ($y > $bottom) {
-                            $bottom = $y;
-                        }
-                    }
-                }
-            }
-
-            if ($right < $left || $bottom < $top) {
-                return; // nothing visible to paste
-            }
-
-            $inkWidth = $right - $left + 1;
-            $inkHeight = $bottom - $top + 1;
-
-            // 3) Scale the ink to the signature band and centre it
-            $bandWidth = 680; // x 530-1210
-            $bandHeight = 24; // y 734-758
-
-            $scale = min($bandWidth / $inkWidth, $bandHeight / $inkHeight);
-            $dstWidth = (int) max(1, $inkWidth * $scale);
-            $dstHeight = (int) max(1, $inkHeight * $scale);
-
-            $dstX = 530 + (int) (($bandWidth - $dstWidth) / 2);
-            $dstY = 734 + (int) (($bandHeight - $dstHeight) / 2);
-
-            imagecopyresampled(
-                $image,
-                $clean,
-                $dstX,
-                $dstY,
-                $left,
-                $top,
-                $dstWidth,
-                $dstHeight,
-                $inkWidth,
-                $inkHeight
-            );
-        } catch (\Throwable $e) {
-            Log::error('Failed to paste cashier signature onto receipt.', [
-                'error' => $e->getMessage(),
+        if ($signature === false) {
+            Log::warning('Cashier signature file could not be decoded; skipped.', [
                 'path' => $storagePath,
             ]);
+
+            return;
         }
+
+        $srcWidth = imagesx($signature);
+        $srcHeight = imagesy($signature);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Create transparent version of signature
+        |--------------------------------------------------------------------------
+        */
+        $clean = imagecreatetruecolor($srcWidth, $srcHeight);
+
+        imagealphablending($clean, false);
+        imagesavealpha($clean, true);
+
+        $transparent = imagecolorallocatealpha(
+            $clean,
+            0,
+            0,
+            0,
+            127
+        );
+
+        imagefill($clean, 0, 0, $transparent);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Convert signature to dark ink
+        |--------------------------------------------------------------------------
+        |
+        | IMPORTANT:
+        |
+        | GD alpha:
+        |   0   = fully visible
+        |   127 = fully transparent
+        |
+        | The old code had this backwards, causing the signature to become
+        | very faint.
+        |
+        */
+        for ($y = 0; $y < $srcHeight; $y++) {
+            for ($x = 0; $x < $srcWidth; $x++) {
+
+                $rgb = imagecolorat($signature, $x, $y);
+
+                $r = ($rgb >> 16) & 0xFF;
+                $g = ($rgb >> 8) & 0xFF;
+                $b = $rgb & 0xFF;
+
+                /*
+                 * Perceived brightness.
+                 */
+                $brightness = (
+                    (0.299 * $r) +
+                    (0.587 * $g) +
+                    (0.114 * $b)
+                );
+
+                /*
+                 * White/light background becomes transparent.
+                 */
+                if ($brightness >= 245) {
+                    continue;
+                }
+
+                /*
+                 * Convert brightness to GD alpha.
+                 *
+                 * Dark pixel:
+                 *   brightness ~ 0
+                 *   alpha ~ 0 = opaque
+                 *
+                 * White pixel:
+                 *   brightness ~ 255
+                 *   alpha ~ 127 = transparent
+                 */
+                $alpha = (int) round(
+                    ($brightness / 255) * 127
+                );
+
+                $alpha = max(0, min(127, $alpha));
+
+                /*
+                 * Force signature ink to the same dark color as the receipt.
+                 */
+                $inkColor = imagecolorallocatealpha(
+                    $clean,
+                    self::INK[0],
+                    self::INK[1],
+                    self::INK[2],
+                    $alpha
+                );
+
+                imagesetpixel(
+                    $clean,
+                    $x,
+                    $y,
+                    $inkColor
+                );
+            }
+        }
+
+        imagedestroy($signature);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Find actual visible signature bounds
+        |--------------------------------------------------------------------------
+        */
+        $left = $srcWidth;
+        $right = -1;
+        $top = $srcHeight;
+        $bottom = -1;
+
+        for ($y = 0; $y < $srcHeight; $y++) {
+            for ($x = 0; $x < $srcWidth; $x++) {
+
+                $pixel = imagecolorat($clean, $x, $y);
+
+                /*
+                 * Alpha is stored in the top 7 bits.
+                 */
+                $alpha = ($pixel >> 24) & 0x7F;
+
+                if ($alpha < 120) {
+                    if ($x < $left) {
+                        $left = $x;
+                    }
+
+                    if ($x > $right) {
+                        $right = $x;
+                    }
+
+                    if ($y < $top) {
+                        $top = $y;
+                    }
+
+                    if ($y > $bottom) {
+                        $bottom = $y;
+                    }
+                }
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Nothing visible
+        |--------------------------------------------------------------------------
+        */
+        if ($right < $left || $bottom < $top) {
+            imagedestroy($clean);
+
+            Log::warning('Cashier signature contained no visible ink.', [
+                'path' => $storagePath,
+            ]);
+
+            return;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Crop dimensions
+        |--------------------------------------------------------------------------
+        */
+        $inkWidth = $right - $left + 1;
+        $inkHeight = $bottom - $top + 1;
+
+        /*
+        |--------------------------------------------------------------------------
+        | SIGNATURE AREA
+        |--------------------------------------------------------------------------
+        |
+        | Signature:
+        |   x = 530 → 1210
+        |   y = 728 → 757
+        |
+        | Cashier name:
+        |   baseline around y = 772
+        |
+        | This keeps the signature clearly ABOVE the name.
+        |
+        */
+        $bandX = 530;
+        $bandY = 728;
+
+        $bandWidth = 680;
+        $bandHeight = 29;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Scale signature to fit the band
+        |--------------------------------------------------------------------------
+        */
+        $scale = min(
+            $bandWidth / $inkWidth,
+            $bandHeight / $inkHeight
+        );
+
+        $dstWidth = (int) max(
+            1,
+            round($inkWidth * $scale)
+        );
+
+        $dstHeight = (int) max(
+            1,
+            round($inkHeight * $scale)
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Center signature horizontally and vertically
+        |--------------------------------------------------------------------------
+        */
+        $dstX = $bandX + (int) (($bandWidth - $dstWidth) / 2);
+
+        $dstY = $bandY + (int) (($bandHeight - $dstHeight) / 2);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Paste signature
+        |--------------------------------------------------------------------------
+        */
+        imagealphablending($image, true);
+
+        imagecopyresampled(
+            $image,
+            $clean,
+            $dstX,
+            $dstY,
+            $left,
+            $top,
+            $dstWidth,
+            $dstHeight,
+            $inkWidth,
+            $inkHeight
+        );
+
+        imagedestroy($clean);
+
+    } catch (\Throwable $e) {
+
+        Log::error('Failed to paste cashier signature onto receipt.', [
+            'error' => $e->getMessage(),
+            'path' => $storagePath,
+        ]);
     }
+}
 
     /**
      * Draw the home address on a single centred line inside its 38px row
