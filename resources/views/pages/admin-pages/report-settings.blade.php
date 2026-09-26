@@ -24,7 +24,7 @@
                 <span>Overview</span>
             </a>
 
-            @if(auth()->user()->RoleID == 1)
+            @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
                 <a href="#"
                    @click.prevent="tab='general'"
                    :class="{ active: tab==='general' }">
@@ -69,13 +69,17 @@
         @endif
 
 
+        @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
         <div x-show="tab==='users'" x-cloak class="report-settings-main-card">
             <livewire:admin-pages.report-settings.user-accounts />
         </div>
+        @endif
 
+        @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
         <div x-show="tab==='reports'" x-cloak class="report-settings-main-card">
             <livewire:admin-pages.report-settings.reports />
         </div>
+        @endif
 
         @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
             <div x-show="tab==='pangkabuhayan'" x-cloak class="report-settings-main-card">
