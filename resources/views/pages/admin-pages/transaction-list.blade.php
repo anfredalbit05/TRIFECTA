@@ -183,7 +183,6 @@
     <nav class="report-settings-header">
         <div class="report-settings-header-title">
             <h1>Transaction List</h1>
-            <p>All member withdrawals and activations in one place</p>
         </div>
     </nav>
 
