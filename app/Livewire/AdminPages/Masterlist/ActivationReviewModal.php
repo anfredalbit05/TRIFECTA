@@ -499,9 +499,12 @@ class ActivationReviewModal extends Component
 
             /*
             |--------------------------------------------------------------------------
-            | Multi-Tier Commission Hierarchy (Strictly Matched to Diagram Flow)
+            | Multi-Tier Commission Hierarchy
             |--------------------------------------------------------------------------
-            | Level 1: Direct Referral (400)
+            | Level 1: Direct Referral
+            |   - DR = 90% of Direct Referral Fee
+            |   - TX = 10% of Direct Referral Fee
+            |
             | Level 2: 1st Level Override (50)
             | Level 3: 2nd Level Override (40)
             | Level 4: 3rd Level Override (30)
@@ -509,15 +512,22 @@ class ActivationReviewModal extends Component
             | Level 6: 5th Level Override (10)
             |--------------------------------------------------------------------------
             */
-            $drFee = MembershipFee::where('FeeName', 'Direct Referral')->value('Cost') ?? 400.00;
+
+            $drFee = (float) (
+                MembershipFee::where('FeeName', 'Direct Referral')->value('Cost')
+                ?? 400.00
+            );
+
+            // Split the Direct Referral fee
+            $drCommissionAmount = round($drFee * 0.90, 2); // 90% = 360.00
+            $txAmount = round($drFee * 0.10, 2);           // 10% = 40.00
 
             $levelCommissionRates = [
-                1 => (float) $drFee, // Level 1 - Direct Referral
-                2 => 50.00,          // Level 2 - 1st Level Override
-                3 => 40.00,          // Level 3 - 2nd Level Override
-                4 => 30.00,          // Level 4 - 3rd Level Override
-                5 => 20.00,          // Level 5 - 4th Level Override
-                6 => 10.00,          // Level 6 - 5th Level Override
+                2 => 50.00, // 1st Level Override
+                3 => 40.00, // 2nd Level Override
+                4 => 30.00, // 3rd Level Override
+                5 => 20.00, // 4th Level Override
+                6 => 10.00, // 5th Level Override
             ];
 
             $currentUplineCode = $this->activation->upline_code;
@@ -525,34 +535,112 @@ class ActivationReviewModal extends Component
             $maxLevels = 6;
 
             while ($currentUplineCode && $level <= $maxLevels) {
+
                 $uplineUser = User::where('referralCode', $currentUplineCode)->first();
 
                 if (! $uplineUser) {
-                    Log::warning("Upline user not found for code: {$currentUplineCode} at Level {$level}");
+                    Log::warning(
+                        "Upline user not found for code: {$currentUplineCode} at Level {$level}"
+                    );
+
                     break;
                 }
 
-                $sourceType = ($level === 1) ? 'DR' : 'OV';
-                $commissionAmount = $levelCommissionRates[$level] ?? 0.00;
+                /*
+                |--------------------------------------------------------------------------
+                | Level 1 - Direct Referral
+                |--------------------------------------------------------------------------
+                | DR receives only 90% of the original DR fee.
+                |--------------------------------------------------------------------------
+                */
+                if ($level === 1) {
 
-                if ($commissionAmount > 0) {
-                    Wallet::create([
-                        'UserID' => $uplineUser->UserID,
-                        'ActivationID' => $this->activation->ActivationID,
-                        'amount' => $commissionAmount,
-                        'source' => $sourceType,
-                        'status' => 'Active',
-                    ]);
+                    if ($drCommissionAmount > 0) {
 
-                    Ledger::create([
-                        'RefID' => $uplineUser->UserID,
-                        'amount' => -$commissionAmount,
-                        'Source' => $sourceType,
-                        'ActivationID' => $this->activation->ActivationID,
-                        'status' => 'Completed',
-                    ]);
+                        Wallet::create([
+                            'UserID' => $uplineUser->UserID,
+                            'ActivationID' => $this->activation->ActivationID,
+                            'amount' => $drCommissionAmount,
+                            'source' => 'DR',
+                            'status' => 'Active',
+                        ]);
 
-                    Log::info("Commission written for UserID: {$uplineUser->UserID} at Level {$level} [{$sourceType}]: {$commissionAmount}");
+                        Ledger::create([
+                            'RefID' => $uplineUser->UserID,
+                            'amount' => -$drCommissionAmount,
+                            'Source' => 'DR',
+                            'ActivationID' => $this->activation->ActivationID,
+                            'status' => 'Completed',
+                        ]);
+
+                        Log::info('Direct Referral commission written.', [
+                            'UserID' => $uplineUser->UserID,
+                            'ActivationID' => $this->activation->ActivationID,
+                            'amount' => $drCommissionAmount,
+                            'percentage' => '90%',
+                        ]);
+                    }
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | TX - 10% of Direct Referral
+                    |--------------------------------------------------------------------------
+                    | TX is ONLY added to the Ledger.
+                    | No Wallet entry is created for TX.
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if ($txAmount > 0) {
+
+                        Ledger::create([
+                            'RefID' => $uplineUser->UserID,
+                            'amount' => -$txAmount,
+                            'Source' => 'TX',
+                            'ActivationID' => $this->activation->ActivationID,
+                            'status' => 'Completed',
+                        ]);
+
+                        Log::info('TX ledger entry created.', [
+                            'UserID' => $uplineUser->UserID,
+                            'ActivationID' => $this->activation->ActivationID,
+                            'amount' => $txAmount,
+                            'percentage' => '10%',
+                        ]);
+                    }
+
+                } else {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Levels 2-6 - Override
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $commissionAmount = $levelCommissionRates[$level] ?? 0.00;
+
+                    if ($commissionAmount > 0) {
+
+                        Wallet::create([
+                            'UserID' => $uplineUser->UserID,
+                            'ActivationID' => $this->activation->ActivationID,
+                            'amount' => $commissionAmount,
+                            'source' => 'OV',
+                            'status' => 'Active',
+                        ]);
+
+                        Ledger::create([
+                            'RefID' => $uplineUser->UserID,
+                            'amount' => -$commissionAmount,
+                            'Source' => 'OV',
+                            'ActivationID' => $this->activation->ActivationID,
+                            'status' => 'Completed',
+                        ]);
+
+                        Log::info(
+                            "Override commission written for UserID: {$uplineUser->UserID} " .
+                            "at Level {$level}: {$commissionAmount}"
+                        );
+                    }
                 }
 
                 // Traverse up to next upline level

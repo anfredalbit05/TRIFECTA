@@ -24,7 +24,7 @@
                 <span>Overview</span>
             </a>
 
-            @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
+            @if(auth()->user()->RoleID == 1)
                 <a href="#"
                    @click.prevent="tab='general'"
                    :class="{ active: tab==='general' }">
@@ -62,28 +62,26 @@
             <livewire:admin-pages.report-settings.overview />
         </div>
 
-        @if(auth()->user()->RoleID == 1)
-            <div x-show="tab==='general'" x-cloak class="report-settings-main-card">
-                <livewire:admin-pages.report-settings.general-settings />
-            </div>
-        @endif
 
 
-        @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
         <div x-show="tab==='users'" x-cloak class="report-settings-main-card">
             <livewire:admin-pages.report-settings.user-accounts />
         </div>
-        @endif
 
-        @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
         <div x-show="tab==='reports'" x-cloak class="report-settings-main-card">
             <livewire:admin-pages.report-settings.reports />
         </div>
-        @endif
 
         @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
             <div x-show="tab==='pangkabuhayan'" x-cloak class="report-settings-main-card">
                 <livewire:components.spin-fund-report />
+            </div>
+        @endif
+
+
+        @if(auth()->user()->RoleID == 1)
+            <div x-show="tab==='general'" x-cloak class="report-settings-main-card">
+                <livewire:admin-pages.report-settings.general-settings />
             </div>
         @endif
 
