@@ -157,6 +157,49 @@ body{
 
 }
 
+/*
+ | Signature images, overlaid ABOVE each printed name block (the
+ | artwork already prints "RENANTE S. ROLES, MPA, LFA / CHIEF EXECUTIVE
+ | OFFICER" on the left and the COO block on the right; their lines
+ | sit at y828 of the 1536x1024 image = 80.9%). Each image is
+ | contain-fit into the white space between the policy rows and the
+ | printed line so the ink never covers the name below.
+ |
+ | Geometry (percent of the 1536 x 1024 page):
+ |   LEFT  (CEO): line x305-696  → signature x19.9-45.3%, y 72.3-80.6%
+ |   RIGHT (COO): line x887-1266 → signature x57.7-82.3%, y 72.3-80.6%
+ */
+
+.sig-img{
+
+    position:absolute;
+
+    top:72.3%;
+
+    height:8.3%;
+
+    object-fit:contain;
+
+    object-position:center bottom;
+
+}
+
+.sig-ceo{
+
+    left:19.9%;
+
+    width:25.4%;
+
+}
+
+.sig-coo{
+
+    left:57.7%;
+
+    width:24.6%;
+
+}
+
 </style>
 
 </head>
@@ -198,6 +241,22 @@ body{
 {{ $validUntil }}
 
 </div>
+
+{{-- SIGNATORIES — signature ink above each printed name block.
+     Rendered only when that officer has a signature on file; the
+     artwork's printed name + title remain visible either way. --}}
+
+@if (($ceo['signature'] ?? null) !== null)
+
+<img src="{{ $ceo['signature'] }}" class="sig-img sig-ceo">
+
+@endif
+
+@if (($coo['signature'] ?? null) !== null)
+
+<img src="{{ $coo['signature'] }}" class="sig-img sig-coo">
+
+@endif
 
 
 

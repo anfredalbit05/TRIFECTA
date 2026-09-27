@@ -9,6 +9,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class CertificateController extends Controller
 {
@@ -43,6 +44,51 @@ class CertificateController extends Controller
         ];
     }
 
+    /**
+     * The certificate artwork (certificate.jpg) already prints a CEO
+     * signature line + name/title block on the LEFT and a second (COO)
+     * block on the RIGHT. This resolves each signatory's account by
+     * `position` and turns their stored signature file into a base64
+     * data URI the PDF can overlay above the printed name.
+     */
+    private function signatories(): array
+    {
+        $resolve = function (string $position): ?array {
+            $signatory = User::where('position', $position)
+                ->whereNotNull('signature')
+                ->where('signature', '!=', '')
+                ->first();
+
+            if (! $signatory) {
+                return null;
+            }
+
+            $signature = null;
+
+            if (Storage::disk('public')->exists($signatory->signature)) {
+                $path = Storage::disk('public')->path($signatory->signature);
+                $mime = mime_content_type($path);
+                $signature = 'data:'.$mime.';base64,'.
+                    base64_encode(file_get_contents($path));
+            }
+
+            return [
+                'name' => strtoupper(trim(
+                    $signatory->firstname.' '.
+                    ($signatory->middlename ? substr(trim($signatory->middlename), 0, 1).'. ' : '').
+                    $signatory->lastname
+                )),
+                'position' => $position,
+                'signature' => $signature,
+            ];
+        };
+
+        return [
+            'ceo' => $resolve('CEO'),
+            'coo' => $resolve('COO'),
+        ];
+    }
+
     public function download(Request $request)
     {
         $user = Auth::user();
@@ -69,6 +115,8 @@ class CertificateController extends Controller
             'issuedDate' => now()->format('F d, Y'),
 
             ...$this->certificateFields($user->UserID),
+
+            ...$this->signatories(),
 
         ];
 
@@ -104,6 +152,7 @@ class CertificateController extends Controller
             'certificateNumber' => $certificateNumber,
             'issuedDate' => now()->format('F d, Y'),
             ...$this->certificateFields($userId),
+            ...$this->signatories(),
         ];
 
         $pdf = Pdf::loadView('certificates.template', $data)

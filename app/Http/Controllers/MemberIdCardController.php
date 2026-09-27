@@ -193,25 +193,28 @@ class MemberIdCardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | CR80 ID CARD SIZE
+        | HALF LETTER PAPER (PORTRAIT), TWO CARDS
         |--------------------------------------------------------------------------
         |
-        | 85.6mm × 54mm
+        | One page of HALF letter (short band) paper in PORTRAIT:
+        | 5.5in wide × 8.5in high (139.7mm × 215.9mm). The FRONT card
+        | sits on the left and the BACK card on the right, each exactly
+        | 55.5mm × 75mm — matching the CSS layout in id-card.css.
         |
         | DomPDF uses points:
         | 1mm = 2.83464567pt
         |--------------------------------------------------------------------------
         */
 
-        $width = 85.6 * 2.83464567;
-        $height = 54 * 2.83464567;
+        $width = 139.7 * 2.83464567;
+        $height = 215.9 * 2.83464567;
 
         $pdf->setPaper([
             0,
             0,
             $width,
             $height,
-        ]);
+        ], 'portrait');
 
         /*
         |--------------------------------------------------------------------------
@@ -221,7 +224,7 @@ class MemberIdCardController extends Controller
 
         return $pdf->download(
             'True-Life-Dayongan-ID-'.
-            str_pad($user->id, 5, '0', STR_PAD_LEFT).
+            str_pad((string) $user->UserID, 5, '0', STR_PAD_LEFT).
             '.pdf'
         );
     }

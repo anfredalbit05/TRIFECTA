@@ -1,16 +1,19 @@
 /*
 |--------------------------------------------------------------------------
-| DOMPDF PAGE — TRI-CARE MEMBER'S ID (image-template design)
+| DOMPDF PAGE — TRI-CARE MEMBER'S ID (half letter, PORTRAIT)
 |--------------------------------------------------------------------------
 |
-| Controller sets: 85.6mm × 54mm — each card face is its own PDF page.
-| Do NOT set the paper size here.
+| Controller sets the paper: 5.5in wide × 8.5in high (139.7mm ×
+| 215.9mm) — HALF of letter paper in PORTRAIT orientation. ONE page
+| holds BOTH faces: FRONT on the left, BACK on the right, centered
+| as a pair near the top, ready to cut out.
 |
-| Both faces render the official portrait artwork
-| (public/images/certificate/id-front.png / id-back.png, 432 × 578 px)
-| full-bleed and place live data on top. Overlay geometry is derived
-| from pixel measurements of the 432×578 template converted with the
-| same factor as the page: 1 px = (85.6mm / 432) ≈ 0.19815mm.
+| Each card is exactly 55.5mm wide × 75mm high. The artwork
+| (public/images/certificate/id-front.png / id-back.png, 432×578)
+| fills the card full-bleed and live data sits on top using the SAME
+| percentage coordinates as the live ID preview's rendered layout
+| (.idn-* rules, section 9b of my-profile.css) — so every value
+| lands on its printed placeholder line exactly as on screen.
 |
 */
 
@@ -36,129 +39,115 @@ body {
 
 /*
 |--------------------------------------------------------------------------
-| PDF PAGE CONTAINER — one .pdf-page = ONE PDF PAGE (one card face)
+| PAGE — 5.5in × 8.5in portrait, two 55.5×75mm cards side by side
 |--------------------------------------------------------------------------
+|
+| Cards: 55.5mm + 3mm gap + 55.5mm = 114mm. Side margins:
+| (139.7 − 114) / 2 ≈ 12.85mm. Top margin 8mm.
+|
 */
 
 .pdf-page {
     position: relative;
-    width: 85.6mm;
-    height: 54mm;
-    margin: 0;
-    padding: 0;
-    page-break-after: always;
-    page-break-inside: avoid;
-}
-
-.pdf-page:last-child {
-    page-break-after: auto;
-}
-
-/*
-|--------------------------------------------------------------------------
-| CARD FACE — full-bleed artwork + absolutely positioned overlays
-|--------------------------------------------------------------------------
-|
-| The artwork is portrait (432×578) so it is scaled to the page HEIGHT
-| (54mm → 272.7px) and horizontally centered. The face is 85.6mm wide;
-| the artwork covers 54mm × (432/578) = 40.34mm, leaving 22.63mm of
-| white margin split evenly left/right.
-|
-*/
-
-.card {
-    position: relative;
-    width: 85.6mm;
-    height: 54mm;
+    width: 139.7mm;
+    height: 215.9mm;
     margin: 0;
     padding: 0;
     background: #ffffff;
     overflow: hidden;
 }
 
+.card {
+    position: absolute;
+    top: 8mm;
+    width: 55.5mm;
+    height: 75mm;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+/* FRONT — left card, BACK — right card (pair centered) */
+.card-front {
+    left: 12.85mm;
+}
+
+.card-back {
+    left: 71.35mm;
+}
+
+/* Artwork fills its whole card (aspect ratio 432:578 ≈ 55.5:75). */
 .template-img {
     position: absolute;
     top: 0;
-    left: 22.63mm;
-    width: 40.34mm;
-    height: 54mm;
+    left: 0;
+    width: 55.5mm;
+    height: 75mm;
 }
 
 /*
 |--------------------------------------------------------------------------
-| FRONT FACE OVERLAYS
+| FRONT FACE OVERLAYS — SAME coordinates as the live preview
 |--------------------------------------------------------------------------
 |
-| Template px → mm: multiply by 54 / 578 = 0.0934256.
+| Copied from .idn-* (section 9b of my-profile.css), the rules that
+| actually render on screen (they override section 9):
 |
-| Photo frame (outer): x 23-172, y 235-437
-|   → left 2.15mm, top 21.96mm, w 13.92mm, h 18.87mm (inner: +0.47mm inset)
-| Label text bands (vertical centers): NAME y358, MEMBERSHIP y390,
-| ISSUE y422, VALID y456. Labels end ≈ x 300 (28.03mm); lines end x 412.
-| Signature card: right of the barcode, x 312-416, y 475-517.
+|   photo    left 5.9%  top 41%    w 33.6%  h 34.2%
+|   NAME     left 44.2% top 55.1%  w 50%     — value starts right
+|                                             after the "NAME:" label
+|   MEMBERSH left 67.8% top 61.0%  w 31.7%   — after its label
+|   ISSUE    left 65.7% top 66%    w 33.8%   — +1px nudge ≈ +0.22%
+|   VALID    left 63.2% top 71.4%  w 36.3%   — +1px nudge ≈ +0.22%
+|   signature left 71.8% top 77.9% w 23%  h 6.2%  — right of barcode
+|
+| Font: the preview uses 10px on a 320px card / 11px on a 340px card
+| ≈ 3.1-3.2% of card width. At 55.5mm that is 1.73mm ≈ 4.9pt, and
+| line-height 1.1 matches the preview's line box, so text rests on
+| the placeholder lines at the same relative height.
 |
 */
 
 .photo-box {
     position: absolute;
-    top: 22.43mm;
-    left: 2.62mm;
-    width: 12.98mm;
-    height: 17.93mm;
+    left: 5.9%;
+    top: 41%;
+    width: 33.6%;
+    height: 34.2%;
     overflow: hidden;
     background: #d1d5db;
-    text-align: center;
 }
 
 .photo-box img {
     width: 100%;
     height: 100%;
+    vertical-align: top;
 }
 
-/* Data lines — vertically centered on the printed labels */
+/* Data lines — same placement as .idn-field on screen */
 .idf-field {
     position: absolute;
     font-family: Helvetica, Arial, sans-serif;
     font-weight: bold;
-    font-size: 6.5pt;
-    line-height: 1;
+    font-size: 4.9pt;
+    line-height: 1.1;
     color: #0c2c6b;
-    letter-spacing: 0.1pt;
+    letter-spacing: 0.05pt;
     white-space: nowrap;
     overflow: hidden;
 }
 
-.idf-name {
-    top: 32.84mm;
-    left: 28.03mm;
-    width: 10.8mm;
-}
+.idf-name       { left: 44.2%; top: 55.1%; width: 50%; }
+.idf-membership { left: 67.8%; top: 61%;   width: 31.7%; }
+.idf-issue      { left: 65.7%; top: 66.22%; width: 33.8%; }
+.idf-valid      { left: 63.2%; top: 71.62%; width: 36.3%; }
 
-.idf-membership {
-    top: 36.10mm;
-    left: 28.03mm;
-    width: 10.8mm;
-}
-
-.idf-issue {
-    top: 39.10mm;
-    left: 28.03mm;
-    width: 10.8mm;
-}
-
-.idf-valid {
-    top: 42.30mm;
-    left: 28.03mm;
-    width: 10.8mm;
-}
-
-/* Member signature — white card so the ink shows beside the barcode */
+/* Member signature — white card right of the barcode (as previewed) */
 .idf-signature {
     position: absolute;
-    top: 44.38mm;
-    left: 29.15mm;
-    width: 9.72mm;
-    height: 3.92mm;
+    left: 71.8%;
+    top: 77.9%;
+    width: 23%;
+    height: 6.2%;
     background: #ffffff;
     overflow: hidden;
     text-align: center;
@@ -167,19 +156,7 @@ body {
 .idf-signature img {
     max-width: 100%;
     max-height: 100%;
-}
-
-/* "SIGNATURE" caption under the ink area */
-.idf-signature-caption {
-    position: absolute;
-    top: 48.45mm;
-    left: 29.15mm;
-    width: 9.72mm;
-    font-size: 3.4pt;
-    line-height: 1;
-    text-align: center;
-    color: #444444;
-    letter-spacing: 0.2pt;
+    vertical-align: middle;
 }
 
 /*

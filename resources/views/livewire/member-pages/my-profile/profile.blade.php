@@ -48,7 +48,8 @@
     {{-- ========================= 2. SUCCESS ALERTS ========================= --}}
     @if (session()->has('profile-success'))
         <div class="alert-success">
-            <svg xmlns="http://www.w3.org/2000/svg" class="alert-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="alert-icon" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
             <p class="alert-text">{{ session('profile-success') }}</p>
@@ -57,7 +58,8 @@
 
     @if (session()->has('picture-success'))
         <div class="alert-success">
-            <svg xmlns="http://www.w3.org/2000/svg" class="alert-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="alert-icon" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
             <p class="alert-text">{{ session('picture-success') }}</p>
@@ -79,14 +81,16 @@
                 <div class="avatar-section">
                     <div class="avatar-frame">
                         @if ($profilepic)
-                            <img src="{{ $profilepic->temporaryUrl() }}" class="avatar-img" alt="New profile picture preview">
+                            <img src="{{ $profilepic->temporaryUrl() }}" class="avatar-img"
+                                alt="New profile picture preview">
                         @else
                             @php
                                 $profilePic = auth()->user()->profilepic;
                             @endphp
 
                             @if (!$profilePic || $profilePic === 'images/profiles/default-avatar.png')
-                                <img src="{{ asset('images/profiles/default-avatar.png') }}" class="avatar-img" alt="Default profile picture">
+                                <img src="{{ asset('images/profiles/default-avatar.png') }}" class="avatar-img"
+                                    alt="Default profile picture">
                             @else
                                 <img src="{{ Storage::url($profilePic) }}" class="avatar-img" alt="Profile picture">
                             @endif
@@ -98,7 +102,8 @@
                             <label for="profilepic" class="btn-primary">
                                 Choose Profile Picture
                             </label>
-                            <input id="profilepic" type="file" wire:model="profilepic" accept="image/jpeg,image/jpg" class="hidden">
+                            <input id="profilepic" type="file" wire:model="profilepic" accept="image/jpeg,image/jpg"
+                                class="hidden">
 
                             @if (!$profilepic && auth()->user()->profilepic && auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
                                 <button type="button" wire:click="removeProfilePicture"
@@ -126,7 +131,8 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Personal Details & Emergency Contact</h3>
-                    <p class="card-subtitle">Update your account info and emergency contact details for the ID back side.</p>
+                    <p class="card-subtitle">Update your account info and emergency contact details for the ID back
+                        side.</p>
                 </div>
 
                 <form @submit.prevent="confirmSave">
@@ -204,49 +210,55 @@
                             @enderror
                         </div>
 
-                        @if(auth()->user()->RoleID != 8)
-                        {{-- Emergency Contact Details Section --}}
-                        <div class="form-section-divider">
-                            <h4 class="form-section-title">In Case of Emergency (ICE) Details</h4>
-                            <p class="form-section-desc">This will sync directly to the back of your ID card preview.</p>
-                        </div>
+                        @if (auth()->user()->RoleID != 8)
+                            {{-- Emergency Contact Details Section --}}
+                            <div class="form-section-divider">
+                                <h4 class="form-section-title">In Case of Emergency (ICE) Details</h4>
+                                <p class="form-section-desc">This will sync directly to the back of your ID card
+                                    preview.</p>
+                            </div>
 
-                        <div class="form-field">
-                            <label class="form-label">Emergency Contact Name</label>
-                            <input type="text" wire:model="emergencyName" class="form-input" placeholder="Full name">
-                            @error('emergencyName')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
+                            <div class="form-field">
+                                <label class="form-label">Emergency Contact Name</label>
+                                <input type="text" wire:model="emergencyName" class="form-input"
+                                    placeholder="Full name">
+                                @error('emergencyName')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
 
-                        <div class="form-field">
-                            <label class="form-label">Relationship</label>
-                            <input type="text" wire:model="emergencyRelationship" class="form-input" placeholder="e.g. Spouse, Parent">
-                            @error('emergencyRelationship')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
+                            <div class="form-field">
+                                <label class="form-label">Relationship</label>
+                                <input type="text" wire:model="emergencyRelationship" class="form-input"
+                                    placeholder="e.g. Spouse, Parent">
+                                @error('emergencyRelationship')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
 
-                        <div class="form-field">
-                            <label class="form-label">Emergency Contact No.</label>
-                            <input type="text" wire:model="emergencyContactno" class="form-input" placeholder="Mobile number">
-                            @error('emergencyContactno')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
+                            <div class="form-field">
+                                <label class="form-label">Emergency Contact No.</label>
+                                <input type="text" wire:model="emergencyContactno" class="form-input"
+                                    placeholder="Mobile number">
+                                @error('emergencyContactno')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
 
-                        <div class="form-field">
-                            <label class="form-label">Emergency Address</label>
-                            <input type="text" wire:model="emergencyAddress" class="form-input" placeholder="Address">
-                            @error('emergencyAddress')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
-                         @endif
+                            <div class="form-field">
+                                <label class="form-label">Emergency Address</label>
+                                <input type="text" wire:model="emergencyAddress" class="form-input"
+                                    placeholder="Address">
+                                @error('emergencyAddress')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        @endif
                     </div>
 
                     <div class="card-footer">
-                        <button type="submit" wire:loading.attr="disabled" wire:target="saveProfile" class="btn-submit">
+                        <button type="submit" wire:loading.attr="disabled" wire:target="saveProfile"
+                            class="btn-submit">
                             <span wire:loading.remove wire:target="saveProfile">Save Personal Information</span>
                             <span wire:loading wire:target="saveProfile">Saving...</span>
                         </button>
@@ -258,48 +270,50 @@
         {{-- =================== RIGHT COLUMN =================== --}}
         <div class="profile-col">
 
-            @if(auth()->user()->RoleID != 8)
-            {{-- --------------- 5. REGISTERED BENEFICIARIES (READ-ONLY) --------------- --}}
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Registered Beneficiaries</h3>
-                </div>
+            @if (auth()->user()->RoleID != 8)
+                {{-- --------------- 5. REGISTERED BENEFICIARIES (READ-ONLY) --------------- --}}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Registered Beneficiaries</h3>
+                    </div>
 
-                <div class="card-body">
-                    @if (count($beneficiaries) > 0)
-                        <div class="table-wrap">
-                            <table class="table">
-                                <thead>
-                                    <tr class="table-head-row">
-                                        <th class="table-head-cell">Full Name</th>
-                                        <th class="table-head-cell">Birthdate</th>
-                                        <th class="table-head-cell">Relationship</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="table-body">
-                                    @foreach ($beneficiaries as $beneficiary)
-                                        <tr>
-                                            <td class="table-cell-primary">{{ $beneficiary->fullname ?? 'N/A' }}</td>
-                                            <td class="table-cell">
-                                                {{ $beneficiary->birthdate ? \Carbon\Carbon::parse($beneficiary->birthdate)->format('M d, Y') : 'N/A' }}
-                                            </td>
-                                            <td class="table-cell">{{ $beneficiary->relationship ?? 'N/A' }}</td>
+                    <div class="card-body">
+                        @if (count($beneficiaries) > 0)
+                            <div class="table-wrap">
+                                <table class="table">
+                                    <thead>
+                                        <tr class="table-head-row">
+                                            <th class="table-head-cell">Full Name</th>
+                                            <th class="table-head-cell">Birthdate</th>
+                                            <th class="table-head-cell">Relationship</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <p class="table-empty">No beneficiaries registered.</p>
-                    @endif
+                                    </thead>
+                                    <tbody class="table-body">
+                                        @foreach ($beneficiaries as $beneficiary)
+                                            <tr>
+                                                <td class="table-cell-primary">{{ $beneficiary->fullname ?? 'N/A' }}
+                                                </td>
+                                                <td class="table-cell">
+                                                    {{ $beneficiary->birthdate ? \Carbon\Carbon::parse($beneficiary->birthdate)->format('M d, Y') : 'N/A' }}
+                                                </td>
+                                                <td class="table-cell">{{ $beneficiary->relationship ?? 'N/A' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <p class="table-empty">No beneficiaries registered.</p>
+                        @endif
+                    </div>
                 </div>
-            </div>
             @endif
 
             {{-- --------------- 6. SIGNATURE PAD --------------- --}}
             <div class="signature-card" x-data="signaturePadSetup()" x-init="initPad()">
                 <h3 class="signature-title">Signature</h3>
-                <p class="signature-desc">Draw your signature inside the box below to display on your ID front preview.</p>
+                <p class="signature-desc">Draw your signature inside the box below to display on your ID front preview.
+                </p>
 
                 <div class="signature-pad-frame">
                     <canvas x-ref="signatureCanvas" class="signature-canvas"></canvas>
@@ -315,70 +329,76 @@
                 </div>
             </div>
 
-            @if(auth()->user()->RoleID != 8)
-            {{-- --------------- 7. LIVE ID PREVIEW --------------- --}}
-            <div class="id-preview-card">
-                <h4 class="id-preview-title">👁️ Live ID Preview</h4>
+            @if (auth()->user()->RoleID != 8)
+                {{-- --------------- 7. LIVE ID PREVIEW --------------- --}}
+                <div class="id-preview-card">
+                    <h4 class="id-preview-title">👁️ Live ID Preview</h4>
 
-                <div class="id-card-viewport">
+                    <div class="id-card-viewport">
 
-                    {{-- FRONT SIDE --}}
-                    <div id="id-card-front" class="id-card-front-new">
-                        {{-- Template artwork --}}
-                        <img src="{{ asset('images/certificate/id-front.png') }}" class="id-template-img" alt="ID Front">
+                        {{-- FRONT SIDE --}}
+                        <div id="id-card-front" class="id-card-front-new">
+                            {{-- Template artwork --}}
+                            <img src="{{ asset('images/certificate/id-front.png') }}" class="id-template-img"
+                                alt="ID Front">
 
-                        {{-- Photo overlay (fills the framed portrait area) --}}
-                        <div class="idn-photo">
-                            @if ($profilepic && is_object($profilepic))
-                                <img src="{{ $profilepic->temporaryUrl() }}">
-                            @elseif (auth()->user()->profilepic && auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
-                                <img src="{{ asset('storage/' . auth()->user()->profilepic) }}">
-                            @endif
+                            {{-- Photo overlay (fills the framed portrait area) --}}
+                            <div class="idn-photo">
+                                @if ($profilepic && is_object($profilepic))
+                                    <img src="{{ $profilepic->temporaryUrl() }}">
+                                @elseif (auth()->user()->profilepic && auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
+                                    <img src="{{ asset('storage/' . auth()->user()->profilepic) }}">
+                                @endif
+                            </div>
+
+                            {{-- Data overlays --}}
+                            <div class="idn-field idn-name">
+                                {{ strtoupper(trim("$firstname " . ($middlename ? substr(trim($middlename), 0, 1) . '. ' : '') . $lastname) ?: 'NAME HERE') }}
+                            </div>
+                            <div class="idn-field idn-membership">{{ $membershipNo }}</div>
+                            <div class="idn-field idn-issue">{{ $dateOfIssue }}</div>
+                            <div class="idn-field idn-valid">{{ $validUntil }}</div>
+
+                            {{-- Member signature on a white card below the QR/barcode area --}}
+                            <div class="idn-signature">
+                                @if ($signature)
+                                    <img src="{{ asset('storage/' . $signature) }}">
+                                @endif
+                            </div>
                         </div>
 
-                        {{-- Data overlays --}}
-                        <div class="idn-field idn-name">{{ strtoupper(trim("$firstname " . ($middlename ? substr(trim($middlename), 0, 1) . '. ' : '') . $lastname) ?: 'NAME HERE') }}</div>
-                        <div class="idn-field idn-membership">{{ $membershipNo }}</div>
-                        <div class="idn-field idn-issue">{{ $dateOfIssue }}</div>
-                        <div class="idn-field idn-valid">{{ $validUntil }}</div>
-
-                        {{-- Member signature on a white card below the QR/barcode area --}}
-                        <div class="idn-signature">
-                            @if ($signature)
-                                <img src="{{ asset('storage/' . $signature) }}">
-                            @endif
-                        </div>
-                    </div>
-
-                    {{-- BACK SIDE --}}
-                    {{-- The back artwork is fully pre-printed (Member Benefits
+                        {{-- BACK SIDE --}}
+                        {{-- The back artwork is fully pre-printed (Member Benefits
                          summary) — no data overlays needed here. --}}
-                    <div id="id-card-back" class="id-card-back-new hidden">
-                        <img src="{{ asset('images/certificate/id-back.png') }}" class="id-template-img" alt="ID Back">
+                        <div id="id-card-back" class="id-card-back-new hidden">
+                            <img src="{{ asset('images/certificate/id-back.png') }}" class="id-template-img"
+                                alt="ID Back">
+                        </div>
+                    </div>
+
+                    <div class="id-tabs">
+                        <button type="button" id="btn-front" onclick="switchIdTab('front')"
+                            class="id-tab id-tab--active">Front</button>
+                        <button type="button" id="btn-back" onclick="switchIdTab('back')"
+                            class="id-tab id-tab--inactive">Back</button>
+                    </div>
+
+                    <div class="id-actions flex justify-center items-center gap-4">
+                        <a href="{{ route('member.id-card.pdf') }}" class="btn-download text-center">
+                            Download ID (PDF)
+                        </a>
+
+                        {{-- @if ($hasDownloadableReceipt)
+                            <a href="{{ route('activation.receipt.download') }}" class="btn-download">
+                                🧾 Download Receipt
+                            </a>
+                        @endif --}}
+
+                        {{-- <button type="button" wire:click="requestPhysicalId" class="btn-primary flex-1">
+                            Request Physical ID
+                        </button> --}}
                     </div>
                 </div>
-
-                <div class="id-tabs">
-                    <button type="button" id="btn-front" onclick="switchIdTab('front')" class="id-tab id-tab--active">Front</button>
-                    <button type="button" id="btn-back" onclick="switchIdTab('back')" class="id-tab id-tab--inactive">Back</button>
-                </div>
-
-                <div class="id-actions">
-                    <button type="button" x-data="idPdfDownload" @click="downloadPdf" class="btn-download">
-                        Download ID (PDF)
-                    </button>
-
-                    {{-- @if ($hasDownloadableReceipt)
-                        <a href="{{ route('activation.receipt.download') }}"
-                            class="btn-download">
-                            🧾 Download Receipt
-                        </a>
-                    @endif --}}
-                    {{-- <button type="button" wire:click="requestPhysicalId" class="btn-primary flex-1">
-                        Request Physical ID
-                    </button> --}}
-                </div>
-            </div>
 
             @endif
         </div>
@@ -386,8 +406,6 @@
 </div>
 
 {{-- ============================= 8. SCRIPTS ============================= --}}
-<script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.0/dist/html2canvas-pro.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 
 <script>
@@ -553,290 +571,49 @@
                 this.pad.clear();
                 @this.call('removeSignature');
             },
-savePad() {
-    if (this.pad.isEmpty()) {
-        Swal.fire({
-            title: 'No Signature',
-            text: 'Please provide a signature first.',
-            icon: 'warning',
-            confirmButtonColor: '#0C2C6B'
-        });
-        return;
-    }
-
-    const dataUrl = (() => {
-        // signature_pad only paints its white background on clear() — a
-        // pad drawn on without clearing stays transparent, and JPEG has
-        // no alpha (transparent → BLACK). Composite onto white first.
-        const src = this.pad.canvas;
-        const exportCanvas = document.createElement('canvas');
-        exportCanvas.width = src.width;
-        exportCanvas.height = src.height;
-
-        const ctx = exportCanvas.getContext('2d');
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-        ctx.drawImage(src, 0, 0);
-
-        return exportCanvas.toDataURL('image/jpeg', 1.0);
-    })();
-
-    Swal.fire({
-        title: 'Save Signature?',
-        text: 'Your signature will be saved to your profile.',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#0B2A5B',
-        cancelButtonColor: '#D79B10',
-        confirmButtonText: 'Yes, Save it',
-        cancelButtonText: 'Cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            @this.call('saveSignature', dataUrl);
-        }
-    });
-}
-        }
-    }
-
-    document.addEventListener('alpine:init', () => {
-
-        Alpine.data('idPdfDownload', () => ({
-            async downloadPdf() {
-
-                const frontEl = document.getElementById('id-card-front');
-
-                if (!frontEl) {
-                    console.error('idPdfDownload: #id-card-front was not found.');
-
+            savePad() {
+                if (this.pad.isEmpty()) {
                     Swal.fire({
-                        title: 'Download Failed',
-                        text: 'ID card preview was not found.',
-                        icon: 'error',
+                        title: 'No Signature',
+                        text: 'Please provide a signature first.',
+                        icon: 'warning',
                         confirmButtonColor: '#0C2C6B'
                     });
-
                     return;
                 }
 
-                if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
-                    console.error('idPdfDownload: html2canvas/jsPDF did not load.');
+                const dataUrl = (() => {
+                    // signature_pad only paints its white background on clear() — a
+                    // pad drawn on without clearing stays transparent, and JPEG has
+                    // no alpha (transparent → BLACK). Composite onto white first.
+                    const src = this.pad.canvas;
+                    const exportCanvas = document.createElement('canvas');
+                    exportCanvas.width = src.width;
+                    exportCanvas.height = src.height;
 
-                    Swal.fire({
-                        title: 'Download Failed',
-                        text: 'PDF generator did not load. Please refresh the page and try again.',
-                        icon: 'error',
-                        confirmButtonColor: '#0C2C6B'
-                    });
-
-                    return;
-                }
-
-                let container = null;
-
-                try {
-                    // ---------------------------------------------------------
-                    // Capture BOTH faces from offscreen clones (so the hidden
-                    // back renders even while the user is on the front tab).
-                    // Each page is drawn manually — template artwork plus the
-                    // live-computed overlay geometry — because html2canvas
-                    // re-implements text layout and drifts the values off
-                    // their printed lines. Manual drawing matches the preview
-                    // pixel-for-pixel.
-                    // ---------------------------------------------------------
-                    const backEl = document.getElementById('id-card-back');
-
-                    const refWidth = frontEl.offsetWidth || backEl?.offsetWidth || 320;
-
-                    container = document.createElement('div');
-                    container.style.cssText = 'position:fixed;left:-100000px;top:0;z-index:-9999;';
-                    document.body.appendChild(container);
-
-                    const cloneSide = (el) => {
-                        const clone = el.cloneNode(true);
-                        clone.classList.remove('hidden');
-                        clone.style.position = 'static';
-                        clone.style.width = refWidth + 'px';
-                        container.appendChild(clone);
-
-                        return clone;
-                    };
-
-                    const frontClone = cloneSide(frontEl);
-                    const backClone = backEl ? cloneSide(backEl) : null;
-
-                    await this.waitForImages(container);
-
-                    const frontCanvas = this.captureCardCanvas(frontClone);
-                    const backCanvas = backClone ? this.captureCardCanvas(backClone) : null;
-
-                    // ---------------------------------------------------------
-                    // Page size derives from each captured canvas so nothing
-                    // is ever stretched onto the page.
-                    // ---------------------------------------------------------
-                    const pageW = 54;
-                    const pageH = pageW * (frontCanvas.height / frontCanvas.width);
-
-                    const pdf = new window.jspdf.jsPDF({
-                        orientation: 'portrait',
-                        unit: 'mm',
-                        format: [pageW, pageH]
-                    });
-
-                    pdf.addImage(frontCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pageW, pageH);
-
-                    if (backCanvas) {
-                        pdf.addPage([pageW, pageH], 'portrait');
-                        pdf.addImage(backCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pageW, pageH);
-                    }
-
-                    pdf.save('member-id-card.pdf');
-
-                    console.log('idPdfDownload: PDF generated successfully.');
-
-                } catch (error) {
-                    console.error('idPdfDownload: PDF generation failed', error);
-
-                    Swal.fire({
-                        title: 'Download Failed',
-                        text: 'Something went wrong while generating your ID card PDF.',
-                        icon: 'error',
-                        confirmButtonColor: '#0C2C6B'
-                    });
-
-                } finally {
-                    if (container && container.parentNode) {
-                        container.remove();
-                    }
-                }
-            },
-
-            // Draws one card face onto a hi-res canvas: template artwork
-            // first, then photo/signature images and the overlay values at
-            // the SAME live-computed positions the preview uses — so the
-            // PDF is pixel-faithful to what the member sees.
-            captureCardCanvas(el) {
-                const template = el.querySelector('.id-template-img');
-
-                const S = 3; // hi-res multiplier on the template's natural size
-
-                const canvas = document.createElement('canvas');
-                canvas.width = template.naturalWidth * S;
-                canvas.height = template.naturalHeight * S;
-
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-
-                const ir = template.getBoundingClientRect();
-
-                const toX = px => (px - ir.x) / ir.width * canvas.width;
-                const toY = px => (px - ir.y) / ir.height * canvas.height;
-                const toW = px => px / ir.width * canvas.width;
-                const toH = px => px / ir.height * canvas.height;
-
-                // -- photo (cover-fit into the framed portrait area) --
-                const photoBox = el.querySelector('.idn-photo');
-                const photoImg = photoBox?.querySelector('img');
-
-                if (photoBox && photoImg && photoImg.naturalWidth > 0) {
-                    const b = photoBox.getBoundingClientRect();
-                    const bx = toX(b.x);
-                    const by = toY(b.y);
-                    const bw = toW(b.width);
-                    const bh = toH(b.height);
-
-                    const ratio = Math.max(bw / photoImg.naturalWidth, bh / photoImg.naturalHeight);
-                    const sw = bw / ratio;
-                    const sh = bh / ratio;
-
-                    ctx.drawImage(
-                        photoImg,
-                        (photoImg.naturalWidth - sw) / 2,
-                        (photoImg.naturalHeight - sh) / 2,
-                        sw,
-                        sh,
-                        bx, by, bw, bh
-                    );
-                }
-
-                // -- member signature (white card + contain-fit image) --
-                const sigBox = el.querySelector('.idn-signature');
-                const sigImg = sigBox?.querySelector('img');
-
-                if (sigBox) {
-                    const b = sigBox.getBoundingClientRect();
-                    const bx = toX(b.x);
-                    const by = toY(b.y);
-                    const bw = toW(b.width);
-                    const bh = toH(b.height);
-
-                    ctx.save();
+                    const ctx = exportCanvas.getContext('2d');
                     ctx.fillStyle = '#ffffff';
-                    ctx.beginPath();
-                    ctx.roundRect(bx, by, bw, bh, 4 * S / 3);
-                    ctx.fill();
-                    ctx.restore();
+                    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+                    ctx.drawImage(src, 0, 0);
 
-                    if (sigImg && sigImg.naturalWidth > 0) {
-                        const ratio = Math.min(bw / sigImg.naturalWidth, bh / sigImg.naturalHeight);
-                        const dw = sigImg.naturalWidth * ratio;
-                        const dh = sigImg.naturalHeight * ratio;
+                    return exportCanvas.toDataURL('image/jpeg', 1.0);
+                })();
 
-                        ctx.drawImage(sigImg, bx + (bw - dw) / 2, by + (bh - dh) / 2, dw, dh);
+                Swal.fire({
+                    title: 'Save Signature?',
+                    text: 'Your signature will be saved to your profile.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0B2A5B',
+                    cancelButtonColor: '#D79B10',
+                    confirmButtonText: 'Yes, Save it',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        @this.call('saveSignature', dataUrl);
                     }
-                }
-
-                // -- overlay values (same text/positions as the preview) --
-                for (const field of el.querySelectorAll('.idn-field')) {
-                    const r = field.getBoundingClientRect();
-                    const cs = getComputedStyle(field);
-
-                    let fontPx = toW(parseFloat(cs.fontSize));
-                    const weight = cs.fontWeight || '600';
-                    const maxWidth = toW(r.width);
-                    const text = field.textContent.trim();
-
-                    ctx.font = weight + ' ' + fontPx + 'px Arial, Helvetica, sans-serif';
-
-                    // Shrink-to-fit so long names never overflow the line.
-                    while (fontPx > 6 && ctx.measureText(text).width > maxWidth) {
-                        fontPx -= 1;
-                        ctx.font = weight + ' ' + fontPx + 'px Arial, Helvetica, sans-serif';
-                    }
-
-                    ctx.fillStyle = cs.color || '#0C2C6B';
-                    ctx.textBaseline = 'alphabetic';
-
-                    // Browser line box bottom ≈ baseline + descent (~0.21em).
-                    const bottomPx = toY(r.bottom);
-                    ctx.fillText(text, toX(r.x), bottomPx - fontPx * 0.21);
-                }
-
-                return canvas;
-            },
-
-            // Waits for all <img> tags inside root to finish loading.
-            waitForImages(root) {
-                const images = Array.from(root.querySelectorAll('img'));
-
-                if (images.length === 0) {
-                    return Promise.resolve();
-                }
-
-                return Promise.all(
-                    images.map(img => {
-                        if (img.complete) {
-                            return Promise.resolve();
-                        }
-
-                        return new Promise(resolve => {
-                            img.addEventListener('load', resolve, { once: true });
-                            img.addEventListener('error', resolve, { once: true });
-                        });
-                    })
-                );
+                });
             }
-        }));
-
-    });
+        }
+    }
 </script>

@@ -13,12 +13,16 @@
 <body>
 
     {{-- ================================================================
-         PDF PAGE 1 — FRONT OF ID (TRI-CARE artwork + live data)
+         ONE PAGE — HALF SHORT BOND (8.5in x 5.5in)
+         FRONT face on the LEFT, BACK face on the RIGHT.
+         Cut down the middle for a two-sided badge.
          ================================================================ --}}
 
     <div class="pdf-page">
 
-        <div class="card">
+        {{-- ============ FRONT (left half) ============ --}}
+
+        <div class="card card-front">
 
             {{-- Template artwork --}}
             <img class="template-img" src="{{ public_path('images/certificate/id-front.png') }}" alt="">
@@ -30,7 +34,7 @@
                 @endif
             </div>
 
-            {{-- DATA LINES — written after the printed labels --}}
+            {{-- DATA LINES — same positions as the live preview --}}
             <div class="idf-field idf-name">{{ strtoupper(trim($user->firstname . ' ' . $user->middlename . ' ' . $user->lastname)) }}</div>
 
             <div class="idf-field idf-membership">{{ $membershipNo }}</div>
@@ -45,19 +49,12 @@
                     <img src="{{ $signatureBase64 }}" alt="Member Signature">
                 @endif
             </div>
-            <div class="idf-signature-caption">SIGNATURE</div>
 
         </div>
 
-    </div>
+        {{-- ============ BACK (right half) ============ --}}
 
-    {{-- ================================================================
-         PDF PAGE 2 — BACK OF ID (artwork only)
-         ================================================================ --}}
-
-    <div class="pdf-page">
-
-        <div class="card">
+        <div class="card card-back">
 
             <img class="template-img" src="{{ public_path('images/certificate/id-back.png') }}" alt="">
 
