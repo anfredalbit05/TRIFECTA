@@ -35,7 +35,13 @@
             </div>
 
             {{-- DATA LINES — same positions as the live preview --}}
-            <div class="idf-field idf-name">{{ strtoupper(trim($user->firstname . ' ' . $user->middlename . ' ' . $user->lastname)) }}</div>
+          <div class="idf-field idf-name">
+                {{ strtoupper(trim(
+                    $user->firstname . ' ' .
+                    ($user->middlename ? substr(trim($user->middlename), 0, 1) . '. ' : '') .
+                    $user->lastname
+                )) }}
+            </div>
 
             <div class="idf-field idf-membership">{{ $membershipNo }}</div>
 
