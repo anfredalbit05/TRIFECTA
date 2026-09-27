@@ -36,7 +36,7 @@ class CertificateController extends Controller
                 ? Carbon::parse($activation->policy_effectivity_date)->format('F d, Y')
                 : 'N/A',
 
-            'coverageType' => 'Primary Policy Holder',
+            'coverageType' => 'HMO',
 
             'validUntil' => $activation?->policy_expiration_date
                 ? Carbon::parse($activation->policy_expiration_date)->format('F d, Y')
