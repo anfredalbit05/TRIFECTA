@@ -1,10 +1,16 @@
 /*
 |--------------------------------------------------------------------------
-| DOMPDF PAGE
+| DOMPDF PAGE — TRI-CARE MEMBER'S ID (image-template design)
 |--------------------------------------------------------------------------
 |
-| Controller sets: 85.6mm × 54mm
+| Controller sets: 85.6mm × 54mm — each card face is its own PDF page.
 | Do NOT set the paper size here.
+|
+| Both faces render the official portrait artwork
+| (public/images/certificate/id-front.png / id-back.png, 432 × 578 px)
+| full-bleed and place live data on top. Overlay geometry is derived
+| from pixel measurements of the 432×578 template converted with the
+| same factor as the page: 1 px = (85.6mm / 432) ≈ 0.19815mm.
 |
 */
 
@@ -23,21 +29,15 @@ body {
 }
 
 body {
-    margin: 0;
-    padding: 0;
     font-family: Helvetica, Arial, sans-serif;
     font-size: 0;
-    color: #1f2933;
+    color: #0c2c6b;
 }
 
 /*
 |--------------------------------------------------------------------------
-| PDF PAGE CONTAINER
+| PDF PAGE CONTAINER — one .pdf-page = ONE PDF PAGE (one card face)
 |--------------------------------------------------------------------------
-|
-| IMPORTANT: This is what controls pagination.
-| One .pdf-page = ONE PDF PAGE.
-|
 */
 
 .pdf-page {
@@ -56,375 +56,138 @@ body {
 
 /*
 |--------------------------------------------------------------------------
-| ID CARD
+| CARD FACE — full-bleed artwork + absolutely positioned overlays
 |--------------------------------------------------------------------------
 |
-| Slightly smaller than the physical page so DomPDF cannot overflow.
+| The artwork is portrait (432×578) so it is scaled to the page HEIGHT
+| (54mm → 272.7px) and horizontally centered. The face is 85.6mm wide;
+| the artwork covers 54mm × (432/578) = 40.34mm, leaving 22.63mm of
+| white margin split evenly left/right.
 |
 */
 
 .card {
     position: relative;
-    width: 85.0mm;
-    height: 53.2mm;
+    width: 85.6mm;
+    height: 54mm;
     margin: 0;
     padding: 0;
     background: #ffffff;
-    border: 0.3mm solid #e2e5ea;
     overflow: hidden;
-    font-size: 5pt;
+}
+
+.template-img {
+    position: absolute;
+    top: 0;
+    left: 22.63mm;
+    width: 40.34mm;
+    height: 54mm;
 }
 
 /*
 |--------------------------------------------------------------------------
-| FRONT
+| FRONT FACE OVERLAYS
 |--------------------------------------------------------------------------
-*/
-
-.brand {
-    position: absolute;
-    top: 3mm;
-    left: 4mm;
-    font-size: 8.5pt;
-    font-weight: bold;
-    color: #17335e;
-}
-
-.badge {
-    position: absolute;
-    top: 3.4mm;
-    right: 4mm;
-    background: #e6f0fd;
-    color: #2563eb;
-    font-size: 5pt;
-    font-weight: bold;
-    letter-spacing: 0.3pt;
-    padding: 1mm 2.5mm;
-    border-radius: 3mm;
-}
-
-.divider-top {
-    position: absolute;
-    top: 8.1mm;
-    left: 4mm;
-    right: 4mm;
-    border-top: 0.5pt solid #1a2b4c;
-}
-
-/*
-|--------------------------------------------------------------------------
-| PHOTO
-|--------------------------------------------------------------------------
+|
+| Template px → mm: multiply by 54 / 578 = 0.0934256.
+|
+| Photo frame (outer): x 23-172, y 235-437
+|   → left 2.15mm, top 21.96mm, w 13.92mm, h 18.87mm (inner: +0.47mm inset)
+| Label text bands (vertical centers): NAME y358, MEMBERSHIP y390,
+| ISSUE y422, VALID y456. Labels end ≈ x 300 (28.03mm); lines end x 412.
+| Signature card: right of the barcode, x 312-416, y 475-517.
+|
 */
 
 .photo-box {
     position: absolute;
-    top: 11mm;
-    left: 4mm;
-    width: 15.5mm;
-    height: 19.5mm;
-    border: 0.4pt solid #9aa1ac;
-    text-align: center;
+    top: 22.43mm;
+    left: 2.62mm;
+    width: 12.98mm;
+    height: 17.93mm;
     overflow: hidden;
-    color: #9aa1ac;
-    font-size: 5pt;
-    line-height: 19.5mm;
+    background: #d1d5db;
+    text-align: center;
 }
 
 .photo-box img {
-    display: block;
-    width: 15.5mm;
-    height: 19.5mm;
-    object-fit: cover;
+    width: 100%;
+    height: 100%;
 }
 
-/*
-|--------------------------------------------------------------------------
-| MEMBER DETAILS
-|--------------------------------------------------------------------------
-*/
-
-.details {
+/* Data lines — vertically centered on the printed labels */
+.idf-field {
     position: absolute;
-    top: 10.2mm;
-    left: 22mm;
-    width: 42mm;
-    /* Remove 'height: 22.5mm;' so it doesn't hard-clip content */
-    min-height: 21.5mm;
-    font-size: 4.6pt; /* Slightly smaller font to fit wrapped text better */
-    line-height: 2.5mm; /* Tighter line-height to save vertical space */
-    overflow: hidden;
-}
-
-.details .label {
+    font-family: Helvetica, Arial, sans-serif;
     font-weight: bold;
-    color: #17335e;
-}
-
-.details .val {
-    font-weight: bold;
-    color: #1f2933;
-}
-
-/*
-|--------------------------------------------------------------------------
-| QR CODE
-|--------------------------------------------------------------------------
-*/
-
-.qr-cell {
-    position: absolute;
-    top: 10mm;
-    right: 4mm;
-    width: 15mm;
-    height: 15mm;
-    text-align: center;
-    overflow: hidden;
-}
-
-.qr-cell img {
-    display: block;
-    width: 15mm;
-    height: 15mm;
-}
-
-/*
-|--------------------------------------------------------------------------
-| BENEFICIARIES
-|--------------------------------------------------------------------------
-*/
-
-.divider-mid {
-    position: absolute;
-    top: 34mm;
-    left: 4mm;
-    right: 4mm;
-    border-top: 0.4pt solid #c7ccd4;
-}
-
-.ben-label {
-    position: absolute;
-    top: 36mm;
-    left: 4mm;
-    font-size: 5pt;
-    font-weight: bold;
-    color: #1f2933;
-}
-
-.ben-content {
-    position: absolute;
-    top: 40mm;
-    left: 4mm;
-    width: 50mm;
-    height: 9mm;
-    font-size: 5pt;
-    line-height: 2.5mm;
-    overflow: hidden;
-    color: #1f2933;
-}
-
-.ben-content ul {
-    margin: 0;
-    padding-left: 3mm;
-}
-
-.ben-content li {
-    margin: 0;
-    padding: 0;
-    white-space: nowrap;
-}
-
-/*
-|--------------------------------------------------------------------------
-| MEMBER SIGNATURE
-|--------------------------------------------------------------------------
-*/
-
-.member-signature {
-    display: block;
-    width: 25mm;
-    height: 7mm;
-    margin: 0 auto;
-    object-fit: contain;
-}
-
-.sig-cell {
-    position: absolute;
-    bottom: 2.5mm;
-    right: 4mm;
-    width: 26mm;
-    text-align: center;
-}
-
-.sig-line {
-    border-top: 0.4pt solid #1f2933;
-    margin-bottom: 0.7mm;
-}
-
-.sig-caption {
-    font-size: 4pt;
-    letter-spacing: 0.5pt;
-    color: #4b5563;
-}
-
-/*
-|--------------------------------------------------------------------------
-| BACK
-|--------------------------------------------------------------------------
-*/
-
-.terms-title {
-    position: absolute;
-    top: 3.2mm;
-    left: 4mm;
-    right: 4mm;
-    text-align: center;
     font-size: 6.5pt;
-    font-weight: bold;
-    color: #17335e;
+    line-height: 1;
+    color: #0c2c6b;
+    letter-spacing: 0.1pt;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
-.terms-intro {
+.idf-name {
+    top: 32.84mm;
+    left: 28.03mm;
+    width: 10.8mm;
+}
+
+.idf-membership {
+    top: 36.10mm;
+    left: 28.03mm;
+    width: 10.8mm;
+}
+
+.idf-issue {
+    top: 39.10mm;
+    left: 28.03mm;
+    width: 10.8mm;
+}
+
+.idf-valid {
+    top: 42.30mm;
+    left: 28.03mm;
+    width: 10.8mm;
+}
+
+/* Member signature — white card so the ink shows beside the barcode */
+.idf-signature {
     position: absolute;
-    top: 8.2mm;
-    left: 4mm;
-    right: 4mm;
-    font-size: 4.6pt;
-    font-weight: bold;
-    color: #2563eb;
-    line-height: 2.3mm;
+    top: 44.38mm;
+    left: 29.15mm;
+    width: 9.72mm;
+    height: 3.92mm;
+    background: #ffffff;
+    overflow: hidden;
+    text-align: center;
 }
 
-.terms-list {
+.idf-signature img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* "SIGNATURE" caption under the ink area */
+.idf-signature-caption {
     position: absolute;
-    top: 12.3mm;
-    left: 4mm;
-    right: 4mm;
-    margin: 0;
-    padding-left: 3mm;
-    font-size: 4.5pt;
-    line-height: 2.4mm;
-    color: #b8721a;
-}
-
-.terms-list li {
-    margin: 0;
-    padding: 0;
-}
-
-.terms-note {
-    position: absolute;
-    top: 20.5mm;
-    left: 4mm;
-    right: 4mm;
-    font-size: 4.2pt;
-    font-style: italic;
-    color: #6b7280;
-    line-height: 2.2mm;
-}
-
-.divider-back {
-    position: absolute;
-    top: 25mm;
-    left: 4mm;
-    right: 4mm;
-    border-top: 0.4pt solid #c7ccd4;
+    top: 48.45mm;
+    left: 29.15mm;
+    width: 9.72mm;
+    font-size: 3.4pt;
+    line-height: 1;
+    text-align: center;
+    color: #444444;
+    letter-spacing: 0.2pt;
 }
 
 /*
 |--------------------------------------------------------------------------
-| EMERGENCY
+| BACK FACE
 |--------------------------------------------------------------------------
+|
+| The artwork already contains all printed content (benefits,
+| reminders, QR, logos) — nothing to overlay.
+|
 */
-
-.emergency-title {
-    position: absolute;
-    top: 26.5mm;
-    left: 4mm;
-    font-size: 4.8pt;
-    font-weight: bold;
-}
-
-.emergency-fields {
-    position: absolute;
-    top: 31mm;
-    left: 4mm;
-    width: 43mm;
-    font-size: 4.4pt;
-}
-
-.ef-row {
-    /* Removed fixed height and overflow clipping to allow rows to expand */
-    margin-bottom: 1.2mm;
-}
-
-.ef-label {
-    display: inline-block;
-    vertical-align: top; /* Aligns label to the top when value spans multiple lines */
-    width: 15mm;
-    font-weight: bold;
-    color: #17335e;
-}
-
-.ef-value {
-    display: inline-block;
-    vertical-align: top; /* Aligns value text to the top */
-    width: 27mm;
-    font-weight: normal;
-    color: #1f2933;
-
-    /* Allow text to wrap to the next line */
-    white-space: normal;
-    word-wrap: break-word;
-}
-
-/* ============================================================
-   MANAGER / CEO / COO SIGNATURE
-   ============================================================ */
-
-.manager-cell {
-    position: absolute;
-    bottom: 1.8mm;
-    right: 4mm;
-    width: 30mm;
-    height: 14mm;
-    text-align: center;
-    overflow: hidden;
-}
-
-.manager-script {
-    height: 7mm;
-    font-family: 'Zapfino', 'Brush Script MT', cursive;
-    font-size: 8pt;
-    line-height: 7mm;
-    color: #1f2933;
-}
-
-.manager-signature {
-    display: block;
-    width: 25mm;
-    height: 7mm;
-    margin: 0 auto;
-    object-fit: contain;
-}
-
-.manager-line {
-    width: 27mm;
-    margin: 0 auto;
-    border-top: 0.4pt solid #1f2933;
-}
-
-.manager-name {
-    height: 2.8mm;
-    margin-top: 0.5mm;
-    font-size: 3.8pt;
-    line-height: 2.8mm;
-    font-weight: bold;
-    color: #17335e;
-}
-
-.manager-title {
-    font-size: 3.2pt;
-    line-height: 2mm;
-    color: #4b5563;
-}
