@@ -3,7 +3,22 @@
 
     $user = auth()->user();
     $isAdmin = $user && !in_array($user->RoleID, [4, 8]);
-    $isSatelliteMember = $user?->RoleID == 8;
+
+    /*
+    | Satellite nav visibility:
+    | - Satellite users (RoleID 8) always see it.
+    | - Other members see it once at least ONE satellite member used
+    |   their referralCode as the upline code (a live DB check, cached
+    |   for the request).
+    */
+    $isSatelliteMember = $user?->RoleID == 8
+        || ($user
+            && $user->RoleID != 8
+            && filled($user->referralCode)
+            && \App\Models\Activation::where('upline_code', $user->referralCode)
+                ->whereHas('user', fn ($q) => $q->where('RoleID', 8))
+                ->exists());
+
     $profilePic = $user?->profilepic;
     $defaultAvatar = 'images/profiles/default-avatar.png';
 @endphp
@@ -150,7 +165,8 @@
                     </a>
 
                     @if ($isSatelliteMember)
-                        <a href="#" class="menu-item">
+                        <a href="{{ route('satellite.portal') }}"
+                           class="menu-item {{ request()->routeIs('satellite.portal') ? 'active-menu' : '' }}">
                             <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <circle cx="12" cy="12" r="3" stroke-width="1.8"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
@@ -242,7 +258,8 @@
         </a>
 
         @if ($isSatelliteMember)
-            <a href="#" class="member-mobile-nav-item">
+            <a href="{{ route('satellite.portal') }}"
+               class="member-mobile-nav-item {{ request()->routeIs('satellite.portal') ? 'active' : '' }}">
                 <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <circle cx="12" cy="12" r="3" stroke-width="1.8"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"

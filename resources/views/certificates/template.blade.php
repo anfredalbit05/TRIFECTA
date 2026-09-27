@@ -43,10 +43,10 @@ body{
 
     position:absolute;
 
-    /* Sits exactly on the printed name line of the background
-       (line at 44.4% of image height → 362px of the 816px page) */
+    /* Name sits ABOVE the printed name line (the long line at y485 of
+       the 1024px image → 47.4%) so the bold text never overlaps it. */
 
-    top:350px;
+    top:43.4%;
 
     left:0;
 
@@ -54,7 +54,7 @@ body{
 
     text-align:center;
 
-    font-size:22px;
+    font-size:20px;
 
     font-weight:bold;
 
@@ -62,27 +62,98 @@ body{
 
 }
 
-.date{
+/*
+ | Data rows measured on the background image (1536 x 1024):
+ |   Name line                 y485  (x392-1198)
+ |   Policy Number :  label y700-710, value line y714  (x470-700)
+ |   Date of Issue :  label y733-748, value line y751  (x476-700)
+ |   Coverage Type :  label y700-710, value line y714  (x1020-1266)
+ |   Valid Until   :  label y733-748, value line y752  (x1019-1266)
+ | Percentages are relative to the full page so the layout scales.
+ */
+
+.policy-number-value{
 
     position:absolute;
 
-    bottom:105px;
+    /* Value line runs x470-700 (15% wide) — a 10.5px font keeps long
+       TRI-xxxxx-TSxxxx-xx numbers on ONE line without wrapping. */
 
-    left:175px;
+    top:67.9%;
 
-    font-size:18px;
+    /* Nudged right so the value clears the printed ":" colon. */
+
+    left:calc(30.6% + 2px);
+
+    width:15.5%;
+
+    font-size:10.5px;
+
+    font-weight:bold;
+
+    color:#000;
+
+    white-space:nowrap;
 
 }
 
-.cert{
+.issue-value{
 
     position:absolute;
 
-    bottom:105px;
+    top:71.5%;
 
-    right:170px;
+    left:calc(31% + 1px);
 
-    font-size:18px;
+    width:15%;
+
+    font-size:10.5px;
+
+    font-weight:bold;
+
+    color:#000;
+
+    white-space:nowrap;
+
+}
+
+.coverage-value{
+
+    position:absolute;
+
+    top:67.9%;
+
+    left:66.4%;
+
+    width:16.5%;
+
+    font-size:10.5px;
+
+    font-weight:bold;
+
+    color:#000;
+
+    white-space:nowrap;
+
+}
+
+.valid-value{
+
+    position:absolute;
+
+    top:71.6%;
+
+    left:calc(66.3% + 1px);
+
+    width:16.6%;
+
+    font-size:10.5px;
+
+    font-weight:bold;
+
+    color:#000;
+
+    white-space:nowrap;
 
 }
 
@@ -101,6 +172,30 @@ body{
 <div class="name">
 
 {{ $fullname }}
+
+</div>
+
+<div class="policy-number-value">
+
+{{ $policyNumber }}
+
+</div>
+
+<div class="issue-value">
+
+{{ $dateOfIssue }}
+
+</div>
+
+<div class="coverage-value">
+
+{{ $coverageType }}
+
+</div>
+
+<div class="valid-value">
+
+{{ $validUntil }}
 
 </div>
 

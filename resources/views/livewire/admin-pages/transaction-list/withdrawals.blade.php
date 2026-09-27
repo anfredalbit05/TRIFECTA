@@ -13,7 +13,7 @@
 
     {{-- SEARCH --}}
     <div class="mb-4 px-4">
-        <input type="text" wire:model.blur="search" class="txn-search-input"
+        <input type="text" wire:model.live.debounce.350ms="search" class="txn-search-input"
             placeholder="Search ID, member, method, reference, status...">
     </div>
 

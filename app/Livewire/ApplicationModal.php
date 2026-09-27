@@ -68,6 +68,8 @@ class ApplicationModal extends Component
      */
     public $receipt_number = null;
 
+    public $cocogen_policy_number = null;
+
     public $activationControlNumber = null;
 
     public ?int $activationId = null;
@@ -134,49 +136,49 @@ class ApplicationModal extends Component
     }
 
     #[Computed]
-public function previewPolicyNumber(): string
-{
-    $year = now()->year;
+    public function previewPolicyNumber(): string
+    {
+        $year = now()->year;
 
-    $policyNumbers = User::query()
-        ->whereNotNull('policy_number')
-        ->where('policy_number', 'like', 'TRI-%-TS' . $year . '-%')
-        ->pluck('policy_number');
+        $policyNumbers = User::query()
+            ->whereNotNull('policy_number')
+            ->where('policy_number', 'like', 'TRI-%-TS'.$year.'-%')
+            ->pluck('policy_number');
 
-    $highest = 0;
+        $highest = 0;
 
-    foreach ($policyNumbers as $policyNumber) {
-        if (preg_match('/^TRI-(\d+)-TS\d{4}-(\d+)$/', $policyNumber, $matches)) {
-            // Use the final sequence number.
-            $number = (int) $matches[2];
+        foreach ($policyNumbers as $policyNumber) {
+            if (preg_match('/^TRI-(\d+)-TS\d{4}-(\d+)$/', $policyNumber, $matches)) {
+                // Use the final sequence number.
+                $number = (int) $matches[2];
 
-            if ($number > $highest) {
-                $highest = $number;
+                if ($number > $highest) {
+                    $highest = $number;
+                }
             }
         }
+
+        $next = $highest + 1;
+
+        return sprintf(
+            'TRI-%05d-TS%d-%d',
+            $next,
+            $year,
+            $next
+        );
     }
 
-    $next = $highest + 1;
+    public function generatePolicyNumber(): void
+    {
+        // Don't overwrite an existing/generated value.
+        if (filled($this->policy_number)) {
+            return;
+        }
 
-    return sprintf(
-        'TRI-%05d-TS%d-%d',
-        $next,
-        $year,
-        $next
-    );
-}
-
-public function generatePolicyNumber(): void
-{
-    // Don't overwrite an existing/generated value.
-    if (filled($this->policy_number)) {
-        return;
+        // Recalculate from the database at the exact moment
+        // the Generate button is clicked.
+        $this->policy_number = $this->previewPolicyNumber;
     }
-
-    // Recalculate from the database at the exact moment
-    // the Generate button is clicked.
-    $this->policy_number = $this->previewPolicyNumber;
-}
 
     /*
     |--------------------------------------------------------------------------
@@ -398,6 +400,7 @@ public function generatePolicyNumber(): void
             'policy_effectivity_date',
             'policy_expiration_date',
             'receipt_number',
+            'cocogen_policy_number',
             'activationControlNumber',
             'activationId',
         ]);
@@ -486,331 +489,331 @@ public function generatePolicyNumber(): void
     */
     #[On('confirmed-save-application')]
     /*
-|--------------------------------------------------------------------------
-| Save Application (Called after confirmation)
-|--------------------------------------------------------------------------
-*/
-#[On('confirmed-save-application')]
-public function saveApplication()
-{
-    try {
-
-        /*
         |--------------------------------------------------------------------------
-        | START DATABASE TRANSACTION
+        | Save Application (Called after confirmation)
         |--------------------------------------------------------------------------
         */
-        DB::beginTransaction();
+    #[On('confirmed-save-application')]
+    public function saveApplication()
+    {
+        try {
 
-        Log::info('=== SAVE APPLICATION STARTED ===', [
-            'username' => $this->username,
-            'email' => $this->email,
-        ]);
+            /*
+            |--------------------------------------------------------------------------
+            | START DATABASE TRANSACTION
+            |--------------------------------------------------------------------------
+            */
+            DB::beginTransaction();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Generate Unique Referral Code
-        |--------------------------------------------------------------------------
-        */
-        do {
-            $referralCode = $this->generateUplineCode();
-            $exists = User::where('referralCode', $referralCode)->exists();
-        } while ($exists);
+            Log::info('=== SAVE APPLICATION STARTED ===', [
+                'username' => $this->username,
+                'email' => $this->email,
+            ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Create User
-        |--------------------------------------------------------------------------
-        */
-        $user = User::create([
-            'username' => $this->username,
-            'password' => bcrypt($this->password),
-            'referralCode' => $referralCode,
-            'uplineCode' => $this->upline,
-            'lastname' => $this->surname,
-            'firstname' => $this->first_name,
-            'middlename' => $this->middle_name,
-            'gender' => $this->gender,
-            'civilstatus' => $this->civil_status,
-            'birthdate' => $this->birthdate,
-            'occupation' => $this->occupation,
-            'policy_number' => $this->policy_number ?: null,
-            'policy_effectivity_date' => $this->policy_effectivity_date ?: null,
-            'policy_expiration_date' => $this->policy_expiration_date ?: null,
-            'contactno' => $this->mobile,
-            'email' => filled($this->email) ? $this->email : null,
-            'address' => $this->address,
-            'latitude' => $this->latitude,
-            'longitude' => $this->longitude,
-            'RoleID' => 4,
-            'status' => 'Inactive',
-        ]);
+            /*
+            |--------------------------------------------------------------------------
+            | Generate Unique Referral Code
+            |--------------------------------------------------------------------------
+            */
+            do {
+                $referralCode = $this->generateUplineCode();
+                $exists = User::where('referralCode', $referralCode)->exists();
+            } while ($exists);
 
-        Log::info('User created successfully', [
-            'UserID' => $user->UserID,
-        ]);
+            /*
+            |--------------------------------------------------------------------------
+            | Create User
+            |--------------------------------------------------------------------------
+            */
+            $user = User::create([
+                'username' => $this->username,
+                'password' => bcrypt($this->password),
+                'referralCode' => $referralCode,
+                'uplineCode' => $this->upline,
+                'lastname' => $this->surname,
+                'firstname' => $this->first_name,
+                'middlename' => $this->middle_name,
+                'gender' => $this->gender,
+                'civilstatus' => $this->civil_status,
+                'birthdate' => $this->birthdate,
+                'occupation' => $this->occupation,
+                'policy_number' => $this->policy_number ?: null,
+                'policy_effectivity_date' => $this->policy_effectivity_date ?: null,
+                'policy_expiration_date' => $this->policy_expiration_date ?: null,
+                'contactno' => $this->mobile,
+                'email' => filled($this->email) ? $this->email : null,
+                'address' => $this->address,
+                'latitude' => $this->latitude,
+                'longitude' => $this->longitude,
+                'RoleID' => 4,
+                'status' => 'Inactive',
+            ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Save Beneficiaries
-        |--------------------------------------------------------------------------
-        */
-        Log::info('Saving beneficiaries');
+            Log::info('User created successfully', [
+                'UserID' => $user->UserID,
+            ]);
 
-        foreach ($this->beneficiaries as $beneficiary) {
-
-            Log::info('Beneficiary data', $beneficiary);
-
-            Log::info('Sending emails');
+            /*
+            |--------------------------------------------------------------------------
+            | Save Beneficiaries
+            |--------------------------------------------------------------------------
+            */
+            Log::info('Saving beneficiaries');
 
             foreach ($this->beneficiaries as $beneficiary) {
-                if (!empty($beneficiary['fullname']) && !empty($beneficiary['birthdate'])) {
-                    Beneficiary::create([
-                        'UserID' => $user->UserID,
-                        'fullname' => $beneficiary['fullname'],
-                        'birthdate' => $beneficiary['birthdate'],
-                        'relationship' => $beneficiary['relationship'] ?? null,
-                        'status' => true,
+
+                Log::info('Beneficiary data', $beneficiary);
+
+                Log::info('Sending emails');
+
+                foreach ($this->beneficiaries as $beneficiary) {
+                    if (! empty($beneficiary['fullname']) && ! empty($beneficiary['birthdate'])) {
+                        Beneficiary::create([
+                            'UserID' => $user->UserID,
+                            'fullname' => $beneficiary['fullname'],
+                            'birthdate' => $beneficiary['birthdate'],
+                            'relationship' => $beneficiary['relationship'] ?? null,
+                            'status' => true,
+                        ]);
+                    }
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Prepare Application Details
+                |--------------------------------------------------------------------------
+                */
+                $applicationDetails = [
+                    'surname' => $this->surname,
+                    'first_name' => $this->first_name,
+                    'middle_name' => $this->middle_name,
+                    'occupation' => $this->occupation,
+                    'gender' => $this->gender,
+                    'civil_status' => $this->civil_status,
+                    'birthdate' => $this->birthdate,
+                    'policy_number' => $this->policy_number,
+                    'policy_effectivity_date' => $this->policy_effectivity_date,
+                    'policy_expiration_date' => $this->policy_expiration_date,
+                    'address' => $this->address,
+                    'mobile' => $this->mobile,
+                    'email' => $this->email,
+                    'username' => $this->username,
+                    'beneficiaries' => $this->beneficiaries,
+                ];
+
+                /*
+                |--------------------------------------------------------------------------
+                | COMMIT DATABASE FIRST
+                |--------------------------------------------------------------------------
+                |
+                | IMPORTANT:
+                | Do NOT put Mail::send() before this commit.
+                |
+                */
+                DB::commit();
+
+                Log::info('=== DATABASE TRANSACTION COMMITTED ===', [
+                    'UserID' => $user->UserID,
+                ]);
+
+                /*
+                |--------------------------------------------------------------------------
+                | SEND EMAILS AFTER DATABASE COMMIT
+                |--------------------------------------------------------------------------
+                |
+                | Email failure will NOT rollback the saved application.
+                |
+                */
+
+                $emailErrors = [];
+
+                /*
+                |--------------------------------------------------------------------------
+                | Send Admin Notification Emails
+                |--------------------------------------------------------------------------
+                */
+                try {
+
+                    $admins = User::whereIn('RoleID', [1])
+                        ->whereNotNull('email')
+                        ->get();
+
+                    foreach ($admins as $admin) {
+
+                        try {
+
+                            $adminData = array_merge($applicationDetails, [
+                                'title' => 'New Member Application Notice (Admin)',
+                                'includeCredentials' => false,
+                            ]);
+
+                            Mail::send('emails.new-application', $adminData, function ($message) use ($admin) {
+                                $message->to($admin->email)
+                                    ->subject('New Member Application Submitted');
+                            });
+
+                        } catch (\Throwable $e) {
+
+                            $emailErrors[] = [
+                                'type' => 'admin',
+                                'email' => $admin->email,
+                                'error' => $e->getMessage(),
+                            ];
+
+                            Log::error('Failed to send admin email', [
+                                'email' => $admin->email,
+                                'message' => $e->getMessage(),
+                            ]);
+                        }
+                    }
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Send Applicant Email
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if (filled($this->email)) {
+
+                        try {
+
+                            $userData = array_merge($applicationDetails, [
+                                'title' => 'Welcome to True Life - Application Details',
+                                'password' => $this->password,
+                                'includeCredentials' => true,
+                            ]);
+
+                            Mail::send('emails.new-application', $userData, function ($message) use ($userData) {
+
+                                $message->to($userData['email'])
+                                    ->subject('Your Application Details & Credentials');
+
+                                $benefitsPath = public_path('images/benefits.jpeg');
+
+                                if (file_exists($benefitsPath)) {
+                                    $message->attach($benefitsPath, [
+                                        'as' => 'benefits.png',
+                                        'mime' => 'image/png',
+                                    ]);
+                                }
+
+                                $secondPath = public_path('images/second-image.jpeg');
+
+                                if (file_exists($secondPath)) {
+                                    $message->attach($secondPath, [
+                                        'as' => 'second-image.png',
+                                        'mime' => 'image/png',
+                                    ]);
+                                }
+                            });
+
+                            Log::info('Applicant email sent successfully', [
+                                'email' => $this->email,
+                                'UserID' => $user->UserID,
+                            ]);
+
+                        } catch (\Throwable $e) {
+
+                            $emailErrors[] = [
+                                'type' => 'applicant',
+                                'email' => $this->email,
+                                'error' => $e->getMessage(),
+                            ];
+
+                            Log::error('Failed to send applicant email', [
+                                'email' => $this->email,
+                                'UserID' => $user->UserID,
+                                'message' => $e->getMessage(),
+                            ]);
+                        }
+                    }
+
+                } catch (\Throwable $e) {
+
+                    Log::error('Email notification process failed', [
+                        'message' => $e->getMessage(),
                     ]);
                 }
             }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Prepare Application Details
-        |--------------------------------------------------------------------------
-        */
-        $applicationDetails = [
-            'surname' => $this->surname,
-            'first_name' => $this->first_name,
-            'middle_name' => $this->middle_name,
-            'occupation' => $this->occupation,
-            'gender' => $this->gender,
-            'civil_status' => $this->civil_status,
-            'birthdate' => $this->birthdate,
-            'policy_number' => $this->policy_number,
-            'policy_effectivity_date' => $this->policy_effectivity_date,
-            'policy_expiration_date' => $this->policy_expiration_date,
-            'address' => $this->address,
-            'mobile' => $this->mobile,
-            'email' => $this->email,
-            'username' => $this->username,
-            'beneficiaries' => $this->beneficiaries,
-        ];
+            /*
+            |--------------------------------------------------------------------------
+            | Application Successfully Saved
+            |--------------------------------------------------------------------------
+            */
 
-        /*
-        |--------------------------------------------------------------------------
-        | COMMIT DATABASE FIRST
-        |--------------------------------------------------------------------------
-        |
-        | IMPORTANT:
-        | Do NOT put Mail::send() before this commit.
-        |
-        */
-        DB::commit();
-
-        Log::info('=== DATABASE TRANSACTION COMMITTED ===', [
-            'UserID' => $user->UserID,
-        ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | SEND EMAILS AFTER DATABASE COMMIT
-        |--------------------------------------------------------------------------
-        |
-        | Email failure will NOT rollback the saved application.
-        |
-        */
-
-        $emailErrors = [];
-
-        /*
-        |--------------------------------------------------------------------------
-        | Send Admin Notification Emails
-        |--------------------------------------------------------------------------
-        */
-        try {
-
-    $admins = User::whereIn('RoleID', [1])
-        ->whereNotNull('email')
-        ->get();
-
-    foreach ($admins as $admin) {
-
-        try {
-
-            $adminData = array_merge($applicationDetails, [
-                'title' => 'New Member Application Notice (Admin)',
-                'includeCredentials' => false,
+            Log::info('=== SAVE APPLICATION FINISHED ===', [
+                'UserID' => $user->UserID,
+                'email_errors' => count($emailErrors),
             ]);
 
-            Mail::send('emails.new-application', $adminData, function ($message) use ($admin) {
-                $message->to($admin->email)
-                    ->subject('New Member Application Submitted');
-            });
+            /*
+            |--------------------------------------------------------------------------
+            | Close Confirmation Dialog
+            |--------------------------------------------------------------------------
+            */
+            $this->dispatch('swal-close');
+
+            /*
+            |--------------------------------------------------------------------------
+            | Show Success Message
+            |--------------------------------------------------------------------------
+            */
+            $this->dispatch(
+                'show-success-after-close',
+                title: 'Success!',
+                text: 'Application submitted successfully.'
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | Toast Notification
+            |--------------------------------------------------------------------------
+            */
+            $this->dispatch(
+                'show-toast',
+                title: 'Application submitted successfully!',
+                icon: 'success'
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | Refresh Members
+            |--------------------------------------------------------------------------
+            */
+            $this->dispatch('refresh-members');
+
+            /*
+            |--------------------------------------------------------------------------
+            | Close Application Form
+            |--------------------------------------------------------------------------
+            */
+            $this->close();
 
         } catch (\Throwable $e) {
 
-            $emailErrors[] = [
-                'type' => 'admin',
-                'email' => $admin->email,
-                'error' => $e->getMessage(),
-            ];
+            /*
+            |--------------------------------------------------------------------------
+            | ONLY DATABASE ERRORS SHOULD REACH THIS BLOCK
+            |--------------------------------------------------------------------------
+            */
 
-            Log::error('Failed to send admin email', [
-                'email' => $admin->email,
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+
+            Log::error('APPLICATION DATABASE FAILED', [
                 'message' => $e->getMessage(),
-            ]);
-        }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Send Applicant Email
-    |--------------------------------------------------------------------------
-    */
-
-    if (filled($this->email)) {
-
-        try {
-
-            $userData = array_merge($applicationDetails, [
-                'title' => 'Welcome to True Life - Application Details',
-                'password' => $this->password,
-                'includeCredentials' => true,
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
-            Mail::send('emails.new-application', $userData, function ($message) use ($userData) {
-
-                $message->to($userData['email'])
-                    ->subject('Your Application Details & Credentials');
-
-                $benefitsPath = public_path('images/benefits.jpeg');
-
-                if (file_exists($benefitsPath)) {
-                    $message->attach($benefitsPath, [
-                        'as' => 'benefits.png',
-                        'mime' => 'image/png',
-                    ]);
-                }
-
-                $secondPath = public_path('images/second-image.jpeg');
-
-                if (file_exists($secondPath)) {
-                    $message->attach($secondPath, [
-                        'as' => 'second-image.png',
-                        'mime' => 'image/png',
-                    ]);
-                }
-            });
-
-            Log::info('Applicant email sent successfully', [
-                'email' => $this->email,
-                'UserID' => $user->UserID,
-            ]);
-
-        } catch (\Throwable $e) {
-
-            $emailErrors[] = [
-                'type' => 'applicant',
-                'email' => $this->email,
-                'error' => $e->getMessage(),
-            ];
-
-            Log::error('Failed to send applicant email', [
-                'email' => $this->email,
-                'UserID' => $user->UserID,
-                'message' => $e->getMessage(),
-            ]);
-        }
-    }
-
-} catch (\Throwable $e) {
-
-    Log::error('Email notification process failed', [
-        'message' => $e->getMessage(),
-    ]);
-}
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Application Successfully Saved
-        |--------------------------------------------------------------------------
-        */
-
-        Log::info('=== SAVE APPLICATION FINISHED ===', [
-            'UserID' => $user->UserID,
-            'email_errors' => count($emailErrors),
-        ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Close Confirmation Dialog
-        |--------------------------------------------------------------------------
-        */
-        $this->dispatch('swal-close');
-
-        /*
-        |--------------------------------------------------------------------------
-        | Show Success Message
-        |--------------------------------------------------------------------------
-        */
-        $this->dispatch(
-            'show-success-after-close',
-            title: 'Success!',
-            text: 'Application submitted successfully.'
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Toast Notification
-        |--------------------------------------------------------------------------
-        */
-        $this->dispatch(
-            'show-toast',
-            title: 'Application submitted successfully!',
-            icon: 'success'
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Refresh Members
-        |--------------------------------------------------------------------------
-        */
-        $this->dispatch('refresh-members');
-
-        /*
-        |--------------------------------------------------------------------------
-        | Close Application Form
-        |--------------------------------------------------------------------------
-        */
-        $this->close();
-
-    } catch (\Throwable $e) {
-
-        /*
-        |--------------------------------------------------------------------------
-        | ONLY DATABASE ERRORS SHOULD REACH THIS BLOCK
-        |--------------------------------------------------------------------------
-        */
-
-        if (DB::transactionLevel() > 0) {
-            DB::rollBack();
-        }
-
-        Log::error('APPLICATION DATABASE FAILED', [
-            'message' => $e->getMessage(),
-            'line' => $e->getLine(),
-            'file' => $e->getFile(),
-            'trace' => $e->getTraceAsString(),
-        ]);
-
-        $this->dispatch('swal-close');
+            $this->dispatch('swal-close');
 
             $this->dispatch('validation-error',
                 title: 'Error',
-                html: 'Something went wrong: ' . htmlspecialchars($e->getMessage())
+                html: 'Something went wrong: '.htmlspecialchars($e->getMessage())
             );
         }
     }
@@ -843,6 +846,10 @@ public function saveApplication()
             ? null
             : trim($this->receipt_number);
 
+        $this->cocogen_policy_number = blank($this->cocogen_policy_number)
+            ? null
+            : trim($this->cocogen_policy_number);
+
         try {
             $this->validate([
                 'surname' => 'required|string|max:255',
@@ -862,6 +869,7 @@ public function saveApplication()
                 'policy_number' => 'nullable|string|max:100',
                 'policy_effectivity_date' => 'nullable|date',
                 'policy_expiration_date' => 'nullable|date',
+                'cocogen_policy_number' => 'nullable|string|max:255',
                 'receipt_number' => ['nullable', 'string', 'max:50', 'regex:/^\d{6}$/',
                     Rule::unique('activations', 'receipt_number')->ignore($this->activationId, 'ActivationID')],
             ]);
@@ -926,6 +934,7 @@ public function saveApplication()
             'policy_effectivity_date' => 'Policy Effectivity Date',
             'policy_expiration_date' => 'Policy Expiration Date',
             'receipt_number' => 'Receipt Number',
+            'cocogen_policy_number' => 'Cocogen Policy Number',
         ];
 
         $changes = [];
@@ -1000,6 +1009,10 @@ public function saveApplication()
         ? null
         : trim($this->receipt_number);
 
+        $this->cocogen_policy_number = blank($this->cocogen_policy_number)
+        ? null
+        : trim($this->cocogen_policy_number);
+
         $this->validate([
             'surname' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',
@@ -1019,6 +1032,7 @@ public function saveApplication()
             'policy_number' => 'nullable|string|max:100',
             'policy_effectivity_date' => 'nullable|date',
             'policy_expiration_date' => 'nullable|date',
+            'cocogen_policy_number' => 'nullable|string|max:255',
             'receipt_number' => ['nullable', 'string', 'max:50', 'regex:/^\d{6}$/',
                 Rule::unique('activations', 'receipt_number')->ignore($this->activationId, 'ActivationID')],
         ]);
@@ -1042,10 +1056,23 @@ public function saveApplication()
                 'address' => $this->address,
                 'latitude' => $this->latitude,
                 'longitude' => $this->longitude,
-                'policy_number' => $this->policy_number,
-                'policy_effectivity_date' => $this->policy_effectivity_date,
-                'policy_expiration_date' => $this->policy_expiration_date,
             ]);
+
+            /*
+            | All policy fields (Cocogen policy number, policy number,
+            | effectivity/expiration dates) belong to the member's APPROVED
+            | activation — the users table has no such columns, and writing
+            | them there aborts the whole update with an SQL error.
+            */
+            if ($this->activationId) {
+                Activation::where('ActivationID', $this->activationId)
+                    ->update([
+                        'cocogen_policy_number' => $this->cocogen_policy_number,
+                        'policy_number' => $this->policy_number,
+                        'policy_effectivity_date' => $this->policy_effectivity_date,
+                        'policy_expiration_date' => $this->policy_expiration_date,
+                    ]);
+            }
 
             /*
             | Attach the control number to the member's APPROVED activation
@@ -1253,18 +1280,9 @@ public function saveApplication()
         $this->mobile = $user->contactno ?? '';
         $this->email = $user->email ?? '';
         $this->username = $user->username ?? '';
-        // Policy fields
-        $this->policy_number = $user->policy_number ?: null;
 
-        $this->policy_effectivity_date = $user->policy_effectivity_date
-            ? Carbon::parse($user->policy_effectivity_date)->format('Y-m-d')
-            : null;
-
-        $this->policy_expiration_date = $user->policy_expiration_date
-            ? Carbon::parse($user->policy_expiration_date)->format('Y-m-d')
-            : null;
-
-        // Control number lives on the member's APPROVED activation.
+        // Control number + ALL policy fields live on the member's
+        // APPROVED activation (the users table has no such columns).
         $approvedActivation = Activation::where('UserID', $user->UserID)
             ->where('status', 'Approved')
             ->latest('ActivationID')
@@ -1273,6 +1291,17 @@ public function saveApplication()
         $this->activationId = $approvedActivation?->ActivationID;
         $this->activationControlNumber = $approvedActivation?->receipt_number;
         $this->receipt_number = null; // editable only when adding a missing one
+
+        $this->cocogen_policy_number = $approvedActivation?->cocogen_policy_number;
+        $this->policy_number = $approvedActivation?->policy_number ?: null;
+
+        $this->policy_effectivity_date = $approvedActivation?->policy_effectivity_date
+            ? Carbon::parse($approvedActivation->policy_effectivity_date)->format('Y-m-d')
+            : null;
+
+        $this->policy_expiration_date = $approvedActivation?->policy_expiration_date
+            ? Carbon::parse($approvedActivation->policy_expiration_date)->format('Y-m-d')
+            : null;
 
         // Reset both the form slots and the "which slot is a saved DB row" tracker.
         $this->beneficiaries = [
@@ -1309,10 +1338,10 @@ public function saveApplication()
             'email' => $this->email,
             'username' => $this->username,
             'policy_number' => $this->policy_number,
+            'cocogen_policy_number' => $this->cocogen_policy_number,
             'policy_effectivity_date' => $this->policy_effectivity_date,
             'policy_expiration_date' => $this->policy_expiration_date,
             'beneficiaries' => $this->beneficiaries,
         ];
     }
 }
-

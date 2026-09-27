@@ -13,10 +13,10 @@
 
     {{-- SEARCH + STATUS FILTER --}}
     <div class="mb-4 flex flex-wrap items-center gap-3 px-4">
-        <input type="text" wire:model.blur="search" class="txn-search-input"
+        <input type="text" wire:model.live.debounce.350ms="search" class="txn-search-input"
             placeholder="Search ID, member, receipt no., payment method, status...">
 
-        <select wire:model.blur="statusFilter" class="txn-filter-select">
+        <select wire:model.live="statusFilter" class="txn-filter-select">
             <option value="">All statuses</option>
             <option value="Pending">Pending</option>
             <option value="Approved">Approved</option>

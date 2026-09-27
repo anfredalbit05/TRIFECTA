@@ -6,7 +6,7 @@
                 <button
                     type="button"
                     onclick="Livewire.dispatch('open-activation-modal')"
-                    class="activate-account-btn px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md transition duration-300">
+                    class="activate-account-btn px-4 py-2 bg-[#0C2C6B] text-white rounded-xl font-bold text-xs sm:text-sm shadow-md transition duration-300">
                     Activate Account
                 </button>
 
@@ -22,7 +22,7 @@
 
                 <button
                     disabled
-                    class="px-4 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs sm:text-sm cursor-not-allowed flex items-center gap-1.5 shadow-sm">
+                    class="px-4 py-2 bg-[#0C2C6B] text-white rounded-xl font-bold text-xs sm:text-sm cursor-not-allowed flex items-center gap-1.5 shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                     Approved
                 </button>

@@ -111,7 +111,7 @@
         white-space: nowrap;
     }
 
-    .txn-pill-approved { background: #15803d; }
+    .txn-pill-approved { background: #0C2C6B; }
     .txn-pill-pending { background: #D79B10; }
     .txn-pill-rejected { background: #b91c1c; }
 

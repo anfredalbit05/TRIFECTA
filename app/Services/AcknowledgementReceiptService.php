@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Activation;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
@@ -107,8 +108,15 @@ class AcknowledgementReceiptService
             | Top boxes (baselines centred in y 414-455)
             |----------------------------------------------------------------------
             */
-            // Policy Number — from the users table (drawn only when present)
-            $this->text($image, (string) ($user->policy_number ?? ''), 295, 440, 13, self::FONT_BOLD, $ink, 400);
+            // Policy Number — from the member's latest APPROVED activation
+            // (the users table no longer holds policy data; drawn only when
+            // present).
+            $activationPolicyNumber = Activation::where('UserID', $user->UserID)
+                ->where('status', 'Approved')
+                ->latest('ActivationID')
+                ->value('policy_number');
+
+            $this->text($image, (string) ($activationPolicyNumber ?? ''), 295, 440, 13, self::FONT_BOLD, $ink, 400);
 
             // Date
             $this->text($image, now()->format('M j, Y'), 1370, 440, 13, self::FONT_BOLD, $ink, 240);
@@ -164,27 +172,27 @@ class AcknowledgementReceiptService
             | name underneath, pre-printed caption below the divider.
             |----------------------------------------------------------------------
             */
-/*
-|--------------------------------------------------------------------------
-| By: — signature ABOVE name
-|--------------------------------------------------------------------------
-*/
-$this->pasteSignature($image, $cashierSignature);
+            /*
+            |--------------------------------------------------------------------------
+            | By: — signature ABOVE name
+            |--------------------------------------------------------------------------
+            */
+            $this->pasteSignature($image, $cashierSignature);
 
-if (filled($cashierName)) {
-    // Name directly BELOW the signature
-    $this->text(
-        $image,
-        (string) $cashierName,
-        530,
-        772,
-        16, // slightly larger
-        self::FONT_BOLD,
-        $ink,
-        680,
-        870
-    );
-}
+            if (filled($cashierName)) {
+                // Name directly BELOW the signature
+                $this->text(
+                    $image,
+                    (string) $cashierName,
+                    530,
+                    772,
+                    16, // slightly larger
+                    self::FONT_BOLD,
+                    $ink,
+                    680,
+                    870
+                );
+            }
 
             /*
             |----------------------------------------------------------------------
@@ -235,90 +243,54 @@ if (filled($cashierName)) {
      * is given the finished line is centred on that pixel (never starting
      * left of $x).
      */
-private function text(
-    $image,
-    string $value,
-    int $x,
-    int $y,
-    int $size,
-    string $font,
-    $ink,
-    int $maxWidth,
-    ?int $centerX = null
-): void {
-    $value = trim($value);
+    private function text(
+        $image,
+        string $value,
+        int $x,
+        int $y,
+        int $size,
+        string $font,
+        $ink,
+        int $maxWidth,
+        ?int $centerX = null
+    ): void {
+        $value = trim($value);
 
-    if ($value === '') {
-        return;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | TrueType font available
-    |--------------------------------------------------------------------------
-    */
-    if (is_file($font)) {
-
-        // Shrink until it fits.
-        while ($size > 9) {
-
-            $box = imagettfbbox(
-                $size,
-                0,
-                $font,
-                $value
-            );
-
-            $width = abs($box[4] - $box[0]);
-
-            if ($width <= $maxWidth) {
-                break;
-            }
-
-            $size--;
+        if ($value === '') {
+            return;
         }
 
         /*
         |--------------------------------------------------------------------------
-        | Truncate if still too wide
+        | TrueType font available
         |--------------------------------------------------------------------------
         */
-        $box = imagettfbbox(
-            $size,
-            0,
-            $font,
-            $value
-        );
+        if (is_file($font)) {
 
-        if (abs($box[4] - $box[0]) > $maxWidth) {
-
-            while (mb_strlen($value) > 3) {
-
-                $test = mb_substr($value, 0, -1).'…';
+            // Shrink until it fits.
+            while ($size > 9) {
 
                 $box = imagettfbbox(
                     $size,
                     0,
                     $font,
-                    $test
+                    $value
                 );
 
-                if (abs($box[4] - $box[0]) <= $maxWidth) {
-                    $value = $test;
+                $width = abs($box[4] - $box[0]);
+
+                if ($width <= $maxWidth) {
                     break;
                 }
 
-                $value = mb_substr($value, 0, -1);
+                $size--;
             }
-        }
 
-        /*
-        |--------------------------------------------------------------------------
-        | CENTER TRUE TYPE TEXT
-        |--------------------------------------------------------------------------
-        */
-        if ($centerX !== null) {
-
+            /*
+            |--------------------------------------------------------------------------
+            | Truncate if still too wide
+            |--------------------------------------------------------------------------
+            */
             $box = imagettfbbox(
                 $size,
                 0,
@@ -326,98 +298,134 @@ private function text(
                 $value
             );
 
-            $textWidth = abs($box[4] - $box[0]);
+            if (abs($box[4] - $box[0]) > $maxWidth) {
+
+                while (mb_strlen($value) > 3) {
+
+                    $test = mb_substr($value, 0, -1).'…';
+
+                    $box = imagettfbbox(
+                        $size,
+                        0,
+                        $font,
+                        $test
+                    );
+
+                    if (abs($box[4] - $box[0]) <= $maxWidth) {
+                        $value = $test;
+                        break;
+                    }
+
+                    $value = mb_substr($value, 0, -1);
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | CENTER TRUE TYPE TEXT
+            |--------------------------------------------------------------------------
+            */
+            if ($centerX !== null) {
+
+                $box = imagettfbbox(
+                    $size,
+                    0,
+                    $font,
+                    $value
+                );
+
+                $textWidth = abs($box[4] - $box[0]);
+
+                $x = (int) (
+                    $centerX - ($textWidth / 2)
+                );
+
+                // Never go outside the allowed starting position.
+                $x = max($x, $x);
+            }
+
+            imagettftext(
+                $image,
+                $size,
+                0,
+                $x,
+                $y,
+                $ink,
+                $font,
+                $value
+            );
+
+            return;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Railway / Linux fallback
+        |--------------------------------------------------------------------------
+        |
+        | Windows Arial does not exist on Railway.
+        |
+        | imagestring() uses GD's built-in bitmap font.
+        | We therefore calculate its approximate width ourselves and
+        | manually center it.
+        |--------------------------------------------------------------------------
+        */
+
+        $fontSize = 4;
+
+        /*
+         * GD built-in font 4 is approximately 8px wide per character.
+         */
+        $charWidth = imagefontwidth($fontSize);
+
+        $textWidth = imagefontwidth($fontSize) * strlen($value);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Truncate to maximum width
+        |--------------------------------------------------------------------------
+        */
+        $maxChars = max(
+            1,
+            (int) floor($maxWidth / $charWidth)
+        );
+
+        if (strlen($value) > $maxChars) {
+            $value = substr(
+                $value,
+                0,
+                max(1, $maxChars - 1)
+            ).'…';
+
+            $textWidth = imagefontwidth($fontSize) * strlen($value);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | CENTER BITMAP TEXT
+        |--------------------------------------------------------------------------
+        */
+        if ($centerX !== null) {
 
             $x = (int) (
                 $centerX - ($textWidth / 2)
             );
-
-            // Never go outside the allowed starting position.
-            $x = max($x, $x);
         }
 
-        imagettftext(
+        /*
+        |--------------------------------------------------------------------------
+        | Draw bitmap text
+        |--------------------------------------------------------------------------
+        */
+        imagestring(
             $image,
-            $size,
-            0,
+            $fontSize,
             $x,
-            $y,
-            $ink,
-            $font,
-            $value
-        );
-
-        return;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Railway / Linux fallback
-    |--------------------------------------------------------------------------
-    |
-    | Windows Arial does not exist on Railway.
-    |
-    | imagestring() uses GD's built-in bitmap font.
-    | We therefore calculate its approximate width ourselves and
-    | manually center it.
-    |--------------------------------------------------------------------------
-    */
-
-    $fontSize = 4;
-
-    /*
-     * GD built-in font 4 is approximately 8px wide per character.
-     */
-    $charWidth = imagefontwidth($fontSize);
-
-    $textWidth = imagefontwidth($fontSize) * strlen($value);
-
-    /*
-    |--------------------------------------------------------------------------
-    | Truncate to maximum width
-    |--------------------------------------------------------------------------
-    */
-    $maxChars = max(
-        1,
-        (int) floor($maxWidth / $charWidth)
-    );
-
-    if (strlen($value) > $maxChars) {
-        $value = substr(
+            $y - imagefontheight($fontSize),
             $value,
-            0,
-            max(1, $maxChars - 1)
-        ).'…';
-
-        $textWidth = imagefontwidth($fontSize) * strlen($value);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | CENTER BITMAP TEXT
-    |--------------------------------------------------------------------------
-    */
-    if ($centerX !== null) {
-
-        $x = (int) (
-            $centerX - ($textWidth / 2)
+            $ink
         );
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Draw bitmap text
-    |--------------------------------------------------------------------------
-    */
-    imagestring(
-        $image,
-        $fontSize,
-        $x,
-        $y - imagefontheight($fontSize),
-        $value,
-        $ink
-    );
-}
 
     /**
      * Paste the cashier signature into the By: box (band x 530-1210,
@@ -427,328 +435,329 @@ private function text(
      * trimmed to its bounding box and CENTRED in the band. Silently skipped
      * when the file is missing or unreadable.
      */
-/**
- * Paste cashier signature above the cashier name.
- *
- * The signature image may be JPEG/PNG and may have a white background.
- * White/light pixels become transparent while the actual signature ink
- * is converted to a dark ink color so it remains visible on Railway/PDF/etc.
- */
-private function pasteSignature($image, ?string $storagePath): void
-{
-    if (blank($storagePath)) {
-        return;
-    }
-
-    try {
-        if (!Storage::disk('public')->exists($storagePath)) {
-            Log::warning('Cashier signature file missing; receipt signed without signature.', [
-                'path' => $storagePath,
-            ]);
-
+    /**
+     * Paste cashier signature above the cashier name.
+     *
+     * The signature image may be JPEG/PNG and may have a white background.
+     * White/light pixels become transparent while the actual signature ink
+     * is converted to a dark ink color so it remains visible on Railway/PDF/etc.
+     */
+    private function pasteSignature($image, ?string $storagePath): void
+    {
+        if (blank($storagePath)) {
             return;
         }
 
-        $binary = Storage::disk('public')->get($storagePath);
+        try {
+            if (! Storage::disk('public')->exists($storagePath)) {
+                Log::warning('Cashier signature file missing; receipt signed without signature.', [
+                    'path' => $storagePath,
+                ]);
 
-        $signature = @imagecreatefromstring($binary);
+                return;
+            }
 
-        if ($signature === false) {
-            Log::warning('Cashier signature file could not be decoded; skipped.', [
-                'path' => $storagePath,
-            ]);
+            $binary = Storage::disk('public')->get($storagePath);
 
-            return;
-        }
+            $signature = @imagecreatefromstring($binary);
 
-        $srcWidth  = imagesx($signature);
-        $srcHeight = imagesy($signature);
+            if ($signature === false) {
+                Log::warning('Cashier signature file could not be decoded; skipped.', [
+                    'path' => $storagePath,
+                ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | STEP 1: Find the white signature canvas
-        |--------------------------------------------------------------------------
-        |
-        | Some uploaded images contain a dark/black border around the actual
-        | white signature area. We must ignore that border completely.
-        |
-        */
+                return;
+            }
 
-        $canvasLeft   = $srcWidth;
-        $canvasRight  = -1;
-        $canvasTop    = $srcHeight;
-        $canvasBottom = -1;
+            $srcWidth = imagesx($signature);
+            $srcHeight = imagesy($signature);
 
-        for ($y = 0; $y < $srcHeight; $y++) {
-            for ($x = 0; $x < $srcWidth; $x++) {
+            /*
+            |--------------------------------------------------------------------------
+            | STEP 1: Find the white signature canvas
+            |--------------------------------------------------------------------------
+            |
+            | Some uploaded images contain a dark/black border around the actual
+            | white signature area. We must ignore that border completely.
+            |
+            */
 
-                $rgb = imagecolorat($signature, $x, $y);
+            $canvasLeft = $srcWidth;
+            $canvasRight = -1;
+            $canvasTop = $srcHeight;
+            $canvasBottom = -1;
 
-                $r = ($rgb >> 16) & 0xFF;
-                $g = ($rgb >> 8) & 0xFF;
-                $b = $rgb & 0xFF;
+            for ($y = 0; $y < $srcHeight; $y++) {
+                for ($x = 0; $x < $srcWidth; $x++) {
 
-                /*
-                 * White / near-white pixels belong to the signature canvas.
-                 */
-                if ($r >= 245 && $g >= 245 && $b >= 245) {
+                    $rgb = imagecolorat($signature, $x, $y);
 
-                    $canvasLeft = min($canvasLeft, $x);
-                    $canvasRight = max($canvasRight, $x);
-                    $canvasTop = min($canvasTop, $y);
-                    $canvasBottom = max($canvasBottom, $y);
+                    $r = ($rgb >> 16) & 0xFF;
+                    $g = ($rgb >> 8) & 0xFF;
+                    $b = $rgb & 0xFF;
+
+                    /*
+                     * White / near-white pixels belong to the signature canvas.
+                     */
+                    if ($r >= 245 && $g >= 245 && $b >= 245) {
+
+                        $canvasLeft = min($canvasLeft, $x);
+                        $canvasRight = max($canvasRight, $x);
+                        $canvasTop = min($canvasTop, $y);
+                        $canvasBottom = max($canvasBottom, $y);
+                    }
                 }
             }
-        }
 
-        /*
-        |--------------------------------------------------------------------------
-        | No white canvas detected
-        |--------------------------------------------------------------------------
-        */
+            /*
+            |--------------------------------------------------------------------------
+            | No white canvas detected
+            |--------------------------------------------------------------------------
+            */
 
-        if ($canvasRight < $canvasLeft || $canvasBottom < $canvasTop) {
-            Log::warning('Could not detect white signature canvas.', [
-                'path' => $storagePath,
-            ]);
+            if ($canvasRight < $canvasLeft || $canvasBottom < $canvasTop) {
+                Log::warning('Could not detect white signature canvas.', [
+                    'path' => $storagePath,
+                ]);
+
+                imagedestroy($signature);
+
+                return;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | STEP 2: Crop to the actual white signature canvas
+            |--------------------------------------------------------------------------
+            */
+
+            $canvasWidth = $canvasRight - $canvasLeft + 1;
+            $canvasHeight = $canvasBottom - $canvasTop + 1;
+
+            $clean = imagecreatetruecolor(
+                $canvasWidth,
+                $canvasHeight
+            );
+
+            imagealphablending($clean, false);
+            imagesavealpha($clean, true);
+
+            $transparent = imagecolorallocatealpha(
+                $clean,
+                0,
+                0,
+                0,
+                127
+            );
+
+            imagefill(
+                $clean,
+                0,
+                0,
+                $transparent
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | STEP 3: Extract ONLY the actual signature ink
+            |--------------------------------------------------------------------------
+            */
+
+            for ($y = $canvasTop; $y <= $canvasBottom; $y++) {
+
+                for ($x = $canvasLeft; $x <= $canvasRight; $x++) {
+
+                    $rgb = imagecolorat($signature, $x, $y);
+
+                    $r = ($rgb >> 16) & 0xFF;
+                    $g = ($rgb >> 8) & 0xFF;
+                    $b = $rgb & 0xFF;
+
+                    $brightness =
+                        (0.299 * $r) +
+                        (0.587 * $g) +
+                        (0.114 * $b);
+
+                    /*
+                     * Ignore white background.
+                     */
+                    if ($brightness >= 245) {
+                        continue;
+                    }
+
+                    /*
+                     * Convert darkness into opacity.
+                     *
+                     * Dark pixels  = opaque
+                     * Light pixels = transparent
+                     */
+                    $alpha = (int) round(
+                        ($brightness / 255) * 127
+                    );
+
+                    $alpha = max(0, min(127, $alpha));
+
+                    $inkColor = imagecolorallocatealpha(
+                        $clean,
+                        self::INK[0],
+                        self::INK[1],
+                        self::INK[2],
+                        $alpha
+                    );
+
+                    imagesetpixel(
+                        $clean,
+                        $x - $canvasLeft,
+                        $y - $canvasTop,
+                        $inkColor
+                    );
+                }
+            }
 
             imagedestroy($signature);
 
-            return;
-        }
+            /*
+            |--------------------------------------------------------------------------
+            | STEP 4: Find the actual signature ink bounds
+            |--------------------------------------------------------------------------
+            */
 
-        /*
-        |--------------------------------------------------------------------------
-        | STEP 2: Crop to the actual white signature canvas
-        |--------------------------------------------------------------------------
-        */
+            $left = $canvasWidth;
+            $right = -1;
+            $top = $canvasHeight;
+            $bottom = -1;
 
-        $canvasWidth  = $canvasRight - $canvasLeft + 1;
-        $canvasHeight = $canvasBottom - $canvasTop + 1;
+            for ($y = 0; $y < $canvasHeight; $y++) {
 
-        $clean = imagecreatetruecolor(
-            $canvasWidth,
-            $canvasHeight
-        );
+                for ($x = 0; $x < $canvasWidth; $x++) {
 
-        imagealphablending($clean, false);
-        imagesavealpha($clean, true);
+                    $pixel = imagecolorat($clean, $x, $y);
 
-        $transparent = imagecolorallocatealpha(
-            $clean,
-            0,
-            0,
-            0,
-            127
-        );
+                    $alpha = ($pixel >> 24) & 0x7F;
 
-        imagefill(
-            $clean,
-            0,
-            0,
-            $transparent
-        );
+                    /*
+                     * Anything with meaningful opacity is actual ink.
+                     */
+                    if ($alpha < 120) {
 
-        /*
-        |--------------------------------------------------------------------------
-        | STEP 3: Extract ONLY the actual signature ink
-        |--------------------------------------------------------------------------
-        */
-
-        for ($y = $canvasTop; $y <= $canvasBottom; $y++) {
-
-            for ($x = $canvasLeft; $x <= $canvasRight; $x++) {
-
-                $rgb = imagecolorat($signature, $x, $y);
-
-                $r = ($rgb >> 16) & 0xFF;
-                $g = ($rgb >> 8) & 0xFF;
-                $b = $rgb & 0xFF;
-
-                $brightness =
-                    (0.299 * $r) +
-                    (0.587 * $g) +
-                    (0.114 * $b);
-
-                /*
-                 * Ignore white background.
-                 */
-                if ($brightness >= 245) {
-                    continue;
-                }
-
-                /*
-                 * Convert darkness into opacity.
-                 *
-                 * Dark pixels  = opaque
-                 * Light pixels = transparent
-                 */
-                $alpha = (int) round(
-                    ($brightness / 255) * 127
-                );
-
-                $alpha = max(0, min(127, $alpha));
-
-                $inkColor = imagecolorallocatealpha(
-                    $clean,
-                    self::INK[0],
-                    self::INK[1],
-                    self::INK[2],
-                    $alpha
-                );
-
-                imagesetpixel(
-                    $clean,
-                    $x - $canvasLeft,
-                    $y - $canvasTop,
-                    $inkColor
-                );
-            }
-        }
-
-        imagedestroy($signature);
-
-        /*
-        |--------------------------------------------------------------------------
-        | STEP 4: Find the actual signature ink bounds
-        |--------------------------------------------------------------------------
-        */
-
-        $left   = $canvasWidth;
-        $right  = -1;
-        $top    = $canvasHeight;
-        $bottom = -1;
-
-        for ($y = 0; $y < $canvasHeight; $y++) {
-
-            for ($x = 0; $x < $canvasWidth; $x++) {
-
-                $pixel = imagecolorat($clean, $x, $y);
-
-                $alpha = ($pixel >> 24) & 0x7F;
-
-                /*
-                 * Anything with meaningful opacity is actual ink.
-                 */
-                if ($alpha < 120) {
-
-                    $left = min($left, $x);
-                    $right = max($right, $x);
-                    $top = min($top, $y);
-                    $bottom = max($bottom, $y);
+                        $left = min($left, $x);
+                        $right = max($right, $x);
+                        $top = min($top, $y);
+                        $bottom = max($bottom, $y);
+                    }
                 }
             }
-        }
 
-        /*
-        |--------------------------------------------------------------------------
-        | No signature found
-        |--------------------------------------------------------------------------
-        */
+            /*
+            |--------------------------------------------------------------------------
+            | No signature found
+            |--------------------------------------------------------------------------
+            */
 
-        if ($right < $left || $bottom < $top) {
+            if ($right < $left || $bottom < $top) {
+
+                imagedestroy($clean);
+
+                Log::warning(
+                    'Cashier signature contained no visible ink.',
+                    ['path' => $storagePath]
+                );
+
+                return;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | STEP 5: Actual signature dimensions
+            |--------------------------------------------------------------------------
+            */
+
+            $inkWidth = $right - $left + 1;
+            $inkHeight = $bottom - $top + 1;
+
+            /*
+            |--------------------------------------------------------------------------
+            | STEP 6: Receipt signature area
+            |--------------------------------------------------------------------------
+            |
+            | Signature sits above cashier name.
+            |
+            */
+
+            $bandX = 530;
+            $bandY = 728;
+
+            $bandWidth = 680;
+            $bandHeight = 29;
+
+            /*
+            |--------------------------------------------------------------------------
+            | STEP 7: Scale while maintaining aspect ratio
+            |--------------------------------------------------------------------------
+            */
+
+            $scale = min(
+                $bandWidth / $inkWidth,
+                $bandHeight / $inkHeight
+            );
+
+            $dstWidth = max(
+                1,
+                (int) round($inkWidth * $scale)
+            );
+
+            $dstHeight = max(
+                1,
+                (int) round($inkHeight * $scale)
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | STEP 8: Center signature
+            |--------------------------------------------------------------------------
+            */
+
+            $dstX = $bandX +
+                (int) (($bandWidth - $dstWidth) / 2);
+
+            $dstY = $bandY +
+                (int) (($bandHeight - $dstHeight) / 2);
+
+            /*
+            |--------------------------------------------------------------------------
+            | STEP 9: Paste signature
+            |--------------------------------------------------------------------------
+            */
+
+            imagealphablending($image, true);
+
+            imagecopyresampled(
+                $image,
+                $clean,
+                $dstX,
+                $dstY,
+                $left,
+                $top,
+                $dstWidth,
+                $dstHeight,
+                $inkWidth,
+                $inkHeight
+            );
 
             imagedestroy($clean);
 
-            Log::warning(
-                'Cashier signature contained no visible ink.',
-                ['path' => $storagePath]
+        } catch (\Throwable $e) {
+
+            Log::error(
+                'Failed to paste cashier signature onto receipt.',
+                [
+                    'error' => $e->getMessage(),
+                    'path' => $storagePath,
+                ]
             );
-
-            return;
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | STEP 5: Actual signature dimensions
-        |--------------------------------------------------------------------------
-        */
-
-        $inkWidth  = $right - $left + 1;
-        $inkHeight = $bottom - $top + 1;
-
-        /*
-        |--------------------------------------------------------------------------
-        | STEP 6: Receipt signature area
-        |--------------------------------------------------------------------------
-        |
-        | Signature sits above cashier name.
-        |
-        */
-
-        $bandX = 530;
-        $bandY = 728;
-
-        $bandWidth  = 680;
-        $bandHeight = 29;
-
-        /*
-        |--------------------------------------------------------------------------
-        | STEP 7: Scale while maintaining aspect ratio
-        |--------------------------------------------------------------------------
-        */
-
-        $scale = min(
-            $bandWidth / $inkWidth,
-            $bandHeight / $inkHeight
-        );
-
-        $dstWidth = max(
-            1,
-            (int) round($inkWidth * $scale)
-        );
-
-        $dstHeight = max(
-            1,
-            (int) round($inkHeight * $scale)
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | STEP 8: Center signature
-        |--------------------------------------------------------------------------
-        */
-
-        $dstX = $bandX +
-            (int) (($bandWidth - $dstWidth) / 2);
-
-        $dstY = $bandY +
-            (int) (($bandHeight - $dstHeight) / 2);
-
-        /*
-        |--------------------------------------------------------------------------
-        | STEP 9: Paste signature
-        |--------------------------------------------------------------------------
-        */
-
-        imagealphablending($image, true);
-
-        imagecopyresampled(
-            $image,
-            $clean,
-            $dstX,
-            $dstY,
-            $left,
-            $top,
-            $dstWidth,
-            $dstHeight,
-            $inkWidth,
-            $inkHeight
-        );
-
-        imagedestroy($clean);
-
-    } catch (\Throwable $e) {
-
-        Log::error(
-            'Failed to paste cashier signature onto receipt.',
-            [
-                'error' => $e->getMessage(),
-                'path' => $storagePath,
-            ]
-        );
     }
-}
+
     /**
      * Draw the home address on a single centred line inside its 38px row
      * (673-711), auto-shrinking/truncating when too wide.
@@ -828,7 +837,4 @@ private function pasteSignature($image, ?string $storagePath): void
 
         return (string) $number;
     }
-
-
-
 }

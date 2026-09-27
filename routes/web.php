@@ -97,7 +97,6 @@ Route::middleware(['auth'])->group(function () {
         [ReceiptController::class, 'memberDownload']
     )->name('activation.receipt.download');
 
-
     Route::get('/admin/members/{userId}/policy/download', [PolicyController::class, 'adminDownload'])
         ->name('admin.member.policy.download');
 
@@ -113,6 +112,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/member/id-card/pdf', [MemberIdCardController::class, 'download'])
         ->name('member.id-card.pdf');
+
+    Route::get('/satellite', fn () => view('pages.member-pages.satellite'))
+        ->name('satellite.portal');
 
     Route::post('/logout', function () {
         Auth::logout();

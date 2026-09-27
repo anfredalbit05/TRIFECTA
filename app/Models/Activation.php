@@ -31,6 +31,12 @@ class Activation extends Model
         'UserID',
 
         /*
+        | Satellite row this activation belongs to (satellite memberships)
+        */
+
+        'satelliteID',
+
+        /*
         | Activation amount
         */
 
@@ -88,6 +94,15 @@ class Activation extends Model
 
         'receipt_number',
 
+        /*
+        | Policy details (Cocogen) attached to this activation —
+        | the users table has no such columns.
+        */
+
+        'policy_number',
+        'cocogen_policy_number',
+        'policy_effectivity_date',
+        'policy_expiration_date',
 
         /*
         | Cashier who signed the acknowledgement receipt

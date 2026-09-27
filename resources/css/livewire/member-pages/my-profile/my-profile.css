@@ -130,7 +130,7 @@
   }
 
   .btn-download {
-    @apply flex-1 cursor-pointer rounded-xl bg-slate-200 py-3 text-xs font-semibold;
+    @apply flex-1 cursor-pointer rounded-xl bg-[#0C2C6B] py-3 text-white hover:bg-[#071a42] font-semibold;
   }
 
   /* ===============================================================
@@ -460,6 +460,102 @@
   }
 
   /* ===============================================================
+     9b. TEMPLATE-BASED ID CARD (id-front.png / id-back.png artwork
+     with absolutely-positioned data overlays)
+     -----------------------------------------------------------------
+     Template pixel geometry (432 x 578 id-front.png):
+       photo box   x 30-170   y 255-440
+       NAME row    label ends ~188, underline y283, x 188-400
+       MEMBERSHIP  underline y333, x 190-406 (label ends ~x185)
+       DATE ISSUE  underline y367, x 293-430 (label "DATE OF ISSUE:" ends ~290)
+       VALID UNTIL underline y400, x 284-430
+       barcode strip y 452-484
+     All overlay coordinates are % of the card so the card can scale.
+     =============================================================== */
+
+  .id-card-front-new,
+  .id-card-back-new {
+    @apply relative w-full max-w-[320px] shrink-0 overflow-hidden rounded-xl border border-slate-300 bg-white shadow-lg sm:max-w-[340px];
+  }
+
+  /* Artwork fills the card and defines its aspect ratio. */
+  .id-template-img {
+    @apply block h-auto w-full;
+  }
+
+  /* -- photo overlay: sits inside the framed portrait area -- */
+  .idn-photo {
+    position: absolute;
+    left: 5.9%;
+    top: 41%;
+    width: 33.6%;
+    height: 34.2%;
+    border-radius: 5%;
+    overflow: hidden;
+  }
+
+  .idn-photo img {
+    @apply h-full w-full object-cover;
+  }
+
+  /* -- shared text overlay styling -- */
+  .idn-field {
+    position: absolute;
+    @apply truncate font-semibold text-[#0C2C6B];
+    line-height: 1.1;
+  }
+
+  /* Name: value on the line at y333 (x190-406). 10px keeps long
+     names on a single line inside the 50%-wide value area. */
+  .idn-name {
+    left: 44.2%;
+    top: 55.1%;
+    width: 50%;
+    @apply text-[10px] sm:text-[11px];
+  }
+
+  /* Membership No: value on the line at y367 (x293-430). */
+  .idn-membership {
+    left: 67.8%;
+    top: 61.0%;
+    width: 31.7%;
+    @apply text-[10px] sm:text-[11px];
+  }
+
+  /* Date of Issue: value on the line at y400 (x284-430), nudged 1px
+     down so the text rests on the printed line. */
+  .idn-issue {
+    left: 65.7%;
+    top: calc(66% + 1px);
+    width: 33.8%;
+    @apply text-[10px] sm:text-[11px];
+  }
+
+  /* Valid Until: value on the line at y431 (x272-430), nudged 1px down
+     so the text rests on the printed line. */
+  .idn-valid {
+    left: 63.2%;
+    top: calc(71.4% + 1px);
+    width: 36.3%;
+    @apply text-[10px] sm:text-[11px];
+  }
+
+  /* Member signature: white card over the free white area right of
+     the barcode strip (x310-425, y450-486). */
+  .idn-signature {
+    position: absolute;
+    left: 71.8%;
+    top: 77.9%;
+    width: 23%;
+    height: 6.2%;
+    @apply flex items-center justify-center overflow-hidden rounded bg-white/95;
+  }
+
+  .idn-signature img {
+    @apply h-full w-full object-contain;
+  }
+
+  /* ===============================================================
      10. ACCOUNT INFORMATION PAGE
      -----------------------------------------------------------------
      Reuses shared classes from section 1–6 above:
@@ -496,15 +592,15 @@
   }
 
   .status-badge--active {
-    @apply bg-[#0C2C6B] ;
+    @apply bg-[#0C2C6B] text-white;
   }
 
   .status-badge--inactive {
-      @apply bg-[#D79B10] ;
+      @apply bg-[#D79B10] text-white;
   }
 
   .status-badge--suspended {
-    @apply bg-red-100 text-red-700;
+    @apply bg-[#b91c1c] text-white;
   }
 
   /* -- referral QR / link section -- */
@@ -792,7 +888,7 @@
   }
 
   .btn-dark {
-    @apply inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800;
+    @apply inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-[#0C2C6B] hover:bg-[#071a42] px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800;
   }
 
   .btn-locked {
@@ -846,7 +942,17 @@
   }
 
   .status-badge-sm {
-    @apply inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold;
+    @apply inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold text-white;
+  }
+
+  /* Certificate/receipt availability pills — navy/amber palette,
+     white text for contrast on the colored backgrounds. */
+  .status-badge-sm.status-badge--active {
+    @apply bg-[#0C2C6B] text-white;
+  }
+
+  .status-badge-sm.status-badge--inactive {
+    @apply bg-[#D79B10] text-white;
   }
 
   /* ===============================================================

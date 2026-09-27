@@ -158,15 +158,29 @@ class GenealogyTree extends Component
     | Name Search Filter
     |
     | Recursively removes nodes whose name does not match the search term.
-    | A node is kept when IT matches, or when any of its descendants match
-    | (so a matching downline is still reachable through its ancestors).
-    | Matching nodes are flagged "highlighted" for UI emphasis.
+    | When a node ITSELF matches, the node AND its entire downline subtree
+    | are kept intact — so searching a member shows that member plus every
+    | downline beneath them. A non-matching node is still kept when some
+    | descendant matches (so the matching branch stays reachable through
+    | its ancestors). Matching nodes are flagged "highlighted" for UI.
     |--------------------------------------------------------------------------
      */
     private function filterTree(?array $node, string $term): ?array
     {
         if ($node === null) {
             return null;
+        }
+
+        $selfMatches = $term === '' || str_contains(
+            mb_strtolower($node['name']),
+            $term
+        );
+
+        // The matched member keeps their WHOLE downline subtree.
+        if ($selfMatches) {
+            $node['highlighted'] = true;
+
+            return $node;
         }
 
         $children = [];
@@ -179,19 +193,14 @@ class GenealogyTree extends Component
             }
         }
 
-        $selfMatches = $term === '' || str_contains(
-            mb_strtolower($node['name']),
-            $term
-        );
-
-        // Keep the node when it matches itself OR has matching descendants
-        if (! $selfMatches && empty($children)) {
+        // Non-matching node survives only as an ancestor of a match.
+        if (empty($children)) {
             return null;
         }
 
         $node['downlines'] = $children;
         $node['direct_count'] = count($children);
-        $node['highlighted'] = $selfMatches;
+        $node['highlighted'] = false;
 
         return $node;
     }

@@ -204,6 +204,7 @@
                             @enderror
                         </div>
 
+                        @if(auth()->user()->RoleID != 8)
                         {{-- Emergency Contact Details Section --}}
                         <div class="form-section-divider">
                             <h4 class="form-section-title">In Case of Emergency (ICE) Details</h4>
@@ -241,6 +242,7 @@
                                 <p class="field-error">{{ $message }}</p>
                             @enderror
                         </div>
+                         @endif
                     </div>
 
                     <div class="card-footer">
@@ -256,6 +258,7 @@
         {{-- =================== RIGHT COLUMN =================== --}}
         <div class="profile-col">
 
+            @if(auth()->user()->RoleID != 8)
             {{-- --------------- 5. REGISTERED BENEFICIARIES (READ-ONLY) --------------- --}}
             <div class="card">
                 <div class="card-header">
@@ -291,6 +294,7 @@
                     @endif
                 </div>
             </div>
+            @endif
 
             {{-- --------------- 6. SIGNATURE PAD --------------- --}}
             <div class="signature-card" x-data="signaturePadSetup()" x-init="initPad()">
@@ -311,6 +315,7 @@
                 </div>
             </div>
 
+            @if(auth()->user()->RoleID != 8)
             {{-- --------------- 7. LIVE ID PREVIEW --------------- --}}
             <div class="id-preview-card">
                 <h4 class="id-preview-title">👁️ Live ID Preview</h4>
@@ -318,101 +323,38 @@
                 <div class="id-card-viewport">
 
                     {{-- FRONT SIDE --}}
-                    <div id="id-card-front" class="id-card id-card-front">
-                        <div class="id-card-top">
-                            <div class="id-org-name">TRUELIFE</div>
-                            <div class="id-badge">PRIMARY MEMBER</div>
+                    <div id="id-card-front" class="id-card-front-new">
+                        {{-- Template artwork --}}
+                        <img src="{{ asset('images/certificate/id-front.png') }}" class="id-template-img" alt="ID Front">
+
+                        {{-- Photo overlay (fills the framed portrait area) --}}
+                        <div class="idn-photo">
+                            @if ($profilepic && is_object($profilepic))
+                                <img src="{{ $profilepic->temporaryUrl() }}">
+                            @elseif (auth()->user()->profilepic && auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
+                                <img src="{{ asset('storage/' . auth()->user()->profilepic) }}">
+                            @endif
                         </div>
 
-                        <div class="id-card-mid">
-                            <div class="id-photo-box">
-                                @if ($profilepic && is_object($profilepic))
-                                    <img src="{{ $profilepic->temporaryUrl() }}" class="avatar-img">
-                                @elseif ($profilePic && $profilePic !== 'images/profiles/default-avatar.png')
-                                    <img src="{{ Str::startsWith($profilePic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic) }}" class="avatar-img">
-                                @else
-                                    PHOTO
-                                @endif
-                            </div>
+                        {{-- Data overlays --}}
+                        <div class="idn-field idn-name">{{ strtoupper(trim("$firstname " . ($middlename ? substr(trim($middlename), 0, 1) . '. ' : '') . $lastname) ?: 'NAME HERE') }}</div>
+                        <div class="idn-field idn-membership">{{ $membershipNo }}</div>
+                        <div class="idn-field idn-issue">{{ $dateOfIssue }}</div>
+                        <div class="idn-field idn-valid">{{ $validUntil }}</div>
 
-                            <div class="id-details">
-                                <p><strong>ID No.:</strong> UL-{{ str_pad(auth()->id(), 5, '0', STR_PAD_LEFT) }}</p>
-                                <p><strong>FULL NAME:</strong>
-                                    {{ strtoupper(trim("$firstname $middlename $lastname") ?: 'NAME HERE') }}</p>
-                                <p><strong>ADDRESS:</strong> {{ strtoupper($address ?: 'N/A') }}</p>
-                                <p><strong>SEX:</strong> {{ strtoupper($sex) }} &nbsp;&nbsp;&nbsp;
-                                    <strong>STATUS:</strong> {{ strtoupper($civilStatus) }}
-                                </p>
-                                <p><strong>BIRTH DATE:</strong>
-                                    {{ $birthdate ? \Carbon\Carbon::parse($birthdate)->format('F d, Y') : 'N/A' }}</p>
-                                <p><strong>DATE JOINED:</strong>
-                                    {{ auth()->user()->created_at?->format('F d, Y') ?? 'N/A' }}</p>
-                                <p>
-                                <strong>EXPIRATION DATE:</strong>
-                                {{ auth()->user()->policy_expiration_date
-                                    ? \Carbon\Carbon::parse(auth()->user()->policy_expiration_date)->format('F d, Y')
-                                    : 'N/A'
-                                }}
-                            </p>
-
-                            </div>
-
-                            <div class="id-qr">
-                                {!! $qrCode !!}
-                            </div>
-                        </div>
-
-                        <div class="id-card-bottom">
-                            <div class="id-beneficiaries">
-                                <p class="id-beneficiaries-title">BENEFICIARIES:</p>
-                                @forelse($beneficiaries->take(3) as $b)
-                                    <p class="id-beneficiary-line">• {{ $b->fullname }}</p>
-                                @empty
-                                    <p class="id-beneficiary-empty">No beneficiaries added</p>
-                                @endforelse
-                            </div>
-
-                            <div class="id-signature-block">
-                                <div class="id-signature-line">
-                                    @if ($signature)
-                                        <img src="{{ asset('storage/' . $signature) }}" class="id-signature-img">
-                                    @else
-                                        <span class="id-signature-empty">No Signature</span>
-                                    @endif
-                                </div>
-                                <span class="id-signature-label">SIGNATURE</span>
-                            </div>
+                        {{-- Member signature on a white card below the QR/barcode area --}}
+                        <div class="idn-signature">
+                            @if ($signature)
+                                <img src="{{ asset('storage/' . $signature) }}">
+                            @endif
                         </div>
                     </div>
 
                     {{-- BACK SIDE --}}
-                    <div id="id-card-back" class="id-card id-card-back hidden">
-                        <div>
-                            <h5 class="id-back-title">TRUELIFE TERM AND TERMINATION</h5>
-                            <p class="id-back-text">TRUELIFE may terminate this MEMBERSHIP, for the following grounds:</p>
-                            <ul class="id-back-list">
-                                <li>Fraud or misrepresentation</li>
-                                <li>Misuse of TRUELIFE name and materials</li>
-                                <li>Violation of company rules or applicable laws</li>
-                            </ul>
-                            <p class="id-back-note">Termination shall be without prejudice to any liabilities incurred prior to termination.</p>
-                        </div>
-
-                        <div class="id-back-bottom">
-                            <div class="id-ice-block">
-                                <p class="id-ice-title">IN CASE OF EMERGENCY:</p>
-                                <p class="id-ice-line"><strong>NAME:</strong> {{ strtoupper($emergencyName ?: '____________________') }}</p>
-                                <p class="id-ice-line"><strong>ADDRESS:</strong> {{ strtoupper($emergencyAddress ?: '____________________') }}</p>
-                                <p class="id-ice-line"><strong>RELATIONSHIP:</strong> {{ strtoupper($emergencyRelationship ?: '____________________') }}</p>
-                                <p class="id-ice-line"><strong>CONTACT NO.:</strong> {{ strtoupper($emergencyContactno ?: '____________________') }}</p>
-                            </div>
-                            <div class="id-signatory-block">
-                                <div class="id-signatory-script"></div>
-                                <div class="id-signatory-divider"></div>
-                                <p class="id-signatory-name">RENANTE SUAYBAGUIO-ROBLES, MPA, LFA</p>
-                                <p class="id-signatory-role">CEO</p>
-                            </div>
-                        </div>
+                    {{-- The back artwork is fully pre-printed (Member Benefits
+                         summary) — no data overlays needed here. --}}
+                    <div id="id-card-back" class="id-card-back-new hidden">
+                        <img src="{{ asset('images/certificate/id-back.png') }}" class="id-template-img" alt="ID Back">
                     </div>
                 </div>
 
@@ -422,21 +364,30 @@
                 </div>
 
                 <div class="id-actions">
-                    <button type="button" onclick="window.location.href='{{ route('member.id-card.pdf') }}'" class="btn-download">
-                        📥 Download ID (PDF)
+                    <button type="button" x-data="idPdfDownload" @click="downloadPdf" class="btn-download">
+                        Download ID (PDF)
                     </button>
+
+                    {{-- @if ($hasDownloadableReceipt)
+                        <a href="{{ route('activation.receipt.download') }}"
+                            class="btn-download">
+                            🧾 Download Receipt
+                        </a>
+                    @endif --}}
                     {{-- <button type="button" wire:click="requestPhysicalId" class="btn-primary flex-1">
                         Request Physical ID
                     </button> --}}
                 </div>
             </div>
+
+            @endif
         </div>
     </div>
 </div>
 
 {{-- ============================= 8. SCRIPTS ============================= --}}
 <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.0/dist/html2canvas-pro.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 
 <script>
@@ -613,7 +564,22 @@ savePad() {
         return;
     }
 
-    const dataUrl = this.pad.toDataURL('image/jpeg', 1.0); // was: this.pad.toDataURL()
+    const dataUrl = (() => {
+        // signature_pad only paints its white background on clear() — a
+        // pad drawn on without clearing stays transparent, and JPEG has
+        // no alpha (transparent → BLACK). Composite onto white first.
+        const src = this.pad.canvas;
+        const exportCanvas = document.createElement('canvas');
+        exportCanvas.width = src.width;
+        exportCanvas.height = src.height;
+
+        const ctx = exportCanvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+        ctx.drawImage(src, 0, 0);
+
+        return exportCanvas.toDataURL('image/jpeg', 1.0);
+    })();
 
     Swal.fire({
         title: 'Save Signature?',
@@ -638,14 +604,14 @@ savePad() {
         Alpine.data('idPdfDownload', () => ({
             async downloadPdf() {
 
-                const pdfTemplate = document.getElementById('pdf-membership-card');
+                const frontEl = document.getElementById('id-card-front');
 
-                if (!pdfTemplate) {
-                    console.error('idPdfDownload: #pdf-membership-card was not found.');
+                if (!frontEl) {
+                    console.error('idPdfDownload: #id-card-front was not found.');
 
                     Swal.fire({
                         title: 'Download Failed',
-                        text: 'PDF card template was not found.',
+                        text: 'ID card preview was not found.',
                         icon: 'error',
                         confirmButtonColor: '#0C2C6B'
                     });
@@ -653,8 +619,8 @@ savePad() {
                     return;
                 }
 
-                if (typeof html2pdf === 'undefined') {
-                    console.error('idPdfDownload: html2pdf library did not load.');
+                if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+                    console.error('idPdfDownload: html2canvas/jsPDF did not load.');
 
                     Swal.fire({
                         title: 'Download Failed',
@@ -670,62 +636,61 @@ savePad() {
 
                 try {
                     // ---------------------------------------------------------
-                    // Create PDF container
+                    // Capture BOTH faces from offscreen clones (so the hidden
+                    // back renders even while the user is on the front tab).
+                    // Each page is drawn manually — template artwork plus the
+                    // live-computed overlay geometry — because html2canvas
+                    // re-implements text layout and drifts the values off
+                    // their printed lines. Manual drawing matches the preview
+                    // pixel-for-pixel.
                     // ---------------------------------------------------------
+                    const backEl = document.getElementById('id-card-back');
+
+                    const refWidth = frontEl.offsetWidth || backEl?.offsetWidth || 320;
+
                     container = document.createElement('div');
-                    container.id = 'pdf-download-container';
-                    container.style.position = 'fixed';
-                    container.style.left = '-100000px';
-                    container.style.top = '0';
-                    container.style.width = '760px';
-                    container.style.background = '#ffffff';
-                    container.style.padding = '10px';
-                    container.style.margin = '0';
-                    container.style.zIndex = '-9999';
-
-                    // ---------------------------------------------------------
-                    // Clone plain-HTML card (uses hex/rgba colors only, no
-                    // Tailwind classes, so html2canvas renders it reliably)
-                    // ---------------------------------------------------------
-                    const clone = pdfTemplate.cloneNode(true);
-
-                    clone.removeAttribute('hidden');
-                    clone.style.display = 'block';
-                    clone.style.visibility = 'visible';
-                    clone.style.position = 'static';
-                    clone.style.width = '100%';
-                    clone.style.background = '#ffffff';
-
-                    clone.querySelectorAll('*').forEach(element => {
-                        element.style.removeProperty('display');
-                        element.style.removeProperty('visibility');
-                    });
-
-                    container.appendChild(clone);
+                    container.style.cssText = 'position:fixed;left:-100000px;top:0;z-index:-9999;';
                     document.body.appendChild(container);
 
-                    // ---------------------------------------------------------
-                    // Wait for images, then generate the PDF
-                    // ---------------------------------------------------------
-                    await this.waitForImages(clone);
+                    const cloneSide = (el) => {
+                        const clone = el.cloneNode(true);
+                        clone.classList.remove('hidden');
+                        clone.style.position = 'static';
+                        clone.style.width = refWidth + 'px';
+                        container.appendChild(clone);
 
-                    const options = {
-                        margin: 10,
-                        filename: 'member-id-card.pdf',
-                        image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: {
-                            scale: 2,
-                            useCORS: true,
-                            allowTaint: false,
-                            backgroundColor: '#ffffff',
-                            logging: false,
-                            imageTimeout: 15000
-                        },
-                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                        pagebreak: { mode: ['css', 'legacy'] }
+                        return clone;
                     };
 
-                    await html2pdf().set(options).from(clone).save();
+                    const frontClone = cloneSide(frontEl);
+                    const backClone = backEl ? cloneSide(backEl) : null;
+
+                    await this.waitForImages(container);
+
+                    const frontCanvas = this.captureCardCanvas(frontClone);
+                    const backCanvas = backClone ? this.captureCardCanvas(backClone) : null;
+
+                    // ---------------------------------------------------------
+                    // Page size derives from each captured canvas so nothing
+                    // is ever stretched onto the page.
+                    // ---------------------------------------------------------
+                    const pageW = 54;
+                    const pageH = pageW * (frontCanvas.height / frontCanvas.width);
+
+                    const pdf = new window.jspdf.jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: [pageW, pageH]
+                    });
+
+                    pdf.addImage(frontCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pageW, pageH);
+
+                    if (backCanvas) {
+                        pdf.addPage([pageW, pageH], 'portrait');
+                        pdf.addImage(backCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pageW, pageH);
+                    }
+
+                    pdf.save('member-id-card.pdf');
 
                     console.log('idPdfDownload: PDF generated successfully.');
 
@@ -746,7 +711,111 @@ savePad() {
                 }
             },
 
-            // Waits for all <img> tags inside `root` to finish loading.
+            // Draws one card face onto a hi-res canvas: template artwork
+            // first, then photo/signature images and the overlay values at
+            // the SAME live-computed positions the preview uses — so the
+            // PDF is pixel-faithful to what the member sees.
+            captureCardCanvas(el) {
+                const template = el.querySelector('.id-template-img');
+
+                const S = 3; // hi-res multiplier on the template's natural size
+
+                const canvas = document.createElement('canvas');
+                canvas.width = template.naturalWidth * S;
+                canvas.height = template.naturalHeight * S;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+
+                const ir = template.getBoundingClientRect();
+
+                const toX = px => (px - ir.x) / ir.width * canvas.width;
+                const toY = px => (px - ir.y) / ir.height * canvas.height;
+                const toW = px => px / ir.width * canvas.width;
+                const toH = px => px / ir.height * canvas.height;
+
+                // -- photo (cover-fit into the framed portrait area) --
+                const photoBox = el.querySelector('.idn-photo');
+                const photoImg = photoBox?.querySelector('img');
+
+                if (photoBox && photoImg && photoImg.naturalWidth > 0) {
+                    const b = photoBox.getBoundingClientRect();
+                    const bx = toX(b.x);
+                    const by = toY(b.y);
+                    const bw = toW(b.width);
+                    const bh = toH(b.height);
+
+                    const ratio = Math.max(bw / photoImg.naturalWidth, bh / photoImg.naturalHeight);
+                    const sw = bw / ratio;
+                    const sh = bh / ratio;
+
+                    ctx.drawImage(
+                        photoImg,
+                        (photoImg.naturalWidth - sw) / 2,
+                        (photoImg.naturalHeight - sh) / 2,
+                        sw,
+                        sh,
+                        bx, by, bw, bh
+                    );
+                }
+
+                // -- member signature (white card + contain-fit image) --
+                const sigBox = el.querySelector('.idn-signature');
+                const sigImg = sigBox?.querySelector('img');
+
+                if (sigBox) {
+                    const b = sigBox.getBoundingClientRect();
+                    const bx = toX(b.x);
+                    const by = toY(b.y);
+                    const bw = toW(b.width);
+                    const bh = toH(b.height);
+
+                    ctx.save();
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.roundRect(bx, by, bw, bh, 4 * S / 3);
+                    ctx.fill();
+                    ctx.restore();
+
+                    if (sigImg && sigImg.naturalWidth > 0) {
+                        const ratio = Math.min(bw / sigImg.naturalWidth, bh / sigImg.naturalHeight);
+                        const dw = sigImg.naturalWidth * ratio;
+                        const dh = sigImg.naturalHeight * ratio;
+
+                        ctx.drawImage(sigImg, bx + (bw - dw) / 2, by + (bh - dh) / 2, dw, dh);
+                    }
+                }
+
+                // -- overlay values (same text/positions as the preview) --
+                for (const field of el.querySelectorAll('.idn-field')) {
+                    const r = field.getBoundingClientRect();
+                    const cs = getComputedStyle(field);
+
+                    let fontPx = toW(parseFloat(cs.fontSize));
+                    const weight = cs.fontWeight || '600';
+                    const maxWidth = toW(r.width);
+                    const text = field.textContent.trim();
+
+                    ctx.font = weight + ' ' + fontPx + 'px Arial, Helvetica, sans-serif';
+
+                    // Shrink-to-fit so long names never overflow the line.
+                    while (fontPx > 6 && ctx.measureText(text).width > maxWidth) {
+                        fontPx -= 1;
+                        ctx.font = weight + ' ' + fontPx + 'px Arial, Helvetica, sans-serif';
+                    }
+
+                    ctx.fillStyle = cs.color || '#0C2C6B';
+                    ctx.textBaseline = 'alphabetic';
+
+                    // Browser line box bottom ≈ baseline + descent (~0.21em).
+                    const bottomPx = toY(r.bottom);
+                    ctx.fillText(text, toX(r.x), bottomPx - fontPx * 0.21);
+                }
+
+                return canvas;
+            },
+
+            // Waits for all <img> tags inside root to finish loading.
             waitForImages(root) {
                 const images = Array.from(root.querySelectorAll('img'));
 
