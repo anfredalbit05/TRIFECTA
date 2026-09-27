@@ -182,6 +182,8 @@ body{
 
     object-position:center bottom;
 
+
+
 }
 
 .sig-ceo{
@@ -189,6 +191,8 @@ body{
     left:19.9%;
 
     width:25.4%;
+    height: 6.4%;
+    margin-top: 20px;
 
 }
 
@@ -197,6 +201,9 @@ body{
     left:57.7%;
 
     width:24.6%;
+
+    height: 6.4%;
+    margin-top: 20px;
 
 }
 

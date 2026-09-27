@@ -51,6 +51,113 @@ class CertificateController extends Controller
      * `position` and turns their stored signature file into a base64
      * data URI the PDF can overlay above the printed name.
      */
+    /**
+ * Convert a signature image with a white background into a transparent PNG.
+ */
+
+    private function signatureToTransparentDataUri(string $path): ?string
+    {
+        $contents = file_get_contents($path);
+
+        if ($contents === false) {
+            return null;
+        }
+
+        $source = @imagecreatefromstring($contents);
+
+        if ($source === false) {
+            return null;
+        }
+
+        $width = imagesx($source);
+        $height = imagesy($source);
+
+        // Create transparent PNG canvas
+        $output = imagecreatetruecolor($width, $height);
+
+        imagealphablending($output, false);
+        imagesavealpha($output, true);
+
+        $transparent = imagecolorallocatealpha(
+            $output,
+            255,
+            255,
+            255,
+            127
+        );
+
+        imagefill($output, 0, 0, $transparent);
+
+        /*
+        * Remove white / near-white background.
+        *
+        * Pure white becomes fully transparent.
+        * Near-white pixels become partially transparent so
+        * anti-aliased edges of the signature remain smooth.
+        */
+        for ($x = 0; $x < $width; $x++) {
+            for ($y = 0; $y < $height; $y++) {
+
+                $rgba = imagecolorat($source, $x, $y);
+
+                $r = ($rgba >> 16) & 0xFF;
+                $g = ($rgba >> 8) & 0xFF;
+                $b = $rgba & 0xFF;
+
+                // Calculate brightness.
+                $brightness = ($r + $g + $b) / 3;
+
+                if ($brightness >= 245) {
+                    // White / almost-white = transparent
+                    $alpha = 127;
+                } else {
+                    /*
+                    * Convert darker pixels into more opaque pixels.
+                    * Black = opaque.
+                    * Gray = partially transparent.
+                    */
+                    $alpha = (int) round(
+                        (($brightness / 245) * 127)
+                    );
+
+                    $alpha = max(0, min(127, $alpha));
+                }
+
+                $color = imagecolorallocatealpha(
+                    $output,
+                    $r,
+                    $g,
+                    $b,
+                    $alpha
+                );
+
+                imagesetpixel(
+                    $output,
+                    $x,
+                    $y,
+                    $color
+                );
+            }
+        }
+
+        imagedestroy($source);
+
+        // Capture PNG directly into memory.
+        ob_start();
+
+        imagepng($output);
+
+        $png = ob_get_clean();
+
+        imagedestroy($output);
+
+        if ($png === false || $png === '') {
+            return null;
+        }
+
+        return 'data:image/png;base64,'.base64_encode($png);
+    }
+
     private function signatories(): array
     {
         $resolve = function (string $position): ?array {
@@ -66,19 +173,25 @@ class CertificateController extends Controller
             $signature = null;
 
             if (Storage::disk('public')->exists($signatory->signature)) {
-                $path = Storage::disk('public')->path($signatory->signature);
-                $mime = mime_content_type($path);
-                $signature = 'data:'.$mime.';base64,'.
-                    base64_encode(file_get_contents($path));
+                $path = Storage::disk('public')->path(
+                    $signatory->signature
+                );
+
+                $signature = $this->signatureToTransparentDataUri($path);
             }
 
             return [
                 'name' => strtoupper(trim(
                     $signatory->firstname.' '.
-                    ($signatory->middlename ? substr(trim($signatory->middlename), 0, 1).'. ' : '').
+                    ($signatory->middlename
+                        ? substr(trim($signatory->middlename), 0, 1).'. '
+                        : ''
+                    ).
                     $signatory->lastname
                 )),
+
                 'position' => $position,
+
                 'signature' => $signature,
             ];
         };
