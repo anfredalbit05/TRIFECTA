@@ -168,25 +168,43 @@ class Profile extends Component
 
         $this->signature = $filename;
 
-        $this->dispatch('signature-saved');
+        $this->dispatch(
+        'signature-saved',
+        url: Storage::url($filename)
+    );
     }
 
-    public function removeSignature(): void
-    {
-        $user = User::findOrFail(Auth::id());
 
-        if ($user->signature && Storage::disk('public')->exists($user->signature)) {
-            Storage::disk('public')->delete($user->signature);
-        }
+public function removeSignature(): void
+{
+    $user = User::findOrFail(Auth::id());
 
-        $user->update([
-            'signature' => null,
-        ]);
-
+    // Check if there is actually a saved signature
+    if (!$user->signature) {
         $this->signature = null;
 
-        session()->flash('profile-success', 'Signature removed successfully.');
+        $this->dispatch('signature-delete-no-signature');
+
+        return;
     }
+
+    // Delete the physical signature file
+    if (Storage::disk('public')->exists($user->signature)) {
+        Storage::disk('public')->delete($user->signature);
+    }
+
+    // Remove signature from database
+    $user->update([
+        'signature' => null,
+    ]);
+
+    // Update Livewire state
+    $this->signature = null;
+
+    // Notify JavaScript
+    $this->dispatch('signature-deleted');
+}
+
 
     public function updatedProfilepic(): void
     {

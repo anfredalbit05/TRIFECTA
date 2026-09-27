@@ -309,10 +309,13 @@
                 </div>
             @endif
 
+
             {{-- --------------- 6. SIGNATURE PAD --------------- --}}
             <div class="signature-card" x-data="signaturePadSetup()" x-init="initPad()">
                 <h3 class="signature-title">Signature</h3>
-                <p class="signature-desc">Draw your signature inside the box below to display on your ID front preview.
+
+                <p class="signature-desc">
+                    Draw your signature inside the box below to display on your ID front preview.
                 </p>
 
                 <div class="signature-pad-frame">
@@ -320,14 +323,34 @@
                 </div>
 
                 <div class="signature-actions">
-                    <button type="button" @click="clearPad" class="btn-clear">
+
+                {{-- DELETE --}}
+                <button type="button"
+                    @click="deleteSignature"
+                    class="btn-warning">
+                    Delete Signature
+                </button>
+
+                {{-- CLEAR + SAVE --}}
+                <div class="signature-actions-right">
+
+                    <button type="button"
+                        @click="clearPad"
+                        class="btn-clear">
                         🧹 Clear
                     </button>
-                    <button type="button" @click="savePad" class="btn-save">
+
+                    <button type="button"
+                        @click="savePad"
+                        class="btn-save">
                         Save Signature
                     </button>
+
                 </div>
+
             </div>
+            </div>
+
 
             @if (auth()->user()->RoleID != 8)
                 {{-- --------------- 7. LIVE ID PREVIEW --------------- --}}
@@ -531,6 +554,79 @@
                 }
             });
         });
+
+        Livewire.on('signature-saved', ({ url }) => {
+            const canvas = document.querySelector('[x-ref="signatureCanvas"]');
+
+            if (!canvas) return;
+
+            requestAnimationFrame(() => {
+                const width = canvas.offsetWidth;
+                const height = canvas.offsetHeight;
+
+                if (!width || !height) return;
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const pad = new SignaturePad(canvas, {
+                    backgroundColor: 'rgb(255, 255, 255)',
+                    penColor: 'rgb(0, 0, 0)'
+                });
+
+                pad.clear();
+
+                if (url) {
+                    pad.fromDataURL(url);
+                }
+
+                Swal.fire({
+                    title: 'Signature Saved!',
+                    text: 'Your signature has been saved successfully.',
+                    icon: 'success',
+                    confirmButtonColor: '#0C2C6B',
+                    confirmButtonText: 'OK'
+                });
+            });
+        });
+
+
+        // =========================================================
+        // SIGNATURE DELETED SUCCESSFULLY
+        // =========================================================
+        Livewire.on('signature-deleted', () => {
+
+            Swal.fire({
+                title: 'Signature Deleted!',
+                text: 'Your saved signature has been permanently deleted.',
+                icon: 'success',
+                confirmButtonColor: '#0C2C6B',
+                confirmButtonText: 'OK',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            });
+
+        });
+
+        // =========================================================
+        // NO SIGNATURE TO DELETE
+        // =========================================================
+        Livewire.on('signature-delete-no-signature', () => {
+
+            Swal.fire({
+                title: 'No Signature Found',
+                text: 'There is no saved signature to delete.',
+                icon: 'info',
+                confirmButtonColor: '#0C2C6B',
+                confirmButtonText: 'OK',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            });
+
+        });
+
+
+
     });
 
     function switchIdTab(target) {
@@ -552,68 +648,185 @@
         }
     }
 
-    function signaturePadSetup() {
-        return {
-            pad: null,
-            initPad() {
+
+function signaturePadSetup() {
+    return {
+        pad: null,
+
+        initPad() {
+            requestAnimationFrame(() => {
                 const canvas = this.$refs.signatureCanvas;
-                canvas.width = canvas.offsetWidth;
-                canvas.height = canvas.offsetHeight;
+
+                if (!canvas) return;
+
+                const width = canvas.offsetWidth;
+                const height = canvas.offsetHeight;
+
+                if (!width || !height) return;
+
+                canvas.width = width;
+                canvas.height = height;
+
                 this.pad = new SignaturePad(canvas, {
-                    backgroundColor: 'rgb(255, 255, 255)' // needed so JPEG export isn't transparent-black
+                    backgroundColor: 'rgb(255, 255, 255)',
+                    penColor: 'rgb(0, 0, 0)'
                 });
 
-                @if ($signature)
-                    this.pad.fromDataURL("{{ Storage::url($signature) }}");
-                @endif
-            },
-            clearPad() {
+                // Initialize empty canvas
                 this.pad.clear();
-                @this.call('removeSignature');
-            },
-            savePad() {
-                if (this.pad.isEmpty()) {
-                    Swal.fire({
-                        title: 'No Signature',
-                        text: 'Please provide a signature first.',
-                        icon: 'warning',
-                        confirmButtonColor: '#0C2C6B'
-                    });
-                    return;
+
+                // Restore existing saved signature
+                @if ($signature)
+                    this.pad.fromDataURL(@js(Storage::url($signature)));
+                @endif
+            });
+        },
+
+        restoreSignature(url) {
+            requestAnimationFrame(() => {
+                const canvas = this.$refs.signatureCanvas;
+
+                if (!canvas) return;
+
+                const width = canvas.offsetWidth;
+                const height = canvas.offsetHeight;
+
+                if (!width || !height) return;
+
+                canvas.width = width;
+                canvas.height = height;
+
+                this.pad = new SignaturePad(canvas, {
+                    backgroundColor: 'rgb(255, 255, 255)',
+                    penColor: 'rgb(0, 0, 0)'
+                });
+
+                this.pad.clear();
+
+                if (url) {
+                    this.pad.fromDataURL(url);
+                }
+            });
+        },
+
+        // =========================================================
+        // CLEAR ONLY THE CANVAS
+        // DOES NOT DELETE THE SAVED SIGNATURE
+        // =========================================================
+        clearPad() {
+            if (!this.pad) return;
+
+            this.pad.clear();
+
+        },
+
+        // =========================================================
+        // DELETE SAVED SIGNATURE
+        // =========================================================
+        deleteSignature() {
+
+            @if (!$signature)
+                Swal.fire({
+                    title: 'No Signature Found',
+                    text: 'There is no saved signature to delete.',
+                    icon: 'info',
+                    confirmButtonColor: '#0C2C6B',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                });
+
+                return;
+            @endif
+
+            Swal.fire({
+                title: 'Delete Signature?',
+                text: 'Are you sure you want to permanently delete your saved signature?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, Delete It',
+                cancelButtonText: 'Cancel',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+                    @this.call('removeSignature');
                 }
 
-                const dataUrl = (() => {
-                    // signature_pad only paints its white background on clear() — a
-                    // pad drawn on without clearing stays transparent, and JPEG has
-                    // no alpha (transparent → BLACK). Composite onto white first.
-                    const src = this.pad.canvas;
-                    const exportCanvas = document.createElement('canvas');
-                    exportCanvas.width = src.width;
-                    exportCanvas.height = src.height;
+            });
+        },
 
-                    const ctx = exportCanvas.getContext('2d');
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-                    ctx.drawImage(src, 0, 0);
+        // =========================================================
+        // SAVE SIGNATURE
+        // =========================================================
+        savePad() {
 
-                    return exportCanvas.toDataURL('image/jpeg', 1.0);
-                })();
+            if (!this.pad || this.pad.isEmpty()) {
 
                 Swal.fire({
-                    title: 'Save Signature?',
-                    text: 'Your signature will be saved to your profile.',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#0B2A5B',
-                    cancelButtonColor: '#D79B10',
-                    confirmButtonText: 'Yes, Save it',
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        @this.call('saveSignature', dataUrl);
-                    }
+                    title: 'No Signature',
+                    text: 'Please provide a signature first.',
+                    icon: 'warning',
+                    confirmButtonColor: '#0C2C6B',
+                    confirmButtonText: 'OK'
                 });
+
+                return;
             }
+
+            const dataUrl = (() => {
+
+                const src = this.pad.canvas;
+
+                const exportCanvas = document.createElement('canvas');
+
+                exportCanvas.width = src.width;
+                exportCanvas.height = src.height;
+
+                const ctx = exportCanvas.getContext('2d');
+
+                ctx.fillStyle = '#ffffff';
+
+                ctx.fillRect(
+                    0,
+                    0,
+                    exportCanvas.width,
+                    exportCanvas.height
+                );
+
+                ctx.drawImage(src, 0, 0);
+
+                return exportCanvas.toDataURL('image/jpeg', 1.0);
+
+            })();
+
+            // =====================================================
+            // SAVE CONFIRMATION
+            // =====================================================
+            Swal.fire({
+                title: 'Save Signature?',
+                text: 'Your signature will be saved to your profile.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0C2C6B',
+                cancelButtonColor: '#D79B10',
+                confirmButtonText: 'Yes, Save It',
+                cancelButtonText: 'Cancel',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+                    @this.call('saveSignature', dataUrl);
+                }
+
+            });
         }
     }
+}
+
+
 </script>
