@@ -242,7 +242,7 @@
                     wire:model.live="policy_number"
                     type="text"
                     maxlength="100"
-                    placeholder="TRI-00001-TS2026-00001"
+                    placeholder="TRI-00550-TS2026-550"
                     class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm uppercase focus:border-[#0B2A5B] focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
                 >
 
@@ -251,6 +251,12 @@
                         {{ $message }}
                     </p>
                 @enderror
+
+                @if ($policyNumberExists && ! $errors->has('policy_number'))
+                    <p class="mt-1 text-xs font-semibold text-red-600">
+                        ⚠ This policy number has already been used.
+                    </p>
+                @endif
 
                 <p class="mt-1 text-[10px] text-slate-400">
                     Next:
@@ -291,7 +297,7 @@
                     type="text"
                     inputmode="numeric"
                     maxlength="6"
-                    placeholder="000560"
+                    placeholder="{{ $this->nextReceiptNumber }}"
                     class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:border-[#0B2A5B] focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
                 >
 
@@ -300,6 +306,12 @@
                         {{ $message }}
                     </p>
                 @enderror
+
+                @if ($receiptNumberExists && ! $errors->has('receipt_number'))
+                    <p class="mt-1 text-xs font-semibold text-red-600">
+                        ⚠ This receipt number has already been issued.
+                    </p>
+                @endif
 
                 <p class="mt-1 text-[10px] text-slate-400">
                     Next:
@@ -626,7 +638,7 @@
         // ======================================================
         // POLICY NUMBER FORMAT
         // Expected:
-        // TRI-00001-TS2026-00001
+        // TRI-00550-TS2026-550
         // ======================================================
 
         const policyMatch = policy.match(
@@ -638,7 +650,7 @@
             await Swal.fire({
                 icon: 'error',
                 title: 'Invalid Policy Number',
-                text: `The policy number must use the format TRI-00001-TS${year}-00001.`
+                text: `The policy number must use the format TRI-00550-TS${year}-550.`
             });
 
             policyInput?.focus();
@@ -793,7 +805,48 @@
 
         try {
 
-            await $wire.checkActivationNumberDuplicates();
+            // Sync the typed values to the server FIRST — wire:model.live is
+            // debounced, so a fast Approve click would otherwise run the
+            // duplicate check against stale input and miss a duplicate.
+            $wire.policy_number = policy;
+            $wire.receipt_number = receipt;
+
+            const duplicates = await $wire.checkActivationNumberDuplicates();
+
+            // Prefer the call's return value; the property reads are a
+            // fallback for an older deployment of the component class.
+            const policyExists = duplicates?.policy ?? $wire.policyNumberExists;
+            const receiptExists = duplicates?.receipt ?? $wire.receiptNumberExists;
+
+            if (policyExists) {
+
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Duplicate Policy Number',
+                    text:
+                        'This policy number has already been used. ' +
+                        'Please enter or generate another policy number.'
+                });
+
+                policyInput?.focus();
+
+                return false;
+            }
+
+            if (receiptExists) {
+
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Duplicate Receipt Number',
+                    text:
+                        'This receipt number has already been issued. ' +
+                        'Please enter or generate another receipt number.'
+                });
+
+                receiptInput?.focus();
+
+                return false;
+            }
 
         } catch (error) {
 
@@ -807,44 +860,6 @@
                 title: 'Validation Error',
                 text: 'Unable to verify the policy and receipt numbers. Please try again.'
             });
-
-            return false;
-        }
-
-        // ======================================================
-        // DUPLICATE POLICY NUMBER
-        // ======================================================
-
-        if ($wire.policyNumberExists) {
-
-            await Swal.fire({
-                icon: 'error',
-                title: 'Duplicate Policy Number',
-                text:
-                    'This policy number has already been used. ' +
-                    'Please enter or generate another policy number.'
-            });
-
-            policyInput?.focus();
-
-            return false;
-        }
-
-        // ======================================================
-        // DUPLICATE RECEIPT NUMBER
-        // ======================================================
-
-        if ($wire.receiptNumberExists) {
-
-            await Swal.fire({
-                icon: 'error',
-                title: 'Duplicate Receipt Number',
-                text:
-                    'This receipt number has already been issued. ' +
-                    'Please enter or generate another receipt number.'
-            });
-
-            receiptInput?.focus();
 
             return false;
         }

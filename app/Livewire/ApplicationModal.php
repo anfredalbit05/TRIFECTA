@@ -140,15 +140,9 @@ class ApplicationModal extends Component
     #[Computed]
 public function previewPolicyNumber(): string
 {
-    $year = now()->year;
-    $next = $this->latestPolicySequence() + 1;
-
-    return sprintf(
-        'TRI-%05d-TS%d-%d',
-        $next,
-        $year,
-        $next
-    );
+    // Single source of truth on the model: scans BOTH the activations and
+    // users tables and starts the series at TRI-00550-TS2026-550.
+    return Activation::nextPolicyNumber();
 }
 
     public function generatePolicyNumber(): void
@@ -1147,38 +1141,6 @@ public function previewPolicyNumber(): string
     }
 
     /**
- * Get the highest policy sequence currently stored in the database.
- *
- * Example:
- * TRI-00557-TS2026-557
- * returns 557.
- */
-private function latestPolicySequence(): int
-{
-    $year = now()->year;
-
-    $policyNumbers = User::query()
-        ->whereNotNull('policy_number')
-        ->where('policy_number', 'like', 'TRI-%-TS'.$year.'-%')
-        ->pluck('policy_number');
-
-    $highest = 0;
-
-    foreach ($policyNumbers as $policyNumber) {
-        if (preg_match('/^TRI-(\d+)-TS\d{4}-(\d+)$/', $policyNumber, $matches)) {
-            $number = (int) $matches[2];
-
-            if ($number > $highest) {
-                $highest = $number;
-            }
-        }
-    }
-
-    return $highest;
-}
-
-
-/**
  * Validate a manually entered policy number.
  *
  * Rules:
@@ -1265,15 +1227,29 @@ private function validateManualPolicyNumber(): void
     }
 
     /*
-     * Get the latest sequence from the database.
+     * Get the latest sequence from the database (activations + users).
      *
      * Example:
      * latest = 557
      * next   = 558
      */
-    $latest = $this->latestPolicySequence();
+    $latest = Activation::latestPolicySequence();
 
-    $next = $latest + 1;
+    // The series STARTS at 550 — see Activation::FIRST_POLICY_SEQUENCE.
+    $next = max(Activation::FIRST_POLICY_SEQUENCE, $latest + 1);
+
+    /*
+     * The series starts at 550: nothing below it exists, so a lower
+     * number can never be a legitimate backlog number.
+     */
+    if ($sequence < Activation::FIRST_POLICY_SEQUENCE) {
+        throw ValidationException::withMessages([
+            'policy_number' =>
+                'Policy numbers start at '.
+                sprintf('TRI-%05d-TS%d-%d', Activation::FIRST_POLICY_SEQUENCE, $currentYear, Activation::FIRST_POLICY_SEQUENCE).
+                '. Numbers below '.Activation::FIRST_POLICY_SEQUENCE.' are not part of the series.',
+        ]);
+    }
 
     /*
      * Backlog numbers are allowed.

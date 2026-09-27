@@ -157,6 +157,69 @@ class Activation extends Model
 
     /*
     |--------------------------------------------------------------------------
+    | Policy Number Generation
+    |
+    | Sequential TRI-00550-TS2026-550 style numbers. The sequence STARTS at
+    | 550 when nothing has been issued yet, and continues from the HIGHEST
+    | sequence found in BOTH the activations and users tables (users gets a
+    | copy of the policy number on approval, so scanning only one table
+    | could reuse a number). Backlog numbers below the next number remain
+    | allowed as long as they are unused — same rule as receipt numbers.
+    |--------------------------------------------------------------------------
+    */
+
+    /** First policy sequence used when no TRI- number has been issued yet. */
+    public const FIRST_POLICY_SEQUENCE = 550;
+
+    /**
+     * The highest policy sequence issued for the current year, across the
+     * activations AND users tables. 0 when none has been issued yet.
+     */
+    public static function latestPolicySequence(): int
+    {
+        $year = now()->year;
+        $highest = 0;
+
+        $tables = [
+            static::query()->select('policy_number'),
+            User::query()->select('policy_number'),
+        ];
+
+        foreach ($tables as $table) {
+            foreach ($table
+                ->whereNotNull('policy_number')
+                ->where('policy_number', 'like', 'TRI-%-TS'.$year.'-%')
+                ->pluck('policy_number') as $policyNumber) {
+                if (preg_match('/^TRI-(\d+)-TS\d{4}-(\d+)$/', (string) $policyNumber, $matches)) {
+                    // The first and final numbers must match anyway; take the
+                    // larger of the two so a malformed legacy row can never
+                    // make the sequence repeat a number.
+                    $sequence = max((int) $matches[1], (int) $matches[2]);
+
+                    if ($sequence > $highest) {
+                        $highest = $sequence;
+                    }
+                }
+            }
+        }
+
+        return $highest;
+    }
+
+    /**
+     * The next policy number to be generated, e.g. TRI-00551-TS2026-551.
+     * Starts at TRI-00550-TS2026-550 when nothing has been issued yet.
+     */
+    public static function nextPolicyNumber(): string
+    {
+        $next = max(static::FIRST_POLICY_SEQUENCE, static::latestPolicySequence() + 1);
+        $year = now()->year;
+
+        return sprintf('TRI-%05d-TS%d-%d', $next, $year, $next);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Referral / Upline User
     |--------------------------------------------------------------------------
     */

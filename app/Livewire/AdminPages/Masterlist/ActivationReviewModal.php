@@ -133,87 +133,73 @@ class ActivationReviewModal extends Component
         $this->open = true;
     }
 
-    public function checkActivationNumberDuplicates(): void
+    public function checkActivationNumberDuplicates(): array
 {
     if (! $this->activation) {
         $this->policyNumberExists = false;
         $this->receiptNumberExists = false;
-        return;
+
+        return ['policy' => false, 'receipt' => false];
     }
 
     $policy = strtoupper(trim($this->policy_number));
     $receipt = trim($this->receipt_number);
 
+    // Same TRIM/UPPER matching as approve(), so stored numbers with different
+    // casing or stray whitespace are still caught as duplicates.
     $this->policyNumberExists = $policy !== ''
-        && Activation::where('policy_number', $policy)
+        && Activation::whereRaw('UPPER(TRIM(policy_number)) = ?', [$policy])
             ->where('ActivationID', '!=', $this->activation->ActivationID)
             ->exists();
 
     $this->receiptNumberExists = $receipt !== ''
-        && Activation::where('receipt_number', $receipt)
+        && Activation::whereRaw('TRIM(receipt_number) = ?', [$receipt])
             ->where('ActivationID', '!=', $this->activation->ActivationID)
             ->exists();
+
+    return [
+        'policy' => $this->policyNumberExists,
+        'receipt' => $this->receiptNumberExists,
+    ];
 }
+
+/** Live duplicate feedback while the admin types (drives the inline warnings). */
+public function updatedPolicyNumber(): void
+{
+    $this->checkActivationNumberDuplicates();
+}
+
+public function updatedReceiptNumber(): void
+{
+    $this->checkActivationNumberDuplicates();
+}
+
 
 public function generatePolicyNumber(): void
 {
-    $nextSequence = $this->getNextPolicySequence();
-
-    $this->policy_number = sprintf(
-        'TRI-%05d-TS%d-%05d',
-        $nextSequence,
-        now()->year,
-        $nextSequence
-    );
+    // Single source of truth on the model: scans BOTH the activations and
+    // users tables and starts the series at TRI-00550-TS2026-550.
+    $this->policy_number = Activation::nextPolicyNumber();
 
     $this->resetValidation('policy_number');
+
+    // Refresh the inline duplicate warnings for the generated value.
+    $this->checkActivationNumberDuplicates();
 }
 
 public function getNextPolicyNumberProperty(): string
 {
-    $sequence = $this->getNextPolicySequence();
-
-    return sprintf(
-        'TRI-%05d-TS%d-%05d',
-        $sequence,
-        now()->year,
-        $sequence
-    );
+    return Activation::nextPolicyNumber();
 }
 
 private function getNextPolicySequence(): int
 {
-    $currentYear = now()->year;
-
-    $policies = Activation::query()
-        ->whereNotNull('policy_number')
-        ->where(
-            'policy_number',
-            'like',
-            'TRI-%-TS' . $currentYear . '-%'
-        )
-        ->pluck('policy_number');
-
-    $highestSequence = 0;
-
-    foreach ($policies as $policy) {
-        if (preg_match(
-            '/^TRI-(\d+)-TS\d{4}-(\d+)$/',
-            $policy,
-            $matches
-        )) {
-            $firstSequence = (int) $matches[1];
-            $finalSequence = (int) $matches[2];
-
-            $highestSequence = max(
-                $highestSequence,
-                $firstSequence,
-                $finalSequence
-            );
-        }
-    }
-
-    return $highestSequence + 1;
+    // The next sequence the series may use: one past the highest issued
+    // number across activations + users, starting at 550.
+    return max(
+        Activation::FIRST_POLICY_SEQUENCE,
+        Activation::latestPolicySequence() + 1
+    );
 }
 
 
@@ -475,6 +461,9 @@ public function getNextReceiptNumberProperty(): string
     );
 
     $this->resetValidation('receipt_number');
+
+    // Refresh the inline duplicate warnings for the generated value.
+    $this->checkActivationNumberDuplicates();
 }
 
 private function showApprovalValidationError(string $message): void
@@ -575,9 +564,9 @@ public function getNextPolicySequenceForJsProperty(): int
                 'The policy number is required.',
 
             'policy_number.regex' =>
-                "The policy number must use the format TRI-00001-TS" .
+                "The policy number must use the format TRI-00550-TS" .
                 now()->year .
-                "-00001.",
+                "-550.",
 
             'receipt_number.required' =>
                 'The receipt number is required.',

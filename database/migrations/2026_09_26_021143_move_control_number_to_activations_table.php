@@ -17,20 +17,26 @@ return new class extends Migration
             $table->string('control_number', 50)->nullable()->after('status');
         });
 
-        // Carry over any control numbers already saved on users
-        DB::statement('
-            UPDATE activations a
-            INNER JOIN users u ON u.UserID = a.UserID
-            SET a.control_number = u.control_number
-            WHERE u.control_number IS NOT NULL
-              AND a.status = "Approved"
-              AND a.ActivationID = (
-                  SELECT MAX(a2.ActivationID)
-                  FROM activations a2
-                  WHERE a2.UserID = a.UserID
-                    AND a2.status = "Approved"
-              )
-        ');
+        // Carry over any control numbers already saved on users.
+        // Written as a PHP loop (not UPDATE ... INNER JOIN) so the migration
+        // runs on every driver MySQL supports in testing (SQLite) too.
+        $controlByUser = DB::table('users')
+            ->whereNotNull('control_number')
+            ->pluck('control_number', 'UserID');
+
+        foreach ($controlByUser as $userID => $controlNumber) {
+            $latestApproved = DB::table('activations')
+                ->where('UserID', $userID)
+                ->where('status', 'Approved')
+                ->orderByDesc('ActivationID')
+                ->value('ActivationID');
+
+            if ($latestApproved) {
+                DB::table('activations')
+                    ->where('ActivationID', $latestApproved)
+                    ->update(['control_number' => $controlNumber]);
+            }
+        }
 
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('control_number');
@@ -43,18 +49,18 @@ return new class extends Migration
             $table->string('control_number', 50)->nullable()->after('policy_number');
         });
 
-        DB::statement('
-            UPDATE users u
-            INNER JOIN activations a ON a.UserID = u.UserID
-            SET u.control_number = a.control_number
-            WHERE a.control_number IS NOT NULL
-              AND a.ActivationID = (
-                  SELECT MAX(a2.ActivationID)
-                  FROM activations a2
-                  WHERE a2.UserID = u.UserID
-                    AND a2.control_number IS NOT NULL
-              )
-        ');
+        // Copy the newest control number per user back onto users.
+        $controlPerUser = DB::table('activations')
+            ->whereNotNull('control_number')
+            ->orderByDesc('ActivationID')
+            ->get(['UserID', 'control_number'])
+            ->unique('UserID');
+
+        foreach ($controlPerUser as $row) {
+            DB::table('users')
+                ->where('UserID', $row->UserID)
+                ->update(['control_number' => $row->control_number]);
+        }
 
         Schema::table('activations', function (Blueprint $table) {
             $table->dropColumn('control_number');
