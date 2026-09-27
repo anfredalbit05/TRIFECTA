@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Illuminate\Validation\ValidationException;
+
 
 class ActivationReviewModal extends Component
 {
@@ -43,6 +45,16 @@ class ActivationReviewModal extends Component
     public bool $paymayaConvenienceFeeEnabled = false;
 
     public float $totalMembershipFeesCost = 0.00;
+
+
+    public string $policy_number = '';
+
+    public string $receipt_number = '';
+
+    public bool $policyNumberExists = false;
+    public bool $receiptNumberExists = false;
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -85,6 +97,14 @@ class ActivationReviewModal extends Component
             ->latest('ActivationID')
             ->first();
 
+            /*
+            |--------------------------------------------------------------------------
+            | Load Policy / Receipt Numbers
+            |--------------------------------------------------------------------------
+            */
+            $this->policy_number = (string) ($this->activation?->policy_number ?? '');
+            $this->receipt_number = (string) ($this->activation?->receipt_number ?? '');
+
         /*
         |--------------------------------------------------------------------------
         | Load Referral User
@@ -112,6 +132,101 @@ class ActivationReviewModal extends Component
 
         $this->open = true;
     }
+
+    public function checkActivationNumberDuplicates(): void
+{
+    if (! $this->activation) {
+        $this->policyNumberExists = false;
+        $this->receiptNumberExists = false;
+        return;
+    }
+
+    $policy = strtoupper(trim($this->policy_number));
+    $receipt = trim($this->receipt_number);
+
+    $this->policyNumberExists = $policy !== ''
+        && Activation::where('policy_number', $policy)
+            ->where('ActivationID', '!=', $this->activation->ActivationID)
+            ->exists();
+
+    $this->receiptNumberExists = $receipt !== ''
+        && Activation::where('receipt_number', $receipt)
+            ->where('ActivationID', '!=', $this->activation->ActivationID)
+            ->exists();
+}
+
+public function generatePolicyNumber(): void
+{
+    $nextSequence = $this->getNextPolicySequence();
+
+    $this->policy_number = sprintf(
+        'TRI-%05d-TS%d-%05d',
+        $nextSequence,
+        now()->year,
+        $nextSequence
+    );
+
+    $this->resetValidation('policy_number');
+}
+
+public function getNextPolicyNumberProperty(): string
+{
+    $sequence = $this->getNextPolicySequence();
+
+    return sprintf(
+        'TRI-%05d-TS%d-%05d',
+        $sequence,
+        now()->year,
+        $sequence
+    );
+}
+
+private function getNextPolicySequence(): int
+{
+    $currentYear = now()->year;
+
+    $policies = Activation::query()
+        ->whereNotNull('policy_number')
+        ->where(
+            'policy_number',
+            'like',
+            'TRI-%-TS' . $currentYear . '-%'
+        )
+        ->pluck('policy_number');
+
+    $highestSequence = 0;
+
+    foreach ($policies as $policy) {
+        if (preg_match(
+            '/^TRI-(\d+)-TS\d{4}-(\d+)$/',
+            $policy,
+            $matches
+        )) {
+            $firstSequence = (int) $matches[1];
+            $finalSequence = (int) $matches[2];
+
+            $highestSequence = max(
+                $highestSequence,
+                $firstSequence,
+                $finalSequence
+            );
+        }
+    }
+
+    return $highestSequence + 1;
+}
+
+
+public function getNextReceiptNumberProperty(): string
+{
+    return str_pad(
+        (string) Activation::nextReceiptNumber(),
+        6,
+        '0',
+        STR_PAD_LEFT
+    );
+}
+
 
     /*
     |--------------------------------------------------------------------------
@@ -348,33 +463,340 @@ class ActivationReviewModal extends Component
     }
     */
 
+    public function generateReceiptNumber(): void
+{
+    $nextReceiptNumber = (int) Activation::nextReceiptNumber();
+
+    $this->receipt_number = str_pad(
+        (string) $nextReceiptNumber,
+        6,
+        '0',
+        STR_PAD_LEFT
+    );
+
+    $this->resetValidation('receipt_number');
+}
+
+private function showApprovalValidationError(string $message): void
+{
+    $this->dispatch(
+        'swal:error',
+        title: 'Cannot Approve Activation',
+        message: $message
+    );
+}
+
+public function getNextPolicySequenceForJsProperty(): int
+{
+    return $this->getNextPolicySequence();
+}
+
     public function approve(): void
     {
-        // 1. Guard Clauses (Check missing properties & prevent double-approval)
-        if (! $this->activation || ! $this->selectedUserID) {
-            Log::warning('Approval failed: Activation or selected user ID is missing.');
+       // ==========================================================
+    // GUARD CLAUSES
+    // ==========================================================
 
-            return;
-        }
+    if (! $this->activation || ! $this->selectedUserID) {
+        Log::warning(
+            'Approval failed: Activation or selected user ID is missing.'
+        );
 
-        if ($this->activation->status === 'Approved') {
-            Log::warning('Approval aborted: Activation is already approved.', [
+        $this->showApprovalValidationError(
+            'The activation request could not be found. Please close this window and try again.'
+        );
+
+        return;
+    }
+
+    // Refresh the activation from database so we validate
+    // against the latest status/data.
+    $this->activation = Activation::find(
+        $this->activation->ActivationID
+    );
+
+    if (! $this->activation) {
+        $this->showApprovalValidationError(
+            'The activation request could not be found.'
+        );
+
+        return;
+    }
+
+    if ($this->activation->status === 'Approved') {
+        Log::warning(
+            'Approval aborted: Activation is already approved.',
+            [
                 'activation_id' => $this->activation->ActivationID,
-            ]);
+            ]
+        );
 
-            return;
-        }
+        $this->showApprovalValidationError(
+            'This activation has already been approved.'
+        );
 
-        $this->loadPaymentSettings();
+        return;
+    }
 
-        /** @var User|null $activatedUser */
-        $activatedUser = null;
+    $this->loadPaymentSettings();
 
-        // Total Membership Fees (MF) Cost for the Activation
-        // $totalAmount = (float) MembershipFee::sum('Cost');
+    // ==========================================================
+    // NORMALIZE INPUT
+    // ==========================================================
 
-        // 2. Atomic Database Operations (Database Changes Only)
-        DB::transaction(function () use (&$activatedUser) {
+    $this->policy_number = strtoupper(
+        trim($this->policy_number)
+    );
+
+    $this->receipt_number = trim(
+        $this->receipt_number
+    );
+
+    // ==========================================================
+    // BASIC REQUIRED / FORMAT VALIDATION
+    // ==========================================================
+
+    try {
+        $this->validate([
+            'policy_number' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^TRI-\d+-TS\d{4}-\d+$/',
+            ],
+
+            'receipt_number' => [
+                'required',
+                'string',
+                'regex:/^\d{6}$/',
+            ],
+        ], [
+            'policy_number.required' =>
+                'The policy number is required.',
+
+            'policy_number.regex' =>
+                "The policy number must use the format TRI-00001-TS" .
+                now()->year .
+                "-00001.",
+
+            'receipt_number.required' =>
+                'The receipt number is required.',
+
+            'receipt_number.regex' =>
+                'The receipt number must contain exactly 6 digits.',
+        ]);
+    } catch (ValidationException $e) {
+
+        $errors = $e->validator->errors()->all();
+
+        $message = $errors[0]
+            ?? 'Please correct the required fields before approving.';
+
+        $this->showApprovalValidationError($message);
+
+        return;
+    }
+
+    // ==========================================================
+    // PARSE POLICY NUMBER
+    // ==========================================================
+
+    if (! preg_match(
+        '/^TRI-(\d+)-TS(\d{4})-(\d+)$/',
+        $this->policy_number,
+        $matches
+    )) {
+        $this->addError(
+            'policy_number',
+            'The policy number format is invalid.'
+        );
+
+        $this->showApprovalValidationError(
+            'The policy number format is invalid.'
+        );
+
+        return;
+    }
+
+    $policyFirstSequence = (int) $matches[1];
+    $policyYear = (int) $matches[2];
+    $policyFinalSequence = (int) $matches[3];
+
+    $currentYear = now()->year;
+
+    // ==========================================================
+    // POLICY YEAR
+    // ==========================================================
+
+    if ($policyYear !== $currentYear) {
+
+        $message =
+            "The policy number must use the current year {$currentYear}.";
+
+        $this->addError(
+            'policy_number',
+            $message
+        );
+
+        $this->showApprovalValidationError($message);
+
+        return;
+    }
+
+    // ==========================================================
+    // POLICY SEQUENCES MUST MATCH
+    // ==========================================================
+
+    if ($policyFirstSequence !== $policyFinalSequence) {
+
+        $message =
+            'The first and last sequence numbers of the policy number must match.';
+
+        $this->addError(
+            'policy_number',
+            'The policy number sequence must match.'
+        );
+
+        $this->showApprovalValidationError($message);
+
+        return;
+    }
+
+    // ==========================================================
+    // DUPLICATE POLICY NUMBER
+    // ==========================================================
+
+$policyExists = Activation::query()
+    ->whereRaw(
+        'UPPER(TRIM(policy_number)) = ?',
+        [strtoupper(trim($this->policy_number))]
+    )
+    ->where(
+        'ActivationID',
+        '!=',
+        $this->activation->ActivationID
+    )
+    ->exists();
+
+if ($policyExists) {
+    $message = 'This policy number has already been used.';
+
+    $this->addError('policy_number', $message);
+
+    $this->dispatch(
+        'swal:error',
+        title: 'Cannot Approve Activation',
+        message: $message
+    );
+
+    return;
+}
+
+    // ==========================================================
+    // POLICY NUMBER CANNOT JUMP AHEAD
+    // ==========================================================
+
+    $nextPolicySequence = $this->getNextPolicySequence();
+
+    if ($policyFirstSequence > $nextPolicySequence) {
+
+        $formattedNextPolicy = str_pad(
+            $nextPolicySequence,
+            5,
+            '0',
+            STR_PAD_LEFT
+        );
+
+        $message =
+            "The policy number cannot jump ahead. " .
+            "The next available sequence is {$formattedNextPolicy}.";
+
+        $this->addError(
+            'policy_number',
+            $message
+        );
+
+        $this->showApprovalValidationError($message);
+
+        return;
+    }
+
+    // ==========================================================
+    // RECEIPT NUMBER BASIC VALIDATION
+    // ==========================================================
+
+    $receiptNumber = (int) $this->receipt_number;
+
+    // ==========================================================
+    // DUPLICATE RECEIPT NUMBER
+    // ==========================================================
+
+$receiptExists = Activation::query()
+    ->whereRaw(
+        'TRIM(receipt_number) = ?',
+        [trim($this->receipt_number)]
+    )
+    ->where(
+        'ActivationID',
+        '!=',
+        $this->activation->ActivationID
+    )
+    ->exists();
+
+   if ($receiptExists) {
+    $message = 'This receipt number has already been issued.';
+
+    $this->addError('receipt_number', $message);
+
+    $this->dispatch(
+        'swal:error',
+        title: 'Cannot Approve Activation',
+        message: $message
+    );
+
+    return;
+}
+
+    // ==========================================================
+    // RECEIPT NUMBER CANNOT JUMP AHEAD
+    // ==========================================================
+
+    $nextReceiptNumber = (int) Activation::nextReceiptNumber();
+
+    if ($receiptNumber > $nextReceiptNumber) {
+
+        $formattedNextReceipt = str_pad(
+            $nextReceiptNumber,
+            6,
+            '0',
+            STR_PAD_LEFT
+        );
+
+        $message =
+            "The receipt number cannot jump ahead. " .
+            "The next available receipt number is {$formattedNextReceipt}.";
+
+        $this->addError(
+            'receipt_number',
+            $message
+        );
+
+        $this->showApprovalValidationError($message);
+
+        return;
+    }
+
+    // ==========================================================
+    // EVERYTHING IS VALID
+    // ==========================================================
+
+    // Only after ALL validation passes do we continue
+    // with the actual approval transaction.
+    /** @var User|null $activatedUser */
+    $activatedUser = null;
+
+    DB::transaction(function () use (&$activatedUser) {
+
 
             Log::info('Starting approval transaction for ActivationID: '.$this->activation->ActivationID);
 
@@ -383,11 +805,9 @@ class ActivationReviewModal extends Component
             // can't collide on the same number).
             $this->activation->update([
                 'status' => 'Approved',
-                'receipt_number' => Activation::nextReceiptNumber(),
+                'policy_number' => $this->policy_number,
+                'receipt_number' => $this->receipt_number,
 
-                // Snapshot the cashier identity from the settings table at
-                // approval time, so the receipt is reproducible later even
-                // if the settings change.
                 'cashier_name' => Setting::where('name', 'cashier_name')->value('value'),
                 'cashier_signature' => Setting::where('name', 'cashier_signature')->value('value'),
             ]);
@@ -770,6 +1190,9 @@ class ActivationReviewModal extends Component
         $this->referralUser = null;
         $this->beneficiaries = [];
         $this->remarks = '';
+
+        $this->policy_number = '';
+        $this->receipt_number = '';
     }
 
     public function render()

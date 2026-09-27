@@ -108,81 +108,217 @@
                         </div>
                     </section>
 
-                    {{-- ================================================= --}}
-                    {{-- ACTIVATION INFORMATION --}}
-                    {{-- ================================================= --}}
-                    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <div class="bg-[#0B2A5B] px-5 py-3">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
-                                Activation Information
-                            </h3>
-                        </div>
+{{-- ================================================= --}}
+{{-- ACTIVATION INFORMATION --}}
+{{-- ================================================= --}}
+<section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-                        <div class="grid grid-cols-1 gap-5 p-5 sm:grid-cols-2 lg:grid-cols-3">
-                            {{-- ACTIVATION ID --}}
-                            <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                    Activation ID
-                                </p>
-                                <p class="mt-1 font-bold text-slate-800">
-                                    #{{ $activation?->ActivationID }}
-                                </p>
-                            </div>
+    {{-- HEADER --}}
+    <div class="bg-[#0B2A5B] px-5 py-3">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+            Activation Information
+        </h3>
+    </div>
 
-                            {{-- AMOUNT --}}
-                            <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                    Amount
-                                </p>
-                                <p class="mt-1 text-lg font-extrabold text-emerald-600">
-                                    ₱{{ number_format($activation?->amount ?? 0, 2) }}
-                                </p>
-                            </div>
+    {{-- CONTENT --}}
+    <div class="space-y-5 p-5">
 
-                            {{-- PAYMENT METHOD --}}
-                            <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                    Payment Method
-                                </p>
-                                <p class="mt-1 font-bold text-slate-800">
-                                    {{ $activation?->payment_method ?? '-' }}
-                                </p>
-                            </div>
+        {{-- BASIC INFORMATION --}}
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
 
-                            {{-- ACTIVATION TYPE --}}
-                            <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                    Activation Type
-                                </p>
-                                <p class="mt-1 font-bold text-slate-800">
-                                    {{ $activation?->type === 'W' ? 'Walk-in' : ($activation?->type ? 'Online' : '-') }}
-                                </p>
-                            </div>
+            {{-- ACTIVATION ID --}}
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Activation ID
+                </p>
 
-                            {{-- PAYMENT REFERENCE --}}
-                            <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                    Payment Reference
-                                </p>
-                                <p class="mt-1 break-all font-bold text-slate-800">
-                                    {{ $activation?->payment_reference ?? 'Cash Payment' }}
-                                </p>
-                            </div>
+                <p class="mt-1 font-bold text-slate-800">
+                    #{{ $activation?->ActivationID ?? '-' }}
+                </p>
+            </div>
 
-                            {{-- REQUEST STATUS --}}
-                            <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                    Request Status
-                                </p>
-                                <div class="mt-2">
-                                    <span
-                                        class="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
-                                        {{ $activation?->status ?? 'Pending' }}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+
+            {{-- AMOUNT --}}
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Amount
+                </p>
+
+                <p class="mt-1 text-lg font-extrabold text-emerald-600">
+                    ₱{{ number_format($activation?->amount ?? 0, 2) }}
+                </p>
+            </div>
+
+
+            {{-- PAYMENT METHOD --}}
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Payment Method
+                </p>
+
+                <p class="mt-1 font-bold text-slate-800">
+                    {{ $activation?->payment_method ?? '-' }}
+                </p>
+            </div>
+
+
+            {{-- ACTIVATION TYPE --}}
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Activation Type
+                </p>
+
+                <p class="mt-1 font-bold text-slate-800">
+                    {{ $activation?->type === 'W'
+                        ? 'Walk-in'
+                        : ($activation?->type ? 'Online' : '-') }}
+                </p>
+            </div>
+
+
+            {{-- PAYMENT REFERENCE --}}
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Payment Reference
+                </p>
+
+                <p class="mt-1 break-all font-bold text-slate-800">
+                    {{ $activation?->payment_reference ?? 'Cash Payment' }}
+                </p>
+            </div>
+
+
+            {{-- REQUEST STATUS --}}
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Request Status
+                </p>
+
+                <div class="mt-2">
+                    @php
+                        $status = $activation?->status ?? 'Pending';
+
+                        $statusClass = match (strtolower($status)) {
+                            'approved' => 'bg-emerald-100 text-emerald-700',
+                            'rejected' => 'bg-red-100 text-red-700',
+                            'cancelled' => 'bg-slate-200 text-slate-700',
+                            default => 'bg-amber-100 text-amber-700',
+                        };
+                    @endphp
+
+                    <span class="inline-flex rounded-full px-3 py-1 text-xs font-bold {{ $statusClass }}">
+                        {{ $status }}
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+
+        {{-- POLICY + RECEIPT --}}
+        <div class="grid grid-cols-1 gap-5 border-t border-slate-100 pt-5 lg:grid-cols-2">
+
+            {{-- POLICY NUMBER --}}
+            <div>
+                <div class="mb-1.5 flex items-center justify-between gap-2">
+
+                    <label class="text-xs font-bold text-slate-700">
+                        Policy Number
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    <button
+                        type="button"
+                        wire:click="generatePolicyNumber"
+                        class="rounded-lg bg-[#0B2A5B] px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-blue-800"
+                    >
+                        Generate
+                    </button>
+
+                </div>
+
+                <input
+                    id="policy-number-input"
+                    wire:model.live="policy_number"
+                    type="text"
+                    maxlength="100"
+                    placeholder="TRI-00001-TS2026-00001"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm uppercase focus:border-[#0B2A5B] focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+                >
+
+                @error('policy_number')
+                    <p class="mt-1 text-xs font-semibold text-red-600">
+                        {{ $message }}
+                    </p>
+                @enderror
+
+                <p class="mt-1 text-[10px] text-slate-400">
+                    Next:
+                    <span
+                        id="next-policy-number"
+                        data-sequence="{{ $this->nextPolicySequenceForJs }}"
+                        class="font-bold text-slate-600"
+                    >
+                        {{ $this->nextPolicyNumber }}
+                    </span>
+                    — backlog numbers below this are allowed if unused.
+                </p>
+            </div>
+
+
+            {{-- RECEIPT NUMBER --}}
+            <div>
+                <div class="mb-1.5 flex items-center justify-between gap-2">
+
+                    <label class="text-xs font-bold text-slate-700">
+                        Receipt Number
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    <button
+                        type="button"
+                        wire:click="generateReceiptNumber"
+                        class="rounded-lg bg-[#0B2A5B] px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-blue-800"
+                    >
+                        Generate
+                    </button>
+
+                </div>
+
+                <input
+                    id="receipt-number-input"
+                    wire:model.live="receipt_number"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="6"
+                    placeholder="000560"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:border-[#0B2A5B] focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+                >
+
+                @error('receipt_number')
+                    <p class="mt-1 text-xs font-semibold text-red-600">
+                        {{ $message }}
+                    </p>
+                @enderror
+
+                <p class="mt-1 text-[10px] text-slate-400">
+                    Next:
+                    <span
+                        id="next-receipt-number"
+                        data-sequence="{{ (int) $this->nextReceiptNumber }}"
+                        class="font-bold text-slate-600"
+                    >
+                        {{ $this->nextReceiptNumber }}
+                    </span>
+                    — backlog numbers below this are allowed if unused.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
 
                     {{-- ================================================= --}}
                     {{-- PAYMENT BREAKDOWN --}}
@@ -425,13 +561,13 @@
                         </button>
 
                         {{-- APPROVE --}}
-                        <button
-                            type="button"
-                            wire:loading.attr="disabled"
-                            wire:target="approve"
-                            onclick="openActivationApproveAlert()"
-                            class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
-                        >
+                     <button
+    type="button"
+    wire:loading.attr="disabled"
+    wire:target="approve"
+    x-on:click="openActivationApproveAlert()"
+    class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+>
                             <span wire:loading.remove wire:target="approve">
                                 Approve Activation
                             </span>
@@ -446,41 +582,395 @@
         </div>
     @endif
 
-    @script
-    <script>
-        /* Uses the shared SwalFlow API from the shared sweet-alert-handler component */
 
-        window.openActivationApproveAlert = function () {
-            SwalFlow.confirm({
-                title: 'Approve Activation?',
-                html: 'This will activate the member account and send email notifications.<br><br>Type <strong>APPROVE</strong> to confirm.',
-                icon: 'question',
-                requireConfirmWord: 'APPROVE',
-                confirmText: 'Yes, APPROVE!',
-                loadingTitle: 'Approving activation...',
-                loadingText: 'Sending emails and updating records.',
-            }, () => $wire.approve());
-        };
+@script
+<script>
+    // ==========================================================
+    // VALIDATE POLICY + RECEIPT BEFORE APPROVAL
+    // ==========================================================
 
-        window.openActivationRejectAlert = function () {
-            SwalFlow.prompt({
-                title: 'Reject Activation?',
-                icon: 'warning',
-                input: 'textarea',
-                inputLabel: 'Rejection remarks',
-                inputPlaceholder: 'Enter the reason for rejection...',
-                maxLength: 1000,
-                rows: 5,
-                required: true,
-                requiredMessage: 'Remarks are required.',
-                confirmText: 'Reject',
-                loadingTitle: 'Rejecting activation...',
-                loadingText: 'Sending email and updating records.',
-            }, (value) => {
-                $wire.set('remarks', value);
-                $wire.rejectActivation();
+    window.validateActivationNumbersBeforeApprove = async function () {
+
+        const policyInput = document.getElementById('policy-number-input');
+        const receiptInput = document.getElementById('receipt-number-input');
+
+        const policy = policyInput?.value?.trim().toUpperCase() ?? '';
+        const receipt = receiptInput?.value?.trim() ?? '';
+
+        const year = new Date().getFullYear();
+
+        console.log('==========================================');
+        console.log('Approve validation started');
+        console.log('Policy:', policy);
+        console.log('Receipt:', receipt);
+        console.log('Current year:', year);
+        console.log('==========================================');
+
+        // ======================================================
+        // POLICY NUMBER REQUIRED
+        // ======================================================
+
+        if (!policy) {
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Policy Number Required',
+                text: 'Please enter or generate a policy number.'
             });
-        };
-    </script>
-    @endscript
+
+            policyInput?.focus();
+
+            return false;
+        }
+
+        // ======================================================
+        // POLICY NUMBER FORMAT
+        // Expected:
+        // TRI-00001-TS2026-00001
+        // ======================================================
+
+        const policyMatch = policy.match(
+            /^TRI-(\d+)-TS(\d{4})-(\d+)$/
+        );
+
+        if (!policyMatch) {
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Invalid Policy Number',
+                text: `The policy number must use the format TRI-00001-TS${year}-00001.`
+            });
+
+            policyInput?.focus();
+
+            return false;
+        }
+
+        const firstSequence = parseInt(policyMatch[1], 10);
+        const policyYear = parseInt(policyMatch[2], 10);
+        const finalSequence = parseInt(policyMatch[3], 10);
+
+        const nextPolicyElement =
+            document.getElementById('next-policy-number');
+
+        const nextPolicy = parseInt(
+            nextPolicyElement?.dataset.sequence ?? '0',
+            10
+        );
+
+        console.log('First policy sequence:', firstSequence);
+        console.log('Policy year:', policyYear);
+        console.log('Final policy sequence:', finalSequence);
+        console.log('Next available policy sequence:', nextPolicy);
+
+        // ======================================================
+        // POLICY YEAR
+        // ======================================================
+
+        if (policyYear !== year) {
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Invalid Policy Year',
+                text: `The policy number must use the current year ${year}.`
+            });
+
+            policyInput?.focus();
+
+            return false;
+        }
+
+        // ======================================================
+        // POLICY SEQUENCES MUST MATCH
+        // ======================================================
+
+        if (firstSequence !== finalSequence) {
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Invalid Policy Number',
+                text: 'The first and last sequence numbers of the policy number must match.'
+            });
+
+            policyInput?.focus();
+
+            return false;
+        }
+
+        // ======================================================
+        // POLICY CANNOT JUMP AHEAD
+        // ======================================================
+
+        if (firstSequence > nextPolicy) {
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Invalid Policy Number',
+                text:
+                    `The policy number cannot jump ahead. ` +
+                    `The next available sequence is ` +
+                    `${String(nextPolicy).padStart(5, '0')}.`
+            });
+
+            policyInput?.focus();
+
+            return false;
+        }
+
+        // ======================================================
+        // RECEIPT NUMBER REQUIRED
+        // ======================================================
+
+        if (!receipt) {
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Receipt Number Required',
+                text: 'Please enter or generate a receipt number.'
+            });
+
+            receiptInput?.focus();
+
+            return false;
+        }
+
+        // ======================================================
+        // RECEIPT FORMAT
+        // Exactly 6 digits
+        // ======================================================
+
+        if (!/^\d{6}$/.test(receipt)) {
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Invalid Receipt Number',
+                text: 'The receipt number must contain exactly 6 digits.'
+            });
+
+            receiptInput?.focus();
+
+            return false;
+        }
+
+        const receiptSequence = parseInt(receipt, 10);
+
+        const nextReceiptElement =
+            document.getElementById('next-receipt-number');
+
+        const nextReceipt = parseInt(
+            nextReceiptElement?.dataset.sequence ?? '0',
+            10
+        );
+
+        console.log('Receipt sequence:', receiptSequence);
+        console.log('Next available receipt sequence:', nextReceipt);
+
+        // ======================================================
+        // RECEIPT CANNOT JUMP AHEAD
+        // ======================================================
+
+        if (receiptSequence > nextReceipt) {
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Invalid Receipt Number',
+                text:
+                    `The receipt number cannot jump ahead. ` +
+                    `The next available receipt number is ` +
+                    `${String(nextReceipt).padStart(6, '0')}.`
+            });
+
+            receiptInput?.focus();
+
+            return false;
+        }
+
+        // ======================================================
+        // CHECK DATABASE DUPLICATES
+        // ======================================================
+
+        console.log('Checking duplicate policy/receipt numbers...');
+
+        try {
+
+            await $wire.checkActivationNumberDuplicates();
+
+        } catch (error) {
+
+            console.error(
+                'Duplicate validation failed:',
+                error
+            );
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Unable to verify the policy and receipt numbers. Please try again.'
+            });
+
+            return false;
+        }
+
+        // ======================================================
+        // DUPLICATE POLICY NUMBER
+        // ======================================================
+
+        if ($wire.policyNumberExists) {
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Duplicate Policy Number',
+                text:
+                    'This policy number has already been used. ' +
+                    'Please enter or generate another policy number.'
+            });
+
+            policyInput?.focus();
+
+            return false;
+        }
+
+        // ======================================================
+        // DUPLICATE RECEIPT NUMBER
+        // ======================================================
+
+        if ($wire.receiptNumberExists) {
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Duplicate Receipt Number',
+                text:
+                    'This receipt number has already been issued. ' +
+                    'Please enter or generate another receipt number.'
+            });
+
+            receiptInput?.focus();
+
+            return false;
+        }
+
+        // ======================================================
+        // ALL VALIDATIONS PASSED
+        // ======================================================
+
+        console.log('==========================================');
+        console.log('Approve validation PASSED');
+        console.log('==========================================');
+
+        return true;
+    };
+
+
+    // ==========================================================
+    // APPROVE CONFIRMATION
+    // ==========================================================
+
+    window.openActivationApproveAlert = async function () {
+
+        console.log('Approve button clicked');
+
+        // IMPORTANT:
+        // Validation is async, so we MUST await it.
+        const isValid =
+            await window.validateActivationNumbersBeforeApprove();
+
+        // Stop immediately if validation failed.
+        if (!isValid) {
+
+            console.log(
+                'Approval blocked by validation'
+            );
+
+            return;
+        }
+
+        console.log(
+            'Validation passed. Opening approval confirmation.'
+        );
+
+        // ======================================================
+        // APPROVE CONFIRMATION
+        // ======================================================
+
+        const result = await Swal.fire({
+
+            title: 'Approve Activation?',
+
+            html: `
+                <div style="text-align:center">
+                    This will activate the member account
+                    and send email notifications.
+
+                    <br><br>
+
+                    Type <strong>APPROVE</strong> to confirm.
+                </div>
+            `,
+
+            icon: 'question',
+
+            input: 'text',
+
+            inputPlaceholder: 'Type APPROVE',
+
+            inputAttributes: {
+                autocomplete: 'off',
+                autocapitalize: 'characters',
+                spellcheck: 'false'
+            },
+
+            showCancelButton: true,
+
+            confirmButtonText: 'Yes, APPROVE!',
+
+            cancelButtonText: 'Cancel',
+
+            confirmButtonColor: '#0B2A5B',
+
+            allowOutsideClick: false,
+
+            allowEscapeKey: true,
+
+            preConfirm: (value) => {
+
+                if (value !== 'APPROVE') {
+
+                    Swal.showValidationMessage(
+                        'Please type APPROVE exactly to continue.'
+                    );
+
+                    return false;
+                }
+
+                return true;
+            }
+        });
+
+        // ======================================================
+        // USER CANCELLED
+        // ======================================================
+
+        if (!result.isConfirmed) {
+
+            console.log(
+                'Approval confirmation cancelled.'
+            );
+
+            return;
+        }
+
+        // ======================================================
+        // FINAL APPROVAL
+        // ======================================================
+
+        console.log(
+            'APPROVE confirmed. Calling Livewire approve().'
+        );
+
+        await $wire.approve();
+    };
+</script>
+@endscript
+
+
 </div>

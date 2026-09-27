@@ -329,536 +329,194 @@
                          2. POLICY INFORMATION
                     ================================================== --}}
                     @if ($isEditMode)
-                        <div class="space-y-4">
-                            <div
-                                class="flex items-center justify-between rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
-                                <div>
-                                    <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
-                                        Policy Information
-                                    </h3>
-                                    <p
-                                        class="mt-0.5 text-[10px] font-normal normal-case tracking-normal text-slate-200">
-                                        Membership policy details and expiration information.
-                                    </p>
-                                </div>
-                            </div>
+    <div class="space-y-4">
 
-                            <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2 lg:grid-cols-2">
+        {{-- HEADER --}}
+        <div class="flex items-center justify-between rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
+            <div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
+                    Policy Information
+                </h3>
+                <p class="mt-0.5 text-[10px] text-slate-200">
+                    Membership policy details and expiration information.
+                </p>
+            </div>
+        </div>
 
-                                {{-- POLICY NUMBER --}}
-                            <div>
-                                <label class="mb-1 block text-xs font-bold text-slate-700">
-                                    Policy Number
-                                </label>
+        <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2">
 
-                                @if (filled($policy_number))
-                                    {{-- Already generated/issued — read-only display --}}
-                                    <div
-                                        class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700">
-                                        <span>{{ $policy_number }}</span>
+           {{-- POLICY NUMBER --}}
+<div>
+    <label class="mb-1 block text-xs font-bold text-slate-700">
+        Policy Number
+    </label>
 
-                                        <span class="text-[10px] font-bold uppercase tracking-wide text-emerald-600">
-                                            ✓ Issued
-                                        </span>
-                                    </div>
+    <div class="flex gap-2">
+        <input
+            wire:model.live="policy_number"
+            type="text"
+            maxlength="20"
+            placeholder="{{ $this->previewPolicyNumber }}"
+            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+        >
 
-                                @else
-                                    {{-- No policy number yet — Generate button + editable field --}}
-                                    <div class="flex gap-2">
-                                        <input
-                                            wire:model.live="policy_number"
-                                            type="text"
-                                            placeholder="{{ $this->previewPolicyNumber }}"
-                                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
-                                        >
+        <button
+            type="button"
+            wire:click="generatePolicyNumber"
+            class="shrink-0 rounded-xl bg-[#0B2A5B] px-3 py-2 text-xs font-bold text-white hover:bg-[#123c88]"
+        >
+            Generate
+        </button>
+    </div>
 
-                                        <button
-                                            type="button"
-                                            wire:click="generatePolicyNumber"
-                                            title="Generate the next policy number based on the last issued"
-                                            class="shrink-0 rounded-xl bg-[#0B2A5B] px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123c88]"
-                                        >
-                                            Generate
-                                        </button>
-                                    </div>
+    {{-- LAST ISSUED POLICY NUMBER --}}
+    @if (filled($issuedPolicyNumber))
+        <div class="mt-1 flex items-center gap-2">
+            <span class="text-[10px] font-bold uppercase tracking-wide text-emerald-600">
+                ✓ Issued: {{ $issuedPolicyNumber }}
+            </span>
+        </div>
+    @endif
 
-                                    <p class="mt-1 text-[10px] text-slate-400">
-                                        Next available:
-                                        <span class="font-bold text-slate-600">
-                                            {{ $this->previewPolicyNumber }}
-                                        </span>
-                                        — click Generate to use it.
-                                    </p>
-                                @endif
-                            </div>
+    @error('policy_number')
+        <p class="mt-1 text-xs font-semibold text-red-600">
+            {{ $message }}
+        </p>
+    @enderror
 
-                                {{-- RECEIPT NUMBER (acknowledgement receipt, lives on the APPROVED activation) --}}
-                                <div>
-                                    <label class="mb-1 block text-xs font-bold text-slate-700">
-                                        Receipt Number
-                                    </label>
-
-                                    @if (filled($activationControlNumber))
-                                        {{-- Already issued — read-only display --}}
-                                        <div
-                                            class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700">
-                                            <span>{{ $activationControlNumber }}</span>
-                                            <span class="text-[10px] font-bold uppercase tracking-wide text-emerald-600">
-                                                ✓ Issued
-                                            </span>
-                                        </div>
-                                    @elseif ($activationId)
-                                        {{-- Approved activation without a number — Generate button + editable field.
-                                             The placeholder/hint previews the REAL next number, so clicking
-                                             Generate fills exactly what the hint shows. --}}
-                                        <div class="flex gap-2">
-                                            <input wire:model.live="receipt_number" type="text"
-                                                placeholder="{{ $this->previewControlNumber }}"
-                                                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
-                                            <button type="button" wire:click="generateControlNumber"
-                                                title="Generate the next receipt number based on the last issued"
-                                                class="shrink-0 rounded-xl bg-[#0B2A5B] px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123c88]">
-                                                Generate
-                                            </button>
-                                        </div>
-                                        <p class="mt-1 text-[10px] text-slate-400">
-                                            Next available: <span class="font-bold text-slate-600">{{ $this->previewControlNumber }}</span> — click Generate to use it.
-                                        </p>
-
-                                    @else
-                                        {{-- No approved activation — nothing to attach a number to --}}
-                                        <div
-                                            class="w-full rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-400">
-                                            No approved activation yet
-                                        </div>
-                                    @endif
-                                </div>
-
-                                {{-- POLICY EFFECTIVITY DATE (calendar picker, same as Birthdate) --}}
-                                <div wire:key="policy-effectivity-picker-{{ $userId ?? 'new' }}"
-                                    x-data="{
-                                        openPicker: false,
-                                        step: 'year',
-                                        selectedYear: '{{ now()->year }}',
-                                        selectedMonth: '01',
-                                        selectedDay: '01',
-                                        years: Array.from({ length: 50 },
-                                            (_, i) => new Date().getFullYear() + 25 - i
-                                        ),
-                                        months: [
-                                            { name: 'January', val: '01' },
-                                            { name: 'February', val: '02' },
-                                            { name: 'March', val: '03' },
-                                            { name: 'April', val: '04' },
-                                            { name: 'May', val: '05' },
-                                            { name: 'June', val: '06' },
-                                            { name: 'July', val: '07' },
-                                            { name: 'August', val: '08' },
-                                            { name: 'September', val: '09' },
-                                            { name: 'October', val: '10' },
-                                            { name: 'November', val: '11' },
-                                            { name: 'December', val: '12' }
-                                        ],
-                                        get daysInMonth() {
-                                            return Array.from({
-                                                    length: new Date(
-                                                        Number(this.selectedYear),
-                                                        Number(this.selectedMonth),
-                                                        0
-                                                    ).getDate()
-                                                },
-                                                (_, i) => String(i + 1).padStart(2, '0')
-                                            );
-                                        },
-                                        get formattedDate() {
-                                            return `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
-                                        },
-                                        init() {
-                                            this.$watch('$wire.policy_effectivity_date', (value) => {
-                                                if (!value || typeof value !== 'string') {
-                                                    return;
-                                                }
-                                                const parts = value.split('-');
-                                                if (parts.length === 3) {
-                                                    this.selectedYear = parts[0];
-                                                    this.selectedMonth = parts[1];
-                                                    this.selectedDay = parts[2];
-                                                }
-                                            });
-                                            if (this.$wire.policy_effectivity_date) {
-                                                const parts = this.$wire.policy_effectivity_date.split('-');
-                                                if (parts.length === 3) {
-                                                    this.selectedYear = parts[0];
-                                                    this.selectedMonth = parts[1];
-                                                    this.selectedDay = parts[2];
-                                                }
-                                            }
-                                        },
-                                        selectYear(year) {
-                                            this.selectedYear = String(year);
-                                            this.step = 'month';
-                                        },
-                                        selectMonth(month) {
-                                            this.selectedMonth = month;
-                                            const maxDays = new Date(
-                                                Number(this.selectedYear),
-                                                Number(this.selectedMonth),
-                                                0
-                                            ).getDate();
-                                            if (Number(this.selectedDay) > maxDays) {
-                                                this.selectedDay = String(maxDays).padStart(2, '0');
-                                            }
-                                            this.step = 'day';
-                                        },
-                                        selectDay(day) {
-                                            this.selectedDay = day;
-                                        },
-                                        confirmDate() {
-                                            const formatted =
-                                                `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
-                                            @this.set('policy_effectivity_date', formatted);
-                                            this.openPicker = false;
-                                            this.step = 'year';
-                                        }
-                                    }" class="relative">
-                                    <label class="mb-1 block text-xs font-bold text-slate-700">
-                                        Policy Effectivity Date
-                                    </label>
-                                    <button type="button" @click="openPicker = true"
-                                        class="flex w-full items-center justify-between rounded-xl border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-700 transition hover:border-[#0B2A5B] focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
-                                        <span x-text="$wire.policy_effectivity_date || 'Select Effectivity Date'"
-                                            :class="!$wire.policy_effectivity_date ? 'text-slate-400' : 'text-slate-700'">
-                                        </span>
-                                        <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                            </path>
-                                        </svg>
-                                    </button>
-
-                                    <div x-show="openPicker" x-cloak x-transition.opacity
-                                        class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-                                        <div @click.stop
-                                            class="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
-
-                                            <div class="bg-[#E8B923] p-5 text-[#0B2A5B]">
-                                                <span
-                                                    class="text-[10px] font-bold uppercase tracking-widest opacity-80">
-                                                    Select Policy Effectivity Date
-                                                </span>
-                                                <h2 class="mt-1 text-xl font-extrabold" x-text="formattedDate">
-                                                </h2>
-                                                <div class="mt-3 flex gap-3 text-xs font-bold">
-                                                    <button type="button" @click="step = 'year'"
-                                                        :class="step === 'year' ? 'underline opacity-100' : 'opacity-60'">Year</button>
-                                                    <span>/</span>
-                                                    <button type="button" @click="step = 'month'"
-                                                        :class="step === 'month' ? 'underline opacity-100' : 'opacity-60'">Month</button>
-                                                    <span>/</span>
-                                                    <button type="button" @click="step = 'day'"
-                                                        :class="step === 'day' ? 'underline opacity-100' : 'opacity-60'">Day</button>
-                                                </div>
-                                            </div>
-
-                                            <div class="p-4">
-                                                <div x-show="step === 'year'">
-                                                    <div
-                                                        class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
-                                                        <span>Select Year</span>
-                                                        <button type="button" @click="step = 'month'"
-                                                            class="text-[#0B2A5B] hover:underline">Next: Month
-                                                            &rarr;</button>
-                                                    </div>
-                                                    <div
-                                                        class="grid h-64 grid-cols-3 gap-2 overflow-y-auto pr-1 text-center">
-                                                        <template x-for="yr in years" :key="yr">
-                                                            <button type="button" @click="selectYear(yr)"
-                                                                :class="String(selectedYear) === String(yr) ?
-                                                                    'bg-[#0B2A5B] text-white font-bold' :
-                                                                    'bg-slate-50 text-slate-700 hover:bg-slate-100'"
-                                                                class="rounded-lg py-2.5 text-sm transition"
-                                                                x-text="yr"></button>
-                                                        </template>
-                                                    </div>
-                                                </div>
-
-                                                <div x-show="step === 'month'">
-                                                    <div
-                                                        class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
-                                                        <button type="button" @click="step = 'year'"
-                                                            class="hover:underline">&larr; Back</button>
-                                                        <span>Select Month</span>
-                                                        <button type="button" @click="step = 'day'"
-                                                            class="text-[#0B2A5B] hover:underline">Next: Day
-                                                            &rarr;</button>
-                                                    </div>
-                                                    <div
-                                                        class="grid h-64 grid-cols-2 gap-2 overflow-y-auto pr-1 text-center">
-                                                        <template x-for="month in months" :key="month.val">
-                                                            <button type="button" @click="selectMonth(month.val)"
-                                                                :class="selectedMonth === month.val ?
-                                                                    'bg-[#0B2A5B] text-white font-bold' :
-                                                                    'bg-slate-50 text-slate-700 hover:bg-slate-100'"
-                                                                class="rounded-lg py-3 text-sm transition"
-                                                                x-text="month.name"></button>
-                                                        </template>
-                                                    </div>
-                                                </div>
-
-                                                <div x-show="step === 'day'">
-                                                    <div
-                                                        class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
-                                                        <button type="button" @click="step = 'month'"
-                                                            class="hover:underline">&larr; Back</button>
-                                                        <span>Select Day</span>
-                                                        <span></span>
-                                                    </div>
-                                                    <div
-                                                        class="grid h-64 grid-cols-5 gap-2 overflow-y-auto pr-1 text-center">
-                                                        <template x-for="day in daysInMonth" :key="day">
-                                                            <button type="button" @click="selectDay(day)"
-                                                                :class="selectedDay === day ?
-                                                                    'bg-[#0B2A5B] text-white font-bold' :
-                                                                    'bg-slate-50 text-slate-700 hover:bg-slate-100'"
-                                                                class="rounded-lg py-2.5 text-sm transition"
-                                                                x-text="day"></button>
-                                                        </template>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div
-                                                class="flex items-center justify-between border-t bg-slate-50 px-5 py-3">
-                                                <button type="button" @click="openPicker = false; step = 'year';"
-                                                    class="rounded-lg px-4 py-2 text-xs font-bold text-slate-500 transition hover:bg-slate-200">Cancel</button>
-                                                <button type="button" @click="confirmDate()"
-                                                    class="rounded-lg bg-[#0B2A5B] px-6 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123b7a]">OK</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+    <p class="mt-1 text-[10px] text-slate-400">
+        Next:
+        <span class="font-bold text-slate-600">
+            {{ $this->previewPolicyNumber }}
+        </span>
+        — backlog numbers below this are allowed if unused.
+    </p>
+</div>
 
 
-                                {{-- POLICY EXPIRATION DATE (calendar picker, same as Birthdate) --}}
-                                <div wire:key="policy-expiration-picker-{{ $userId ?? 'new' }}"
-                                    x-data="{
-                                        openPicker: false,
-                                        step: 'year',
-                                        selectedYear: '{{ now()->year }}',
-                                        selectedMonth: '01',
-                                        selectedDay: '01',
-                                        years: Array.from({ length: 50 },
-                                            (_, i) => new Date().getFullYear() + 25 - i
-                                        ),
-                                        months: [
-                                            { name: 'January', val: '01' },
-                                            { name: 'February', val: '02' },
-                                            { name: 'March', val: '03' },
-                                            { name: 'April', val: '04' },
-                                            { name: 'May', val: '05' },
-                                            { name: 'June', val: '06' },
-                                            { name: 'July', val: '07' },
-                                            { name: 'August', val: '08' },
-                                            { name: 'September', val: '09' },
-                                            { name: 'October', val: '10' },
-                                            { name: 'November', val: '11' },
-                                            { name: 'December', val: '12' }
-                                        ],
-                                        get daysInMonth() {
-                                            return Array.from({
-                                                    length: new Date(
-                                                        Number(this.selectedYear),
-                                                        Number(this.selectedMonth),
-                                                        0
-                                                    ).getDate()
-                                                },
-                                                (_, i) => String(i + 1).padStart(2, '0')
-                                            );
-                                        },
-                                        get formattedDate() {
-                                            return `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
-                                        },
-                                        init() {
-                                            this.$watch('$wire.policy_expiration_date', (value) => {
-                                                if (!value || typeof value !== 'string') {
-                                                    return;
-                                                }
-                                                const parts = value.split('-');
-                                                if (parts.length === 3) {
-                                                    this.selectedYear = parts[0];
-                                                    this.selectedMonth = parts[1];
-                                                    this.selectedDay = parts[2];
-                                                }
-                                            });
-                                            if (this.$wire.policy_expiration_date) {
-                                                const parts = this.$wire.policy_expiration_date.split('-');
-                                                if (parts.length === 3) {
-                                                    this.selectedYear = parts[0];
-                                                    this.selectedMonth = parts[1];
-                                                    this.selectedDay = parts[2];
-                                                }
-                                            }
-                                        },
-                                        selectYear(year) {
-                                            this.selectedYear = String(year);
-                                            this.step = 'month';
-                                        },
-                                        selectMonth(month) {
-                                            this.selectedMonth = month;
-                                            const maxDays = new Date(
-                                                Number(this.selectedYear),
-                                                Number(this.selectedMonth),
-                                                0
-                                            ).getDate();
-                                            if (Number(this.selectedDay) > maxDays) {
-                                                this.selectedDay = String(maxDays).padStart(2, '0');
-                                            }
-                                            this.step = 'day';
-                                        },
-                                        selectDay(day) {
-                                            this.selectedDay = day;
-                                        },
-                                        confirmDate() {
-                                            const formatted =
-                                                `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
-                                            @this.set('policy_expiration_date', formatted);
-                                            this.openPicker = false;
-                                            this.step = 'year';
-                                        }
-                                    }" class="relative">
-                                    <label class="mb-1 block text-xs font-bold text-slate-700">
-                                        Policy Expiration Date
-                                    </label>
-                                    <button type="button" @click="openPicker = true"
-                                        class="flex w-full items-center justify-between rounded-xl border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-700 transition hover:border-[#0B2A5B] focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
-                                        <span x-text="$wire.policy_expiration_date || 'Select Expiration Date'"
-                                            :class="!$wire.policy_expiration_date ? 'text-slate-400' : 'text-slate-700'">
-                                        </span>
-                                        <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                            </path>
-                                        </svg>
-                                    </button>
+{{-- RECEIPT NUMBER --}}
+<div>
+    <label class="mb-1 block text-xs font-bold text-slate-700">
+        Receipt Number
+    </label>
 
-                                    <div x-show="openPicker" x-cloak x-transition.opacity
-                                        class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-                                        <div @click.stop
-                                            class="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+    @if ($activationId)
+        <div class="flex gap-2">
 
-                                            <div class="bg-[#E8B923] p-5 text-[#0B2A5B]">
-                                                <span
-                                                    class="text-[10px] font-bold uppercase tracking-widest opacity-80">
-                                                    Select Policy Expiration Date
-                                                </span>
-                                                <h2 class="mt-1 text-xl font-extrabold" x-text="formattedDate">
-                                                </h2>
-                                                <div class="mt-3 flex gap-3 text-xs font-bold">
-                                                    <button type="button" @click="step = 'year'"
-                                                        :class="step === 'year' ? 'underline opacity-100' : 'opacity-60'">Year</button>
-                                                    <span>/</span>
-                                                    <button type="button" @click="step = 'month'"
-                                                        :class="step === 'month' ? 'underline opacity-100' : 'opacity-60'">Month</button>
-                                                    <span>/</span>
-                                                    <button type="button" @click="step = 'day'"
-                                                        :class="step === 'day' ? 'underline opacity-100' : 'opacity-60'">Day</button>
-                                                </div>
-                                            </div>
+            <input
+                wire:model.live="receipt_number"
+                type="text"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="{{ $this->previewControlNumber }}"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+            >
 
-                                            <div class="p-4">
-                                                <div x-show="step === 'year'">
-                                                    <div
-                                                        class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
-                                                        <span>Select Year</span>
-                                                        <button type="button" @click="step = 'month'"
-                                                            class="text-[#0B2A5B] hover:underline">Next: Month
-                                                            &rarr;</button>
-                                                    </div>
-                                                    <div
-                                                        class="grid h-64 grid-cols-3 gap-2 overflow-y-auto pr-1 text-center">
-                                                        <template x-for="yr in years" :key="yr">
-                                                            <button type="button" @click="selectYear(yr)"
-                                                                :class="String(selectedYear) === String(yr) ?
-                                                                    'bg-[#0B2A5B] text-white font-bold' :
-                                                                    'bg-slate-50 text-slate-700 hover:bg-slate-100'"
-                                                                class="rounded-lg py-2.5 text-sm transition"
-                                                                x-text="yr"></button>
-                                                        </template>
-                                                    </div>
-                                                </div>
+            <button
+                type="button"
+                wire:click="generateControlNumber"
+                class="shrink-0 rounded-xl bg-[#0B2A5B] px-3 py-2 text-xs font-bold text-white hover:bg-[#123c88]"
+            >
+                Generate
+            </button>
+        </div>
 
-                                                <div x-show="step === 'month'">
-                                                    <div
-                                                        class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
-                                                        <button type="button" @click="step = 'year'"
-                                                            class="hover:underline">&larr; Back</button>
-                                                        <span>Select Month</span>
-                                                        <button type="button" @click="step = 'day'"
-                                                            class="text-[#0B2A5B] hover:underline">Next: Day
-                                                            &rarr;</button>
-                                                    </div>
-                                                    <div
-                                                        class="grid h-64 grid-cols-2 gap-2 overflow-y-auto pr-1 text-center">
-                                                        <template x-for="month in months" :key="month.val">
-                                                            <button type="button" @click="selectMonth(month.val)"
-                                                                :class="selectedMonth === month.val ?
-                                                                    'bg-[#0B2A5B] text-white font-bold' :
-                                                                    'bg-slate-50 text-slate-700 hover:bg-slate-100'"
-                                                                class="rounded-lg py-3 text-sm transition"
-                                                                x-text="month.name"></button>
-                                                        </template>
-                                                    </div>
-                                                </div>
+        {{-- LAST / CURRENTLY ISSUED RECEIPT --}}
+        @if (filled($activationControlNumber))
+            <div class="mt-1 flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wide text-emerald-600">
+                    ✓ Issued: {{ $activationControlNumber }}
+                </span>
+            </div>
+        @endif
 
-                                                <div x-show="step === 'day'">
-                                                    <div
-                                                        class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
-                                                        <button type="button" @click="step = 'month'"
-                                                            class="hover:underline">&larr; Back</button>
-                                                        <span>Select Day</span>
-                                                        <span></span>
-                                                    </div>
-                                                    <div
-                                                        class="grid h-64 grid-cols-5 gap-2 overflow-y-auto pr-1 text-center">
-                                                        <template x-for="day in daysInMonth" :key="day">
-                                                            <button type="button" @click="selectDay(day)"
-                                                                :class="selectedDay === day ?
-                                                                    'bg-[#0B2A5B] text-white font-bold' :
-                                                                    'bg-slate-50 text-slate-700 hover:bg-slate-100'"
-                                                                class="rounded-lg py-2.5 text-sm transition"
-                                                                x-text="day"></button>
-                                                        </template>
-                                                    </div>
-                                                </div>
-                                            </div>
+        @error('receipt_number')
+            <p class="mt-1 text-xs font-semibold text-red-600">
+                {{ $message }}
+            </p>
+        @enderror
 
-                                            <div
-                                                class="flex items-center justify-between border-t bg-slate-50 px-5 py-3">
-                                                <button type="button" @click="openPicker = false; step = 'year';"
-                                                    class="rounded-lg px-4 py-2 text-xs font-bold text-slate-500 transition hover:bg-slate-200">Cancel</button>
-                                                <button type="button" @click="confirmDate()"
-                                                    class="rounded-lg bg-[#0B2A5B] px-6 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123b7a]">OK</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            {{-- COCOGEN POLICY --}}
-                            <div>
-                                <label class="mb-1 block text-xs font-bold text-slate-700">
-                                    Cocogen Policy Number
-                                </label>
-                                <input wire:model.live="cocogen_policy_number" type="text"
-                                    placeholder="12345"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
-                            </div>
+        <p class="mt-1 text-[10px] text-slate-400">
+            Next:
+            <span class="font-bold text-slate-600">
+                {{ $this->previewControlNumber }}
+            </span>
+            — backlog numbers below this are allowed if unused.
+        </p>
+    @else
+        <div
+            class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-400">
+            No approved activation yet
+        </div>
+    @endif
+</div>
 
 
-                            </div>
-                        </div>
-                    @endif
+
+
+            {{-- POLICY EFFECTIVITY DATE --}}
+            <div>
+                <label class="mb-1 block text-xs font-bold text-slate-700">
+                    Policy Effectivity Date
+                </label>
+
+                <input
+                    wire:model.live="policy_effectivity_date"
+                    type="date"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+                >
+
+                @error('policy_effectivity_date')
+                    <p class="mt-1 text-xs font-semibold text-red-600">
+                        {{ $message }}
+                    </p>
+                @enderror
+            </div>
+
+
+            {{-- POLICY EXPIRATION DATE --}}
+            <div>
+                <label class="mb-1 block text-xs font-bold text-slate-700">
+                    Policy Expiration Date
+                </label>
+
+                <input
+                    wire:model.live="policy_expiration_date"
+                    type="date"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+                >
+
+                @error('policy_expiration_date')
+                    <p class="mt-1 text-xs font-semibold text-red-600">
+                        {{ $message }}
+                    </p>
+                @enderror
+            </div>
+
+
+            {{-- COCOGEN POLICY --}}
+            <div class="sm:col-span-2">
+                <label class="mb-1 block text-xs font-bold text-slate-700">
+                    Cocogen Policy Number
+                </label>
+
+                <input
+                    wire:model.live="cocogen_policy_number"
+                    type="text"
+                    placeholder="12345"
+                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+                >
+
+                @error('cocogen_policy_number')
+                    <p class="mt-1 text-xs font-semibold text-red-600">
+                        {{ $message }}
+                    </p>
+                @enderror
+            </div>
+
+        </div>
+    </div>
+@endif
 
                     {{-- =================================================
                          3. ADDRESS & LOCATION

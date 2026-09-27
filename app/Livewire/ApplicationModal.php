@@ -56,6 +56,8 @@ class ApplicationModal extends Component
 
     public $policy_number = null;
 
+    public $issuedPolicyNumber = null;
+
     public $policy_effectivity_date = null;
 
     public $policy_expiration_date = null;
@@ -136,45 +138,21 @@ class ApplicationModal extends Component
     }
 
     #[Computed]
-    public function previewPolicyNumber(): string
-    {
-        $year = now()->year;
+public function previewPolicyNumber(): string
+{
+    $year = now()->year;
+    $next = $this->latestPolicySequence() + 1;
 
-        $policyNumbers = User::query()
-            ->whereNotNull('policy_number')
-            ->where('policy_number', 'like', 'TRI-%-TS'.$year.'-%')
-            ->pluck('policy_number');
-
-        $highest = 0;
-
-        foreach ($policyNumbers as $policyNumber) {
-            if (preg_match('/^TRI-(\d+)-TS\d{4}-(\d+)$/', $policyNumber, $matches)) {
-                // Use the final sequence number.
-                $number = (int) $matches[2];
-
-                if ($number > $highest) {
-                    $highest = $number;
-                }
-            }
-        }
-
-        $next = $highest + 1;
-
-        return sprintf(
-            'TRI-%05d-TS%d-%d',
-            $next,
-            $year,
-            $next
-        );
-    }
+    return sprintf(
+        'TRI-%05d-TS%d-%d',
+        $next,
+        $year,
+        $next
+    );
+}
 
     public function generatePolicyNumber(): void
     {
-        // Don't overwrite an existing/generated value.
-        if (filled($this->policy_number)) {
-            return;
-        }
-
         // Recalculate from the database at the exact moment
         // the Generate button is clicked.
         $this->policy_number = $this->previewPolicyNumber;
@@ -397,6 +375,7 @@ class ApplicationModal extends Component
             'latitude',
             'longitude',
             'policy_number',
+            'issuedPolicyNumber',
             'policy_effectivity_date',
             'policy_expiration_date',
             'receipt_number',
@@ -452,6 +431,8 @@ class ApplicationModal extends Component
                 'password' => 'required|min:8|confirmed',
                 'agree' => 'accepted',
             ]);
+
+            $this->validateManualPolicyNumber();
 
             Log::info('=== VALIDATION PASSED SUCCESSFULLY ===');
 
@@ -873,6 +854,11 @@ class ApplicationModal extends Component
                 'receipt_number' => ['nullable', 'string', 'max:50', 'regex:/^\d{6}$/',
                     Rule::unique('activations', 'receipt_number')->ignore($this->activationId, 'ActivationID')],
             ]);
+
+            $this->validateManualPolicyNumber();
+            $this->validateManualReceiptNumber();
+
+
         } catch (ValidationException $e) {
             $errors = $e->validator->errors()->all();
 
@@ -1160,6 +1146,221 @@ class ApplicationModal extends Component
         return strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 6));
     }
 
+    /**
+ * Get the highest policy sequence currently stored in the database.
+ *
+ * Example:
+ * TRI-00557-TS2026-557
+ * returns 557.
+ */
+private function latestPolicySequence(): int
+{
+    $year = now()->year;
+
+    $policyNumbers = User::query()
+        ->whereNotNull('policy_number')
+        ->where('policy_number', 'like', 'TRI-%-TS'.$year.'-%')
+        ->pluck('policy_number');
+
+    $highest = 0;
+
+    foreach ($policyNumbers as $policyNumber) {
+        if (preg_match('/^TRI-(\d+)-TS\d{4}-(\d+)$/', $policyNumber, $matches)) {
+            $number = (int) $matches[2];
+
+            if ($number > $highest) {
+                $highest = $number;
+            }
+        }
+    }
+
+    return $highest;
+}
+
+
+/**
+ * Validate a manually entered policy number.
+ *
+ * Rules:
+ * - Must use the expected TRI format.
+ * - Must not already exist.
+ * - If manually entered, it cannot jump beyond the next number.
+ * - Backlog numbers below the current highest are allowed.
+ */
+private function validateManualPolicyNumber(): void
+{
+    if (blank($this->policy_number)) {
+        return;
+    }
+
+    $policyNumber = strtoupper(trim($this->policy_number));
+
+    if (! preg_match(
+        '/^TRI-(\d+)-TS(\d{4})-(\d+)$/',
+        $policyNumber,
+        $matches
+    )) {
+        throw ValidationException::withMessages([
+            'policy_number' =>
+                'Invalid policy number format. Expected format: TRI-00557-TS2026-557.',
+        ]);
+    }
+
+    /*
+     * Regex groups:
+     *
+     * TRI-(00500)-TS(2026)-(500)
+     *      [1]      [2]    [3]
+     */
+    $paddedSequence = (int) $matches[1];
+    $year = (int) $matches[2];
+    $sequence = (int) $matches[3];
+
+    $currentYear = now()->year;
+
+    /*
+     * Must use the current policy year.
+     */
+    if ($year !== $currentYear) {
+        throw ValidationException::withMessages([
+            'policy_number' =>
+                "The policy number must use the current year {$currentYear}.",
+        ]);
+    }
+
+    /*
+     * The padded number and final number must match.
+     *
+     * TRI-00500-TS2026-500
+     *      500              500
+     */
+    if ($paddedSequence !== $sequence) {
+        throw ValidationException::withMessages([
+            'policy_number' =>
+                'The policy number sequence is invalid. The numbers must match.',
+        ]);
+    }
+
+    /*
+     * Prevent duplicate policy numbers.
+     */
+    $duplicateQuery = User::where(
+        'policy_number',
+        $policyNumber
+    );
+
+    if ($this->userId) {
+        $duplicateQuery->where(
+            'UserID',
+            '!=',
+            $this->userId
+        );
+    }
+
+    if ($duplicateQuery->exists()) {
+        throw ValidationException::withMessages([
+            'policy_number' =>
+                "Policy number {$policyNumber} already exists.",
+        ]);
+    }
+
+    /*
+     * Get the latest sequence from the database.
+     *
+     * Example:
+     * latest = 557
+     * next   = 558
+     */
+    $latest = $this->latestPolicySequence();
+
+    $next = $latest + 1;
+
+    /*
+     * Backlog numbers are allowed.
+     *
+     * 500 -> allowed
+     * 550 -> allowed
+     * 556 -> allowed
+     * 557 -> allowed only if not duplicate
+     * 558 -> allowed
+     *
+     * 559 -> NOT allowed
+     */
+    if ($sequence > $next) {
+        throw ValidationException::withMessages([
+            'policy_number' =>
+                "Policy number {$policyNumber} cannot be used because it jumps ahead of the latest sequence. ".
+                "The next available policy number is ".
+                sprintf('TRI-%05d-TS%d-%d', $next, $currentYear, $next).
+                '.',
+        ]);
+    }
+
+    /*
+     * Normalize the value before saving.
+     *
+     * Example:
+     * TRI-500-TS2026-500
+     * becomes
+     * TRI-00500-TS2026-500
+     */
+    $this->policy_number = sprintf(
+        'TRI-%05d-TS%d-%d',
+        $sequence,
+        $year,
+        $sequence
+    );
+}
+
+private function validateManualReceiptNumber(): void
+{
+    if (blank($this->receipt_number)) {
+        return;
+    }
+
+    $receiptNumber = trim($this->receipt_number);
+
+    if (! preg_match('/^\d{6}$/', $receiptNumber)) {
+        throw ValidationException::withMessages([
+            'receipt_number' =>
+                'Receipt number must contain exactly 6 digits.',
+        ]);
+    }
+
+    $number = (int) $receiptNumber;
+
+    /*
+     * Duplicate check.
+     */
+    $duplicateQuery = Activation::where('receipt_number', $receiptNumber);
+
+    if ($this->activationId) {
+        $duplicateQuery->where('ActivationID', '!=', $this->activationId);
+    }
+
+    if ($duplicateQuery->exists()) {
+        throw ValidationException::withMessages([
+            'receipt_number' =>
+                "Receipt number {$receiptNumber} already exists.",
+        ]);
+    }
+
+    /*
+     * Activation::nextReceiptNumber() gives the next sequential
+     * available receipt number.
+     */
+    $nextReceipt = (int) Activation::nextReceiptNumber();
+
+    if ($number > $nextReceipt) {
+        throw ValidationException::withMessages([
+            'receipt_number' =>
+                "Receipt number {$receiptNumber} cannot be used because it jumps ahead of the latest sequence. ".
+                "The next available receipt number is ".str_pad($nextReceipt, 6, '0', STR_PAD_LEFT).
+                ". Please use Generate or enter a backlog number.",
+        ]);
+    }
+}
+
     /*
     |--------------------------------------------------------------------------
     | Render
@@ -1224,29 +1425,23 @@ class ApplicationModal extends Component
     }
 
     public function generateControlNumber(): void
-    {
-        if (! $this->activationId) {
-            $this->dispatch(
-                'validation-error',
-                title: 'No Approved Activation',
-                html: 'This member does not have an approved activation to attach a control number to.'
-            );
+{
+    if (! $this->activationId) {
+        $this->dispatch(
+            'validation-error',
+            title: 'No Approved Activation',
+            html: 'This member does not have an approved activation to attach a receipt number to.'
+        );
 
-            return;
-        }
-
-        if (filled($this->activationControlNumber)) {
-            $this->dispatch(
-                'validation-error',
-                title: 'Receipt Number Already Exists',
-                html: 'This member\'s approved activation already has control number <b>'.e($this->activationControlNumber).'</b>.'
-            );
-
-            return;
-        }
-
-        $this->receipt_number = Activation::nextReceiptNumber();
+        return;
     }
+
+    // Always calculate the next available receipt number.
+    // This works even when the current activation already has
+    // a receipt number, because the current activation is ignored
+    // by validateManualReceiptNumber().
+    $this->receipt_number = Activation::nextReceiptNumber();
+}
 
     #[On('open-update-member')]
     public function openEdit($UserID): void
@@ -1289,11 +1484,33 @@ class ApplicationModal extends Component
             ->first();
 
         $this->activationId = $approvedActivation?->ActivationID;
+
+        /*
+        |--------------------------------------------------------------------------
+        | RECEIPT NUMBER
+        |--------------------------------------------------------------------------
+        |
+        | Keep the issued receipt number separately so the green "Issued"
+        | indicator remains available even if the admin clears the input.
+        |
+        */
         $this->activationControlNumber = $approvedActivation?->receipt_number;
-        $this->receipt_number = null; // editable only when adding a missing one
+        $this->receipt_number = $approvedActivation?->receipt_number;
+
+        /*
+        |--------------------------------------------------------------------------
+        | POLICY NUMBER
+        |--------------------------------------------------------------------------
+        |
+        | Same behavior as receipt number:
+        | - input displays the currently issued policy number
+        | - issuedPolicyNumber keeps the last issued number as reference
+        |
+        */
+        $this->issuedPolicyNumber = $approvedActivation?->policy_number;
+        $this->policy_number = $approvedActivation?->policy_number ?: null;
 
         $this->cocogen_policy_number = $approvedActivation?->cocogen_policy_number;
-        $this->policy_number = $approvedActivation?->policy_number ?: null;
 
         $this->policy_effectivity_date = $approvedActivation?->policy_effectivity_date
             ? Carbon::parse($approvedActivation->policy_effectivity_date)->format('Y-m-d')
