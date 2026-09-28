@@ -76,4 +76,11 @@
   .sat-action {
     @apply flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-600 transition hover:bg-[#0C2C6B] hover:text-white;
   }
+
+  /* -- APPLY SATELLITE BUTTON --------------------------------------
+     Sits right of the tab bar; navy fill + amber hover, matching the
+     shared SatelliteModal wizard palette. */
+  .sat-apply-btn {
+    @apply flex shrink-0 cursor-pointer items-center gap-1 rounded-xl bg-[#0C2C6B] px-4 py-2.5 text-[13px] font-bold text-white shadow-[0_4px_12px_rgba(0,0,0,0.12)] transition duration-200 hover:bg-[#D79B10];
+  }
 }

@@ -205,7 +205,7 @@
 
                     <div class="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
 
-                        @if ($status === 'Active')
+                        @if ($status === 'Active' && $canDownload)
                             <a href="{{ route('admin.member.policy.download', $UserID) }}" target="_blank"
                                 class="flex w-full items-center justify-center gap-2 rounded-xl border border-[#0B2A5B] px-5 py-2.5 text-xs font-bold text-[#0B2A5B] shadow-sm transition hover:bg-[#0B2A5B]/5 sm:w-auto">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

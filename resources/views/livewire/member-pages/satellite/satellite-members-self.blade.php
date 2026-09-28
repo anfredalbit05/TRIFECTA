@@ -7,8 +7,8 @@
         </div>
     </div>
 
-    {{-- TAB NAV --}}
-    <div class="px-4 pt-4">
+    {{-- TAB NAV + APPLY ACTION --}}
+    <div class="px-4 pt-4 flex items-start justify-between gap-3">
         <div class="sat-tabs">
             <button type="button" wire:click="setTab('overview')"
                 class="sat-tab {{ $activeTab === 'overview' ? 'sat-tab--active' : '' }}">
@@ -23,6 +23,13 @@
                 @endif
             </button>
         </div>
+
+        {{-- Apply for a new satellite membership — opens the SAME
+             SatelliteModal wizard the admin Members page uses. --}}
+        <button type="button" wire:click="$dispatch('self-apply-satellite')"
+            class="sat-apply-btn" title="Apply for a new satellite membership">
+            ＋ Apply Satellite
+        </button>
     </div>
 
     {{-- ========================= MY SATELLITES ========================= --}}
@@ -63,7 +70,7 @@
                                             👁
                                         </button>
 
-                                        @if (in_array($satellite->activation_status, ['Pending', 'Rejected']))
+                                        @if ($satellite->activation_status === 'Pending')
                                             <button type="button"
                                                 wire:click="$dispatch('self-review-satellite', { userId: {{ $satellite->UserID }} })"
                                                 class="sat-action" title="Payment review">
@@ -101,6 +108,7 @@
                             <th>Amount</th>
                             <th>Status</th>
                             <th>Applied</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -120,10 +128,21 @@
                                     </span>
                                 </td>
                                 <td data-label="Applied">{{ $d->applied_at?->format('M d, Y') ?? '—' }}</td>
+
+                                {{-- View opens the SAME shared view modal the admin page uses --}}
+                                <td data-label="Actions">
+                                    <div class="flex gap-1">
+                                        <button type="button"
+                                            wire:click="$dispatch('self-view-satellite', { userId: {{ $d->user_id }} })"
+                                            class="sat-action" title="View">
+                                            👁
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="sat-empty">
+                                <td colspan="8" class="sat-empty">
                                     No satellite members have used your referral code as their upline yet.
                                 </td>
                             </tr>
@@ -137,8 +156,10 @@
     {{-- ============================================================ --}}
     {{-- SHARED MODALS — the SAME components the admin page mounts --}}
     {{-- ============================================================ --}}
-    <livewire:admin-pages.masterlist.satellite-members-components.satellite-members-edit />
     <livewire:admin-pages.masterlist.satellite-members-components.satellite-members-view />
     <livewire:admin-pages.masterlist.satellite-members-components.satellite-members-activation-review />
+
+    {{-- Apply wizard — the SAME component the admin Members page mounts --}}
+    <livewire:admin-pages.masterlist.members-components.satellite-modal />
 
 </div>

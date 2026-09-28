@@ -9,6 +9,7 @@ use App\Models\Activation;
 use App\Models\ActivationHistory;
 use App\Models\Ledger;
 use App\Models\MembershipFee;
+use App\Models\Privilege;
 use App\Models\Satellite;
 use App\Models\Setting;
 use App\Models\User;
@@ -39,6 +40,13 @@ class SatelliteMembersActivationReview extends Component
     public string $remarks = '';
 
     public bool $isRejecting = false;
+
+    /*
+    | True only when the signed-in user holds satellite-members update/delete
+    | privileges (admins). Members reviewing their OWN request can view the
+    | modal but never see or trigger the approve/reject actions.
+    */
+    public bool $isPrivileged = false;
 
     public bool $gcashConvenienceFeeEnabled = false;
 
@@ -74,11 +82,13 @@ class SatelliteMembersActivationReview extends Component
         ]);
 
         // =====================================================
-        // ONLY ROLE ID 8 IS ALLOWED
+        // ONLY ROLE ID 8 — OR THE OWNER REVIEWING THEIR OWN REQUEST
         // =====================================================
 
+        $isOwnerViewing = (int) $UserID === (int) Auth::id();
+
         $this->member = User::where('UserID', $UserID)
-            ->where('RoleID', 8)
+            ->when(! $isOwnerViewing, fn ($q) => $q->where('RoleID', 8))
             ->first();
 
         if (! $this->member) {
@@ -100,6 +110,19 @@ class SatelliteMembersActivationReview extends Component
 
             return;
         }
+
+        /*
+        | Approve/reject is an ADMIN decision on a SATELLITE MEMBER (RoleID 8).
+        | The owner (member) reviewing their own request gets a read-only modal;
+        | the buttons are also hidden in the blade.
+        */
+        $this->isPrivileged = (int) $this->member->RoleID === 8
+            && Auth::user()
+            && ((int) Auth::user()->RoleID === 1
+                || Privilege::where('RoleID', Auth::user()->RoleID)
+                    ->where('ModuleID', 2)
+                    ->where(fn ($q) => $q->where('can_update', 1)->orWhere('can_delete', 1))
+                    ->exists());
 
         // =====================================================
         // SET SELECTED USER
@@ -437,6 +460,23 @@ class SatelliteMembersActivationReview extends Component
 
     public function approve(): void
     {
+        /*
+        | Approve/reject is admin-only. A member reviewing their own request
+        | (opened via the member Satellite page) can never trigger this.
+        */
+        if (! $this->isPrivileged) {
+            Log::warning('Satellite approval blocked: user lacks satellite-members privileges.', [
+                'UserID' => Auth::id(),
+            ]);
+
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'Only administrators can approve satellite activations.',
+            ]);
+
+            return;
+        }
+
         if (! $this->activation || ! $this->selectedUserID) {
             Log::warning(
                 'Satellite approval failed: activation or selected user ID is missing.'
@@ -722,6 +762,22 @@ class SatelliteMembersActivationReview extends Component
 
     public function rejectActivation(): void
     {
+        /*
+        | Same admin-only gate as approve() — owners are read-only reviewers.
+        */
+        if (! $this->isPrivileged) {
+            Log::warning('Satellite rejection blocked: user lacks satellite-members privileges.', [
+                'UserID' => Auth::id(),
+            ]);
+
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'Only administrators can reject satellite activations.',
+            ]);
+
+            return;
+        }
+
         if ($this->isRejecting) {
             return;
         }
@@ -782,6 +838,8 @@ class SatelliteMembersActivationReview extends Component
     public function closeModal(): void
     {
         $this->open = false;
+
+        $this->isPrivileged = false;
 
         $this->selectedUserID = null;
 

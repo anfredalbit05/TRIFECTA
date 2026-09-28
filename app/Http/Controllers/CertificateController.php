@@ -52,9 +52,8 @@ class CertificateController extends Controller
      * data URI the PDF can overlay above the printed name.
      */
     /**
- * Convert a signature image with a white background into a transparent PNG.
- */
-
+     * Convert a signature image with a white background into a transparent PNG.
+     */
     private function signatureToTransparentDataUri(string $path): ?string
     {
         $contents = file_get_contents($path);
@@ -243,8 +242,17 @@ class CertificateController extends Controller
 
     public function adminDownload(Request $request, int $userId)
     {
-
-        abort_unless($this->callerHasReadPermission(Auth::user()), 403);
+        /*
+        | The member's own certificate is always downloadable by the
+        | member themselves (the shared satellite View modal links
+        | here); for everyone else the caller needs ModuleID 2 read
+        | privilege.
+        */
+        abort_unless(
+            (int) $userId === (int) Auth::id()
+                || $this->callerHasReadPermission(Auth::user()),
+            403
+        );
 
         $user = User::findOrFail($userId);
 

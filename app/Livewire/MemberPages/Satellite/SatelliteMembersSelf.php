@@ -120,8 +120,18 @@ class SatelliteMembersSelf extends Component
 
     /*
     |--------------------------------------------------------------------------
+    | Refresh after shared-modal actions (approve / reject) — the member
+    | page re-renders its tabs, counts and status pills automatically.
+    |--------------------------------------------------------------------------
+    */
+
+    #[On('members-refresh')]
+    public function refreshSelf(): void {}
+
+    /*
+    |--------------------------------------------------------------------------
     | Open the SHARED admin modals for rows this member owns.
-    | The Edit/View/Review components listen for these same events the admin
+    | The View/Review components listen for these same events the admin
     | page dispatches — no duplicate components needed.
     |--------------------------------------------------------------------------
     */
@@ -136,6 +146,22 @@ class SatelliteMembersSelf extends Component
     public function reviewSatellite(int $userId): void
     {
         $this->dispatch('open-satellite-activation-review', UserID: $userId);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Apply for a NEW satellite membership
+    |--------------------------------------------------------------------------
+    | Reuses the SAME SatelliteModal wizard the admin Members page uses
+    | (open-satellite-modal). It is pre-filled from the signed-in member's
+    | account, validates every step, and BLOCKS using the member's own
+    | referralCode as the upline code — identical rules to the admin flow.
+    |--------------------------------------------------------------------------
+    */
+    #[On('self-apply-satellite')]
+    public function applySatellite(): void
+    {
+        $this->dispatch('open-satellite-modal', UserID: Auth::id());
     }
 
     public function render()

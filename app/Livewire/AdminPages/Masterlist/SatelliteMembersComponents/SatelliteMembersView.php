@@ -2,18 +2,48 @@
 
 namespace App\Livewire\AdminPages\Masterlist\SatelliteMembersComponents;
 
-use App\Models\User;
-use Livewire\Component;
-use Livewire\Attributes\On;
 use App\Models\Activation;
 use App\Models\ActivationHistory;
+use App\Models\Privilege;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
+use Livewire\Component;
 
 class SatelliteMembersView extends Component
 {
     public bool $open = false;
 
     public ?int $UserID = null;
+
     public ?string $status = null;
+
+    /*
+    | True when the signed-in user is the record owner or holds ModuleID 2
+    | read privilege — only then are the Policy/Certificate download links
+    | rendered in the modal footer.
+    */
+    public bool $canDownload = false;
+
+    /**
+     * Mirrors ChecksMemberPermissions::callerHasReadPermission — kept local so
+     * the trait's other members never leak into this component.
+     */
+    protected function callerHasReadPermission($caller): bool
+    {
+        if (! $caller) {
+            return false;
+        }
+
+        if ((int) $caller->RoleID === 1) {
+            return true;
+        }
+
+        return Privilege::where('RoleID', $caller->RoleID)
+            ->where('ModuleID', 2)
+            ->where('can_read', 1)
+            ->exists();
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -21,13 +51,21 @@ class SatelliteMembersView extends Component
     |--------------------------------------------------------------------------
     */
     public $surname = '';
+
     public $first_name = '';
+
     public $middle_name = '';
+
     public $occupation = '';
+
     public $gender = '';
+
     public $civil_status = '';
+
     public $birthdate = '';
+
     public $referralCode = '';
+
     public $uplineCode = '';
 
     /*
@@ -36,7 +74,9 @@ class SatelliteMembersView extends Component
     |--------------------------------------------------------------------------
     */
     public $policy_number = '';
+
     public $policy_expiration_date = '';
+
     public $policy_effectivity_date = '';
 
     /*
@@ -45,7 +85,9 @@ class SatelliteMembersView extends Component
     |--------------------------------------------------------------------------
     */
     public $address = '';
+
     public $latitude = null;
+
     public $longitude = null;
 
     /*
@@ -54,7 +96,9 @@ class SatelliteMembersView extends Component
     |--------------------------------------------------------------------------
     */
     public $mobile = '';
+
     public $email = '';
+
     public $username = '';
 
     /*
@@ -63,7 +107,9 @@ class SatelliteMembersView extends Component
     |--------------------------------------------------------------------------
     */
     public ?string $activationStatus = null;
+
     public ?string $activationDate = null;
+
     public ?string $activationLabel = null;
 
     /*
@@ -81,17 +127,34 @@ class SatelliteMembersView extends Component
     #[On('open-satellite-member-view')]
     public function open($UserID): void
     {
+        /*
+        |--------------------------------------------------------------------------
+        | Role guard
+        |--------------------------------------------------------------------------
+        | Admins may only open satellite members (RoleID 8). The signed-in member
+        | may always open their OWN row — the member Satellite page reuses this
+        | modal, and their account is not RoleID 8.
+        |--------------------------------------------------------------------------
+        */
+
+        $isOwnerViewing = (int) $UserID === (int) Auth::id();
+
         $user = User::where('UserID', $UserID)
-            ->where('RoleID', 8)
+            ->when(! $isOwnerViewing, fn ($q) => $q->where('RoleID', 8))
             ->with('beneficiaries')
             ->first();
-
         if (! $user) {
             return;
         }
 
         $this->UserID = $user->UserID;
         $this->status = $user->status;
+
+        /*
+        | Downloads: the owner always can; admins need ModuleID 2 read.
+        */
+        $this->canDownload = (int) $user->UserID === (int) Auth::id()
+            || $this->callerHasReadPermission(Auth::user());
 
         $this->fillPersonalInfo($user);
         $this->fillPolicyInfo($user);
@@ -165,13 +228,14 @@ class SatelliteMembersView extends Component
     private function fillActivationInfo(User $user): void
     {
         $activation = Activation::where('UserID', $user->UserID)
-            ->latest()
+            ->latest('ActivationID')
             ->first();
 
-        if (!$activation) {
+        if (! $activation) {
             $this->activationStatus = null;
             $this->activationDate = null;
             $this->activationLabel = null;
+
             return;
         }
 
@@ -243,6 +307,7 @@ class SatelliteMembersView extends Component
         $this->reset();
 
         $this->open = false;
+        $this->canDownload = false;
     }
 
     /*
