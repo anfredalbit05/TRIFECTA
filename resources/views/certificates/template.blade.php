@@ -117,25 +117,25 @@ body{
 
 }
 
-.coverage-value{
 
+.coverage-value{
     position:absolute;
 
-    top:67.3%;
-
+    top:64.7%;
     left:66.4%;
 
     width:16.5%;
 
     font-size:14px;
-
     font-weight:bold;
-
     color:#000;
 
-    white-space:nowrap;
-
+    line-height:1.2;
+    white-space:normal;
+    text-align:left;
 }
+
+
 
 .valid-value{
 
