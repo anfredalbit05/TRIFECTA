@@ -79,7 +79,7 @@ body{
     /* Value line runs x470-700 (15% wide) — a 10.5px font keeps long
        TRI-xxxxx-TSxxxx-xx numbers on ONE line without wrapping. */
 
-    top:67.9%;
+    top:67.3%;
 
     /* Nudged right so the value clears the printed ":" colon. */
 
@@ -87,7 +87,7 @@ body{
 
     width:15.5%;
 
-    font-size:10.5px;
+    font-size:14px;
 
     font-weight:bold;
 
@@ -101,13 +101,13 @@ body{
 
     position:absolute;
 
-    top:71.5%;
+    top:70.5%;
 
     left:calc(31% + 1px);
 
     width:15%;
 
-    font-size:10.5px;
+    font-size:14px;
 
     font-weight:bold;
 
@@ -121,13 +121,13 @@ body{
 
     position:absolute;
 
-    top:67.9%;
+    top:67.3%;
 
     left:66.4%;
 
     width:16.5%;
 
-    font-size:10.5px;
+    font-size:14px;
 
     font-weight:bold;
 
@@ -141,13 +141,13 @@ body{
 
     position:absolute;
 
-    top:71.6%;
+    top:70.5%;
 
     left:calc(66.3% + 1px);
 
     width:16.6%;
 
-    font-size:10.5px;
+    font-size:14px;
 
     font-weight:bold;
 
