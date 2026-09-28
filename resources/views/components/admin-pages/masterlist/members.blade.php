@@ -64,7 +64,7 @@
             <input
                 type="text"
                 wire:model.live.debounce.300ms="search"
-                placeholder="Search by fullname or username..."
+                placeholder="Search by fullname, username, receipt, cocogen, policy"
             >
 
         </div>

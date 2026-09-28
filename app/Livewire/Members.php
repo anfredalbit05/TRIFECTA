@@ -203,15 +203,21 @@ class Members extends Component
                     $query->where('status', 'Expired');
                 },
             ])
-            ->when(filled($this->search), function ($query) {
-                $search = trim($this->search);
-                $query->where(function ($q) use ($search) {
-                    $q->where('firstname', 'like', "%{$search}%")
-                        ->orWhere('middlename', 'like', "%{$search}%")
-                        ->orWhere('lastname', 'like', "%{$search}%")
-                        ->orWhere('username', 'like', "%{$search}%");
-                });
-            })
+                ->when(filled($this->search), function ($query) {
+                    $search = trim($this->search);
+
+                    $query->where(function ($q) use ($search) {
+                        $q->where('firstname', 'like', "%{$search}%")
+                            ->orWhere('middlename', 'like', "%{$search}%")
+                            ->orWhere('lastname', 'like', "%{$search}%")
+                            ->orWhere('username', 'like', "%{$search}%")
+                            ->orWhereHas('activations', function ($activation) use ($search) {
+                                $activation->where('policy_number', 'like', "%{$search}%")
+                                    ->orWhere('receipt_number', 'like', "%{$search}%")
+                                    ->orWhere('cocogen_policy_number', 'like', "%{$search}%");
+                            });
+                    });
+                })
             ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
                 $query->whereBetween('created_at', [
                     Carbon::parse($dateFrom)->startOfDay(),
