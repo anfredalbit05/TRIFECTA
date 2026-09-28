@@ -1205,21 +1205,39 @@ private function validateManualPolicyNumber(): void
 
     /*
      * Prevent duplicate policy numbers.
+     *
+     * The number can live in TWO places: the users table (copied on
+     * approval / set on creation) and the activations table (the edit
+     * form writes it there). Check BOTH so an edit can never assign a
+     * number another member already holds in either table.
      */
-    $duplicateQuery = User::where(
+    $userDuplicateQuery = User::where(
         'policy_number',
         $policyNumber
     );
 
     if ($this->userId) {
-        $duplicateQuery->where(
+        $userDuplicateQuery->where(
             'UserID',
             '!=',
             $this->userId
         );
     }
 
-    if ($duplicateQuery->exists()) {
+    $activationDuplicateQuery = Activation::where(
+        'policy_number',
+        $policyNumber
+    );
+
+    if ($this->activationId) {
+        $activationDuplicateQuery->where(
+            'ActivationID',
+            '!=',
+            $this->activationId
+        );
+    }
+
+    if ($userDuplicateQuery->exists() || $activationDuplicateQuery->exists()) {
         throw ValidationException::withMessages([
             'policy_number' =>
                 "Policy number {$policyNumber} already exists.",
@@ -1235,33 +1253,23 @@ private function validateManualPolicyNumber(): void
      */
     $latest = Activation::latestPolicySequence();
 
-    // The series STARTS at 550 — see Activation::FIRST_POLICY_SEQUENCE.
+    /*
+     * The series is designed to START at 550 (TRI-00550-TS2026-550), so the
+     * NEXT number to generate never falls below it. Numbers BELOW the next
+     * sequence are allowed as BACKLOG when editing a member, as long as they
+     * are unused — admin may fill in old/backlog numbers (even below 550)
+     * while the series itself keeps advancing from the highest issued number.
+     *
+     * 1   -> allowed (backlog, if unused)
+     * 500 -> allowed (backlog, if unused)
+     * 550 -> allowed (backlog, if unused)
+     * 557 -> allowed only if not duplicate
+     * 558 -> allowed (the next number itself)
+     *
+     * 559 -> NOT allowed (jumps ahead of the series)
+     */
     $next = max(Activation::FIRST_POLICY_SEQUENCE, $latest + 1);
 
-    /*
-     * The series starts at 550: nothing below it exists, so a lower
-     * number can never be a legitimate backlog number.
-     */
-    if ($sequence < Activation::FIRST_POLICY_SEQUENCE) {
-        throw ValidationException::withMessages([
-            'policy_number' =>
-                'Policy numbers start at '.
-                sprintf('TRI-%05d-TS%d-%d', Activation::FIRST_POLICY_SEQUENCE, $currentYear, Activation::FIRST_POLICY_SEQUENCE).
-                '. Numbers below '.Activation::FIRST_POLICY_SEQUENCE.' are not part of the series.',
-        ]);
-    }
-
-    /*
-     * Backlog numbers are allowed.
-     *
-     * 500 -> allowed
-     * 550 -> allowed
-     * 556 -> allowed
-     * 557 -> allowed only if not duplicate
-     * 558 -> allowed
-     *
-     * 559 -> NOT allowed
-     */
     if ($sequence > $next) {
         throw ValidationException::withMessages([
             'policy_number' =>
