@@ -116,18 +116,18 @@ class AcknowledgementReceiptService
                 ->latest('ActivationID')
                 ->value('policy_number');
 
-            $this->text($image, (string) ($activationPolicyNumber ?? ''), 295, 440, 13, self::FONT_BOLD, $ink, 400);
+            $this->text($image, (string) ($activationPolicyNumber ?? ''), 295, 440, 20, self::FONT_BOLD, $ink, 400);
 
             // Date
-            $this->text($image, now()->format('M j, Y'), 1370, 440, 13, self::FONT_BOLD, $ink, 240);
+            $this->text($image, now()->format('M j, Y'), 1370, 440, 20, self::FONT_BOLD, $ink, 240);
 
             /*
             |----------------------------------------------------------------------
             | Left table (navy) — Cash amount + Total (value cell x 152-428)
             |----------------------------------------------------------------------
             */
-            $this->text($image, $amountText, 165, 538, 13, self::FONT_BOLD, $ink, 250);
-            $this->text($image, $amountText, 165, 671, 13, self::FONT_BOLD, $ink, 250);
+            $this->text($image, $amountText, 165, 538, 20, self::FONT_BOLD, $ink, 250);
+            $this->text($image, $amountText, 165, 671, 20, self::FONT_BOLD, $ink, 250);
 
             /*
             |----------------------------------------------------------------------
@@ -136,7 +136,7 @@ class AcknowledgementReceiptService
             |----------------------------------------------------------------------
             */
             if (filled($receiptNumber)) {
-                $this->text($image, (string) $receiptNumber, 205, 733, 14, self::FONT_BOLD, $ink, 210);
+                $this->text($image, (string) $receiptNumber, 205, 733, 20, self::FONT_BOLD, $ink, 210);
             }
 
             /*
@@ -147,23 +147,23 @@ class AcknowledgementReceiptService
             |----------------------------------------------------------------------
             */
             // Payment From — "Lastname, Firstname Middlename" (row 468-507)
-            $this->text($image, $this->formatName($user), 758, 494, 15, self::FONT_BOLD, $ink, 850);
+            $this->text($image, $this->formatName($user), 758, 494, 20, self::FONT_BOLD, $ink, 850);
 
             // Payment for — PRE-PRINTED ("With (HMO ... Insurance.") — skipped
 
             // Premium Amount Paid (row 549-588)
-            $this->text($image, 'PHP '.$amountText, 758, 575, 15, self::FONT_BOLD, $ink, 850);
+            $this->text($image, 'PHP '.$amountText, 758, 575, 20, self::FONT_BOLD, $ink, 850);
 
             // Amount in words (row 591-630)
-            $this->text($image, $amountWords, 758, 617, 14, self::FONT_REGULAR, $ink, 850);
+            $this->text($image, $amountWords, 758, 617, 20, self::FONT_REGULAR, $ink, 850);
 
             // TIN No. — intentionally blank (members have no TIN on file)
 
             // Email Address (value box x 1282-1622, row 633-670)
-            $this->text($image, (string) ($user->email ?? ''), 1295, 658, 13, self::FONT_REGULAR, $ink, 315);
+            $this->text($image, (string) ($user->email ?? ''), 1295, 658, 15, self::FONT_REGULAR, $ink, 315);
 
             // Home Address (row 673-711, table bottom border at 711)
-            $this->address($image, (string) ($user->address ?? ''), 758, $ink);
+            $this->address($image, (string) ($user->address ?? ''), 640, $ink);
 
             /*
             |----------------------------------------------------------------------
@@ -186,7 +186,7 @@ class AcknowledgementReceiptService
                     (string) $cashierName,
                     530,
                     772,
-                    16, // slightly larger
+                    20, // slightly larger
                     self::FONT_BOLD,
                     $ink,
                     680,
@@ -268,7 +268,7 @@ class AcknowledgementReceiptService
         if (is_file($font)) {
 
             // Shrink until it fits.
-            while ($size > 9) {
+            while ($size > 20) {
 
                 $box = imagettfbbox(
                     $size,
@@ -685,10 +685,10 @@ class AcknowledgementReceiptService
             */
 
             $bandX = 530;
-            $bandY = 728;
+            $bandY = 710;
 
-            $bandWidth = 680;
-            $bandHeight = 29;
+            $bandWidth = 700;
+            $bandHeight = 60;
 
             /*
             |--------------------------------------------------------------------------
@@ -764,7 +764,7 @@ class AcknowledgementReceiptService
      */
     private function address($image, string $address, int $x, $ink): void
     {
-        $this->text($image, $address, $x, 698, 13, self::FONT_REGULAR, $ink, 850);
+        $this->text($image, $address, $x, 698, 20, self::FONT_REGULAR, $ink, 850);
     }
 
     private function truncatePlain(string $text, float $maxChars): string
