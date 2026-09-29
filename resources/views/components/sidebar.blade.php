@@ -142,7 +142,7 @@
                             @endif
                         </a>
 
-                        <a href="{{ route('transaction-list') }}"
+                        {{-- <a href="{{ route('transaction-list') }}"
                            class="menu-item {{ request()->routeIs('transaction-list') ? 'active-menu' : '' }}">
                             <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
@@ -152,7 +152,7 @@
                             @if ($pendingTransactions > 0)
                                 <span class="sidebar-badge" title="{{ $pendingActivations }} pending activation(s), {{ $pendingWithdrawals }} pending withdrawal(s)">{{ $pendingTransactions }}</span>
                             @endif
-                        </a>
+                        </a> --}}
 
                         <a href="{{ route('post') }}"
                            class="menu-item {{ request()->routeIs('post') ? 'active-menu' : '' }}">
