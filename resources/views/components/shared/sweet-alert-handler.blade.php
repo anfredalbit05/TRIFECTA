@@ -239,6 +239,144 @@
         Livewire.on('swal-close', closeSwal); // legacy alias
 
         // ==========================================================
+        // ACTIVATION REVIEW MODALS — typed confirmations
+        // ==========================================================
+        // The regular + satellite activation review modals dispatch these
+        // plain browser events instead of using inline @script handlers
+        // (which proved unreliable in this app — handlers intermittently
+        // never register, leaving dead buttons). The events name the OPEN
+        // modal that fired them, so the call below lands on that component
+        // with its state (selected activation, remarks) already loaded.
+        // The transaction-list shell's tab-level handlers
+        // (txn-approve-activation-prompt etc.) stay untouched — modal events
+        // use the txn-modal-* namespace to avoid double-firing.
+        // ==========================================================
+
+        const callByName = (name, method, ...args) => {
+            const el = [...document.querySelectorAll('[wire\\:id]')]
+                .find((el) => JSON.parse(el.getAttribute('wire:snapshot') || '{}').memo?.name === name);
+
+            const wire = el ? window.Livewire.find(el.getAttribute('wire:id')) : null;
+
+            if (! wire) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Modal Not Available',
+                    text: 'The review modal is no longer open. Please reopen it and try again.',
+                    confirmButtonColor: SWAL_NAVY,
+                });
+                return;
+            }
+
+            wire.call(method, ...args);
+        };
+
+        const MODAL_NAMES = {
+            regular: 'admin-pages.masterlist.activation-review-modal',
+            satellite: 'admin-pages.masterlist.satellite-members-components.satellite-members-activation-review',
+        };
+
+        const firstOpenModal = () => {
+            for (const name of Object.values(MODAL_NAMES)) {
+                const el = [...document.querySelectorAll('[wire\\:id]')]
+                    .find((el) => JSON.parse(el.getAttribute('wire:snapshot') || '{}').memo?.name === name);
+
+                if (el) return name;
+            }
+
+            return null;
+        };
+
+        // ---------- MODAL APPROVE (typed APPROVE) ----------
+        window.Livewire.on('txn-modal-approve-activation', (raw) => {
+            const d = payload(raw);
+
+            SwalFlow.confirm({
+                title: 'Approve Activation?',
+                html: 'You are about to approve the activation of '
+                    + '<strong style="color: #0B2A5B;">' + (d.memberName || 'this member') + '</strong>'
+                    + ' for <strong style="color: #0B2A5B;">₱' + (d.amount || '0.00') + '</strong>.'
+                    + ' This activates the member account, writes wallets/ledgers and sends emails.'
+                    + '<br><br>Type <strong>APPROVE</strong> to confirm.',
+                icon: 'question',
+                requireConfirmWord: 'APPROVE',
+                inputPlaceholder: 'APPROVE',
+                confirmText: 'Yes, approve!',
+                cancelText: 'Cancel',
+                loadingTitle: 'Approving activation...',
+                loadingText: 'Updating records and sending emails.',
+            }, () => {
+                // The payload names the modal that fired (both may be mounted
+                // on the same page); firstOpenModal is a fallback.
+                const name = (d.modal && MODAL_NAMES[d.modal]) ? MODAL_NAMES[d.modal] : firstOpenModal();
+
+                if (name === MODAL_NAMES.regular) {
+                    callByName(MODAL_NAMES.regular, 'approve');
+                } else if (name === MODAL_NAMES.satellite) {
+                    callByName(MODAL_NAMES.satellite, 'approve');
+                }
+            });
+        });
+
+        // ---------- MODAL REJECT (remarks required) ----------
+        window.Livewire.on('txn-modal-reject-activation', (raw) => {
+            const d = payload(raw);
+
+            SwalFlow.prompt({
+                title: 'Reject Activation?',
+                icon: 'warning',
+                input: 'textarea',
+                inputLabel: 'Rejection remarks',
+                inputPlaceholder: 'Enter the reason for rejection...',
+                maxLength: 1000,
+                rows: 5,
+                required: true,
+                requiredMessage: 'Remarks are required.',
+                confirmText: 'Reject',
+                cancelText: 'Cancel',
+                loadingTitle: 'Rejecting activation...',
+                loadingText: 'Sending email and updating records.',
+            }, (value) => {
+                // submit-rejection sets remarks then rejects on that modal.
+                const name = (d.modal && MODAL_NAMES[d.modal]) ? MODAL_NAMES[d.modal] : firstOpenModal();
+
+                if (name === MODAL_NAMES.regular) {
+                    callByName(MODAL_NAMES.regular, 'submitRejection', value);
+                } else if (name === MODAL_NAMES.satellite) {
+                    callByName(MODAL_NAMES.satellite, 'submitRejection', value);
+                }
+            });
+        });
+
+        // ---------- MODAL RESUBMIT (typed RESUBMIT) ----------
+        window.Livewire.on('txn-modal-resubmit-activation', (raw) => {
+            const d = payload(raw);
+
+            SwalFlow.confirm({
+                title: 'Resubmit Activation?',
+                html: 'The activation request will be reopened and set back to '
+                    + '<strong style="color: #0B2A5B;">Pending</strong> for review.'
+                    + ' The full history trail is kept.'
+                    + '<br><br>Type <strong>RESUBMIT</strong> to confirm.',
+                icon: 'question',
+                requireConfirmWord: 'RESUBMIT',
+                inputPlaceholder: 'RESUBMIT',
+                confirmText: 'Yes, resubmit it!',
+                cancelText: 'Cancel',
+                loadingTitle: 'Resubmitting activation...',
+                loadingText: 'Updating records.',
+            }, () => {
+                const name = (d.modal && MODAL_NAMES[d.modal]) ? MODAL_NAMES[d.modal] : firstOpenModal();
+
+                if (name === MODAL_NAMES.regular) {
+                    callByName(MODAL_NAMES.regular, 'resubmitActivation');
+                } else if (name === MODAL_NAMES.satellite) {
+                    callByName(MODAL_NAMES.satellite, 'resubmitActivation');
+                }
+            });
+        });
+
+        // ==========================================================
         // LEGACY SHIMS — old dispatchers keep working via the shared flow
         // ==========================================================
         Livewire.on('swal-confirm-submission', () => {

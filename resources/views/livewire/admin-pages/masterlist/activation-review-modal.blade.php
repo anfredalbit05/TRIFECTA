@@ -8,9 +8,20 @@
                 {{-- ================================================= --}}
                 <div class="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
                     <div>
-                        <h2 class="text-xl font-extrabold text-[#0B2A5B]">
-                            Activation Review
-                        </h2>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-xl font-extrabold text-[#0B2A5B]">
+                                Activation Review
+                            </h2>
+                            @if ($this->memberType === 'satellite')
+                                <span class="inline-flex items-center rounded-full bg-[#D79B10] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                                    Satellite Member
+                                </span>
+                            @else
+                                <span class="inline-flex items-center rounded-full bg-[#0B2A5B] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                                    TrueLife Member
+                                </span>
+                            @endif
+                        </div>
                         <p class="mt-1 text-xs text-slate-500">
                             Review the member's activation request and beneficiary information.
                         </p>
@@ -560,33 +571,27 @@
                     </button>
 
                     <div class="flex flex-col gap-3 sm:flex-row">
+                        {{-- RESUBMIT (rejected only) --}}
+                        @if ($isPrivileged && $activation?->status === 'Rejected')
+                            <button type="button" wire:click="confirmResubmit"
+                                class="rounded-xl border border-[#0B2A5B] bg-white px-6 py-2.5 text-xs font-bold text-[#0B2A5B] transition hover:bg-[#0B2A5B] hover:text-white">
+                                ↺ Resubmit
+                            </button>
+                        @endif
+
+                        @if ($isPrivileged && $activation?->status === 'Pending')
                         {{-- REJECT --}}
-                        <button type="button" wire:loading.attr="disabled" wire:target="rejectActivation"
-                            onclick="openActivationRejectAlert()"
-                            class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
-                            <span wire:loading.remove wire:target="rejectActivation">
-                                Reject
-                            </span>
-                            <span wire:loading wire:target="rejectActivation">
-                                Rejecting...
-                            </span>
+                        <button type="button" wire:click="confirmReject"
+                            class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition cursor-pointer">
+                            Reject
                         </button>
 
                         {{-- APPROVE --}}
-                     <button
-    type="button"
-    wire:loading.attr="disabled"
-    wire:target="approve"
-    x-on:click="openActivationApproveAlert()"
-    class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
->
-                            <span wire:loading.remove wire:target="approve">
-                                Approve Activation
-                            </span>
-                            <span wire:loading wire:target="approve">
-                                Approving...
-                            </span>
+                        <button type="button" wire:click="confirmApprove"
+                            class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 cursor-pointer">
+                            Approve Activation
                         </button>
+                        @endif
                     </div>
                 </div>
 
@@ -595,397 +600,11 @@
     @endif
 
 
-@script
-<script>
-    // ==========================================================
-    // VALIDATE POLICY + RECEIPT BEFORE APPROVAL
-    // ==========================================================
-
-    window.validateActivationNumbersBeforeApprove = async function () {
-
-        const policyInput = document.getElementById('policy-number-input');
-        const receiptInput = document.getElementById('receipt-number-input');
-
-        const policy = policyInput?.value?.trim().toUpperCase() ?? '';
-        const receipt = receiptInput?.value?.trim() ?? '';
-
-        const year = new Date().getFullYear();
-
-        console.log('==========================================');
-        console.log('Approve validation started');
-        console.log('Policy:', policy);
-        console.log('Receipt:', receipt);
-        console.log('Current year:', year);
-        console.log('==========================================');
-
-        // ======================================================
-        // POLICY NUMBER REQUIRED
-        // ======================================================
-
-        if (!policy) {
-
-            await Swal.fire({
-                icon: 'error',
-                title: 'Policy Number Required',
-                text: 'Please enter or generate a policy number.'
-            });
-
-            policyInput?.focus();
-
-            return false;
-        }
-
-        // ======================================================
-        // POLICY NUMBER FORMAT
-        // Expected:
-        // TRI-00550-TS2026-550
-        // ======================================================
-
-        const policyMatch = policy.match(
-            /^TRI-(\d+)-TS(\d{4})-(\d+)$/
-        );
-
-        if (!policyMatch) {
-
-            await Swal.fire({
-                icon: 'error',
-                title: 'Invalid Policy Number',
-                text: `The policy number must use the format TRI-00550-TS${year}-550.`
-            });
-
-            policyInput?.focus();
-
-            return false;
-        }
-
-        const firstSequence = parseInt(policyMatch[1], 10);
-        const policyYear = parseInt(policyMatch[2], 10);
-        const finalSequence = parseInt(policyMatch[3], 10);
-
-        const nextPolicyElement =
-            document.getElementById('next-policy-number');
-
-        const nextPolicy = parseInt(
-            nextPolicyElement?.dataset.sequence ?? '0',
-            10
-        );
-
-        console.log('First policy sequence:', firstSequence);
-        console.log('Policy year:', policyYear);
-        console.log('Final policy sequence:', finalSequence);
-        console.log('Next available policy sequence:', nextPolicy);
-
-        // ======================================================
-        // POLICY YEAR
-        // ======================================================
-
-        if (policyYear !== year) {
-
-            await Swal.fire({
-                icon: 'error',
-                title: 'Invalid Policy Year',
-                text: `The policy number must use the current year ${year}.`
-            });
-
-            policyInput?.focus();
-
-            return false;
-        }
-
-        // ======================================================
-        // POLICY SEQUENCES MUST MATCH
-        // ======================================================
-
-        if (firstSequence !== finalSequence) {
-
-            await Swal.fire({
-                icon: 'error',
-                title: 'Invalid Policy Number',
-                text: 'The first and last sequence numbers of the policy number must match.'
-            });
-
-            policyInput?.focus();
-
-            return false;
-        }
-
-        // ======================================================
-        // POLICY CANNOT JUMP AHEAD
-        // ======================================================
-
-        if (firstSequence > nextPolicy) {
-
-            await Swal.fire({
-                icon: 'error',
-                title: 'Invalid Policy Number',
-                text:
-                    `The policy number cannot jump ahead. ` +
-                    `The next available sequence is ` +
-                    `${String(nextPolicy).padStart(5, '0')}.`
-            });
-
-            policyInput?.focus();
-
-            return false;
-        }
-
-        // ======================================================
-        // RECEIPT NUMBER REQUIRED
-        // ======================================================
-
-        if (!receipt) {
-
-            await Swal.fire({
-                icon: 'error',
-                title: 'Receipt Number Required',
-                text: 'Please enter or generate a receipt number.'
-            });
-
-            receiptInput?.focus();
-
-            return false;
-        }
-
-        // ======================================================
-        // RECEIPT FORMAT
-        // Exactly 6 digits
-        // ======================================================
-
-        if (!/^\d{6}$/.test(receipt)) {
-
-            await Swal.fire({
-                icon: 'error',
-                title: 'Invalid Receipt Number',
-                text: 'The receipt number must contain exactly 6 digits.'
-            });
-
-            receiptInput?.focus();
-
-            return false;
-        }
-
-        const receiptSequence = parseInt(receipt, 10);
-
-        const nextReceiptElement =
-            document.getElementById('next-receipt-number');
-
-        const nextReceipt = parseInt(
-            nextReceiptElement?.dataset.sequence ?? '0',
-            10
-        );
-
-        console.log('Receipt sequence:', receiptSequence);
-        console.log('Next available receipt sequence:', nextReceipt);
-
-        // ======================================================
-        // RECEIPT CANNOT JUMP AHEAD
-        // ======================================================
-
-        if (receiptSequence > nextReceipt) {
-
-            await Swal.fire({
-                icon: 'error',
-                title: 'Invalid Receipt Number',
-                text:
-                    `The receipt number cannot jump ahead. ` +
-                    `The next available receipt number is ` +
-                    `${String(nextReceipt).padStart(6, '0')}.`
-            });
-
-            receiptInput?.focus();
-
-            return false;
-        }
-
-        // ======================================================
-        // CHECK DATABASE DUPLICATES
-        // ======================================================
-
-        console.log('Checking duplicate policy/receipt numbers...');
-
-        try {
-
-            // Sync the typed values to the server FIRST — wire:model.live is
-            // debounced, so a fast Approve click would otherwise run the
-            // duplicate check against stale input and miss a duplicate.
-            $wire.policy_number = policy;
-            $wire.receipt_number = receipt;
-
-            const duplicates = await $wire.checkActivationNumberDuplicates();
-
-            // Prefer the call's return value; the property reads are a
-            // fallback for an older deployment of the component class.
-            const policyExists = duplicates?.policy ?? $wire.policyNumberExists;
-            const receiptExists = duplicates?.receipt ?? $wire.receiptNumberExists;
-
-            if (policyExists) {
-
-                await Swal.fire({
-                    icon: 'error',
-                    title: 'Duplicate Policy Number',
-                    text:
-                        'This policy number has already been used. ' +
-                        'Please enter or generate another policy number.'
-                });
-
-                policyInput?.focus();
-
-                return false;
-            }
-
-            if (receiptExists) {
-
-                await Swal.fire({
-                    icon: 'error',
-                    title: 'Duplicate Receipt Number',
-                    text:
-                        'This receipt number has already been issued. ' +
-                        'Please enter or generate another receipt number.'
-                });
-
-                receiptInput?.focus();
-
-                return false;
-            }
-
-        } catch (error) {
-
-            console.error(
-                'Duplicate validation failed:',
-                error
-            );
-
-            await Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: 'Unable to verify the policy and receipt numbers. Please try again.'
-            });
-
-            return false;
-        }
-
-        // ======================================================
-        // ALL VALIDATIONS PASSED
-        // ======================================================
-
-        console.log('==========================================');
-        console.log('Approve validation PASSED');
-        console.log('==========================================');
-
-        return true;
-    };
-
-
-    // ==========================================================
-    // APPROVE CONFIRMATION
-    // ==========================================================
-
-    window.openActivationApproveAlert = async function () {
-
-        console.log('Approve button clicked');
-
-        // IMPORTANT:
-        // Validation is async, so we MUST await it.
-        const isValid =
-            await window.validateActivationNumbersBeforeApprove();
-
-        // Stop immediately if validation failed.
-        if (!isValid) {
-
-            console.log(
-                'Approval blocked by validation'
-            );
-
-            return;
-        }
-
-        console.log(
-            'Validation passed. Opening approval confirmation.'
-        );
-
-        // ======================================================
-        // APPROVE CONFIRMATION
-        // ======================================================
-
-        const result = await Swal.fire({
-
-            title: 'Approve Activation?',
-
-            html: `
-                <div style="text-align:center">
-                    This will activate the member account
-                    and send email notifications.
-
-                    <br><br>
-
-                    Type <strong>APPROVE</strong> to confirm.
-                </div>
-            `,
-
-            icon: 'question',
-
-            input: 'text',
-
-            inputPlaceholder: 'Type APPROVE',
-
-            inputAttributes: {
-                autocomplete: 'off',
-                autocapitalize: 'characters',
-                spellcheck: 'false'
-            },
-
-            showCancelButton: true,
-
-            confirmButtonText: 'Yes, APPROVE!',
-
-            cancelButtonText: 'Cancel',
-
-            confirmButtonColor: '#0B2A5B',
-
-            allowOutsideClick: false,
-
-            allowEscapeKey: true,
-
-            preConfirm: (value) => {
-
-                if (value !== 'APPROVE') {
-
-                    Swal.showValidationMessage(
-                        'Please type APPROVE exactly to continue.'
-                    );
-
-                    return false;
-                }
-
-                return true;
-            }
-        });
-
-        // ======================================================
-        // USER CANCELLED
-        // ======================================================
-
-        if (!result.isConfirmed) {
-
-            console.log(
-                'Approval confirmation cancelled.'
-            );
-
-            return;
-        }
-
-        // ======================================================
-        // FINAL APPROVAL
-        // ======================================================
-
-        console.log(
-            'APPROVE confirmed. Calling Livewire approve().'
-        );
-
-        await $wire.approve();
-    };
-</script>
-@endscript
+    {{-- swal:success, swal:error and the typed APPROVE/REJECT/RESUBMIT
+         confirmations are handled globally by the shared sweet-alert-handler
+         component (plain livewire:init script). Inline @script handlers
+         proved unreliable in this app. Policy/receipt format + duplicate
+         validation happens server-side in approve() (swal:error feedback). --}}
 
 
 </div>

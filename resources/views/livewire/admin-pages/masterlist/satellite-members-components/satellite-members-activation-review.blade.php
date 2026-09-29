@@ -8,9 +8,14 @@
                 {{-- ================================================= --}}
                 <div class="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
                     <div>
-                        <h2 class="text-xl font-extrabold text-[#0B2A5B]">
-                            Activation Review
-                        </h2>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-xl font-extrabold text-[#0B2A5B]">
+                                Activation Review
+                            </h2>
+                            <span class="inline-flex items-center rounded-full bg-[#D79B10] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                                Satellite Member
+                            </span>
+                        </div>
                         <p class="mt-1 text-xs text-slate-500">
                             Review the member's activation request and beneficiary information.
                         </p>
@@ -345,29 +350,25 @@
                     </button>
 
                     <div class="flex flex-col gap-3 sm:flex-row">
-                        @if ($isPrivileged)
+                        {{-- RESUBMIT (rejected only) --}}
+                        @if ($isPrivileged && $activation?->status === 'Rejected')
+                            <button type="button" wire:click="confirmResubmit"
+                                class="rounded-xl border border-[#0B2A5B] bg-white px-6 py-2.5 text-xs font-bold text-[#0B2A5B] transition hover:bg-[#0B2A5B] hover:text-white">
+                                ↺ Resubmit
+                            </button>
+                        @endif
+
+                        @if ($isPrivileged && $activation?->status === 'Pending')
                         {{-- REJECT --}}
-                        <button type="button" wire:loading.attr="disabled" wire:target="rejectActivation"
-                            onclick="confirmReject()"
-                            class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
-                            <span wire:loading.remove wire:target="rejectActivation">
-                                Reject
-                            </span>
-                            <span wire:loading wire:target="rejectActivation">
-                                Rejecting...
-                            </span>
+                        <button type="button" wire:click="confirmReject"
+                            class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition cursor-pointer">
+                            Reject
                         </button>
 
                         {{-- APPROVE --}}
-                        <button type="button" wire:loading.attr="disabled" wire:target="approve"
-                            onclick="confirmApprove()"
-                            class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
-                            <span wire:loading.remove wire:target="approve">
-                                Approve Activation
-                            </span>
-                            <span wire:loading wire:target="approve">
-                                Approving...
-                            </span>
+                        <button type="button" wire:click="confirmApprove"
+                            class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 cursor-pointer">
+                            Approve Activation
                         </button>
                         @endif
                     </div>
@@ -377,45 +378,8 @@
         </div>
     @endif
 
-    @script
-        <script>
-            /* swal:close and swal:success are handled globally by the shared sweet-alert-handler component */
-
-            {{-- Typed confirmation (shared SwalFlow) — REJECT with required remarks --}}
-            window.confirmReject = function() {
-                SwalFlow.prompt({
-                    title: 'Reject Activation?',
-                    icon: 'warning',
-                    input: 'textarea',
-                    inputLabel: 'Rejection remarks',
-                    inputPlaceholder: 'Enter the reason for rejection...',
-                    maxLength: 1000,
-                    rows: 5,
-                    required: true,
-                    requiredMessage: 'Remarks are required.',
-                    confirmText: 'Reject',
-                    cancelText: 'Cancel',
-                    loadingTitle: 'Rejecting activation...',
-                    loadingText: 'Sending email and updating records.',
-                }, (value) => {
-                    $wire.set('remarks', value);
-                    $wire.rejectActivation();
-                });
-            };
-
-            {{-- Typed confirmation (shared SwalFlow) — APPROVE --}}
-            window.confirmApprove = function() {
-                SwalFlow.confirm({
-                    title: 'Approve Activation?',
-                    html: 'This will activate the member account and send email notifications.<br><br>Type <strong>APPROVE</strong> to confirm.',
-                    icon: 'question',
-                    requireConfirmWord: 'APPROVE',
-                    confirmText: 'Yes, approve!',
-                    cancelText: 'Cancel',
-                    loadingTitle: 'Approving activation...',
-                    loadingText: 'Sending emails and updating records.',
-                }, () => $wire.approve());
-            };
-        </script>
-    @endscript
+    {{-- swal:success, swal:error and the typed APPROVE/REJECT/RESUBMIT
+         confirmations are handled globally by the shared sweet-alert-handler
+         component (plain livewire:init script — inline @script handlers
+         proved unreliable in this app). --}}
 </div>

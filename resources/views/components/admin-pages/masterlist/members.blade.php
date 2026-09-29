@@ -439,7 +439,7 @@
 
                                                 <button type="button" wire:click="openWithdrawalModal({{ $member->UserID }})"
                                                     title="Create Withdrawal Request"
-                                                    class="member-action member-action-withdraw" >
+                                                    class="member-action member-action-withdraw member-action-badge-anchor" >
                                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path
                                                         stroke-linecap="round"
@@ -460,6 +460,12 @@
                                                         d="M8 20a8 8 0 0 0 12-12"
                                                     />
                                                 </svg>
+
+                                                    {{-- Pending withdrawal count badge --}}
+                                                    @if (($member->pending_withdrawals_count ?? 0) > 0)
+                                                        <span class="member-action-badge"
+                                                            title="{{ $member->pending_withdrawals_count }} pending withdrawal request(s)">{{ $member->pending_withdrawals_count }}</span>
+                                                    @endif
                                                 </button>
                                                  @endif
                                             @endif
@@ -533,21 +539,9 @@
 
 
                                         {{-- WITHDRAWAL --}}
-                                        @if ($member->has_pending_withdrawal)
-
-                                            <button
-                                                type="button"
-                                                wire:click="openWithdrawalApproval({{ $member->UserID }})"
-                                                title="Approve Withdrawal Request"
-                                                class="member-action member-action-pending"
-                                            >
-                                                Pending
-                                            </button>
-
-
-
-                                        @else
-                                        @endif
+                                        {{-- Pending withdrawals are surfaced as a count
+                                             badge on the withdraw icon button above —
+                                             no separate Pending button anymore. --}}
 
                                     </div>
 

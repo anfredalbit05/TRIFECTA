@@ -320,176 +320,280 @@
 
     {{-- =====================================================
          WITHDRAWAL APPROVAL MODAL
-    ===================================================== --}}
-    @if ($isWithdrawalModalOpen && $selectedWithdrawalUser && $selectedWithdrawal)
-        <div class="au-modal-overlay">
-            <div class="au-modal-box-md">
+    ===================================================== --}}    @if ($isWithdrawalModalOpen && $selectedWithdrawalUser && $selectedWithdrawal)
+        {{-- Same design as the Transaction List withdrawal review modal:
+             navy sections, gold captions, release breakdown, actions below. --}}
+        <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm">
+            <div class="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
 
-                {{-- Header --}}
-                <div class="au-modal-header">
-                    <div class="au-modal-header-title-wrap">
-                        <svg class="au-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 9V7a4 4 0 00-8 0v2m-2 0h12a2 2 0 012 2v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7a2 2 0 012-2z" />
-                        </svg>
-
-                        <h3 class="au-modal-title">
-                            Approve &amp; Release Withdrawal
-                        </h3>
-                    </div>
-
-                    <button type="button" wire:click="closeWithdrawalModal"
-                        class="au-modal-close">
-                        &times;
-                    </button>
-                </div>
-
-                {{-- Body --}}
-                <div class="au-modal-body">
-
-                    {{-- Selected User --}}
-                    <div class="au-detail-card">
-                        <span class="au-detail-card-label">
-                            Withdrawal User
-                        </span>
-
-                        <p class="au-detail-card-value">
-                            {{ $selectedWithdrawalUser->firstname }}
-                            {{ $selectedWithdrawalUser->middlename }}
-                            {{ $selectedWithdrawalUser->lastname }}
+                {{-- ================================================= --}}
+                {{-- HEADER --}}
+                {{-- ================================================= --}}
+                <div class="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-xl font-extrabold text-[#0B2A5B]">
+                                Withdrawal Review
+                            </h2>
+                            @if ((int) ($selectedWithdrawalUser->RoleID ?? 0) === 8)
+                                <span class="inline-flex items-center rounded-full bg-[#D79B10] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                                    Satellite Member
+                                </span>
+                            @else
+                                <span class="inline-flex items-center rounded-full bg-[#0B2A5B] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                                    TrueLife Member
+                                </span>
+                            @endif
+                        </div>
+                        <p class="mt-1 text-xs text-slate-500">
+                            Review the withdrawal request in full before approving or rejecting it.
                         </p>
                     </div>
 
-                    {{-- Pending Withdrawal Details --}}
-                    <div class="au-pending-box">
-                        <div class="au-pending-header">
-                            <span class="text-xl">⏳</span>
-                            <h4 class="au-pending-title">
-                                Pending Withdrawal Request
-                            </h4>
+                    <button wire:click="closeWithdrawalModal" type="button"
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-lg font-bold text-slate-500 transition hover:bg-red-100 hover:text-red-600"
+                        title="Close">
+                        ✕
+                    </button>
+                </div>
+
+                {{-- ================================================= --}}
+                {{-- BODY --}}
+                {{-- ================================================= --}}
+                <div class="flex-1 space-y-6 overflow-y-auto bg-slate-50 p-4 sm:p-6">
+
+                    {{-- MEMBER INFORMATION --}}
+                    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <div class="bg-[#0B2A5B] px-5 py-3">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                                Member Information
+                            </h3>
                         </div>
 
-                        <div class="au-pending-rows">
-
-                            {{-- Requested Amount --}}
-                            <div class="au-pending-row">
-                                <span class="au-pending-label">Requested Amount</span>
-                                <span class="au-pending-value">
-                                    ₱{{ number_format($selectedWithdrawal->requested_amount ?? 0, 2) }}
-                                </span>
+                        <div class="grid grid-cols-1 gap-5 p-5 sm:grid-cols-3">
+                            <div>
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    Full Name
+                                </p>
+                                <p class="mt-1 font-bold text-slate-800">
+                                    {{ trim(($selectedWithdrawalUser->firstname ?? '').' '.($selectedWithdrawalUser->middlename ?? '').' '.($selectedWithdrawalUser->lastname ?? '')) ?: '-' }}
+                                </p>
                             </div>
 
-                              {{-- Tax Amount --}}
-                            <div class="au-pending-row">
-                                <span class="au-pending-label">Tax Amount</span>
-                                <span class="au-pending-value">
-                                    - ₱{{ number_format($selectedWithdrawal->tax_amount ?? 0, 2) }}
-                                </span>
+                            <div>
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    Username
+                                </p>
+                                <p class="mt-1 font-bold text-slate-800">
+                                    {{ $selectedWithdrawalUser->username ?? '-' }}
+                                </p>
                             </div>
 
-                              {{-- Release Amount --}}
-                            <div class="au-pending-row">
-                                <span class="au-pending-label">Release Amount</span>
-                                <span class="au-pending-value">
-                                    ₱{{ number_format($selectedWithdrawal->amount ?? 0, 2) }}
-                                </span>
+                            <div>
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    Contact Number
+                                </p>
+                                <p class="mt-1 font-bold text-slate-800">
+                                    {{ $selectedWithdrawalUser->contactno ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    {{-- WITHDRAWAL INFORMATION --}}
+                    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <div class="bg-[#0B2A5B] px-5 py-3">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                                Withdrawal Information
+                            </h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-5 p-5 sm:grid-cols-2 lg:grid-cols-3">
+                            <div>
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    Withdrawal ID
+                                </p>
+                                <p class="mt-1 font-bold text-slate-800">
+                                    #{{ $selectedWithdrawal->WithdrawID }}
+                                </p>
                             </div>
 
-                            {{-- Withdrawal Method --}}
-                            <div class="au-pending-row">
-                                <span class="au-pending-label">Method</span>
-                                <span class="au-pending-value-sm">
-                                    {{ $selectedWithdrawal->withdrawal_method ?? '-' }}
-                                </span>
+                            <div>
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    Type
+                                </p>
+                                <p class="mt-1 font-bold text-slate-800">
+                                    {{ $selectedWithdrawal->type ?: '-' }}
+                                </p>
                             </div>
 
-                            {{-- Bank Name (Only shown if Bank Transfer and bank_name exists) --}}
-                            @if ($selectedWithdrawal->withdrawal_method === 'Bank Transfer' && $selectedWithdrawal->bank_name)
-                                <div class="au-pending-row">
-                                    <span class="au-pending-label">Bank Name</span>
-                                    <span class="au-pending-value-sm">
+                            <div>
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    Request Status
+                                </p>
+                                <div class="mt-2">
+                                    <span class="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
+                                        {{ $selectedWithdrawal->status ?? 'Pending' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    Withdrawal Method
+                                </p>
+                                <p class="mt-1 font-bold text-slate-800">
+                                    {{ ucfirst($selectedWithdrawal->withdrawal_method ?: '-') }}
+                                </p>
+                            </div>
+
+                            @if (filled($selectedWithdrawal->bank_name))
+                                <div>
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                        Bank Name
+                                    </p>
+                                    <p class="mt-1 font-bold text-slate-800">
                                         {{ $selectedWithdrawal->bank_name }}
-                                    </span>
+                                    </p>
                                 </div>
                             @endif
 
-                            {{-- Account Name --}}
-                            @if ($selectedWithdrawal->account_name)
-                                <div class="au-pending-row">
-                                    <span class="au-pending-label">Account Name</span>
-                                    <span class="au-pending-value-sm">
+                            @if (filled($selectedWithdrawal->account_name))
+                                <div>
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                        Account Name
+                                    </p>
+                                    <p class="mt-1 font-bold text-slate-800">
                                         {{ $selectedWithdrawal->account_name }}
-                                    </span>
+                                    </p>
                                 </div>
                             @endif
 
-                            {{-- Account Number --}}
-                            @if ($selectedWithdrawal->account_number)
-                                <div class="au-pending-row">
-                                    <span class="au-pending-label">Account Number</span>
-                                    <span class="au-pending-value-sm">
+                            @if (filled($selectedWithdrawal->account_number))
+                                <div>
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                        Account Number
+                                    </p>
+                                    <p class="mt-1 break-all font-bold text-slate-800">
                                         {{ $selectedWithdrawal->account_number }}
-                                    </span>
+                                    </p>
                                 </div>
                             @endif
 
-                            {{-- Payment Reference --}}
-                            @if ($selectedWithdrawal->payment_reference)
-                                <div class="au-pending-row">
-                                    <span class="au-pending-label">
-                                        Payment Reference
-                                    </span>
+                            <div>
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    Reference No.
+                                </p>
+                                <p class="mt-1 break-all font-bold text-slate-800">
+                                    {{ $selectedWithdrawal->payment_reference ?: '-' }}
+                                </p>
+                            </div>
 
-                                    <span class="au-pending-value-sm">
-                                        {{ $selectedWithdrawal->payment_reference }}
-                                    </span>
+                            <div>
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    Requested On
+                                </p>
+                                <p class="mt-1 font-bold text-slate-800">
+                                    {{ $selectedWithdrawal->created_at?->format('F d, Y h:i A') ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    {{-- RELEASE BREAKDOWN --}}
+                    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <div class="bg-[#0B2A5B] px-5 py-3">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                                Release Breakdown
+                            </h3>
+                        </div>
+
+                        <div class="p-5">
+                            <div class="flex items-center justify-between gap-4 py-2">
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-700">
+                                        Requested Amount
+                                    </p>
+                                    <p class="text-xs text-slate-400">
+                                        Gross withdrawal request
+                                    </p>
                                 </div>
-                            @endif
 
+                                <span class="text-sm font-bold text-slate-800">
+                                    ₱{{ number_format((float) $selectedWithdrawal->requested_amount, 2) }}
+                                </span>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-4 border-t border-slate-100 py-2">
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-700">
+                                        Withholding Tax (10%)
+                                    </p>
+                                    <p class="text-xs text-slate-400">
+                                        Returned to the member's ledger
+                                    </p>
+                                </div>
+
+                                <span class="text-sm font-bold text-slate-800">
+                                    ₱{{ number_format((float) $selectedWithdrawal->tax_amount, 2) }}
+                                </span>
+                            </div>
+
+                            <div class="mt-3 flex items-center justify-between gap-4 rounded-xl bg-slate-50 px-4 py-3">
+                                <div>
+                                    <p class="text-sm font-extrabold text-[#0B2A5B]">
+                                        Net Amount to Release
+                                    </p>
+                                    <p class="mt-0.5 text-[11px] text-slate-500">
+                                        Requested amount minus the 10% withholding tax
+                                    </p>
+                                </div>
+
+                                <span class="text-xl font-extrabold text-emerald-600">
+                                    ₱{{ number_format((float) $selectedWithdrawal->amount, 2) }}
+                                </span>
+                            </div>
+
+                            <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
+                                <p class="text-xs font-semibold text-blue-800">
+                                    Before You Approve
+                                </p>
+                                <p class="mt-1 text-[11px] leading-relaxed text-blue-700">
+                                    Approving releases the net amount above: a wallet debit of
+                                    ₱{{ number_format((float) $selectedWithdrawal->requested_amount, 2) }} and ledger
+                                    records for the net release and the tax are written immediately.
+                                    Verify the payout details and reference number first.
+                                </p>
+                            </div>
                         </div>
-                    </div>
-
-                    {{-- Confirmation Warning --}}
-                    <div class="au-info-box">
-                        <div class="au-info-flex">
-                            <span>ℹ️</span>
-
-                            <p>
-                                Approving this request will mark the withdrawal as
-                                <strong>Approved</strong> and deduct
-                                <strong>
-                                    ₱{{ number_format($selectedWithdrawal->requested_amount ?? 0, 2) }}
-                                </strong>
-                                from the user's wallet.
-                            </p>
-                        </div>
-                    </div>
+                    </section>
 
                 </div>
 
-                {{-- Footer --}}
-                <div class="au-modal-footer">
-
-                    {{-- Reject --}}
-                    <button type="button" wire:click="confirmWithdrawalRejection" wire:loading.attr="disabled"
-                        class="au-btn-secondary">
-                        Reject
+                {{-- ================================================= --}}
+                {{-- FOOTER --}}
+                {{-- ================================================= --}}
+                <div class="flex shrink-0 flex-col-reverse justify-between gap-3 border-t border-slate-200 bg-white p-4 sm:flex-row sm:items-center">
+                    <button wire:click="closeWithdrawalModal" type="button"
+                        class="rounded-xl border border-slate-300 px-6 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-100">
+                        Close
                     </button>
 
-                    {{-- Approve --}}
-                    <button type="button" wire:click="confirmWithdrawalApproval" wire:loading.attr="disabled"
-                        class="au-btn-primary">
+                    <div class="flex flex-col gap-3 sm:flex-row">
+                        {{-- REJECT --}}
+                        <button type="button" wire:click="confirmWithdrawalRejection" wire:loading.attr="disabled"
+                            class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
+                            Reject
+                        </button>
 
-                        <span wire:loading.remove wire:target="confirmWithdrawalApproval">
+                        {{-- APPROVE --}}
+                        <button type="button" wire:click="confirmWithdrawalApproval" wire:loading.attr="disabled"
+                            class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
                             Approve &amp; Release
-                        </span>
-
-                        <span wire:loading wire:target="confirmWithdrawalApproval">
-                            Processing...
-                        </span>
-
-                    </button>
+                        </button>
+                    </div>
                 </div>
+
             </div>
         </div>
     @endif

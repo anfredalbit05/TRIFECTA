@@ -21,6 +21,21 @@
 
     $profilePic = $user?->profilepic;
     $defaultAvatar = 'images/profiles/default-avatar.png';
+
+    /*
+    | Pending transaction counts (admin sidebar badges). Only queried for
+    | admins — members never see these two links.
+    */
+    $pendingActivations = $isAdmin ? \App\Models\Activation::where('status', 'Pending')->count() : 0;
+    $pendingWithdrawals = $isAdmin ? \App\Models\Withdrawal::where('status', 'Pending')->count() : 0;
+    $pendingTransactions = $pendingActivations + $pendingWithdrawals;
+
+    /* Masterlist badge: satellite members awaiting activation review. */
+    $pendingSatelliteActivations = $isAdmin
+        ? \App\Models\Activation::where('status', 'Pending')
+            ->whereHas('user', fn ($q) => $q->where('RoleID', 8))
+            ->count()
+        : 0;
 @endphp
 
 <div x-data x-on:profile-updated.window="window.location.reload()" class="sidebar-wrapper">
@@ -122,6 +137,9 @@
                                       d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
                             </svg>
                             <span>Masterlist</span>
+                            @if ($pendingSatelliteActivations > 0)
+                                <span class="sidebar-badge" title="{{ $pendingSatelliteActivations }} satellite activation(s) pending review">{{ $pendingSatelliteActivations }}</span>
+                            @endif
                         </a>
 
                         <a href="{{ route('transaction-list') }}"
@@ -131,6 +149,9 @@
                                       d="M3 6h18M3 12h18M3 18h18M7 3v2M12 3v2M17 3v2"/>
                             </svg>
                             <span>Transaction List</span>
+                            @if ($pendingTransactions > 0)
+                                <span class="sidebar-badge" title="{{ $pendingActivations }} pending activation(s), {{ $pendingWithdrawals }} pending withdrawal(s)">{{ $pendingTransactions }}</span>
+                            @endif
                         </a>
 
                         <a href="{{ route('post') }}"
@@ -219,10 +240,15 @@
 
             <a href="{{ route('transaction-list') }}"
                class="member-mobile-nav-item {{ request()->routeIs('transaction-list') ? 'active' : '' }}">
-                <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                          d="M3 6h18M3 12h18M3 18h18M7 3v2M12 3v2M17 3v2"/>
-                </svg>
+                <span class="member-mobile-nav-badge-anchor">
+                    <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                              d="M3 6h18M3 12h18M3 18h18M7 3v2M12 3v2M17 3v2"/>
+                    </svg>
+                    @if ($pendingTransactions > 0)
+                        <span class="sidebar-badge sidebar-badge-mobile">{{ $pendingTransactions }}</span>
+                    @endif
+                </span>
                 <span>Transactions</span>
             </a>
 

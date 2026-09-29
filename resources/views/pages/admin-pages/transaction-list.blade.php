@@ -14,6 +14,8 @@
     /* ---------- Search + filter ---------- */
     .txn-search-input {
         width: 100%;
+        max-width: 420px;
+        flex: 1 1 260px;
         border-radius: 0.75rem;
         border: 1px solid #e2e8f0;
         background: #fff;
@@ -122,6 +124,111 @@
         scrollbar-width: thin;
     }
 
+    /* ---------- Pending-count badge on the Withdrawal/Activations tabs -- */
+    .txn-tab-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        border-radius: 9999px;
+        background: #D79B10;
+        color: #fff;
+        font-size: 0.62rem;
+        font-weight: 700;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    /* ---------- Row action buttons (approve / reject) ---------- */
+    .txn-actions {
+        white-space: nowrap;
+    }
+
+    .txn-action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        margin-right: 0.35rem;
+        border: 1px solid transparent;
+        border-radius: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        line-height: 1;
+        cursor: pointer;
+        transition: background .15s ease, color .15s ease, border-color .15s ease;
+    }
+
+    .txn-action-approve {
+        background: #0C2C6B;
+        color: #fff;
+    }
+
+    .txn-action-approve:hover {
+        background: #0B2A5B;
+    }
+
+    .txn-action-reject {
+        background: #fff;
+        color: #b91c1c;
+        border-color: #fecaca;
+    }
+
+    .txn-action-reject:hover {
+        background: #b91c1c;
+        color: #fff;
+        border-color: #b91c1c;
+    }
+
+    .txn-actions-none {
+        color: #cbd5e1;
+    }
+
+    .txn-action-review {
+        background: #fff;
+        color: #0C2C6B;
+        border-color: #cbd5e1;
+    }
+
+    .txn-action-review:hover {
+        background: #0C2C6B;
+        color: #fff;
+        border-color: #0C2C6B;
+    }
+
+    /* ---------- TrueLife / Satellite member-type pills ---------- */
+    .txn-type-pill {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 9999px;
+        padding: 0.25rem 0.6rem;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .txn-type-truelife {
+        background: rgba(12, 44, 107, .08);
+        color: #0C2C6B;
+    }
+
+    .txn-type-satellite {
+        background: rgba(215, 155, 16, .12);
+        color: #B8830D;
+    }
+
+    @media (max-width: 1023px) {
+        .txn-action-btn {
+            width: 34px;
+            height: 34px;
+        }
+    }
+
     /* ---------- Small screens: tighten paddings, stack toolbar ---------- */
     @media (max-width: 640px) {
         .report-settings-desktop-nav {
@@ -177,8 +284,24 @@
     }
 </style>
 
+@php
+    /* Initial pending counts for the tab badges (server-rendered so they
+       appear immediately; the tab components keep them updated via the
+       txn-badges-updated browser event after every approve/reject). */
+    $pendingWithdrawalsCount = \App\Models\Withdrawal::where('status', 'Pending')->count();
+    $pendingActivationsCount = \App\Models\Activation::where('status', 'Pending')->count();
+@endphp
+
 <div class="report-settings-container"
-     x-data="{ tab: $persist('overview').as('transaction-list-tab') }">
+     x-data="{
+         tab: $persist('overview').as('transaction-list-tab'),
+         pendingWithdrawals: {{ $pendingWithdrawalsCount }},
+         pendingActivations: {{ $pendingActivationsCount }},
+     }"
+     x-init="window.addEventListener('txn-badges-updated', (e) => {
+         pendingActivations = e.detail ? (e.detail.activations ?? pendingActivations) : pendingActivations;
+         pendingWithdrawals = e.detail ? (e.detail.withdrawals ?? pendingWithdrawals) : pendingWithdrawals;
+     })">
 
     <nav class="report-settings-header">
         <div class="report-settings-header-title">
@@ -202,6 +325,8 @@
                :class="{ active: tab==='withdrawals' }">
                 <span class="report-settings-tab-icon">↧</span>
                 <span>Withdrawal</span>
+                <span class="txn-tab-badge" x-show="pendingWithdrawals > 0"
+                      x-text="pendingWithdrawals" x-cloak></span>
             </a>
 
             <a href="#"
@@ -209,6 +334,8 @@
                :class="{ active: tab==='activations' }">
                 <span class="report-settings-tab-icon">✦</span>
                 <span>Activations</span>
+                <span class="txn-tab-badge" x-show="pendingActivations > 0"
+                      x-text="pendingActivations" x-cloak></span>
             </a>
 
         </div>
@@ -228,5 +355,134 @@
     </div>
 
 </div>
+
+{{--
+    REVIEW MODALS — used by the Activations tab row actions. A regular
+    TrueLife member activation opens the members-page review modal; a
+    satellite member activation opens the satellite review modal. Both are
+    the same components the Masterlist pages use (they listen for their
+    open events globally), so approve/reject/resubmit inside them behaves
+    identically and refreshes the tab rows + badges via members-refresh /
+    txn-badges-updated.
+--}}
+<livewire:admin-pages.masterlist.activation-review-modal />
+<livewire:admin-pages.masterlist.satellite-members-components.satellite-members-activation-review />
+
+{{-- Withdrawal review modal — the ONLY route to approve/reject a withdrawal:
+     the row eye opens this modal first (full details), and its Approve /
+     Reject buttons fire the typed dialogs below. --}}
+<livewire:admin-pages.transaction-list.withdrawal-review-modal />
+
+{{--
+    APPROVE / REJECT DIALOGS (shared SwalFlow)
+    Fired from the Withdrawal / Activations tab components via browser
+    events (confirmApprove*/confirmReject* gates in PHP dispatch them).
+    Approve requires the typed word APPROVE; withdrawal reject requires
+    REJECT; activation reject requires remarks. Handled here (plain
+    livewire:init script, same pattern as the shared sweet-alert-handler)
+    so the dialogs work regardless of which tab component dispatched.
+--}}
+<script>
+    document.addEventListener('livewire:init', () => {
+        const callTxn = (name, method, ...args) => {
+            const el = [...document.querySelectorAll('[wire\\:id]')]
+                .find((el) => JSON.parse(el.getAttribute('wire:snapshot') || '{}').memo?.name === name);
+
+            // Livewire.find() returns the component's $wire object directly.
+            const wire = el ? window.Livewire.find(el.getAttribute('wire:id')) : null;
+
+            if (! wire) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Tab Not Loaded',
+                    text: 'Open the ' + (name.includes('withdrawal') ? 'Withdrawal' : 'Activations') + ' tab first, then try again.',
+                    confirmButtonColor: '#0B2A5B',
+                });
+                return;
+            }
+
+            wire.call(method, ...args);
+        };
+
+        // ---------- ACTIVATIONS: APPROVE (typed APPROVE) ----------
+        window.Livewire.on('txn-approve-activation-prompt', (raw) => {
+            const d = Array.isArray(raw) ? raw[0] : raw;
+
+            SwalFlow.confirm({
+                title: 'Approve Activation?',
+                html: 'You are about to approve the activation of '
+                    + '<strong style="color: #0B2A5B;">' + (d.memberName || 'this member') + '</strong>'
+                    + ' for <strong style="color: #0B2A5B;">₱' + (d.amount || '0.00') + '</strong>.'
+                    + ' This activates the member account, writes wallets/ledgers and sends emails.'
+                    + '<br><br>Type <strong>APPROVE</strong> to confirm.',
+                icon: 'question',
+                requireConfirmWord: 'APPROVE',
+                inputPlaceholder: 'APPROVE',
+                confirmText: 'Yes, approve!',
+                cancelText: 'Cancel',
+                loadingTitle: 'Approving activation...',
+                loadingText: 'Updating records and sending emails.',
+            }, () => callTxn('admin-pages.transaction-list.activations', 'approveActivation', d.activationId));
+        });
+
+        // Close the withdrawal review modal (if open) so the typed dialog
+        // is the only thing on screen and the modal shows fresh data after.
+        const closeWithdrawalReview = () => {
+            const el = [...document.querySelectorAll('[wire\\:id]')]
+                .find((el) => JSON.parse(el.getAttribute('wire:snapshot') || '{}').memo?.name === 'admin-pages.transaction-list.withdrawal-review-modal');
+
+            if (el) {
+                window.Livewire.find(el.getAttribute('wire:id')).call('closeModal');
+            }
+        };
+
+        // ---------- WITHDRAWALS: APPROVE (typed APPROVE) ----------
+        window.Livewire.on('txn-approve-withdrawal-prompt', (raw) => {
+            const d = Array.isArray(raw) ? raw[0] : raw;
+
+            closeWithdrawalReview();
+
+            SwalFlow.confirm({
+                title: 'Approve & Release Withdrawal?',
+                html: 'You are about to release '
+                    + '<strong style="color: #0B2A5B;">₱' + (d.amount || '0.00') + '</strong>'
+                    + ' to <strong style="color: #0B2A5B;">' + (d.memberName || 'this member') + '</strong>.'
+                    + ' Wallet and ledger records will be written immediately.'
+                    + '<br><br>Type <strong>APPROVE</strong> to confirm.',
+                icon: 'question',
+                requireConfirmWord: 'APPROVE',
+                inputPlaceholder: 'APPROVE',
+                confirmText: 'Yes, approve!',
+                cancelText: 'Cancel',
+                loadingTitle: 'Approving withdrawal...',
+                loadingText: 'Releasing funds and updating records.',
+            }, () => callTxn('admin-pages.transaction-list.withdrawals', 'approveWithdrawal', d.withdrawalId));
+        });
+
+        // Activation review-modal confirmations (approve/reject/resubmit)
+        // are handled globally by the shared sweet-alert-handler — the modals
+        // dispatch txn-modal-* events so they work on every page.
+
+        // ---------- WITHDRAWALS: REJECT (typed REJECT) ----------
+        window.Livewire.on('txn-reject-withdrawal-prompt', (raw) => {
+            const d = Array.isArray(raw) ? raw[0] : raw;
+
+            closeWithdrawalReview();
+
+            SwalFlow.confirm({
+                title: 'Reject Withdrawal?',
+                html: 'This withdrawal request will be rejected. This action cannot be undone.'
+                    + '<br><br>Type <strong>REJECT</strong> to confirm.',
+                icon: 'warning',
+                requireConfirmWord: 'REJECT',
+                inputPlaceholder: 'REJECT',
+                confirmText: 'Yes, reject it!',
+                cancelText: 'Cancel',
+                loadingTitle: 'Rejecting withdrawal...',
+                loadingText: 'Updating records.',
+            }, () => callTxn('admin-pages.transaction-list.withdrawals', 'rejectWithdrawal', d.withdrawalId));
+        });
+    });
+</script>
 
 @endsection

@@ -2,7 +2,15 @@
 
 namespace App\Livewire\AdminPages\TransactionList;
 
+use App\Models\Activation;
+use App\Models\Ledger;
+use App\Models\Privilege;
+use App\Models\Wallet;
 use App\Models\Withdrawal;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -21,6 +29,339 @@ class Withdrawals extends Component
     {
         $this->search = '';
         $this->resetPage();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PERMISSIONS — same rule as the Members page actions
+    |--------------------------------------------------------------------------
+    | Super Admin (RoleID 1) or a role holding Privilege ModuleID 2 with
+    | can_update OR can_delete may approve/reject withdrawals. Non-privileged
+    | callers see only the row data (no action buttons in the blade).
+    |--------------------------------------------------------------------------
+    */
+
+    public function getCanProcessProperty(): bool
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return false;
+        }
+
+        if ((int) $user->RoleID === 1) {
+            return true;
+        }
+
+        return Privilege::where('RoleID', $user->RoleID)
+            ->where('ModuleID', 2)
+            ->where(fn ($q) => $q->where('can_update', 1)->orWhere('can_delete', 1))
+            ->exists();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PENDING COUNTS — badges on the page-shell tab nav
+    |--------------------------------------------------------------------------
+    */
+
+    public function getPendingWithdrawalsCountProperty(): int
+    {
+        return Withdrawal::query()->where('status', 'Pending')->count();
+    }
+
+    public function getPendingActivationsCountProperty(): int
+    {
+        return Activation::query()->where('status', 'Pending')->count();
+    }
+
+    /**
+     * Keep the page-shell badges in sync after any processable change
+     * (approve / reject) made from either tab.
+     */
+    private function broadcastBadgeRefresh(): void
+    {
+        $this->dispatch('txn-badges-updated',
+            activations: $this->pendingActivationsCount,
+            withdrawals: $this->pendingWithdrawalsCount,
+        );
+    }
+
+    #[On('members-refresh')]
+    public function refreshAfterModalAction(): void
+    {
+        // Approve/reject fired from the Members page review modals — the
+        // method call itself round-trips and re-renders rows + badges.
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | APPROVE & RELEASE WITHDRAWAL
+    | Same DB effects as the SatelliteMembers approval modal: status +
+    | confirmed_by, WD wallet debit on the requested amount, WD ledger on the
+    | net amount, and the 10% tax back onto the ledger as a TX row.
+    |--------------------------------------------------------------------------
+    */
+
+    public function approveWithdrawal(int $withdrawalId): void
+    {
+        if (! $this->canProcess) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to approve withdrawals.',
+            ]);
+
+            return;
+        }
+
+        try {
+            DB::transaction(function () use ($withdrawalId) {
+                $withdrawal = Withdrawal::where('WithdrawID', $withdrawalId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $withdrawal || $withdrawal->status !== 'Pending') {
+                    throw new \RuntimeException('Withdrawal is no longer pending.');
+                }
+
+                $requestedAmount = (float) $withdrawal->requested_amount;
+                $taxAmount = (float) $withdrawal->tax_amount;
+                $withdrawalAmount = (float) $withdrawal->amount;
+
+                $withdrawal->update([
+                    'status' => 'Approved',
+                    'confirmed_by' => Auth::user()?->UserID,
+                ]);
+
+                // Wallet entry: the requested amount leaves the wallet.
+                Wallet::create([
+                    'UserID' => $withdrawal->UserID,
+                    'withdrawID' => $withdrawal->WithdrawID,
+                    'amount' => -abs($requestedAmount),
+                    'source' => 'WD',
+                    'status' => 'Active',
+                ]);
+
+                // Ledger - withdrawal (net amount).
+                Ledger::create([
+                    'RefID' => $withdrawal->UserID,
+                    'WithdrawID' => $withdrawal->WithdrawID,
+                    'amount' => -abs($withdrawalAmount),
+                    'Source' => 'WD',
+                    'ActivationID' => null,
+                    'status' => 'Completed',
+                ]);
+
+                // Ledger - tax (returned to the ledger as a TX row).
+                Ledger::create([
+                    'RefID' => $withdrawal->UserID,
+                    'WithdrawID' => $withdrawal->WithdrawID,
+                    'amount' => $taxAmount,
+                    'Source' => 'TX',
+                    'ActivationID' => null,
+                    'status' => 'Completed',
+                ]);
+            });
+        } catch (\RuntimeException $e) {
+            Log::warning('Transaction-list withdrawal approval aborted.', [
+                'WithdrawID' => $withdrawalId,
+                'reason' => $e->getMessage(),
+                'reviewed_by' => Auth::id(),
+            ]);
+
+            $this->dispatch('swal:error', [
+                'title' => 'Cannot Approve',
+                'text' => 'This withdrawal request has already been processed.',
+            ]);
+
+            return;
+        } catch (\Exception $e) {
+            report($e);
+
+            Log::error('Transaction-list withdrawal approval failed: '.$e->getMessage());
+
+            $this->dispatch('swal:error', [
+                'title' => 'Error',
+                'text' => 'Something went wrong while approving the withdrawal.',
+            ]);
+
+            return;
+        }
+
+        Log::info('Withdrawal approved from Transaction List.', [
+            'WithdrawID' => $withdrawalId,
+            'reviewed_by' => Auth::id(),
+        ]);
+
+        $this->broadcastBadgeRefresh();
+
+        // Closes the review modal when the approval was fired from it
+        // (a no-op broadcast when the modal is not open).
+        $this->dispatch('withdrawal-processed');
+
+        $this->dispatch('swal:success', title: 'Success!', message: 'Withdrawal approved and released successfully.');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ROW ACTION — review first (details before decision)
+    |--------------------------------------------------------------------------
+    | The only row action: open the withdrawal review modal pinned to the
+    | exact row. Approve/reject happen from inside that modal, so the
+    | reviewer always sees the full request details before deciding.
+    |--------------------------------------------------------------------------
+    */
+
+    public function reviewWithdrawal(int $withdrawalId): void
+    {
+        if (! $this->canProcess) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to review withdrawals.',
+            ]);
+
+            return;
+        }
+
+        $withdrawal = Withdrawal::find($withdrawalId);
+
+        if (! $withdrawal) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Found',
+                'text' => 'This withdrawal could not be found.',
+            ]);
+
+            return;
+        }
+
+        $this->dispatch('open-withdrawal-review', withdrawalId: $withdrawalId);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CONFIRM GATES (typed dialogs are driven by the page shell)
+    |--------------------------------------------------------------------------
+    */
+
+    public function confirmApproveWithdrawal(int $withdrawalId): void
+    {
+        if (! $this->canProcess) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to approve withdrawals.',
+            ]);
+
+            return;
+        }
+
+        $withdrawal = Withdrawal::find($withdrawalId);
+
+        if (! $withdrawal || $withdrawal->status !== 'Pending') {
+            $this->dispatch('swal:error', [
+                'title' => 'Already Processed',
+                'text' => 'This withdrawal request has already been processed.',
+            ]);
+
+            return;
+        }
+
+        $this->dispatch('txn-approve-withdrawal-prompt',
+            withdrawalId: $withdrawalId,
+            memberName: trim(($withdrawal->user?->lastname ?? '').' '.($withdrawal->user?->firstname ?? '')) ?: 'this member',
+            amount: number_format((float) $withdrawal->amount, 2),
+        );
+    }
+
+    public function confirmRejectWithdrawal(int $withdrawalId): void
+    {
+        if (! $this->canProcess) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to reject withdrawals.',
+            ]);
+
+            return;
+        }
+
+        $withdrawal = Withdrawal::find($withdrawalId);
+
+        if (! $withdrawal || $withdrawal->status !== 'Pending') {
+            $this->dispatch('swal:error', [
+                'title' => 'Already Processed',
+                'text' => 'This withdrawal request has already been processed.',
+            ]);
+
+            return;
+        }
+
+        $this->dispatch('txn-reject-withdrawal-prompt', withdrawalId: $withdrawalId);
+    }
+
+    #[On('txn-reject-withdrawal')]
+    public function rejectWithdrawal($withdrawalId): void
+    {
+        if (! $this->canProcess) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to reject withdrawals.',
+            ]);
+
+            return;
+        }
+
+        try {
+            DB::transaction(function () use ($withdrawalId) {
+                $withdrawal = Withdrawal::where('WithdrawID', (int) $withdrawalId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $withdrawal || $withdrawal->status !== 'Pending') {
+                    throw new \RuntimeException('Withdrawal is no longer pending.');
+                }
+
+                $withdrawal->update([
+                    'status' => 'Rejected',
+                    'confirmed_by' => Auth::user()?->UserID,
+                ]);
+            });
+        } catch (\RuntimeException $e) {
+            Log::warning('Transaction-list withdrawal rejection aborted.', [
+                'WithdrawID' => $withdrawalId,
+                'reason' => $e->getMessage(),
+                'reviewed_by' => Auth::id(),
+            ]);
+
+            $this->dispatch('swal:error', [
+                'title' => 'Already Processed',
+                'text' => 'This withdrawal request has already been processed.',
+            ]);
+
+            return;
+        } catch (\Exception $e) {
+            report($e);
+
+            Log::error('Transaction-list withdrawal rejection failed: '.$e->getMessage());
+
+            $this->dispatch('swal:error', [
+                'title' => 'Error',
+                'text' => 'Something went wrong while rejecting the withdrawal.',
+            ]);
+
+            return;
+        }
+
+        Log::info('Withdrawal rejected from Transaction List.', [
+            'WithdrawID' => $withdrawalId,
+            'reviewed_by' => Auth::id(),
+        ]);
+
+        $this->broadcastBadgeRefresh();
+
+        // Closes the review modal when the rejection was fired from it
+        // (a no-op broadcast when the modal is not open).
+        $this->dispatch('withdrawal-processed');
+
+        $this->dispatch('swal:success', title: 'Withdrawal Rejected', message: 'The withdrawal request has been rejected successfully.');
     }
 
     public function render()

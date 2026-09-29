@@ -198,6 +198,42 @@
     flex-shrink:0;
 }
 
+/* Pending-count badge on sidebar links (Transaction List / Masterlist) */
+.sidebar-badge{
+    margin-left:auto;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:18px;
+    height:18px;
+    padding:0 5px;
+    border-radius:9999px;
+    background:#D79B10;
+    color:#fff;
+    font-size:0.62rem;
+    font-weight:700;
+    line-height:1;
+    white-space:nowrap;
+}
+
+/* Mobile bottom-nav variant: anchored to the icon, not the full-width item */
+.member-mobile-nav-badge-anchor{
+    position:relative;
+    display:inline-flex;
+}
+
+.sidebar-badge-mobile{
+    position:absolute;
+    top:-6px;
+    right:-10px;
+    margin-left:0;
+    min-width:15px;
+    height:15px;
+    padding:0 4px;
+    font-size:0.55rem;
+    border:2px solid #fff;
+}
+
 .active-menu{
     background:#0C2C6B;
     color:#fff;

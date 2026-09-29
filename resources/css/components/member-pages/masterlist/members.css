@@ -408,6 +408,33 @@
     @apply bg-[#0C2C6B] text-white hover:bg-[#09204f];
 }
 
+/* Pending-withdrawal count badge on the withdraw icon button */
+.member-action-badge-anchor {
+    position: relative;
+}
+
+.member-action-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 9999px;
+    background: #D79B10;
+    border: 2px solid #fff;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1;
+}
+
 /* "Renew" — an EXPIRED activation files a brand-new one */
 .member-action-renew {
     @apply bg-[#D79B10] text-white hover:bg-[#b7810c];
