@@ -56,6 +56,8 @@ class ViewMemberModal extends Component
      */
     public $receipt_number = '';
 
+    public $cocogen_policy_number = '';
+
     /*
     |--------------------------------------------------------------------------
     | Address & Location
@@ -144,16 +146,25 @@ class ViewMemberModal extends Component
     */
     private function fillPolicyInfo(User $user): void
     {
-        $this->policy_number = $user->policy_number;
-        $this->policy_expiration_date = $user->policy_expiration_date;
-        $this->policy_effectivity_date = $user->policy_effectivity_date;
-
-        // Control number lives on the member's latest approved activation
-        $this->receipt_number = Activation::where('UserID', $user->UserID)
+        $activation = Activation::where('UserID', $user->UserID)
             ->where('status', 'Approved')
-            ->whereNotNull('receipt_number')
             ->latest('ActivationID')
-            ->value('receipt_number');
+            ->first();
+
+        if (!$activation) {
+            $this->policy_number = '';
+            $this->policy_expiration_date = '';
+            $this->policy_effectivity_date = '';
+            $this->receipt_number = '';
+            $this->cocogen_policy_number = '';
+            return;
+        }
+
+        $this->policy_number = $activation->policy_number ?? '';
+        $this->policy_expiration_date = $activation->policy_expiration_date ?? '';
+        $this->policy_effectivity_date = $activation->policy_effectivity_date ?? '';
+        $this->receipt_number = $activation->receipt_number ?? '';
+        $this->cocogen_policy_number = $activation->cocogen_policy_number ?? '';
     }
 
     /*

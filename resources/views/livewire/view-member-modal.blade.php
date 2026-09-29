@@ -85,16 +85,13 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2 lg:grid-cols-3">
                         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                             <p class="text-xs font-bold uppercase text-slate-400">Policy Number</p>
                             <p class="mt-1 text-sm font-semibold text-slate-800">{{ $policy_number ?: 'N/A' }}</p>
                         </div>
 
-                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                            <p class="text-xs font-bold uppercase text-slate-400">Receipt Number</p>
-                            <p class="mt-1 text-sm font-semibold text-slate-800">{{ $receipt_number ?: 'N/A' }}</p>
-                        </div>
+
 
                         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                             <p class="text-xs font-bold uppercase text-slate-400">Policy Expiration Date</p>
@@ -112,6 +109,16 @@
                                     ? \Carbon\Carbon::parse($policy_effectivity_date)->format('F d, Y')
                                     : 'N/A' }}
                             </p>
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-bold uppercase text-slate-400">Cocogen Policy Number</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-800">{{ $cocogen_policy_number ?: 'N/A' }}</p>
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-bold uppercase text-slate-400">Receipt Number</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-800">{{ $receipt_number ?: 'N/A' }}</p>
                         </div>
 
                         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
