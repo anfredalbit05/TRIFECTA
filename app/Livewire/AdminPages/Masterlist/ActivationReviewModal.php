@@ -312,17 +312,17 @@ class ActivationReviewModal extends Component
         // GUARD CLAUSES
         // ==========================================================
 
-        if (! $this->isPrivileged) {
-            Log::warning('Activation approval blocked: user lacks privileges.', [
-                'UserID' => Auth::id(),
-            ]);
+        // if (! $this->isPrivileged) {
+        //     Log::warning('Activation approval blocked: user lacks privileges.', [
+        //         'UserID' => Auth::id(),
+        //     ]);
 
-            $this->showApprovalValidationError(
-                'Only administrators can approve activations.'
-            );
+        //     $this->showApprovalValidationError(
+        //         'Only administrators can approve activations.'
+        //     );
 
-            return;
-        }
+        //     return;
+        // }
 
         if (! $this->activation || ! $this->selectedUserID) {
             Log::warning(
@@ -659,14 +659,14 @@ class ActivationReviewModal extends Component
 
     public function confirmApprove(): void
     {
-        if (! $this->isPrivileged) {
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'Only administrators can approve activations.',
-            ]);
+        // if (! $this->isPrivileged) {
+        //     $this->dispatch('swal:error', [
+        //         'title' => 'Not Allowed',
+        //         'text' => 'Only administrators can approve activations.',
+        //     ]);
 
-            return;
-        }
+        //     return;
+        // }
 
         $activation = $this->activation ? Activation::find($this->activation->ActivationID) : null;
 
@@ -731,14 +731,14 @@ class ActivationReviewModal extends Component
 
     public function confirmResubmit(): void
     {
-        if (! $this->isPrivileged) {
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'Only administrators can resubmit activations.',
-            ]);
+        // if (! $this->isPrivileged) {
+        //     $this->dispatch('swal:error', [
+        //         'title' => 'Not Allowed',
+        //         'text' => 'Only administrators can resubmit activations.',
+        //     ]);
 
-            return;
-        }
+        //     return;
+        // }
 
         $activation = Activation::where('ActivationID', $this->activation?->ActivationID)->first();
 
