@@ -316,7 +316,7 @@ class ActivationApprovalService
                         if ($txAmount > 0) {
                             Ledger::create([
                                 'RefID' => $uplineUser->UserID,
-                                'amount' => -$txAmount,
+                                'amount' => $txAmount,
                                 'Source' => 'TX',
                                 'ActivationID' => $activation->ActivationID,
                                 'status' => 'Completed',
