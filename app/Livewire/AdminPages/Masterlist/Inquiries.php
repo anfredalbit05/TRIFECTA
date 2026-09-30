@@ -2,32 +2,39 @@
 
 namespace App\Livewire\AdminPages\Masterlist;
 
-use Livewire\Component;
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Inquiry;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
-use Livewire\WithPagination; // 1. Import the pagination trait
-use App\Models\Benefit;
-use App\Models\Privilege;
-use Illuminate\Support\Facades\Auth;
+use App\Support\Modules;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail; // 1. Import the pagination trait
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class Inquiries extends Component
 {
-    use WithPagination; // 2. Use the pagination trait here
+    // 2. Use the pagination trait here
+    use AuthorizesModules;
+    use WithPagination;
 
     protected $paginationTheme = 'tailwind';
+
     public $selectedInquiry = null;
+
     public $showModal = false;
+
     public string $search = '';
+
     public string $dateRange = '';   // e.g. "2026-08-01 to 2026-08-16"
 
     // Reply fields
     public $replySubject = '';
+
     public $replyMessage = '';
+
     public $successMessage = '';
 
-     public function mount()
+    public function mount()
     {
         $this->dateRange = '';
     }
@@ -56,75 +63,34 @@ class Inquiries extends Component
         ]);
 
         try {
-            Log::info('Attempting to send inquiry reply to: ' . $this->selectedInquiry->email);
+            Log::info('Attempting to send inquiry reply to: '.$this->selectedInquiry->email);
 
             Mail::raw($this->replyMessage, function ($mail) {
                 $mail->to($this->selectedInquiry->email)
                     ->subject($this->replySubject);
             });
 
-            $this->successMessage = 'Reply sent successfully to ' . $this->selectedInquiry->email;
+            $this->successMessage = 'Reply sent successfully to '.$this->selectedInquiry->email;
             $this->replyMessage = '';
 
             Log::info('Inquiry reply sent successfully.');
         } catch (\Exception $e) {
-            Log::error('Failed to send inquiry reply: ' . $e->getMessage());
+            Log::error('Failed to send inquiry reply: '.$e->getMessage());
 
             $this->successMessage = '';
             session()->flash('error', 'Failed to send email. Check logs for details.');
         }
     }
 
-    protected function hasPermission($action): bool
+    /*
+    |--------------------------------------------------------------------------
+    | Permission Checkers — global module system (Masterlist - Inquiries)
+    |--------------------------------------------------------------------------
+    */
+
+    protected function module(): int
     {
-        $user = Auth::user();
-
-        if (!$user) {
-            return false;
-        }
-
-        // Super Admin override (RoleID 1)
-        if ((int) $user->RoleID === 1) {
-            return true;
-        }
-
-        $column = 'can_' . $action;
-
-        if ($user->role && method_exists($user->role, 'permissions')) {
-            $hasPerm = optional($user->role->permissions)
-                ->where('ModuleID', 5)
-                ->where($column, 1)
-                ->isNotEmpty();
-
-            if ($hasPerm) {
-                return true;
-            }
-        }
-
-        return Privilege::where('RoleID', $user->RoleID)
-            ->where('ModuleID', 5)
-            ->where($column, 1)
-            ->exists();
-    }
-
-    public function getCanCreateProperty(): bool
-    {
-        return $this->hasPermission('create');
-    }
-
-    public function getCanReadProperty(): bool
-    {
-        return $this->hasPermission('read');
-    }
-
-    public function getCanUpdateProperty(): bool
-    {
-        return $this->hasPermission('update');
-    }
-
-    public function getCanDeleteProperty(): bool
-    {
-        return $this->hasPermission('delete');
+        return Modules::INQUIRIES;
     }
 
     public function closeModal()
@@ -141,9 +107,9 @@ class Inquiries extends Component
         $this->resetPage();
     }
 
-     protected function parsedDateRange(): array
+    protected function parsedDateRange(): array
     {
-        if (blank($this->dateRange) || !str_contains($this->dateRange, ' to ')) {
+        if (blank($this->dateRange) || ! str_contains($this->dateRange, ' to ')) {
             return [null, null];
         }
 
@@ -157,8 +123,7 @@ class Inquiries extends Component
         $this->resetPage();
     }
 
-
-     public function clearDateFilter(): void
+    public function clearDateFilter(): void
     {
         $this->dateRange = '';
         $this->resetPage();
@@ -178,14 +143,14 @@ class Inquiries extends Component
         [$dateFrom, $dateTo] = $this->parsedDateRange();
 
         $inquiries = Inquiry::when(filled($this->search), function ($query) {
-                $search = trim($this->search);
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%")
-                        ->orWhere('subject', 'like', "%{$search}%")
-                        ->orWhere('category', 'like', "%{$search}%");
-                });
-            })
+            $search = trim($this->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('subject', 'like', "%{$search}%")
+                    ->orWhere('category', 'like', "%{$search}%");
+            });
+        })
             ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
                 $query->whereBetween('created_at', [
                     Carbon::parse($dateFrom)->startOfDay(),

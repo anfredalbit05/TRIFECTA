@@ -2,11 +2,9 @@
 
 namespace App\Livewire\AdminPages\ReportSettings;
 
-use App\Models\Module;
-use App\Models\Privilege;
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Setting;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use App\Support\Modules;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -14,8 +12,14 @@ use Livewire\WithPagination;
 
 class GeneralSettings extends Component
 {
-    use WithPagination;
+    use AuthorizesModules;
     use WithFileUploads;
+    use WithPagination;
+
+    protected function module(): int
+    {
+        return Modules::RS_GENERAL;
+    }
 
     public $isOpen = false;
 
@@ -50,66 +54,11 @@ class GeneralSettings extends Component
     }
 
     /**
-     * Check permissions.
+     * Check permissions via the global module system.
      */
     protected function hasPermission($action)
     {
-        /** @var User|null $user */
-        $user = Auth::user();
-
-        if (! $user || ! $user->RoleID) {
-            return false;
-        }
-
-        // Super Admin
-        if ((int) $user->RoleID === 1) {
-            return true;
-        }
-
-        $module = Module::where(
-            'modulename',
-            'Report & Settings - General'
-        )->first();
-
-        if (! $module) {
-            return false;
-        }
-
-        $privilege = Privilege::where('RoleID', $user->RoleID)
-            ->where('ModuleID', $module->ModuleID)
-            ->first();
-
-        if (! $privilege) {
-            return false;
-        }
-
-        return match ($action) {
-            'create' => (bool) $privilege->can_create,
-            'read'   => (bool) $privilege->can_read,
-            'update' => (bool) $privilege->can_update,
-            'delete' => (bool) $privilege->can_delete,
-            default  => false,
-        };
-    }
-
-    public function getCanCreateProperty()
-    {
-        return $this->hasPermission('create');
-    }
-
-    public function getCanReadProperty()
-    {
-        return $this->hasPermission('read');
-    }
-
-    public function getCanUpdateProperty()
-    {
-        return $this->hasPermission('update');
-    }
-
-    public function getCanDeleteProperty()
-    {
-        return $this->hasPermission('delete');
+        return $this->can($action);
     }
 
     /**
@@ -119,6 +68,7 @@ class GeneralSettings extends Component
     {
         if (! $this->canCreate) {
             session()->flash('message', 'Unauthorized action.');
+
             return;
         }
 
@@ -163,6 +113,7 @@ class GeneralSettings extends Component
     {
         if (! $this->canUpdate) {
             session()->flash('message', 'Unauthorized action.');
+
             return;
         }
 
@@ -252,8 +203,8 @@ class GeneralSettings extends Component
 
             $text = count($emptyFields) > 1
                 ? 'The following fields are empty:<br><br><b>• '
-                    . implode('</b><br><b>• ', $emptyFields)
-                    . '</b>'
+                    .implode('</b><br><b>• ', $emptyFields)
+                    .'</b>'
                 : 'The <b>'.$emptyFields[0].'</b> field is empty.';
 
             $this->dispatch('swal:error', [
@@ -395,8 +346,7 @@ class GeneralSettings extends Component
         $this->validateOnly(
             'signatureUpload',
             [
-                'signatureUpload' =>
-                    'required|image|mimes:png,jpg,jpeg|max:5120',
+                'signatureUpload' => 'required|image|mimes:png,jpg,jpeg|max:5120',
             ]
         );
 
@@ -436,11 +386,11 @@ class GeneralSettings extends Component
         }
 
         $filename =
-            'CASHIER_SIG_' .
-            now()->format('Ymd_His') .
-            '_' .
-            uniqid() .
-            '.' .
+            'CASHIER_SIG_'.
+            now()->format('Ymd_His').
+            '_'.
+            uniqid().
+            '.'.
             $extension;
 
         /*
@@ -509,8 +459,7 @@ class GeneralSettings extends Component
 
             $this->dispatch('swal:error', [
                 'title' => 'Invalid Signature',
-                'text' =>
-                    'The signature image could not be read. Please try again.',
+                'text' => 'The signature image could not be read. Please try again.',
             ]);
 
             return;
@@ -529,8 +478,7 @@ class GeneralSettings extends Component
 
             $this->dispatch('swal:error', [
                 'title' => 'Invalid Image',
-                'text' =>
-                    'The signature image is not a valid image.',
+                'text' => 'The signature image is not a valid image.',
             ]);
 
             return;
@@ -548,8 +496,7 @@ class GeneralSettings extends Component
 
             $this->dispatch('swal:error', [
                 'title' => 'Unsupported Image',
-                'text' =>
-                    'The signature must be a PNG or JPEG image.',
+                'text' => 'The signature must be a PNG or JPEG image.',
             ]);
 
             return;
@@ -579,11 +526,11 @@ class GeneralSettings extends Component
         |--------------------------------------------------------------------------
         */
         $path =
-            'images/CASHIER_SIG_' .
-            now()->format('Ymd_His') .
-            '_' .
-            uniqid() .
-            '.' .
+            'images/CASHIER_SIG_'.
+            now()->format('Ymd_His').
+            '_'.
+            uniqid().
+            '.'.
             $extension;
 
         Storage::disk('public')->put(

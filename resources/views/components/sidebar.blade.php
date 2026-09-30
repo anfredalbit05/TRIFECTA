@@ -23,6 +23,59 @@
     $defaultAvatar = 'images/profiles/default-avatar.png';
 
     /*
+    | Section visibility follows the global module system
+    | (App\Support\Modules): a section link shows only when the signed-in
+    | role holds can_read on at least one module inside that section —
+    | on top of the existing isAdmin role gate.
+    */
+    $readableModuleIds = $user
+        ? collect([
+            \App\Support\Modules::ADMIN_USERS,
+            \App\Support\Modules::MEMBERS,
+            \App\Support\Modules::SATELLITE_MEMBERS,
+            \App\Support\Modules::BRANCHES,
+            \App\Support\Modules::BENEFITS,
+            \App\Support\Modules::FAQS,
+            \App\Support\Modules::INQUIRIES,
+            \App\Support\Modules::TXN_WITHDRAWALS,
+            \App\Support\Modules::TXN_ACTIVATIONS,
+            \App\Support\Modules::POST_NEWS,
+            \App\Support\Modules::POST_TESTIMONIALS,
+            \App\Support\Modules::RS_GENERAL,
+            \App\Support\Modules::RS_USERS_REPORTS,
+            \App\Support\Modules::RS_LEDGERS,
+            \App\Support\Modules::RS_PANGKABUHAYAN,
+        ])->filter(fn ($id) => \App\Support\Modules::can($id, 'read'))->all()
+        : [];
+
+    $canReadMasterlist = count(array_intersect($readableModuleIds, [
+        \App\Support\Modules::ADMIN_USERS,
+        \App\Support\Modules::MEMBERS,
+        \App\Support\Modules::SATELLITE_MEMBERS,
+        \App\Support\Modules::BRANCHES,
+        \App\Support\Modules::BENEFITS,
+        \App\Support\Modules::FAQS,
+        \App\Support\Modules::INQUIRIES,
+    ])) > 0;
+
+    $canReadTransactions = count(array_intersect($readableModuleIds, [
+        \App\Support\Modules::TXN_WITHDRAWALS,
+        \App\Support\Modules::TXN_ACTIVATIONS,
+    ])) > 0;
+
+    $canReadPost = count(array_intersect($readableModuleIds, [
+        \App\Support\Modules::POST_NEWS,
+        \App\Support\Modules::POST_TESTIMONIALS,
+    ])) > 0;
+
+    $canReadReports = count(array_intersect($readableModuleIds, [
+        \App\Support\Modules::RS_GENERAL,
+        \App\Support\Modules::RS_USERS_REPORTS,
+        \App\Support\Modules::RS_LEDGERS,
+        \App\Support\Modules::RS_PANGKABUHAYAN,
+    ])) > 0;
+
+    /*
     | Pending transaction counts (admin sidebar badges). Only queried for
     | admins — members never see these two links.
     */
@@ -128,7 +181,7 @@
                         <span>Genealogy</span>
                     </a>
 
-                    @if ($isAdmin)
+                    @if ($isAdmin && $canReadMasterlist)
 
                         <a href="{{ route('masterlist') }}"
                            class="menu-item {{ request()->routeIs('masterlist') ? 'active-menu' : '' }}">
@@ -142,6 +195,7 @@
                             @endif
                         </a>
 
+                        @if ($canReadTransactions)
                         <a href="{{ route('transaction-list') }}"
                            class="menu-item {{ request()->routeIs('transaction-list') ? 'active-menu' : '' }}">
                             <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -153,7 +207,9 @@
                                 <span class="sidebar-badge" title="{{ $pendingActivations }} pending activation(s), {{ $pendingWithdrawals }} pending withdrawal(s)">{{ $pendingTransactions }}</span>
                             @endif
                         </a>
+                        @endif
 
+                        @if ($canReadPost)
                         <a href="{{ route('post') }}"
                            class="menu-item {{ request()->routeIs('post') ? 'active-menu' : '' }}">
                             <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -162,7 +218,9 @@
                             </svg>
                             <span>Post</span>
                         </a>
+                        @endif
 
+                        @if ($canReadReports)
                         <a href="{{ route('report-settings') }}"
                            class="menu-item {{ request()->routeIs('report-settings') ? 'active-menu' : '' }}">
                             <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -171,6 +229,7 @@
                             </svg>
                             <span>Report & Settings</span>
                         </a>
+                        @endif
 
 
 
@@ -227,7 +286,7 @@
             <span>Genealogy</span>
         </a>
 
-        @if ($isAdmin)
+        @if ($isAdmin && $canReadMasterlist)
 
             <a href="{{ route('masterlist') }}"
                class="member-mobile-nav-item {{ request()->routeIs('masterlist') ? 'active' : '' }}">
@@ -238,6 +297,7 @@
                 <span>Masterlist</span>
             </a>
 
+            @if ($canReadTransactions)
             <a href="{{ route('transaction-list') }}"
                class="member-mobile-nav-item {{ request()->routeIs('transaction-list') ? 'active' : '' }}">
                 <span class="member-mobile-nav-badge-anchor">
@@ -251,7 +311,9 @@
                 </span>
                 <span>Transactions</span>
             </a>
+            @endif
 
+            @if ($canReadPost)
             <a href="{{ route('post') }}"
                class="member-mobile-nav-item {{ request()->routeIs('post') ? 'active' : '' }}">
                 <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -260,7 +322,9 @@
                 </svg>
                 <span>Post</span>
             </a>
+            @endif
 
+            @if ($canReadReports)
             <a href="{{ route('report-settings') }}"
                class="member-mobile-nav-item {{ request()->routeIs('report-settings') ? 'active' : '' }}">
                 <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -269,6 +333,7 @@
                 </svg>
                 <span>Reports</span>
             </a>
+            @endif
 
 
 

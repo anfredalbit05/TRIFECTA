@@ -432,7 +432,6 @@
                                         </button>
                                         @endif
 
-
                                         @if($isWithdrawalActive)
 
                                             @if ($this->canCreate)

@@ -4,6 +4,7 @@ namespace App\Livewire\Components;
 
 use App\Models\SpinDraw;
 use App\Services\SpinWheelService;
+use App\Support\Modules;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -18,6 +19,11 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class SpinFundReport extends Component
 {
+    protected function module(): int
+    {
+        return Modules::RS_PANGKABUHAYAN;
+    }
+
     public ?int $viewingDrawId = null;
 
     public string $winnerSearch = '';
@@ -88,6 +94,8 @@ class SpinFundReport extends Component
      */
     public function exportWinners(): StreamedResponse
     {
+        abort_unless($this->can('print'), 403, 'You do not have permission to export this report.');
+
         $draw = $this->viewingDraw;
 
         abort_unless($draw !== null, 404, 'Draw not found.');

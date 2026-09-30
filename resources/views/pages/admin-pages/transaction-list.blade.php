@@ -290,6 +290,11 @@
        txn-badges-updated browser event after every approve/reject). */
     $pendingWithdrawalsCount = \App\Models\Withdrawal::where('status', 'Pending')->count();
     $pendingActivationsCount = \App\Models\Activation::where('status', 'Pending')->count();
+
+    /* Tab visibility follows the global module system (App\Support\Modules):
+       a tab appears only when the viewer holds can_read on its module. */
+    $showWithdrawalsTab = \App\Support\Modules::can(\App\Support\Modules::TXN_WITHDRAWALS, 'read');
+    $showActivationsTab = \App\Support\Modules::can(\App\Support\Modules::TXN_ACTIVATIONS, 'read');
 @endphp
 
 <div class="report-settings-container"
@@ -320,6 +325,7 @@
                 <span>Overview</span>
             </a>
 
+            @if($showWithdrawalsTab)
             <a href="#"
                @click.prevent="tab='withdrawals'"
                :class="{ active: tab==='withdrawals' }">
@@ -328,7 +334,9 @@
                 <span class="txn-tab-badge" x-show="pendingWithdrawals > 0"
                       x-text="pendingWithdrawals" x-cloak></span>
             </a>
+            @endif
 
+            @if($showActivationsTab)
             <a href="#"
                @click.prevent="tab='activations'"
                :class="{ active: tab==='activations' }">
@@ -337,6 +345,7 @@
                 <span class="txn-tab-badge" x-show="pendingActivations > 0"
                       x-text="pendingActivations" x-cloak></span>
             </a>
+            @endif
 
         </div>
 

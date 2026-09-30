@@ -2,15 +2,16 @@
 
 namespace App\Livewire\AdminPages\Masterlist;
 
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Activation;
 use App\Models\ActivationHistory;
 use App\Models\Beneficiary;
 use App\Models\MembershipFee;
-use App\Models\Privilege;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\Withdrawal;
 use App\Services\ActivationApprovalService;
+use App\Support\Modules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,6 +21,13 @@ use Livewire\Component;
 
 class ActivationReviewModal extends Component
 {
+    use AuthorizesModules;
+
+    protected function module(): int
+    {
+        return Modules::TXN_ACTIVATIONS;
+    }
+
     public bool $open = false;
 
     public ?int $selectedUserID = null;
@@ -84,15 +92,11 @@ class ActivationReviewModal extends Component
         $this->selectedUserID = (int) $UserID;
 
         /*
-        | Same privilege rule as the satellite review modal: Super Admin or a
-        | role holding Privilege ModuleID 2 with can_update OR can_delete.
+        | Global module system (Transaction List - Activations): Super Admin
+        | or a role holding ModuleID 9 with can_change_status OR can_delete.
         | Everyone else gets the details read-only (buttons hidden in blade).
         */
-        $this->isPrivileged = Auth::user() && ((int) Auth::user()->RoleID === 1
-            || Privilege::where('RoleID', Auth::user()->RoleID)
-                ->where('ModuleID', 2)
-                ->where(fn ($q) => $q->where('can_update', 1)->orWhere('can_delete', 1))
-                ->exists());
+        $this->isPrivileged = $this->can('change_status') || $this->can('delete');
 
         $this->loadPaymentSettings();
 

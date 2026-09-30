@@ -4,8 +4,8 @@ namespace App\Livewire\AdminPages\Masterlist\SatelliteMembersComponents;
 
 use App\Models\Activation;
 use App\Models\ActivationHistory;
-use App\Models\Privilege;
 use App\Models\User;
+use App\Support\Modules;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -19,15 +19,15 @@ class SatelliteMembersView extends Component
     public ?string $status = null;
 
     /*
-    | True when the signed-in user is the record owner or holds ModuleID 2
-    | read privilege — only then are the Policy/Certificate download links
-    | rendered in the modal footer.
+    | True when the signed-in user is the record owner or holds read
+    | privilege on Members or Satellite Members — only then are the
+    | Policy/Certificate download links rendered in the modal footer.
     */
     public bool $canDownload = false;
 
     /**
-     * Mirrors ChecksMemberPermissions::callerHasReadPermission — kept local so
-     * the trait's other members never leak into this component.
+     * Read permission for member-record documents via the global module
+     * system: Members (ModuleID 2) or Satellite Members (ModuleID 3).
      */
     protected function callerHasReadPermission($caller): bool
     {
@@ -35,14 +35,8 @@ class SatelliteMembersView extends Component
             return false;
         }
 
-        if ((int) $caller->RoleID === 1) {
-            return true;
-        }
-
-        return Privilege::where('RoleID', $caller->RoleID)
-            ->where('ModuleID', 2)
-            ->where('can_read', 1)
-            ->exists();
+        return Modules::can(Modules::MEMBERS, 'read', $caller)
+            || Modules::can(Modules::SATELLITE_MEMBERS, 'read', $caller);
     }
 
     /*

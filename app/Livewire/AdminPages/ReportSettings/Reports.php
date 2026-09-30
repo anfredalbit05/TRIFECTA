@@ -2,7 +2,9 @@
 
 namespace App\Livewire\AdminPages\ReportSettings;
 
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Ledger;
+use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -10,7 +12,13 @@ use Livewire\WithPagination;
 
 class Reports extends Component
 {
+    use AuthorizesModules;
     use WithPagination;
+
+    protected function module(): int
+    {
+        return Modules::RS_LEDGERS;
+    }
 
     protected $paginationTheme = 'tailwind';
 
@@ -27,6 +35,15 @@ class Reports extends Component
      */
     public function preparePrint(): void
     {
+        if (! $this->can('print')) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to print ledgers.',
+            ]);
+
+            return;
+        }
+
         $this->printing = true;
 
         $this->dispatch('print-ledgers');

@@ -2,23 +2,20 @@
 
 namespace App\Traits;
 
-use App\Models\Privilege;
+use App\Support\Modules;
 
 trait ChecksMemberPermissions
 {
+    /**
+     * Read permission on member records via the global module system
+     * (Masterlist - Members, ModuleID 2).
+     */
     protected function callerHasReadPermission($caller): bool
     {
-        if (!$caller) {
+        if (! $caller) {
             return false;
         }
 
-        if ((int) $caller->RoleID === 1) {
-            return true;
-        }
-
-        return Privilege::where('RoleID', $caller->RoleID)
-            ->where('ModuleID', 2)
-            ->where('can_read', 1)
-            ->exists();
+        return Modules::can(Modules::MEMBERS, 'read', $caller);
     }
 }

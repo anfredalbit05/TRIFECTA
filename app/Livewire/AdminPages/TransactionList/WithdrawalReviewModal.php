@@ -2,8 +2,9 @@
 
 namespace App\Livewire\AdminPages\TransactionList;
 
-use App\Models\Privilege;
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Withdrawal;
+use App\Support\Modules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
@@ -11,6 +12,8 @@ use Livewire\Component;
 
 class WithdrawalReviewModal extends Component
 {
+    use AuthorizesModules;
+
     public bool $open = false;
 
     public ?int $withdrawalId = null;
@@ -18,23 +21,23 @@ class WithdrawalReviewModal extends Component
     public ?Withdrawal $withdrawal = null;
 
     /*
-    | True only when the signed-in user is Super Admin (RoleID 1) or holds a
-    | ModuleID 2 privilege with can_update OR can_delete — the same canProcess
-    | rule as the tab components. Everyone else never sees the actions.
+    | True when the signed-in user is Super Admin (RoleID 1) or holds a
+    | ModuleID 8 privilege with can_change_status OR can_delete — the same
+    | canProcess rule as the tab component. Everyone else never sees actions.
     */
     public bool $isPrivileged = false;
+
+    protected function module(): int
+    {
+        return Modules::TXN_WITHDRAWALS;
+    }
 
     #[On('open-withdrawal-review')]
     public function openModal(int $withdrawalId): void
     {
-        $isSuperAdmin = (int) (Auth::user()?->RoleID ?? 0) === 1;
+        $this->isPrivileged = $this->can('change_status') || $this->can('delete');
 
-        $hasPrivilege = Privilege::where('RoleID', Auth::user()?->RoleID)
-            ->where('ModuleID', 2)
-            ->where(fn ($q) => $q->where('can_update', 1)->orWhere('can_delete', 1))
-            ->exists();
-
-        if (! ($isSuperAdmin || $hasPrivilege)) {
+        if (! $this->isPrivileged) {
             Log::warning('Withdrawal review blocked: caller lacks privileges.', [
                 'WithdrawID' => $withdrawalId,
                 'caller' => Auth::id(),
@@ -68,8 +71,6 @@ class WithdrawalReviewModal extends Component
         }
 
         $this->withdrawalId = (int) $this->withdrawal->WithdrawID;
-
-        $this->isPrivileged = $isSuperAdmin || $hasPrivilege;
 
         $this->open = true;
     }

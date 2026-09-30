@@ -2,12 +2,11 @@
 
 namespace App\Livewire\Components;
 
-use App\Models\Ledger;
-use App\Models\Privilege;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
+use App\Support\Modules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,10 +20,15 @@ class WithdrawalModal extends Component
     // ==========================================
 
     public $withdrawAmount = '';
+
     public $withdrawalMethod = '';
+
     public $bankName = ''; // <--- Added property
+
     public $accountName = '';
+
     public $accountNumber = '';
+
     public $paymentReference = '';
 
     // ==========================================
@@ -50,6 +54,7 @@ class WithdrawalModal extends Component
     // ==========================================
 
     public ?int $targetUserID = null;
+
     public bool $isAdminMode = false;
 
     // ==========================================
@@ -66,7 +71,7 @@ class WithdrawalModal extends Component
 
         $admin = Auth::user();
 
-        if (!$admin || !$this->adminCanCreateWithdrawal($admin)) {
+        if (! $admin || ! $this->adminCanCreateWithdrawal($admin)) {
 
             Log::warning('WithdrawalModal: admin lacks permission to create withdrawal.', [
                 'admin_id' => Auth::id(),
@@ -82,7 +87,7 @@ class WithdrawalModal extends Component
 
         $targetUser = User::where('UserID', $userID)->first();
 
-        if (!$targetUser) {
+        if (! $targetUser) {
 
             $this->dispatch(
                 'withdrawal-error',
@@ -116,13 +121,13 @@ class WithdrawalModal extends Component
     #[On('check-pending-withdrawal')]
     public function checkPendingWithdrawal(): void
     {
-        if (!$this->isAdminMode) {
+        if (! $this->isAdminMode) {
             $this->targetUserID = null;
         }
 
         $this->refreshBalance();
 
-        if (!$this->isWithdrawalActive()) {
+        if (! $this->isWithdrawalActive()) {
             $this->dispatch(
                 'withdrawal-error',
                 message: 'Withdrawals are currently unavailable. Please try again later.'
@@ -133,7 +138,7 @@ class WithdrawalModal extends Component
 
         $user = $this->resolveActingUser();
 
-        if (!$user) {
+        if (! $user) {
             $this->dispatch(
                 'withdrawal-error',
                 message: 'You must be logged in.'
@@ -153,7 +158,7 @@ class WithdrawalModal extends Component
                 : null;
 
             $processedByName = $processedByUser
-                ? trim($processedByUser->firstname . ' ' . $processedByUser->lastname)
+                ? trim($processedByUser->firstname.' '.$processedByUser->lastname)
                 : 'N/A';
 
             $this->dispatch(
@@ -179,10 +184,10 @@ class WithdrawalModal extends Component
         if ($this->totalAmount < $minimumWithdrawal) {
             $this->dispatch(
                 'withdrawal-error',
-                message: 'You do not have enough balance to make a withdrawal. Your available balance is ₱' .
-                    number_format($this->totalAmount, 2) .
-                    ', while the minimum withdrawal amount is ₱' .
-                    number_format($minimumWithdrawal, 2) .
+                message: 'You do not have enough balance to make a withdrawal. Your available balance is ₱'.
+                    number_format($this->totalAmount, 2).
+                    ', while the minimum withdrawal amount is ₱'.
+                    number_format($minimumWithdrawal, 2).
                     '.'
             );
 
@@ -202,7 +207,7 @@ class WithdrawalModal extends Component
         // CHECK IF WITHDRAWALS ARE ACTIVE
         // ==========================================
 
-        if (!$this->isWithdrawalActive()) {
+        if (! $this->isWithdrawalActive()) {
             $this->dispatch(
                 'withdrawal-error',
                 message: 'Withdrawals are currently unavailable. Please try again later.'
@@ -219,7 +224,7 @@ class WithdrawalModal extends Component
 
             $admin = Auth::user();
 
-            if (!$admin || !$this->adminCanCreateWithdrawal($admin)) {
+            if (! $admin || ! $this->adminCanCreateWithdrawal($admin)) {
 
                 $this->dispatch(
                     'withdrawal-error',
@@ -236,7 +241,7 @@ class WithdrawalModal extends Component
 
         $user = $this->resolveActingUser();
 
-        if (!$user) {
+        if (! $user) {
 
             $this->dispatch(
                 'withdrawal-error',
@@ -292,8 +297,8 @@ class WithdrawalModal extends Component
             'withdrawAmount' => [
                 'required',
                 'numeric',
-                'min:' . $minimumWithdrawal,
-                'max:' . max(0, $availableBalance),
+                'min:'.$minimumWithdrawal,
+                'max:'.max(0, $availableBalance),
             ],
 
             'withdrawalMethod' => [
@@ -349,29 +354,21 @@ class WithdrawalModal extends Component
         $this->validate(
             $rules,
             [
-                'withdrawAmount.required' =>
-                    'Please enter a withdrawal amount.',
+                'withdrawAmount.required' => 'Please enter a withdrawal amount.',
 
-                'withdrawAmount.numeric' =>
-                    'Withdrawal amount must be a valid number.',
+                'withdrawAmount.numeric' => 'Withdrawal amount must be a valid number.',
 
-                'withdrawAmount.min' =>
-                    "Minimum withdrawal amount is ₱{$minimumWithdrawal}.",
+                'withdrawAmount.min' => "Minimum withdrawal amount is ₱{$minimumWithdrawal}.",
 
-                'withdrawAmount.max' =>
-                    'Withdrawal amount exceeds the available balance.',
+                'withdrawAmount.max' => 'Withdrawal amount exceeds the available balance.',
 
-                'withdrawalMethod.required' =>
-                    'Please select a withdrawal method.',
+                'withdrawalMethod.required' => 'Please select a withdrawal method.',
 
-                'bankName.required' =>
-                    'Please select a bank.',
+                'bankName.required' => 'Please select a bank.',
 
-                'accountName.required' =>
-                    'Please enter the account name.',
+                'accountName.required' => 'Please enter the account name.',
 
-                'accountNumber.required' =>
-                    'Please enter the account number.',
+                'accountNumber.required' => 'Please enter the account number.',
             ]
         );
 
@@ -663,35 +660,17 @@ class WithdrawalModal extends Component
     // ==========================================
     // ADMIN PERMISSION CHECK
     //
-    // Mirrors AdminUsers::hasPermission('create').
-    // Needed because open-admin-withdrawal-modal is
-    // a browser event — without this check, anyone
-    // with dev tools could fire it with an arbitrary
-    // userID and open the modal for someone else.
+    // Global module system: the caller needs Admin
+    // Users (ModuleID 1) can_create. Needed because
+    // open-admin-withdrawal-modal is a browser
+    // event — without this check, anyone with dev
+    // tools could fire it with an arbitrary userID
+    // and open the modal for someone else.
     // ==========================================
 
     private function adminCanCreateWithdrawal(User $admin): bool
     {
-        if ((int) $admin->RoleID === 1) {
-            return true;
-        }
-
-        if ($admin->role && method_exists($admin->role, 'permissions')) {
-
-            $hasPermission = optional($admin->role->permissions)
-                ->where('ModuleID', 1)
-                ->where('can_create', 1)
-                ->isNotEmpty();
-
-            if ($hasPermission) {
-                return true;
-            }
-        }
-
-        return Privilege::where('RoleID', $admin->RoleID)
-            ->where('ModuleID', 1)
-            ->where('can_create', 1)
-            ->exists();
+        return Modules::can(Modules::ADMIN_USERS, 'create', $admin);
     }
 
     // ==========================================
@@ -731,11 +710,9 @@ class WithdrawalModal extends Component
         return view(
             'livewire.components.withdrawal-modal',
             [
-                'minimumWithdrawalAmount' =>
-                    $this->getMinimumWithdrawalAmount(),
+                'minimumWithdrawalAmount' => $this->getMinimumWithdrawalAmount(),
 
-                'isWithdrawalActive' =>
-                    $this->isWithdrawalActive(),
+                'isWithdrawalActive' => $this->isWithdrawalActive(),
 
                 // Only set in admin mode — the view
                 // uses this to show whose wallet it's

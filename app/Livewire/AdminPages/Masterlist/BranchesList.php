@@ -2,31 +2,37 @@
 
 namespace App\Livewire\AdminPages\Masterlist;
 
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Branch;
-use App\Models\Privilege;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use App\Support\Modules;
+use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
 
 class BranchesList extends Component
 {
-
+    use AuthorizesModules;
     use WithPagination;
 
     protected $paginationTheme = 'tailwind';
 
     public $isOpen = false;
+
     public $branch_id;
+
     public string $search = ''; // Added search property
+
     public string $dateRange = '';   // e.g. "2026-08-01 to 2026-08-16"
 
     // Form fields
     public $branchCode;
+
     public $branchname;
+
     public $address;
+
     public $status = true;
+
     public $UserID;
 
     // Validation rules
@@ -37,68 +43,19 @@ class BranchesList extends Component
         'UserID' => 'nullable|exists:users,UserID',
     ];
 
-       public function mount()
+    public function mount()
     {
         $this->dateRange = '';
     }
     /*
     |--------------------------------------------------------------------------
-    | Permission Checkers (ModuleID 3 assumed for Branches)
+    | Permission Checkers — global module system (Masterlist - Branches)
     |--------------------------------------------------------------------------
     */
 
-    protected function hasPermission($action): bool
+    protected function module(): int
     {
-        $user = Auth::user();
-
-        if (!$user) {
-            return false;
-        }
-
-        // Super Admin override (RoleID 1)
-        if ((int) $user->RoleID === 1) {
-            return true;
-        }
-
-        $column = 'can_' . $action;
-
-        // Safely check relation or fall back directly to query to prevent null errors
-        if ($user->role && method_exists($user->role, 'permissions')) {
-            $hasPerm = optional($user->role->permissions)
-                ->where('ModuleID', 3)
-                ->where($column, 1)
-                ->isNotEmpty();
-
-            if ($hasPerm) {
-                return true;
-            }
-        }
-
-        // Direct fallback query check
-        return Privilege::where('RoleID', $user->RoleID)
-            ->where('ModuleID', 3)
-            ->where($column, 1)
-            ->exists();
-    }
-
-    public function getCanCreateProperty(): bool
-    {
-        return $this->hasPermission('create');
-    }
-
-    public function getCanReadProperty(): bool
-    {
-        return $this->hasPermission('read');
-    }
-
-    public function getCanUpdateProperty(): bool
-    {
-        return $this->hasPermission('update');
-    }
-
-    public function getCanDeleteProperty(): bool
-    {
-        return $this->hasPermission('delete');
+        return Modules::BRANCHES;
     }
 
     /*
@@ -109,7 +66,7 @@ class BranchesList extends Component
 
     public function openCreateModal()
     {
-        if (!$this->canCreate) {
+        if (! $this->canCreate) {
             return;
         }
 
@@ -127,7 +84,7 @@ class BranchesList extends Component
 
     public function editBranch($id)
     {
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
             return;
         }
 
@@ -144,10 +101,10 @@ class BranchesList extends Component
 
     public function saveBranch()
     {
-        if ($this->branch_id && !$this->canUpdate) {
+        if ($this->branch_id && ! $this->canUpdate) {
             return;
         }
-        if (!$this->branch_id && !$this->canCreate) {
+        if (! $this->branch_id && ! $this->canCreate) {
             return;
         }
 
@@ -175,7 +132,7 @@ class BranchesList extends Component
 
     public function confirmDeleteBranch($id)
     {
-        if (!$this->canDelete) {
+        if (! $this->canDelete) {
             return;
         }
 
@@ -184,7 +141,7 @@ class BranchesList extends Component
 
     public function deleteBranch($id)
     {
-        if (!$this->canDelete) {
+        if (! $this->canDelete) {
             return;
         }
 
@@ -199,9 +156,9 @@ class BranchesList extends Component
         $this->resetPage();
     }
 
-     protected function parsedDateRange(): array
+    protected function parsedDateRange(): array
     {
-        if (blank($this->dateRange) || !str_contains($this->dateRange, ' to ')) {
+        if (blank($this->dateRange) || ! str_contains($this->dateRange, ' to ')) {
             return [null, null];
         }
 
@@ -253,7 +210,7 @@ class BranchesList extends Component
             ->paginate(10);
 
         return view('components.admin-pages.masterlist.branches', [
-            'branches' => $branches
+            'branches' => $branches,
         ]);
     }
 }

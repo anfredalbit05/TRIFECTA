@@ -2,14 +2,15 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Mail\PasswordResetConfirmation;
 use App\Models\Activation;
 use App\Models\Ledger;
-use App\Models\Privilege;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
+use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,7 @@ use Livewire\WithPagination;
 
 class Members extends Component
 {
+    use AuthorizesModules;
     use WithPagination;
 
     public string $search = '';
@@ -70,58 +72,13 @@ class Members extends Component
 
     /*
     |--------------------------------------------------------------------------
-    | Permission Checkers
+    | Permission Checkers — global module system (Masterlist - Members)
     |--------------------------------------------------------------------------
     */
 
-    protected function hasPermission($action): bool
+    protected function module(): int
     {
-        $user = Auth::user();
-
-        if (! $user) {
-            return false;
-        }
-
-        // Super Admin override (RoleID 1)
-        if ((int) $user->RoleID === 1) {
-            return true;
-        }
-
-        $column = 'can_'.$action;
-
-        // Safely check role permissions or fallback to direct query
-        if ($user->role && method_exists($user->role, 'permissions')) {
-            return optional($user->role->permissions)
-                ->where('ModuleID', 2)
-                ->where($column, 1)
-                ->isNotEmpty();
-        }
-
-        // Fallback direct check against privileges table
-        return Privilege::where('RoleID', $user->RoleID)
-            ->where('ModuleID', 2)
-            ->where($column, 1)
-            ->exists();
-    }
-
-    public function getCanCreateProperty(): bool
-    {
-        return $this->hasPermission('create'); // checks can_create
-    }
-
-    public function getCanReadProperty(): bool
-    {
-        return $this->hasPermission('read'); // checks can_read
-    }
-
-    public function getCanUpdateProperty(): bool
-    {
-        return $this->hasPermission('update'); // checks can_update
-    }
-
-    public function getCanDeleteProperty(): bool
-    {
-        return $this->hasPermission('delete'); // checks can_delete
+        return Modules::MEMBERS;
     }
 
     /*

@@ -2,10 +2,9 @@
 
 namespace App\Livewire\AdminPages\Post;
 
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\NewsUpdate;
-use App\Models\Module;
-use App\Models\Privilege;
-use App\Models\User;
+use App\Support\Modules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -14,86 +13,48 @@ use Livewire\WithPagination;
 
 class CreateNewsUpdates extends Component
 {
+    use AuthorizesModules;
     use WithFileUploads;
     use WithPagination;
 
+    protected function module(): int
+    {
+        return Modules::POST_NEWS;
+    }
+
     public $title = '';
+
     public $details = '';
+
     public $category = 'General';
+
     public $status = 'Published';
+
     public $image = null;
+
     public $existingImage = null;
 
     public bool $showCreateModal = false;
+
     public $selectedPost = null;
+
     public $postIdBeingEdited = null;
 
     public string $search = ''; // Added search property
+
     public string $statusFilter = 'All';
 
     // Helper to check permissions dynamically
     protected function hasPermission($action)
     {
-        /** @var User|null $user */
-        $user = Auth::user();
-
-        if (!$user || !$user->RoleID) {
-            return false;
-        }
-
-        // Super Admin (RoleID 1) bypasses checks
-        if ((int) $user->RoleID === 1) {
-            return true;
-        }
-
-        $module = Module::where('modulename', 'Post - News & Updates')->first();
-
-        if (!$module) {
-            return false;
-        }
-
-        $privilege = Privilege::where('RoleID', $user->RoleID)
-            ->where('ModuleID', $module->ModuleID)
-            ->first();
-
-        if (!$privilege) {
-            return false;
-        }
-
-        return match ($action) {
-            'create' => (bool) $privilege->can_create,
-            'read'   => (bool) $privilege->can_read,
-            'update' => (bool) $privilege->can_update,
-            'delete' => (bool) $privilege->can_delete,
-            default  => false,
-        };
-    }
-
-    // Computed properties for easy access in Blade views
-    public function getCanCreateProperty()
-    {
-        return $this->hasPermission('create');
-    }
-
-    public function getCanReadProperty()
-    {
-        return $this->hasPermission('read');
-    }
-
-    public function getCanUpdateProperty()
-    {
-        return $this->hasPermission('update');
-    }
-
-    public function getCanDeleteProperty()
-    {
-        return $this->hasPermission('delete');
+        return $this->can($action);
     }
 
     public function openCreateModal(): void
     {
-        if (!$this->canCreate) {
+        if (! $this->canCreate) {
             session()->flash('error', 'Unauthorized action.');
+
             return;
         }
 
@@ -115,8 +76,9 @@ class CreateNewsUpdates extends Component
 
     public function editPost($id): void
     {
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
             session()->flash('error', 'Unauthorized action.');
+
             return;
         }
 
@@ -137,22 +99,24 @@ class CreateNewsUpdates extends Component
     public function savePost(): void
     {
         // Check permissions based on whether it's an update or create
-        if ($this->postIdBeingEdited && !$this->canUpdate) {
+        if ($this->postIdBeingEdited && ! $this->canUpdate) {
             $this->addError('title', 'Unauthorized action.');
+
             return;
         }
 
-        if (!$this->postIdBeingEdited && !$this->canCreate) {
+        if (! $this->postIdBeingEdited && ! $this->canCreate) {
             $this->addError('title', 'Unauthorized action.');
+
             return;
         }
 
         $this->validate([
-            'title'    => ['required', 'string', 'max:255'],
-            'details'  => ['required', 'string'],
+            'title' => ['required', 'string', 'max:255'],
+            'details' => ['required', 'string'],
             'category' => ['required', 'string', 'max:100'],
-            'status'   => ['required', 'in:Published,Draft,Archived'],
-            'image'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'status' => ['required', 'in:Published,Draft,Archived'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         /** @var User|null $user */
@@ -168,18 +132,18 @@ class CreateNewsUpdates extends Component
                 }
 
                 // 1. Generate custom filename for update (e.g., NAU_UserID_timestamp.png)
-                $filename = 'NAU_' . ($user->UserID ?? '0') . '_' . time() . '.' . $this->image->extension();
+                $filename = 'NAU_'.($user->UserID ?? '0').'_'.time().'.'.$this->image->extension();
 
                 // 2. Use storeAs instead of store
                 $imagePath = $this->image->storeAs('news-images', $filename, 'public');
             }
 
             $news->update([
-                'title'    => $this->title,
-                'details'  => $this->details,
-                'image'    => $imagePath,
+                'title' => $this->title,
+                'details' => $this->details,
+                'image' => $imagePath,
                 'category' => $this->category,
-                'status'    => $this->status,
+                'status' => $this->status,
             ]);
 
             $message = 'News update updated successfully.';
@@ -187,19 +151,19 @@ class CreateNewsUpdates extends Component
             $imagePath = null;
             if ($this->image) {
                 // 1. Generate custom filename for creation
-                $filename = 'NAU_' . ($user->UserID ?? '0') . '_' . time() . '.' . $this->image->extension();
+                $filename = 'NAU_'.($user->UserID ?? '0').'_'.time().'.'.$this->image->extension();
 
                 // 2. Use storeAs instead of store
                 $imagePath = $this->image->storeAs('news-images', $filename, 'public');
             }
 
             NewsUpdate::create([
-                'title'    => $this->title,
-                'details'  => $this->details,
-                'image'    => $imagePath,
+                'title' => $this->title,
+                'details' => $this->details,
+                'image' => $imagePath,
                 'category' => $this->category,
-                'status'   => $this->status,
-                'UserID'   => $user->UserID ?? null,
+                'status' => $this->status,
+                'UserID' => $user->UserID ?? null,
             ]);
 
             $message = 'News update published successfully.';
@@ -237,13 +201,13 @@ class CreateNewsUpdates extends Component
 
     public function deletePost($id): void
     {
-        if (!$this->canDelete) {
+        if (! $this->canDelete) {
             return;
         }
 
         $news = NewsUpdate::where('ID', $id)->first();
 
-        if (!$news) {
+        if (! $news) {
             return;
         }
 

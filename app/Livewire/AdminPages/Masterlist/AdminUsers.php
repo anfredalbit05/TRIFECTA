@@ -2,6 +2,7 @@
 
 namespace App\Livewire\AdminPages\Masterlist;
 
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Mail\PasswordResetConfirmation;
 use App\Models\Ledger;
 use App\Models\Module;
@@ -10,6 +11,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
+use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +25,7 @@ use Livewire\WithPagination;
 
 class AdminUsers extends Component
 {
+    use AuthorizesModules;
     use WithPagination;
 
     protected $paginationTheme = 'tailwind';
@@ -117,56 +120,15 @@ class AdminUsers extends Component
     |----------------------------------------------------------------------
     */
 
-    protected function hasPermission(string $action): bool
+    /*
+    |----------------------------------------------------------------------
+    | Permissions — global module system (Masterlist - Admin Users)
+    |----------------------------------------------------------------------
+    */
+
+    protected function module(): int
     {
-        $user = Auth::user();
-
-        if (! $user) {
-            return false;
-        }
-
-        // Super Admin override
-        if ((int) $user->RoleID === 1) {
-            return true;
-        }
-
-        $column = 'can_'.$action;
-
-        if ($user->role && method_exists($user->role, 'permissions')) {
-            $hasPermission = optional($user->role->permissions)
-                ->where('ModuleID', 1)
-                ->where($column, 1)
-                ->isNotEmpty();
-
-            if ($hasPermission) {
-                return true;
-            }
-        }
-
-        return Privilege::where('RoleID', $user->RoleID)
-            ->where('ModuleID', 1)
-            ->where($column, 1)
-            ->exists();
-    }
-
-    public function getCanCreateProperty(): bool
-    {
-        return $this->hasPermission('create');
-    }
-
-    public function getCanReadProperty(): bool
-    {
-        return $this->hasPermission('read');
-    }
-
-    public function getCanUpdateProperty(): bool
-    {
-        return $this->hasPermission('update');
-    }
-
-    public function getCanDeleteProperty(): bool
-    {
-        return $this->hasPermission('delete');
+        return Modules::ADMIN_USERS;
     }
 
     // ==========================================

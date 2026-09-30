@@ -2,25 +2,30 @@
 
 namespace App\Livewire\AdminPages\Masterlist;
 
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Faq;
-use App\Models\Privilege;
-use Illuminate\Support\Facades\Auth;
+use App\Support\Modules;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class FaqList extends Component
 {
+    use AuthorizesModules;
     use WithPagination;
 
     protected $paginationTheme = 'tailwind';
 
     public $isOpen = false;
+
     public $faq_id;
+
     public string $search = ''; // Added search property
 
     // Form fields
     public $question;
+
     public $answer;
+
     public $status = true;
 
     // Validation rules
@@ -32,61 +37,13 @@ class FaqList extends Component
 
     /*
     |--------------------------------------------------------------------------
-    | Permission Checkers (ModuleID assumed, e.g., 5 or matching your DB schema)
+    | Permission Checkers — global module system (Masterlist - FAQs)
     |--------------------------------------------------------------------------
     */
 
-    protected function hasPermission($action): bool
+    protected function module(): int
     {
-        $user = Auth::user();
-
-        if (!$user) {
-            return false;
-        }
-
-        // Super Admin override (RoleID 1)
-        if ((int) $user->RoleID === 1) {
-            return true;
-        }
-
-        $column = 'can_' . $action;
-        $moduleID = 6; // Adjust this ID to match your FAQs module ID in the database
-
-        if ($user->role && method_exists($user->role, 'permissions')) {
-            $hasPerm = optional($user->role->permissions)
-                ->where('ModuleID', $moduleID)
-                ->where($column, 1)
-                ->isNotEmpty();
-
-            if ($hasPerm) {
-                return true;
-            }
-        }
-
-        return Privilege::where('RoleID', $user->RoleID)
-            ->where('ModuleID', $moduleID)
-            ->where($column, 1)
-            ->exists();
-    }
-
-    public function getCanCreateProperty(): bool
-    {
-        return $this->hasPermission('create');
-    }
-
-    public function getCanReadProperty(): bool
-    {
-        return $this->hasPermission('read');
-    }
-
-    public function getCanUpdateProperty(): bool
-    {
-        return $this->hasPermission('update');
-    }
-
-    public function getCanDeleteProperty(): bool
-    {
-        return $this->hasPermission('delete');
+        return Modules::FAQS;
     }
 
     /*
@@ -97,7 +54,7 @@ class FaqList extends Component
 
     public function openCreateModal()
     {
-        if (!$this->canCreate) {
+        if (! $this->canCreate) {
             return;
         }
 
@@ -106,7 +63,7 @@ class FaqList extends Component
         $this->reset([
             'question',
             'answer',
-            'faq_id'
+            'faq_id',
         ]);
 
         $this->status = true;
@@ -121,13 +78,13 @@ class FaqList extends Component
             'question',
             'answer',
             'status',
-            'faq_id'
+            'faq_id',
         ]);
     }
 
     public function editFaq($id)
     {
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
             return;
         }
 
@@ -145,10 +102,10 @@ class FaqList extends Component
 
     public function saveFaq()
     {
-        if ($this->faq_id && !$this->canUpdate) {
+        if ($this->faq_id && ! $this->canUpdate) {
             return;
         }
-        if (!$this->faq_id && !$this->canCreate) {
+        if (! $this->faq_id && ! $this->canCreate) {
             return;
         }
 
@@ -181,7 +138,7 @@ class FaqList extends Component
     // SweetAlert confirmation
     public function confirmDeleteFaq($id)
     {
-        if (!$this->canDelete) {
+        if (! $this->canDelete) {
             return;
         }
 
@@ -191,7 +148,7 @@ class FaqList extends Component
     // Delete after confirmation
     public function deleteFaq($id)
     {
-        if (!$this->canDelete) {
+        if (! $this->canDelete) {
             return;
         }
 
@@ -225,7 +182,7 @@ class FaqList extends Component
             ->paginate(10);
 
         return view('components.admin-pages.masterlist.faqs', [
-            'faqs' => $faqs
+            'faqs' => $faqs,
         ]);
     }
 }

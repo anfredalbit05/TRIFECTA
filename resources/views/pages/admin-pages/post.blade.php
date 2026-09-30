@@ -24,19 +24,23 @@
                 <span>Overview</span>
             </a>
 
+            @if(\App\Support\Modules::can(\App\Support\Modules::POST_NEWS, 'read'))
             <a href="#"
                @click.prevent="tab='news'"
                :class="{ active: tab==='news' }">
                 <span class="post-tab-icon">▣</span>
                 <span>News & Update</span>
             </a>
+            @endif
 
+            @if(\App\Support\Modules::can(\App\Support\Modules::POST_TESTIMONIALS, 'read'))
             <a href="#"
                @click.prevent="tab='testimonials'"
                :class="{ active: tab==='testimonials' }">
                 <span class="post-tab-icon">♡</span>
                 <span>Testimonials</span>
             </a>
+            @endif
 
         </div>
 

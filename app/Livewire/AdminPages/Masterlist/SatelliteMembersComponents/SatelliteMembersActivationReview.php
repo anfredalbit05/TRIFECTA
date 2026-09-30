@@ -2,16 +2,17 @@
 
 namespace App\Livewire\AdminPages\Masterlist\SatelliteMembersComponents;
 
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Activation;
 use App\Models\ActivationHistory;
 use App\Models\Beneficiary;
 use App\Models\MembershipFee;
-use App\Models\Privilege;
 use App\Models\Satellite;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\Withdrawal;
 use App\Services\ActivationApprovalService;
+use App\Support\Modules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,6 +21,13 @@ use Livewire\Component;
 
 class SatelliteMembersActivationReview extends Component
 {
+    use AuthorizesModules;
+
+    protected function module(): int
+    {
+        return Modules::TXN_ACTIVATIONS;
+    }
+
     public bool $open = false;
 
     public ?int $selectedUserID = null;
@@ -98,14 +106,9 @@ class SatelliteMembersActivationReview extends Component
         $isOwnerViewing = (int) $UserID === (int) Auth::id();
 
         if (! $isOwnerViewing) {
-            $hasUpdatePrivilege = Privilege::where('RoleID', Auth::user()?->RoleID)
-                ->where('ModuleID', 2)
-                ->where(fn ($q) => $q->where('can_update', 1)->orWhere('can_delete', 1))
-                ->exists();
+            $hasUpdatePrivilege = $this->can('change_status') || $this->can('delete');
 
-            $isSuperAdmin = (int) (Auth::user()?->RoleID ?? 0) === 1;
-
-            if (! ($isSuperAdmin || $hasUpdatePrivilege)) {
+            if (! $hasUpdatePrivilege) {
                 Log::warning('Satellite activation review blocked: caller lacks privileges.', [
                     'UserID' => $UserID,
                     'caller' => Auth::id(),
@@ -150,12 +153,7 @@ class SatelliteMembersActivationReview extends Component
         | the buttons are also hidden in the blade.
         */
         $this->isPrivileged = (int) $this->member->RoleID === 8
-            && Auth::user()
-            && ((int) Auth::user()->RoleID === 1
-                || Privilege::where('RoleID', Auth::user()->RoleID)
-                    ->where('ModuleID', 2)
-                    ->where(fn ($q) => $q->where('can_update', 1)->orWhere('can_delete', 1))
-                    ->exists());
+            && ($this->can('change_status') || $this->can('delete'));
 
         // =====================================================
         // SET SELECTED USER

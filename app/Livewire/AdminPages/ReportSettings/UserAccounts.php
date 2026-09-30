@@ -2,23 +2,36 @@
 
 namespace App\Livewire\AdminPages\ReportSettings;
 
-use App\Models\User;
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Ledger;
+use App\Models\User;
+use App\Support\Modules;
+use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
 
 class UserAccounts extends Component
 {
+    use AuthorizesModules;
     use WithPagination;
+
+    protected function module(): int
+    {
+        return Modules::RS_USERS_REPORTS;
+    }
 
     protected $paginationTheme = 'tailwind';
 
     public string $search = '';
+
     public string $roleFilter = '';
+
     public string $statusFilter = '';
+
     public string $dateRange = ''; // e.g. "2026-08-01 to 2026-08-16"
+
     public ?int $selectedUserLedgerID = null;
+
     public bool $isLedgerModalOpen = false;
 
     protected $queryString = [
@@ -50,7 +63,7 @@ class UserAccounts extends Component
 
     protected function parsedDateRange(): array
     {
-        if (blank($this->dateRange) || !str_contains($this->dateRange, ' to ')) {
+        if (blank($this->dateRange) || ! str_contains($this->dateRange, ' to ')) {
             return [null, null];
         }
 
@@ -104,10 +117,10 @@ class UserAccounts extends Component
         return User::with(['role', 'wallets', 'ledgers'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('firstname', 'like', '%' . $this->search . '%')
-                      ->orWhere('lastname', 'like', '%' . $this->search . '%')
-                      ->orWhere('email', 'like', '%' . $this->search . '%')
-                      ->orWhere('referralCode', 'like', '%' . $this->search . '%');
+                    $q->where('firstname', 'like', '%'.$this->search.'%')
+                        ->orWhere('lastname', 'like', '%'.$this->search.'%')
+                        ->orWhere('email', 'like', '%'.$this->search.'%')
+                        ->orWhere('referralCode', 'like', '%'.$this->search.'%');
                 });
             })
             ->when($this->roleFilter, function ($query) {

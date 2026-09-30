@@ -2,10 +2,11 @@
 
 namespace App\Livewire\AdminPages\TransactionList;
 
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Activation;
-use App\Models\Privilege;
 use App\Models\Withdrawal;
 use App\Services\ActivationApprovalService;
+use App\Support\Modules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
@@ -14,6 +15,7 @@ use Livewire\WithPagination;
 
 class Activations extends Component
 {
+    use AuthorizesModules;
     use WithPagination;
 
     public string $search = '';
@@ -39,30 +41,22 @@ class Activations extends Component
 
     /*
     |--------------------------------------------------------------------------
-    | PERMISSIONS — same rule as the Members page actions
+    | PERMISSIONS — global module system (Transaction List - Activations)
     |--------------------------------------------------------------------------
-    | Super Admin (RoleID 1) or a role holding Privilege ModuleID 2 with
-    | can_update OR can_delete may approve/reject activations. Non-privileged
-    | callers see only the row data (no action buttons in the blade).
+    | Super Admin (RoleID 1) or a role holding the ModuleID 9 privilege with
+    | can_change_status (or can_delete) may approve/reject activations.
+    | Everyone else sees only the row data (no action buttons in the blade).
     |--------------------------------------------------------------------------
     */
 
+    protected function module(): int
+    {
+        return Modules::TXN_ACTIVATIONS;
+    }
+
     public function getCanProcessProperty(): bool
     {
-        $user = Auth::user();
-
-        if (! $user) {
-            return false;
-        }
-
-        if ((int) $user->RoleID === 1) {
-            return true;
-        }
-
-        return Privilege::where('RoleID', $user->RoleID)
-            ->where('ModuleID', 2)
-            ->where(fn ($q) => $q->where('can_update', 1)->orWhere('can_delete', 1))
-            ->exists();
+        return $this->can('change_status') || $this->can('delete');
     }
 
     /*

@@ -2,26 +2,34 @@
 
 namespace App\Livewire\AdminPages\Masterlist;
 
+use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Benefit;
-use App\Models\Privilege;
-use Illuminate\Support\Facades\Auth;
+use App\Support\Modules;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class BenefitsList extends Component
 {
+    use AuthorizesModules;
     use WithPagination;
 
     protected $paginationTheme = 'tailwind';
+
     public $isOpen = false;
+
     public $benefit_id;
+
     public string $search = ''; // Added search property
 
     // Form fields
     public $name;
+
     public $details;
+
     public $amount = 0;
+
     public $holdertype = '';
+
     public $status = true;
 
     // Validation rules
@@ -35,60 +43,13 @@ class BenefitsList extends Component
 
     /*
     |--------------------------------------------------------------------------
-    | Permission Checkers (ModuleID 4 assumed for Benefits)
+    | Permission Checkers — global module system (Masterlist - Benefits)
     |--------------------------------------------------------------------------
     */
 
-    protected function hasPermission($action): bool
+    protected function module(): int
     {
-        $user = Auth::user();
-
-        if (!$user) {
-            return false;
-        }
-
-        // Super Admin override (RoleID 1)
-        if ((int) $user->RoleID === 1) {
-            return true;
-        }
-
-        $column = 'can_' . $action;
-
-        if ($user->role && method_exists($user->role, 'permissions')) {
-            $hasPerm = optional($user->role->permissions)
-                ->where('ModuleID', 4)
-                ->where($column, 1)
-                ->isNotEmpty();
-
-            if ($hasPerm) {
-                return true;
-            }
-        }
-
-        return Privilege::where('RoleID', $user->RoleID)
-            ->where('ModuleID', 4)
-            ->where($column, 1)
-            ->exists();
-    }
-
-    public function getCanCreateProperty(): bool
-    {
-        return $this->hasPermission('create');
-    }
-
-    public function getCanReadProperty(): bool
-    {
-        return $this->hasPermission('read');
-    }
-
-    public function getCanUpdateProperty(): bool
-    {
-        return $this->hasPermission('update');
-    }
-
-    public function getCanDeleteProperty(): bool
-    {
-        return $this->hasPermission('delete');
+        return Modules::BENEFITS;
     }
 
     /*
@@ -99,7 +60,7 @@ class BenefitsList extends Component
 
     public function openCreateModal()
     {
-        if (!$this->canCreate) {
+        if (! $this->canCreate) {
             return;
         }
 
@@ -109,7 +70,7 @@ class BenefitsList extends Component
             'name',
             'details',
             'amount',
-            'benefit_id'
+            'benefit_id',
         ]);
 
         $this->holdertype = 'Both';
@@ -127,7 +88,7 @@ class BenefitsList extends Component
 
     public function editBenefit($id)
     {
-        if (!$this->canUpdate) {
+        if (! $this->canUpdate) {
             return;
         }
 
@@ -146,10 +107,10 @@ class BenefitsList extends Component
 
     public function saveBenefit()
     {
-        if ($this->benefit_id && !$this->canUpdate) {
+        if ($this->benefit_id && ! $this->canUpdate) {
             return;
         }
-        if (!$this->benefit_id && !$this->canCreate) {
+        if (! $this->benefit_id && ! $this->canCreate) {
             return;
         }
 
@@ -183,7 +144,7 @@ class BenefitsList extends Component
     // Trigger SweetAlert popup
     public function confirmDeleteBenefit($id)
     {
-        if (!$this->canDelete) {
+        if (! $this->canDelete) {
             return;
         }
 
@@ -193,7 +154,7 @@ class BenefitsList extends Component
     // Actual deletion executed via JS callback
     public function deleteBenefit($id)
     {
-        if (!$this->canDelete) {
+        if (! $this->canDelete) {
             return;
         }
 
@@ -229,7 +190,7 @@ class BenefitsList extends Component
             ->paginate(10);
 
         return view('components.admin-pages.masterlist.benefits', [
-            'benefits' => $benefits
+            'benefits' => $benefits,
         ]);
     }
 }
