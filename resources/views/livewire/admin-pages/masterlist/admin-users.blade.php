@@ -174,7 +174,7 @@
                             <td class="au-td">
                                 <div class="au-actions">
 
-                                    @if ($this->canCreate)
+                                    @if (auth()->user()->RoleID == 1)
                                         <button wire:click="openAccessModal({{ $user->UserID }})" title="User Access"
                                             class="au-action-btn au-action-blue">
                                             <svg class="au-icon" fill="none" stroke="currentColor"

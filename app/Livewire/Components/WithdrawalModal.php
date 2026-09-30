@@ -64,26 +64,6 @@ class WithdrawalModal extends Component
     #[On('open-admin-withdrawal-modal')]
     public function openForUser(int $userID): void
     {
-        Log::info('WithdrawalModal: open-admin-withdrawal-modal received.', [
-            'admin_id' => Auth::id(),
-            'target_user_id' => $userID,
-        ]);
-
-        $admin = Auth::user();
-
-        if (! $admin || ! $this->adminCanCreateWithdrawal($admin)) {
-
-            Log::warning('WithdrawalModal: admin lacks permission to create withdrawal.', [
-                'admin_id' => Auth::id(),
-            ]);
-
-            $this->dispatch(
-                'withdrawal-error',
-                message: 'You do not have permission to create a withdrawal request.'
-            );
-
-            return;
-        }
 
         $targetUser = User::where('UserID', $userID)->first();
 
@@ -214,25 +194,6 @@ class WithdrawalModal extends Component
             );
 
             return;
-        }
-
-        // ==========================================
-        // RE-CHECK ADMIN PERMISSION
-        // ==========================================
-
-        if ($this->isAdminMode) {
-
-            $admin = Auth::user();
-
-            if (! $admin || ! $this->adminCanCreateWithdrawal($admin)) {
-
-                $this->dispatch(
-                    'withdrawal-error',
-                    message: 'You do not have permission to create a withdrawal request.'
-                );
-
-                return;
-            }
         }
 
         // ==========================================

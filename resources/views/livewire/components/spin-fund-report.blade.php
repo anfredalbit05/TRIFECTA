@@ -3,6 +3,7 @@
     {{-- =========================================
          TOOLBAR · PRINT THE WHOLE FUND REPORT
     ========================================== --}}
+
     <div class="flex justify-end print:hidden">
         <button
             type="button"
@@ -13,6 +14,7 @@
             🖨️ Print report
         </button>
     </div>
+
 
     {{-- Printable region for "print the whole fund report" (revealed only in print) --}}
     <div id="printable-spin-fund-report" class="space-y-4">

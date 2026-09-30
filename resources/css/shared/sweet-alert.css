@@ -109,6 +109,16 @@
     outline: none;
 }
 
+/* ---------- LAYERING ---------- */
+
+/* In-app modals use z-[9999]; typed confirmations must always sit ON TOP of
+   an open review/activation modal (which now stays open behind the typed
+   dialog until the action is processed). */
+
+.swal2-container {
+    z-index: 10000 !important;
+}
+
 /* ---------- TIMER PROGRESS BAR (toasts) ---------- */
 
 .swal2-container .swal2-timer-progress-bar {

@@ -351,9 +351,12 @@
 
                     <div class="flex flex-col gap-3 sm:flex-row">
                         {{-- RESUBMIT — needs can_change_status (or can_delete)
-                             on Transaction List - Activations --}}
+                             on Transaction List - Activations. Opens the
+                             satellite reapply wizard pre-filled from the
+                             rejected application; the typed confirmation
+                             happens on submit inside it. --}}
                         @if (($this->canChangeStatus || $this->canDelete) && $activation?->status === 'Rejected')
-                            <button type="button" wire:click="confirmResubmit"
+                            <button type="button" wire:click="openResubmitForm"
                                 class="rounded-xl border border-[#0B2A5B] bg-white px-6 py-2.5 text-xs font-bold text-[#0B2A5B] transition hover:bg-[#0B2A5B] hover:text-white">
                                 ↺ Resubmit
                             </button>

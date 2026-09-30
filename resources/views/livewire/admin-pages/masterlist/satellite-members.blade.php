@@ -203,7 +203,7 @@
 
                         <th>Status</th>
 
-                        @if ($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
+                        @if ($this->canUpdate || $this->canRead)
                             <th class="member-actions-header">
                                 Action
                             </th>
@@ -283,7 +283,7 @@
 
 
                             {{-- ACTIONS --}}
-                            @if ($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
+                            @if ($this->canUpdate || $this->canRead)
 
                                 <td class="member-actions-cell">
 

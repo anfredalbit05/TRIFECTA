@@ -542,7 +542,7 @@
                                 @if ($isRenewal)
                                     Renew Activation
                                 @elseif ($isReactivation)
-                                    Reactivate Account
+                                    ReActivate Account
                                 @else
                                     Activate Account
                                 @endif

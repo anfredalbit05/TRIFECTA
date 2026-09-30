@@ -721,13 +721,44 @@ class ActivationReviewModal extends Component
 
     /*
     |--------------------------------------------------------------------------
-    | Resubmit a REJECTED activation (back to Pending)
+    | Resubmit a REJECTED activation — open the ActivationModal
     |--------------------------------------------------------------------------
-    | Used when a rejection was entered in error or the member corrected their
-    | requirements: the same activation row is reopened instead of creating a
-    | duplicate request. Full history trail is kept in activation_histories.
+    | Clicking Resubmit does NOT ask for confirmation here: it opens the
+    | activation form modal in reactivate mode (pre-filled from the rejected
+    | request, submit button "ReActivate Account"). The typed confirmation
+    | happens on submit inside that modal; filing it flips the SAME rejected
+    | activation row back to Pending — no duplicate request is created.
     |--------------------------------------------------------------------------
     */
+
+    public function openResubmitForm(): void
+    {
+        if (! $this->isPrivileged) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'Only administrators can resubmit activations.',
+            ]);
+
+            return;
+        }
+
+        $activation = Activation::where('ActivationID', $this->activation?->ActivationID)->first();
+
+        if (! $activation || $activation->status !== 'Rejected') {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Available',
+                'text' => 'Resubmit is only available for rejected activations.',
+            ]);
+
+            return;
+        }
+
+        $userID = (int) $this->selectedUserID;
+
+        $this->closeModal();
+
+        $this->dispatch('open-rejected-activation', UserID: $userID);
+    }
 
     public function confirmResubmit(): void
     {

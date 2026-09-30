@@ -159,6 +159,9 @@ class Members extends Component
                 'activations as has_expired_activation' => function ($query) {
                     $query->where('status', 'Expired');
                 },
+                'activations as has_rejected_activation' => function ($query) {
+                    $query->where('status', 'Rejected');
+                },
             ])
             ->withCount([
                 'withdrawals as pending_withdrawals_count' => function ($query) {
@@ -274,10 +277,6 @@ class Members extends Component
 
     public function openReview($id): void
     {
-        if (! $this->canUpdate) {
-            return;
-        }
-
         Log::info('Activation review clicked', ['UserID' => $id, 'reviewed_by' => Auth::id()]);
 
         $member = User::find($id);
@@ -299,17 +298,6 @@ class Members extends Component
 
     public function openSatellite($id): void
     {
-        if (! $this->canUpdate) {
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'You do not have permission to manage satellite subscriptions.',
-            ]);
-
-            return;
-        }
-
-        Log::info('Satellite modal clicked', ['UserID' => $id, 'opened_by' => Auth::id()]);
-
         $member = User::find($id);
 
         if (! $member) {
@@ -334,12 +322,6 @@ class Members extends Component
 
     public function confirmStatus($id): void
     {
-        if (! $this->canUpdate) {
-            return;
-        }
-
-        Log::info('Status button clicked', ['UserID' => $id]);
-
         $member = User::find($id);
 
         if (! $member) {
@@ -376,9 +358,6 @@ class Members extends Component
 
     public function updateStatus($id): void
     {
-        if (! $this->canUpdate) {
-            return;
-        }
 
         Log::info('Updating member status', ['UserID' => $id, 'updated_by' => Auth::id()]);
 
@@ -432,9 +411,6 @@ class Members extends Component
     */
     public function openRenewal($id): void
     {
-        if (! $this->canUpdate) {
-            return;
-        }
 
         Log::info('Admin renewal clicked', ['target_UserID' => $id, 'opened_by' => Auth::id()]);
 
@@ -451,15 +427,41 @@ class Members extends Component
 
     /*
     |--------------------------------------------------------------------------
+    | Open Reactivate Modal
+    |
+    | A member whose latest activation was REJECTED re-enters here: the
+    | ActivationModal opens in reactivate mode (pre-filled from the rejected
+    | request, submit button "ReActivate Account") and filing it flips the
+    | SAME activation row back to Pending — no duplicate request is created.
+    |--------------------------------------------------------------------------
+    */
+    public function openReactivate($id): void
+    {
+        if (! $this->canUpdate) {
+            return;
+        }
+
+        Log::info('Admin reactivate clicked', ['target_UserID' => $id, 'opened_by' => Auth::id()]);
+
+        $member = User::find($id);
+
+        if (! $member) {
+            Log::warning('Reactivate failed. Member not found.', ['target_UserID' => $id]);
+
+            return;
+        }
+
+        $this->dispatch('open-rejected-activation', UserID: $member->UserID);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Open Activation Modal
     |--------------------------------------------------------------------------
     */
 
     public function openActivation($id): void
     {
-        if (! $this->canUpdate) {
-            return;
-        }
 
         Log::info('Admin activation clicked', ['target_UserID' => $id, 'processed_by' => Auth::id()]);
 
@@ -482,11 +484,6 @@ class Members extends Component
 
     public function editMember($id): void
     {
-        if (! $this->canUpdate) {
-            return;
-        }
-
-        Log::info('Edit member clicked', ['UserID' => $id]);
 
         $member = User::find($id);
 
@@ -501,9 +498,6 @@ class Members extends Component
 
     public function viewMember($id): void
     {
-        if (! $this->canRead) {
-            return;
-        }
 
         $member = User::find($id);
 
@@ -562,14 +556,6 @@ class Members extends Component
 
     public function promptMemberPasswordReset($id): void
     {
-        if (! $this->canUpdate) {
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'You do not have permission to reset member passwords.',
-            ]);
-
-            return;
-        }
 
         $member = User::find($id);
 
@@ -600,14 +586,6 @@ class Members extends Component
      */
     public function resetMemberPassword($id, $password): void
     {
-        if (! $this->canUpdate) {
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'You do not have permission to reset member passwords.',
-            ]);
-
-            return;
-        }
 
         $member = User::find($id);
 
@@ -723,15 +701,6 @@ class Members extends Component
 
     public function openWithdrawalModal(int $userId): void
     {
-        if (! $this->canCreate) {
-
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'You do not have permission to create a withdrawal request.',
-            ]);
-
-            return;
-        }
 
         $member = User::find($userId);
 
@@ -755,11 +724,6 @@ class Members extends Component
 
     public function openWithdrawalApproval($id): void
     {
-        if (! $this->canUpdate) {
-            return;
-        }
-
-        Log::info('Withdrawal approval clicked', ['UserID' => $id, 'reviewed_by' => Auth::id()]);
 
         $member = User::find($id);
 
@@ -808,15 +772,6 @@ class Members extends Component
 
     public function confirmWithdrawalRejection(): void
     {
-        if (! $this->canUpdate) {
-
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'You do not have permission to reject withdrawals.',
-            ]);
-
-            return;
-        }
 
         if (! $this->selectedWithdrawal) {
 
@@ -839,19 +794,6 @@ class Members extends Component
 
     public function rejectWithdrawal(): void
     {
-        // ==========================================
-        // PERMISSION CHECK
-        // ==========================================
-
-        if (! $this->canUpdate) {
-
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'You do not have permission to reject withdrawals.',
-            ]);
-
-            return;
-        }
 
         if (! $this->selectedWithdrawal) {
             return;
@@ -940,19 +882,6 @@ class Members extends Component
 
     public function processWithdrawalApproval(): void
     {
-        // ==========================================
-        // PERMISSION CHECK
-        // ==========================================
-
-        if (! $this->canUpdate) {
-
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'You do not have permission to approve withdrawals.',
-            ]);
-
-            return;
-        }
 
         if (! $this->selectedWithdrawal) {
             return;

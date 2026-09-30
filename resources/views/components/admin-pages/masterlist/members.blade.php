@@ -82,7 +82,6 @@
                 <option value="all">All Status</option>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
-                <option value="Suspended">Suspended</option>
             </select>
 
             {{-- DATE RANGE --}}
@@ -432,7 +431,6 @@
                                         </button>
                                         @endif
 
-
                                         @if($isWithdrawalActive)
 
                                             @if ($this->canCreate)
@@ -470,10 +468,8 @@
                                                  @endif
                                             @endif
 
-
-
                                         {{-- STATUS --}}
-                                        @if ($this->canUpdate)
+                                        @if ($this->canCreate)
 
                                             @if ($member->has_expired_activation)
 
@@ -508,6 +504,22 @@
                                                     class="member-action member-action-activate"
                                                 >
                                                     Activate Account
+                                                </button>
+
+                                            @elseif ($member->has_rejected_activation)
+
+                                                {{-- Latest activation REJECTED → reopen the
+                                                     ActivationModal in reactivate mode: the same
+                                                     form is pre-filled from the rejected request,
+                                                     and submitting resubmits the SAME row — no
+                                                     duplicate activation is created. --}}
+                                                <button
+                                                    type="button"
+                                                    wire:click="openReactivate({{ $member->UserID }})"
+                                                    title="Reactivate Membership"
+                                                    class="member-action member-action-activate"
+                                                >
+                                                    Reactivate Membership
                                                 </button>
 
                                             @elseif (strtolower($member->status) === 'inactive')

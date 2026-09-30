@@ -809,8 +809,19 @@
             `,
 
             confirmButtonText: 'Okay',
-            confirmButtonColor: '#0C2C6B'
+            confirmButtonColor: '#0C2C6B',
+
+            showDenyButton: true,
+            denyButtonText: 'Release',
+            denyButtonColor: '#D79B10',
+    }).then((result) => {
+
+            if (result.isDenied) {
+                window.location.href = "{{ route('transaction-list') }}";
+            }
+
         });
+
     });
 </script>
 @endscript

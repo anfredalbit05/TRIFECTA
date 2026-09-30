@@ -193,6 +193,17 @@
         border-color: #cbd5e1;
     }
 
+    .txn-action-resubmit {
+        background: #fff;
+        color: #0C2C6B;
+        border-color: #cbd5e1;
+    }
+
+    .txn-action-resubmit:hover {
+        background: #0C2C6B;
+        color: #fff;
+    }
+
     .txn-action-review:hover {
         background: #0C2C6B;
         color: #fff;
@@ -368,6 +379,15 @@
 <livewire:admin-pages.masterlist.activation-review-modal />
 <livewire:admin-pages.masterlist.satellite-members-components.satellite-members-activation-review />
 
+{{-- Activation FORM modals — opened by the Activations tab RESUBMIT action:
+     TrueLife members get the regular ActivationModal in reactivate mode
+     (pre-filled from the rejected request, submit "ReActivate Account"),
+     satellite members get the reapply wizard. Both dispatch
+     members-refresh + txn-badges-updated after submitting, so the tab rows
+     and page badges stay in sync. --}}
+<livewire:member-pages.my-profile.activation-modal />
+<livewire:admin-pages.masterlist.members-components.satellite-modal />
+
 {{-- Withdrawal review modal — the ONLY route to approve/reject a withdrawal:
      the row eye opens this modal first (full details), and its Approve /
      Reject buttons fire the typed dialogs below. --}}
@@ -425,22 +445,13 @@
             }, () => callTxn('admin-pages.transaction-list.activations', 'approveActivation', d.activationId));
         });
 
-        // Close the withdrawal review modal (if open) so the typed dialog
-        // is the only thing on screen and the modal shows fresh data after.
-        const closeWithdrawalReview = () => {
-            const el = [...document.querySelectorAll('[wire\\:id]')]
-                .find((el) => JSON.parse(el.getAttribute('wire:snapshot') || '{}').memo?.name === 'admin-pages.transaction-list.withdrawal-review-modal');
-
-            if (el) {
-                window.Livewire.find(el.getAttribute('wire:id')).call('closeModal');
-            }
-        };
-
         // ---------- WITHDRAWALS: APPROVE (typed APPROVE) ----------
+        // The review modal STAYS OPEN behind the typed dialog — it is only
+        // dismissed after the typed APPROVE is confirmed and processing
+        // succeeds (the tab component broadcasts withdrawal-processed, and
+        // the modal closes itself then; the success alert follows).
         window.Livewire.on('txn-approve-withdrawal-prompt', (raw) => {
             const d = Array.isArray(raw) ? raw[0] : raw;
-
-            closeWithdrawalReview();
 
             SwalFlow.confirm({
                 title: 'Approve & Release Withdrawal?',
@@ -464,10 +475,10 @@
         // dispatch txn-modal-* events so they work on every page.
 
         // ---------- WITHDRAWALS: REJECT (typed REJECT) ----------
+        // Same rule as approve: the review modal stays open behind the
+        // typed dialog and closes itself after the rejection is processed.
         window.Livewire.on('txn-reject-withdrawal-prompt', (raw) => {
             const d = Array.isArray(raw) ? raw[0] : raw;
-
-            closeWithdrawalReview();
 
             SwalFlow.confirm({
                 title: 'Reject Withdrawal?',

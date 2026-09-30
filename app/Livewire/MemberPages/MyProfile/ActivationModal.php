@@ -2,6 +2,7 @@
 
 namespace App\Livewire\MemberPages\MyProfile;
 
+use App\Jobs\SendActivationEmail;
 use App\Models\Activation;
 use App\Models\ActivationHistory;
 use App\Models\Beneficiary;
@@ -11,11 +12,10 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use App\Jobs\SendActivationEmail;
-use Illuminate\Support\Facades\Mail;
 
 class ActivationModal extends Component
 {
@@ -781,53 +781,51 @@ class ActivationModal extends Component
             DB::commit();
 
             if (filled($selectedUser->email)) {
-            SendActivationEmail::dispatch(
-                $selectedUser->email,
-                $userSubject,
-                'Activation Request Status',
-                "Your activation request has been {$actionLabel}. Below are your complete details:",
-                $mailData
-            );
-        }
+                SendActivationEmail::dispatch(
+                    $selectedUser->email,
+                    $userSubject,
+                    'Activation Request Status',
+                    "Your activation request has been {$actionLabel}. Below are your complete details:",
+                    $mailData
+                );
+            }
 
-        if ($referralUser && filled($referralUser->email)) {
-            SendActivationEmail::dispatch(
-                $referralUser->email,
-                $uplineSubject,
-                'Downline Activation Notice',
-                'Hello '.($referralUser->firstname ?? $referralUser->username)
-                    .', your downline ('.$selectedUser->username
-                    .") has {$actionLabel} an activation request.",
-                $mailData
-            );
-        }
+            if ($referralUser && filled($referralUser->email)) {
+                SendActivationEmail::dispatch(
+                    $referralUser->email,
+                    $uplineSubject,
+                    'Downline Activation Notice',
+                    'Hello '.($referralUser->firstname ?? $referralUser->username)
+                        .', your downline ('.$selectedUser->username
+                        .") has {$actionLabel} an activation request.",
+                    $mailData
+                );
+            }
 
-        if (filled($adminEmail)) {
-            SendActivationEmail::dispatch(
-                $adminEmail,
-                $adminSubject,
-                'Admin Notice: Activation Request',
-                "An activation request has been {$actionLabel} with the following comprehensive details:",
-                $mailData
-            );
-        }
+            if (filled($adminEmail)) {
+                SendActivationEmail::dispatch(
+                    $adminEmail,
+                    $adminSubject,
+                    'Admin Notice: Activation Request',
+                    "An activation request has been {$actionLabel} with the following comprehensive details:",
+                    $mailData
+                );
+            }
 
-        if (
-            $currentUser &&
-            filled($currentUser->email) &&
-            $currentUser->UserID !== $selectedUser->UserID
-        ) {
-            SendActivationEmail::dispatch(
-                $currentUser->email,
-                'Activation Request Submitted on Behalf',
-                'Action Notice: Activation Submission',
-                'You have successfully submitted an activation request for '
-                    .$selectedUser->username.'. Here are the details:',
-                $mailData
-            );
-        }
-
-
+            if (
+                $currentUser &&
+                filled($currentUser->email) &&
+                $currentUser->UserID !== $selectedUser->UserID
+            ) {
+                SendActivationEmail::dispatch(
+                    $currentUser->email,
+                    'Activation Request Submitted on Behalf',
+                    'Action Notice: Activation Submission',
+                    'You have successfully submitted an activation request for '
+                        .$selectedUser->username.'. Here are the details:',
+                    $mailData
+                );
+            }
 
             Log::info('✅ ACTIVATION COMMITTED SUCCESSFULLY', [
                 'selected_user_id' => $selectedUser->UserID,
@@ -934,7 +932,7 @@ class ActivationModal extends Component
         if ($this->isRenewal) {
             $action = 'Renew';
         } elseif ($this->isReactivation) {
-            $action = 'Reactivate';
+            $action = 'ReActivate';
         } else {
             $action = 'Activate';
         }

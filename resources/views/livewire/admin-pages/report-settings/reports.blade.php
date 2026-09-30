@@ -62,12 +62,17 @@
                 </button>
             @endif
 
-             <!-- PRINT BUTTON — builds the printable report, prints, then tears it down -->
+            @if($this->canPrint)
+
+            <!-- PRINT BUTTON — builds the printable report, prints, then tears it down -->
             <button type="button" wire:click="preparePrint" title="Print Report"
                 class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-[#0C2C6B] text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
                 <span>🖨️</span>
                 <span class="hidden sm:inline">Print</span>
             </button>
+
+            @endif
+
 
             <!-- REFRESH BUTTON -->
             {{-- REFRESH TABLE --}}

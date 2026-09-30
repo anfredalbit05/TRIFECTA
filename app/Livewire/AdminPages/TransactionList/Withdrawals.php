@@ -8,6 +8,7 @@ use App\Models\Ledger;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
 use App\Support\Modules;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -22,7 +23,32 @@ class Withdrawals extends Component
 
     public string $search = '';
 
+    /*
+    | Date-range filter, e.g. "2026-08-01 to 2026-08-16" — same flatpickr
+    | pattern as the Inquiries tab (Masterlist). Empty means ALL TIME.
+    */
+    public string $dateRange = '';
+
+    /*
+    | Payment-method dropdown filter (withdrawal_method). Empty shows all.
+    | Print honors EVERY active filter — date range, dropdown, and search.
+    */
+    public string $paymentFilter = '';
+
+    /*
+    | When true, the printable (unpaginated) report table is rendered into
+    | the DOM for printing. Kept false at all other times — rendering every
+    | row on every page load would be wasteful (same approach as the Report
+    | & Settings Ledgers print).
+    */
+    public bool $printing = false;
+
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPaymentFilter()
     {
         $this->resetPage();
     }
@@ -30,7 +56,58 @@ class Withdrawals extends Component
     public function resetTable(): void
     {
         $this->search = '';
+        $this->dateRange = '';
+        $this->paymentFilter = '';
         $this->resetPage();
+        $this->dispatch('ranges-reset');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PRINT — honors ALL active filters (search + payment dropdown + dates)
+    |--------------------------------------------------------------------------
+    | "Whatever is on screen is what prints": erase a filter and the print
+    | goes back to printing everything again.
+    |--------------------------------------------------------------------------
+    */
+
+    public function preparePrint(): void
+    {
+        if (! $this->can('print')) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to print withdrawals.',
+            ]);
+
+            return;
+        }
+
+        $this->printing = true;
+
+        $this->dispatch('print-withdrawals');
+    }
+
+    protected function parsedDateRange(): array
+    {
+        if (blank($this->dateRange) || ! str_contains($this->dateRange, ' to ')) {
+            return [null, null];
+        }
+
+        [$from, $to] = explode(' to ', $this->dateRange, 2);
+
+        return [trim($from) ?: null, trim($to) ?: null];
+    }
+
+    public function updatedDateRange()
+    {
+        $this->resetPage();
+    }
+
+    public function clearDateFilter(): void
+    {
+        $this->dateRange = '';
+        $this->resetPage();
+        $this->dispatch('ranges-reset');
     }
 
     /*
@@ -358,12 +435,23 @@ class Withdrawals extends Component
         $this->dispatch('swal:success', title: 'Withdrawal Rejected', message: 'The withdrawal request has been rejected successfully.');
     }
 
-    public function render()
+    /*
+    |--------------------------------------------------------------------------
+    | SHARED QUERY — paginated table AND print export use the SAME filters
+    |--------------------------------------------------------------------------
+    | Search, payment-method dropdown, and date range all apply to both, so
+    | the printed report always matches what is on screen.
+    |--------------------------------------------------------------------------
+    */
+    protected function baseQuery()
     {
+        [$dateFrom, $dateTo] = $this->parsedDateRange();
         $search = trim($this->search);
+        $method = trim($this->paymentFilter);
 
-        $withdrawals = Withdrawal::query()
+        return Withdrawal::query()
             ->with('user')
+            ->when($method !== '', fn ($query) => $query->where('withdrawal_method', $method))
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('WithdrawID', 'like', "%{$search}%")
@@ -378,11 +466,34 @@ class Withdrawals extends Component
                         });
                 });
             })
+            ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($dateFrom)->startOfDay(),
+                    Carbon::parse($dateTo)->endOfDay(),
+                ]);
+            });
+    }
+
+    public function render()
+    {
+        [$dateFrom, $dateTo] = $this->parsedDateRange();
+
+        $withdrawals = (clone $this->baseQuery())
             ->latest('WithdrawID')
             ->paginate(10);
 
+        // Unpaginated set for the printable report, matching the same filters —
+        // only queried when the user actually prints (keeps the page light).
+        $printWithdrawals = $this->printing
+            ? (clone $this->baseQuery())->latest('WithdrawID')->get()
+            : collect();
+
         return view('livewire.admin-pages.transaction-list.withdrawals', [
             'withdrawals' => $withdrawals,
+            'printWithdrawals' => $printWithdrawals,
+            'dateRangeLabel' => $dateFrom && $dateTo
+                ? Carbon::parse($dateFrom)->format('M d, Y').' — '.Carbon::parse($dateTo)->format('M d, Y')
+                : 'All Time',
         ]);
     }
 }

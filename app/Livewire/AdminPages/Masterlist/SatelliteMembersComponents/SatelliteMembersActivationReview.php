@@ -393,7 +393,12 @@ class SatelliteMembersActivationReview extends Component
     |--------------------------------------------------------------------------
     */
 
-    public function confirmResubmit(): void
+    /*
+    | Clicking Resubmit opens the satellite reapply wizard pre-filled from the
+    | rejected application (no confirmation here — the typed confirmation
+    | happens on submit inside the wizard).
+    */
+    public function openResubmitForm(): void
     {
         if (! $this->isPrivileged) {
             $this->dispatch('swal:error', [
@@ -415,7 +420,11 @@ class SatelliteMembersActivationReview extends Component
             return;
         }
 
-        $this->dispatch('txn-modal-resubmit-activation', activationId: $activation->ActivationID, modal: 'satellite');
+        $userID = (int) $this->selectedUserID;
+
+        $this->closeModal();
+
+        $this->dispatch('open-satellite-reapply', UserID: $userID);
     }
 
     #[On('txn-resubmit-activation')]

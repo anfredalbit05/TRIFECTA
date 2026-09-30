@@ -7,6 +7,7 @@ use App\Models\Activation;
 use App\Models\Withdrawal;
 use App\Services\ActivationApprovalService;
 use App\Support\Modules;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
@@ -22,6 +23,25 @@ class Activations extends Component
 
     public string $statusFilter = '';
 
+    /*
+    | Date-range filter, e.g. "2026-08-01 to 2026-08-16" — same flatpickr
+    | pattern as the Inquiries tab (Masterlist). Empty means ALL TIME.
+    */
+    public string $dateRange = '';
+
+    /*
+    | Payment-method dropdown filter (payment_method). Empty shows all.
+    | Print honors EVERY active filter — date range, dropdown, status, search.
+    */
+    public string $paymentFilter = '';
+
+    /*
+    | When true, the printable (unpaginated) report table is rendered into
+    | the DOM for printing. Kept false at all other times (same approach as
+    | the Report & Settings Ledgers print).
+    */
+    public bool $printing = false;
+
     public function updatingSearch()
     {
         $this->resetPage();
@@ -32,11 +52,67 @@ class Activations extends Component
         $this->resetPage();
     }
 
+    public function updatingPaymentFilter()
+    {
+        $this->resetPage();
+    }
+
     public function resetTable(): void
     {
         $this->search = '';
         $this->statusFilter = '';
+        $this->dateRange = '';
+        $this->paymentFilter = '';
         $this->resetPage();
+        $this->dispatch('ranges-reset');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PRINT — honors ALL active filters (search + status + payment + dates)
+    |--------------------------------------------------------------------------
+    | "Whatever is on screen is what prints": erase a filter and the print
+    | goes back to printing everything again.
+    |--------------------------------------------------------------------------
+    */
+
+    public function preparePrint(): void
+    {
+        if (! $this->can('print')) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to print activations.',
+            ]);
+
+            return;
+        }
+
+        $this->printing = true;
+
+        $this->dispatch('print-activations');
+    }
+
+    protected function parsedDateRange(): array
+    {
+        if (blank($this->dateRange) || ! str_contains($this->dateRange, ' to ')) {
+            return [null, null];
+        }
+
+        [$from, $to] = explode(' to ', $this->dateRange, 2);
+
+        return [trim($from) ?: null, trim($to) ?: null];
+    }
+
+    public function updatedDateRange()
+    {
+        $this->resetPage();
+    }
+
+    public function clearDateFilter(): void
+    {
+        $this->dateRange = '';
+        $this->resetPage();
+        $this->dispatch('ranges-reset');
     }
 
     /*
@@ -90,8 +166,12 @@ class Activations extends Component
     #[On('members-refresh')]
     public function refreshAfterModalAction(): void
     {
-        // Approve/reject fired from the Members page review modals — the
-        // method call itself round-trips and re-renders rows + badges.
+        // Approve/reject/resubmit fired from the review modals or the
+        // activation form modal — the method call itself round-trips and
+        // re-renders rows, and badge counts may have changed (e.g. a
+        // rejected activation resubmitted back to Pending), so re-broadcast
+        // them for the page-shell tab nav.
+        $this->broadcastBadgeRefresh();
     }
 
     /*
@@ -211,6 +291,57 @@ class Activations extends Component
         }
     }
 
+    /*
+    | RESUBMIT a REJECTED activation — opens the activation FORM modal
+    | (ActivationModal for TrueLife members, the satellite reapply wizard for
+    | satellite members) pre-filled from the rejected request. The typed
+    | confirmation happens on submit inside that modal; no separate
+    | confirmation dialog is shown on click.
+    */
+    public function resubmitActivationRow(int $activationId): void
+    {
+        if (! $this->canProcess) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to resubmit activations.',
+            ]);
+
+            return;
+        }
+
+        $activation = Activation::with('user')->find($activationId);
+
+        if (! $activation) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Found',
+                'text' => 'This activation could not be found.',
+            ]);
+
+            return;
+        }
+
+        if ($activation->status !== 'Rejected') {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Available',
+                'text' => 'Resubmit is only available for rejected activations.',
+            ]);
+
+            return;
+        }
+
+        // Satellite member (RoleID 8) → the satellite reapply wizard;
+        // everyone else → the regular activation modal in reactivate mode.
+        if ((int) ($activation->user?->RoleID ?? 0) === 8) {
+            $this->dispatch('open-satellite-reapply',
+                UserID: (int) $activation->UserID,
+            );
+        } else {
+            $this->dispatch('open-rejected-activation',
+                UserID: (int) $activation->UserID,
+            );
+        }
+    }
+
     public function confirmApproveActivation(int $activationId): void
     {
         if (! $this->canProcess) {
@@ -277,14 +408,25 @@ class Activations extends Component
         }
     }
 
-    public function render()
+    /*
+    |--------------------------------------------------------------------------
+    | SHARED QUERY — paginated table AND print export use the SAME filters
+    |--------------------------------------------------------------------------
+    | Search, status, payment-method dropdown, and date range all apply to
+    | both, so the printed report always matches what is on screen.
+    |--------------------------------------------------------------------------
+    */
+    protected function baseQuery()
     {
+        [$dateFrom, $dateTo] = $this->parsedDateRange();
         $search = trim($this->search);
         $status = trim($this->statusFilter);
+        $method = trim($this->paymentFilter);
 
-        $activations = Activation::query()
+        return Activation::query()
             ->with('user')
             ->when($status !== '', fn ($query) => $query->where('status', $status))
+            ->when($method !== '', fn ($query) => $query->where('payment_method', $method))
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('ActivationID', 'like', "%{$search}%")
@@ -298,11 +440,34 @@ class Activations extends Component
                         });
                 });
             })
+            ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($dateFrom)->startOfDay(),
+                    Carbon::parse($dateTo)->endOfDay(),
+                ]);
+            });
+    }
+
+    public function render()
+    {
+        [$dateFrom, $dateTo] = $this->parsedDateRange();
+
+        $activations = (clone $this->baseQuery())
             ->latest('ActivationID')
             ->paginate(10);
 
+        // Unpaginated set for the printable report, matching the same filters —
+        // only queried when the user actually prints (keeps the page light).
+        $printActivations = $this->printing
+            ? (clone $this->baseQuery())->latest('ActivationID')->get()
+            : collect();
+
         return view('livewire.admin-pages.transaction-list.activations', [
             'activations' => $activations,
+            'printActivations' => $printActivations,
+            'dateRangeLabel' => $dateFrom && $dateTo
+                ? Carbon::parse($dateFrom)->format('M d, Y').' — '.Carbon::parse($dateTo)->format('M d, Y')
+                : 'All Time',
         ]);
     }
 }

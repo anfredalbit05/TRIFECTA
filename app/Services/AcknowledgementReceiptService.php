@@ -116,18 +116,18 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
                 ->latest('ActivationID')
                 ->value('policy_number');
 
-            $this->text($image, (string) ($activationPolicyNumber ?? ''), 295, 440, 20, self::FONT_BOLD, $ink, 400);
+            $this->text($image, (string) ($activationPolicyNumber ?? ''), 295, 440, 15, self::FONT_BOLD, $ink, 400);
 
             // Date
-            $this->text($image, now()->format('M j, Y'), 1370, 440, 20, self::FONT_BOLD, $ink, 240);
+            $this->text($image, now()->format('M j, Y'), 1370, 440, 15, self::FONT_BOLD, $ink, 240);
 
             /*
             |----------------------------------------------------------------------
             | Left table (navy) — Cash amount + Total (value cell x 152-428)
             |----------------------------------------------------------------------
             */
-            $this->text($image, $amountText, 165, 538, 20, self::FONT_BOLD, $ink, 250);
-            $this->text($image, $amountText, 165, 671, 20, self::FONT_BOLD, $ink, 250);
+            $this->text($image, $amountText, 165, 538, 15, self::FONT_BOLD, $ink, 250);
+            $this->text($image, $amountText, 165, 671, 15, self::FONT_BOLD, $ink, 250);
 
             /*
             |----------------------------------------------------------------------
@@ -136,7 +136,7 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
             |----------------------------------------------------------------------
             */
             if (filled($receiptNumber)) {
-                $this->text($image, (string) $receiptNumber, 205, 733, 20, self::FONT_BOLD, $ink, 210);
+                $this->text($image, (string) $receiptNumber, 205, 733, 15, self::FONT_BOLD, $ink, 210);
             }
 
             /*
@@ -147,15 +147,15 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
             |----------------------------------------------------------------------
             */
             // Payment From — "Lastname, Firstname Middlename" (row 468-507)
-            $this->text($image, $this->formatName($user), 758, 494, 25, self::FONT_BOLD, $ink, 850);
+            $this->text($image, $this->formatName($user), 758, 494, 15, self::FONT_BOLD, $ink, 850);
 
             // Payment for — PRE-PRINTED ("With (HMO ... Insurance.") — skipped
 
             // Premium Amount Paid (row 549-588)
-            $this->text($image, 'PHP '.$amountText, 758, 575, 20, self::FONT_BOLD, $ink, 850);
+            $this->text($image, 'PHP '.$amountText, 758, 575, 15, self::FONT_BOLD, $ink, 850);
 
             // Amount in words (row 591-630)
-            $this->text($image, $amountWords, 758, 617, 20, self::FONT_REGULAR, $ink, 850);
+            $this->text($image, $amountWords, 758, 617, 15, self::FONT_REGULAR, $ink, 850);
 
             // TIN No. — intentionally blank (members have no TIN on file)
 
@@ -186,7 +186,7 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
                     (string) $cashierName,
                     530,
                     772,
-                    20, // slightly larger
+                    18, // slightly larger
                     self::FONT_BOLD,
                     $ink,
                     680,
@@ -670,7 +670,7 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
      */
     private function address($image, string $address, int $x, $ink): void
     {
-        $this->text($image, $address, $x, 698, 20, self::FONT_REGULAR, $ink, 850);
+        $this->text($image, $address, $x, 698, 15, self::FONT_REGULAR, $ink, 850);
     }
 
     private function truncatePlain(string $text, float $maxChars): string
