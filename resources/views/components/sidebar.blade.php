@@ -195,7 +195,7 @@
                             @endif
                         </a>
 
-                        @if ($canReadTransactions)
+                        {{-- @if ($canReadTransactions)
                         <a href="{{ route('transaction-list') }}"
                            class="menu-item {{ request()->routeIs('transaction-list') ? 'active-menu' : '' }}">
                             <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -207,7 +207,7 @@
                                 <span class="sidebar-badge" title="{{ $pendingActivations }} pending activation(s), {{ $pendingWithdrawals }} pending withdrawal(s)">{{ $pendingTransactions }}</span>
                             @endif
                         </a>
-                        @endif
+                        @endif --}}
 
                         @if ($canReadPost)
                         <a href="{{ route('post') }}"

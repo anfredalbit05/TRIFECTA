@@ -591,10 +591,10 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
             */
 
             $bandX = 530;
-            $bandY = 710;
+            $bandY = 690;
 
-            $bandWidth = 700;
-            $bandHeight = 60;
+            $bandWidth = 750;
+            $bandHeight = 80;
 
             /*
             |--------------------------------------------------------------------------

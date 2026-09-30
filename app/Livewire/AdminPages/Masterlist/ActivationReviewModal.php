@@ -757,14 +757,14 @@ class ActivationReviewModal extends Component
     #[On('txn-resubmit-activation')]
     public function resubmitActivation(): void
     {
-        if (! $this->isPrivileged) {
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'Only administrators can resubmit activations.',
-            ]);
+        // if (! $this->isPrivileged) {
+        //     $this->dispatch('swal:error', [
+        //         'title' => 'Not Allowed',
+        //         'text' => 'Only administrators can resubmit activations.',
+        //     ]);
 
-            return;
-        }
+        //     return;
+        // }
 
         $activation = Activation::where('ActivationID', $this->activation?->ActivationID)->first();
 
