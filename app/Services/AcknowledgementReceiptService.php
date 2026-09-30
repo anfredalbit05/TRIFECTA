@@ -147,7 +147,7 @@ class AcknowledgementReceiptService
             |----------------------------------------------------------------------
             */
             // Payment From — "Lastname, Firstname Middlename" (row 468-507)
-            $this->text($image, $this->formatName($user), 758, 494, 20, self::FONT_BOLD, $ink, 850);
+            $this->text($image, $this->formatName($user), 758, 494, 25, self::FONT_BOLD, $ink, 850);
 
             // Payment for — PRE-PRINTED ("With (HMO ... Insurance.") — skipped
 
