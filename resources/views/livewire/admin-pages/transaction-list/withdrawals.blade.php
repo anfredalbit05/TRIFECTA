@@ -75,15 +75,15 @@
                             </td>
                             <td data-label="Date">{{ $w->created_at?->format('M d, Y') }}</td>
                             <td data-label="Actions" class="txn-actions">
-                                @if ($this->canProcess)
+                                {{-- @if ($this->canProcess) --}}
                                     <button type="button"
                                         wire:click="reviewWithdrawal({{ $w->WithdrawID }})"
                                         class="txn-action-btn txn-action-review"
                                         title="Review details"
                                         aria-label="Review withdrawal for {{ trim($w->user?->lastname.' '.$w->user?->firstname) ?: 'member' }}">👁</button>
-                                @else
+                                {{-- @else
                                     <span class="txn-actions-none">—</span>
-                                @endif
+                                @endif --}}
                             </td>
                         </tr>
                     @empty

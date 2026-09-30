@@ -294,7 +294,7 @@
                     <div class="flex flex-col gap-3 sm:flex-row">
                         {{-- REJECT — needs can_change_status (or can_delete)
                              on Transaction List - Withdrawal --}}
-                        @if (($this->canChangeStatus || $this->canDelete) && $withdrawal->status === 'Pending')
+                        @if ($withdrawal->status === 'Pending')
                             <button type="button" wire:click="confirmReject"
                                 class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition cursor-pointer">
                                 Reject

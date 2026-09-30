@@ -99,14 +99,14 @@ class Withdrawals extends Component
 
     public function approveWithdrawal(int $withdrawalId): void
     {
-        if (! $this->canProcess) {
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'You do not have permission to approve withdrawals.',
-            ]);
+        // if (! $this->canUpdate) {
+        //     $this->dispatch('swal:error', [
+        //         'title' => 'Not Allowed',
+        //         'text' => 'You do not have permission to approve withdrawals.',
+        //     ]);
 
-            return;
-        }
+        //     return;
+        // }
 
         try {
             DB::transaction(function () use ($withdrawalId) {
@@ -208,14 +208,14 @@ class Withdrawals extends Component
 
     public function reviewWithdrawal(int $withdrawalId): void
     {
-        if (! $this->canProcess) {
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'You do not have permission to review withdrawals.',
-            ]);
+        // if (! $this->canProcess) {
+        //     $this->dispatch('swal:error', [
+        //         'title' => 'Not Allowed',
+        //         'text' => 'You do not have permission to review withdrawals.',
+        //     ]);
 
-            return;
-        }
+        //     return;
+        // }
 
         $withdrawal = Withdrawal::find($withdrawalId);
 
@@ -239,14 +239,14 @@ class Withdrawals extends Component
 
     public function confirmApproveWithdrawal(int $withdrawalId): void
     {
-        if (! $this->canProcess) {
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'You do not have permission to approve withdrawals.',
-            ]);
+        // if (! $this->canProcess) {
+        //     $this->dispatch('swal:error', [
+        //         'title' => 'Not Allowed',
+        //         'text' => 'You do not have permission to approve withdrawals.',
+        //     ]);
 
-            return;
-        }
+        //     return;
+        // }
 
         $withdrawal = Withdrawal::find($withdrawalId);
 
@@ -268,14 +268,14 @@ class Withdrawals extends Component
 
     public function confirmRejectWithdrawal(int $withdrawalId): void
     {
-        if (! $this->canProcess) {
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'You do not have permission to reject withdrawals.',
-            ]);
+        // if (! $this->canProcess) {
+        //     $this->dispatch('swal:error', [
+        //         'title' => 'Not Allowed',
+        //         'text' => 'You do not have permission to reject withdrawals.',
+        //     ]);
 
-            return;
-        }
+        //     return;
+        // }
 
         $withdrawal = Withdrawal::find($withdrawalId);
 
@@ -294,14 +294,14 @@ class Withdrawals extends Component
     #[On('txn-reject-withdrawal')]
     public function rejectWithdrawal($withdrawalId): void
     {
-        if (! $this->canProcess) {
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'You do not have permission to reject withdrawals.',
-            ]);
+        // if (! $this->canProcess) {
+        //     $this->dispatch('swal:error', [
+        //         'title' => 'Not Allowed',
+        //         'text' => 'You do not have permission to reject withdrawals.',
+        //     ]);
 
-            return;
-        }
+        //     return;
+        // }
 
         try {
             DB::transaction(function () use ($withdrawalId) {
