@@ -517,7 +517,7 @@
                                                     type="button"
                                                     wire:click="openReactivate({{ $member->UserID }})"
                                                     title="Reactivate Membership"
-                                                    class="member-action member-action-activate"
+                                                    class="member-action member-action-renew"
                                                 >
                                                     Reactivate Membership
                                                 </button>
