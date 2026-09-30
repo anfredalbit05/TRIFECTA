@@ -572,14 +572,14 @@
 
                     <div class="flex flex-col gap-3 sm:flex-row">
                         {{-- RESUBMIT (rejected only) --}}
-                        @if ($isPrivileged && $activation?->status === 'Rejected')
+                        @if ($activation?->status === 'Rejected')
                             <button type="button" wire:click="confirmResubmit"
                                 class="rounded-xl border border-[#0B2A5B] bg-white px-6 py-2.5 text-xs font-bold text-[#0B2A5B] transition hover:bg-[#0B2A5B] hover:text-white">
                                 ↺ Resubmit
                             </button>
                         @endif
 
-                        @if ($isPrivileged && $activation?->status === 'Pending')
+                        @if ($activation?->status === 'Pending')
                         {{-- REJECT --}}
                         <button type="button" wire:click="confirmReject"
                             class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition cursor-pointer">
