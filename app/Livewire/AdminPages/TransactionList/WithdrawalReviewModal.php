@@ -35,21 +35,21 @@ class WithdrawalReviewModal extends Component
     #[On('open-withdrawal-review')]
     public function openModal(int $withdrawalId): void
     {
-        // $this->isPrivileged = $this->can('change_status') || $this->can('delete');
+        $this->isPrivileged = $this->can('change_status') || $this->can('delete');
 
-        // if (! $this->isPrivileged) {
-        //     Log::warning('Withdrawal review blocked: caller lacks privileges.', [
-        //         'WithdrawID' => $withdrawalId,
-        //         'caller' => Auth::id(),
-        //     ]);
+        if (! $this->isPrivileged) {
+            Log::warning('Withdrawal review blocked: caller lacks privileges.', [
+                'WithdrawID' => $withdrawalId,
+                'caller' => Auth::id(),
+            ]);
 
-        //     $this->dispatch('swal:error', [
-        //         'title' => 'Not Allowed',
-        //         'text' => 'You do not have permission to review withdrawals.',
-        //     ]);
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to review withdrawals.',
+            ]);
 
-        //     return;
-        // }
+            return;
+        }
 
         $this->withdrawal = Withdrawal::with('user')->find($withdrawalId);
 
@@ -88,18 +88,18 @@ class WithdrawalReviewModal extends Component
 
     public function confirmApprove(): void
     {
-        // if (! $this->isPrivileged) {
-        //     Log::warning('Withdrawal approval blocked: user lacks privileges.', [
-        //         'UserID' => Auth::id(),
-        //     ]);
+        if (! $this->isPrivileged) {
+            Log::warning('Withdrawal approval blocked: user lacks privileges.', [
+                'UserID' => Auth::id(),
+            ]);
 
-        //     $this->dispatch('swal:error', [
-        //         'title' => 'Not Allowed',
-        //         'text' => 'You do not have permission to approve withdrawals.',
-        //     ]);
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to approve withdrawals.',
+            ]);
 
-        //     return;
-        // }
+            return;
+        }
 
         $withdrawal = Withdrawal::find($this->withdrawalId);
 
@@ -121,18 +121,18 @@ class WithdrawalReviewModal extends Component
 
     public function confirmReject(): void
     {
-        // if (! $this->isPrivileged) {
-        //     Log::warning('Withdrawal rejection blocked: user lacks privileges.', [
-        //         'UserID' => Auth::id(),
-        //     ]);
+        if (! $this->isPrivileged) {
+            Log::warning('Withdrawal rejection blocked: user lacks privileges.', [
+                'UserID' => Auth::id(),
+            ]);
 
-        //     $this->dispatch('swal:error', [
-        //         'title' => 'Not Allowed',
-        //         'text' => 'You do not have permission to reject withdrawals.',
-        //     ]);
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to reject withdrawals.',
+            ]);
 
-        //     return;
-        // }
+            return;
+        }
 
         $withdrawal = Withdrawal::find($this->withdrawalId);
 
