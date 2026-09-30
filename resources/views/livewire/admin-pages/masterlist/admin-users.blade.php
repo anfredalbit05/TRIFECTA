@@ -1097,35 +1097,37 @@
                                 @foreach ($userAccess as $moduleName => $permissions)
                                     <tr class="au-access-row">
                                         <td class="au-access-module-td">
-                                            <input type="checkbox"
-                                                class="au-checkbox">
-                                            <span>{{ $moduleName }}</span>
+                                            <div class="au-access-module-wrap">
+                                                <input type="checkbox"
+                                                    class="au-checkbox">
+                                                <span>{{ $moduleName }}</span>
+                                            </div>
                                         </td>
                                         <td class="au-access-perm-td">
                                             <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.create"
-                                                class="au-checkbox">
+                                                class="au-checkbox" title="{{ $moduleName }} — can_create">
                                         </td>
                                         <td class="au-access-perm-td">
                                             <input type="checkbox"
                                                 wire:model="userAccess.{{ $moduleName }}.retrieve"
-                                                class="au-checkbox">
+                                                class="au-checkbox" title="{{ $moduleName }} — can_read">
                                         </td>
                                         <td class="au-access-perm-td">
                                             <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.update"
-                                                class="au-checkbox">
+                                                class="au-checkbox" title="{{ $moduleName }} — can_update">
                                         </td>
                                         <td class="au-access-perm-td">
                                             <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.delete"
-                                                class="au-checkbox">
+                                                class="au-checkbox" title="{{ $moduleName }} — can_delete">
                                         </td>
                                         <td class="au-access-perm-td">
                                             <input type="checkbox" wire:model="userAccess.{{ $moduleName }}.status"
-                                                class="au-checkbox">
+                                                class="au-checkbox" title="{{ $moduleName }} — can_change_status">
                                         </td>
                                         <td class="au-access-perm-td">
                                             <input type="checkbox"
                                                 wire:model="userAccess.{{ $moduleName }}.printall"
-                                                class="au-checkbox">
+                                                class="au-checkbox" title="{{ $moduleName }} — can_print">
                                         </td>
                                     </tr>
                                 @endforeach

@@ -76,9 +76,6 @@ final class Modules
         'change_status' => 'can_change_status',
     ];
 
-    /** Per-request memo of resolved privileges, keyed RoleID:ModuleID. */
-    private static array $cache = [];
-
     /**
      * Can the given user (defaults to the signed-in user) perform $action
      * on $moduleId? Actions: create|read|update|delete|print|change_status.
@@ -121,24 +118,16 @@ final class Modules
         return self::privilege($user, $moduleId) !== null;
     }
 
-    /** Cached privilege row for a user + module, or null. */
+    /**
+     * Privilege row for a user + module, or null. Queried fresh on every
+     * check (no static cache) so permission changes saved from the User
+     * Access Control matrix apply immediately, even under `php artisan serve`.
+     */
     public static function privilege(User $user, int $moduleId): ?Privilege
     {
-        $key = $user->RoleID.':'.$moduleId;
-
-        if (! array_key_exists($key, self::$cache)) {
-            self::$cache[$key] = Privilege::query()
-                ->where('RoleID', $user->RoleID)
-                ->where('ModuleID', $moduleId)
-                ->first();
-        }
-
-        return self::$cache[$key];
-    }
-
-    /** Clear the per-request memo (mainly for long-running workers/tests). */
-    public static function flush(): void
-    {
-        self::$cache = [];
+        return Privilege::query()
+            ->where('RoleID', $user->RoleID)
+            ->where('ModuleID', $moduleId)
+            ->first();
     }
 }

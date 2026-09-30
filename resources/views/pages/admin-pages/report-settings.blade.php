@@ -24,7 +24,7 @@
                 <span>Overview</span>
             </a>
 
-            @if(\App\Support\Modules::can(\App\Support\Modules::RS_GENERAL, 'read'))
+            @if(auth()->user()->RoleID == 1)
                 <a href="#"
                    @click.prevent="tab='general'"
                    :class="{ active: tab==='general' }">
@@ -47,7 +47,7 @@
                 <span>Ledgers</span>
             </a>
 
-            @if(\App\Support\Modules::can(\App\Support\Modules::RS_PANGKABUHAYAN, 'read'))
+            @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
                 <a href="#"
                    @click.prevent="tab='pangkabuhayan'"
                    :class="{ active: tab==='pangkabuhayan' }">

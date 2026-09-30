@@ -689,14 +689,14 @@ class ActivationReviewModal extends Component
 
     public function confirmReject(): void
     {
-        if (! $this->isPrivileged) {
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'text' => 'Only administrators can reject activations.',
-            ]);
+        // if (! $this->isPrivileged) {
+        //     $this->dispatch('swal:error', [
+        //         'title' => 'Not Allowed',
+        //         'text' => 'Only administrators can reject activations.',
+        //     ]);
 
-            return;
-        }
+        //     return;
+        // }
 
         $activation = $this->activation ? Activation::find($this->activation->ActivationID) : null;
 

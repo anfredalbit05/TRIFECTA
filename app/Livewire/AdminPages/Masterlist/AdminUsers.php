@@ -648,19 +648,29 @@ class AdminUsers extends Component
 
     private function initializeAccessMatrix(): void
     {
-        $modules = Module::pluck('modulename')->toArray();
+        /* Ordered by ModuleID (the seeded 1-15 order), not alphabetical,
+           so the matrix rows match the modules table exactly. */
+        $modules = Module::orderBy('ModuleID')
+            ->pluck('modulename', 'ModuleID')
+            ->toArray();
 
         if (empty($modules)) {
             $modules = [
-                'Masterlist - Admin Users',
-                'Masterlist - Members',
-                'Masterlist - Branches',
-                'Masterlist - Benefits',
-                'Masterlist - Inquiries',
-                'Masterlist - FAQs',
-                'Post - News & Updates',
-                'Post - Testimonials',
-                'Report & Settings - General',
+                1 => 'Masterlist - Admin Users',
+                2 => 'Masterlist - Members',
+                3 => 'Masterlist - Satellite Members',
+                4 => 'Masterlist - Branches',
+                5 => 'Masterlist - Benefits',
+                6 => 'Masterlist - FAQs',
+                7 => 'Masterlist - Inquiries',
+                8 => 'Transaction List - Withdrawal',
+                9 => 'Transaction List - Activations',
+                10 => 'Post - News & Update',
+                11 => 'Post - Testimonials',
+                12 => 'Report & Settings - General',
+                13 => 'Report & Settings - Users Reports',
+                14 => 'Report & Settings - Ledgers',
+                15 => 'Report & Settings - Pangkabuhayan',
             ];
         }
 

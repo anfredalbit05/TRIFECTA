@@ -547,7 +547,21 @@
 
 .au-access-table{
     @apply w-full text-left border-collapse text-sm;
-    min-width:650px;
+    table-layout:fixed;
+    min-width:720px;
+}
+
+/* Column widths — fixed so every permission checkbox lines up
+   exactly under its header, regardless of module-name length. */
+.au-access-table th:nth-child(1),
+.au-access-table td:nth-child(1){
+    width:34%;
+}
+
+.au-access-table th:nth-child(n+2),
+.au-access-table td:nth-child(n+2){
+    width:11%;
+    text-align:center;
 }
 
 .au-access-thead-row{
@@ -559,7 +573,8 @@
 }
 
 .au-access-th-center{
-    @apply py-3 px-3 text-center whitespace-nowrap;
+    @apply py-3 px-1 text-center whitespace-nowrap;
+    font-size:0.7rem;
 }
 
 .au-access-tbody{
@@ -571,11 +586,17 @@
 }
 
 .au-access-module-td{
-    @apply py-3.5 px-4 font-medium text-slate-700 flex items-center space-x-2.5 whitespace-nowrap;
+    @apply py-3.5 px-4 font-medium text-slate-700 whitespace-nowrap;
+}
+
+/* Flex wrapper INSIDE the cell — display:flex directly on a <td>
+   breaks table column alignment. */
+.au-access-module-wrap{
+    @apply flex items-center space-x-2.5;
 }
 
 .au-access-perm-td{
-    @apply py-3.5 px-3 text-center;
+    @apply py-3.5 px-1 text-center;
 }
 
 .au-checkbox{

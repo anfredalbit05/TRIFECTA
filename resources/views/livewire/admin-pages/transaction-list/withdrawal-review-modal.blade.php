@@ -292,14 +292,16 @@
                     </button>
 
                     <div class="flex flex-col gap-3 sm:flex-row">
-                        @if ($isPrivileged && $withdrawal->status === 'Pending')
-                            {{-- REJECT --}}
+                        {{-- REJECT — needs can_change_status (or can_delete)
+                             on Transaction List - Withdrawal --}}
+                        @if (($this->canChangeStatus || $this->canDelete) && $withdrawal->status === 'Pending')
                             <button type="button" wire:click="confirmReject"
                                 class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition cursor-pointer">
                                 Reject
                             </button>
 
-                            {{-- APPROVE --}}
+                            {{-- APPROVE — needs can_change_status (or can_delete)
+                                 on Transaction List - Withdrawal --}}
                             <button type="button" wire:click="confirmApprove"
                                 class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 cursor-pointer">
                                 Approve & Release
