@@ -43,9 +43,9 @@ class AcknowledgementReceiptService
     private const TEMPLATE = 'images/ack-receipt.jpg';
 
     /** Built-in Windows fonts used to imitate the form's printed type. */
-    private const FONT_REGULAR = 'C:/Windows/Fonts/arial.ttf';
+private const FONT_REGULAR = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuSans.ttf';
 
-    private const FONT_BOLD = 'C:/Windows/Fonts/arialbd.ttf';
+private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuSans-Bold.ttf';
 
     private const INK = [0x1E, 0x29, 0x3B]; // slate-800
 
@@ -243,54 +243,40 @@ class AcknowledgementReceiptService
      * is given the finished line is centred on that pixel (never starting
      * left of $x).
      */
-    private function text(
-        $image,
-        string $value,
-        int $x,
-        int $y,
-        int $size,
-        string $font,
-        $ink,
-        int $maxWidth,
-        ?int $centerX = null
-    ): void {
-        $value = trim($value);
+   private function text(
+    $image,
+    string $value,
+    int $x,
+    int $y,
+    int $size,
+    string $font,
+    $ink,
+    int $maxWidth,
+    ?int $centerX = null
+): void {
+    $value = trim($value);
 
-        if ($value === '') {
-            return;
-        }
+    if ($value === '') {
+        return;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | TrueType font
+    |--------------------------------------------------------------------------
+    */
+    if (is_file($font)) {
 
         /*
         |--------------------------------------------------------------------------
-        | TrueType font available
+        | DO NOT AUTO-SHRINK
+        |--------------------------------------------------------------------------
+        | The $size passed to this function is the actual font size.
         |--------------------------------------------------------------------------
         */
-        if (is_file($font)) {
 
-            // Shrink until it fits.
-            while ($size > 20) {
+        if ($centerX !== null) {
 
-                $box = imagettfbbox(
-                    $size,
-                    0,
-                    $font,
-                    $value
-                );
-
-                $width = abs($box[4] - $box[0]);
-
-                if ($width <= $maxWidth) {
-                    break;
-                }
-
-                $size--;
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | Truncate if still too wide
-            |--------------------------------------------------------------------------
-            */
             $box = imagettfbbox(
                 $size,
                 0,
@@ -298,134 +284,54 @@ class AcknowledgementReceiptService
                 $value
             );
 
-            if (abs($box[4] - $box[0]) > $maxWidth) {
-
-                while (mb_strlen($value) > 3) {
-
-                    $test = mb_substr($value, 0, -1).'…';
-
-                    $box = imagettfbbox(
-                        $size,
-                        0,
-                        $font,
-                        $test
-                    );
-
-                    if (abs($box[4] - $box[0]) <= $maxWidth) {
-                        $value = $test;
-                        break;
-                    }
-
-                    $value = mb_substr($value, 0, -1);
-                }
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | CENTER TRUE TYPE TEXT
-            |--------------------------------------------------------------------------
-            */
-            if ($centerX !== null) {
-
-                $box = imagettfbbox(
-                    $size,
-                    0,
-                    $font,
-                    $value
-                );
-
-                $textWidth = abs($box[4] - $box[0]);
-
-                $x = (int) (
-                    $centerX - ($textWidth / 2)
-                );
-
-                // Never go outside the allowed starting position.
-                $x = max($x, $x);
-            }
-
-            imagettftext(
-                $image,
-                $size,
-                0,
-                $x,
-                $y,
-                $ink,
-                $font,
-                $value
-            );
-
-            return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Railway / Linux fallback
-        |--------------------------------------------------------------------------
-        |
-        | Windows Arial does not exist on Railway.
-        |
-        | imagestring() uses GD's built-in bitmap font.
-        | We therefore calculate its approximate width ourselves and
-        | manually center it.
-        |--------------------------------------------------------------------------
-        */
-
-        $fontSize = 4;
-
-        /*
-         * GD built-in font 4 is approximately 8px wide per character.
-         */
-        $charWidth = imagefontwidth($fontSize);
-
-        $textWidth = imagefontwidth($fontSize) * strlen($value);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Truncate to maximum width
-        |--------------------------------------------------------------------------
-        */
-        $maxChars = max(
-            1,
-            (int) floor($maxWidth / $charWidth)
-        );
-
-        if (strlen($value) > $maxChars) {
-            $value = substr(
-                $value,
-                0,
-                max(1, $maxChars - 1)
-            ).'…';
-
-            $textWidth = imagefontwidth($fontSize) * strlen($value);
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | CENTER BITMAP TEXT
-        |--------------------------------------------------------------------------
-        */
-        if ($centerX !== null) {
+            $textWidth = abs($box[4] - $box[0]);
 
             $x = (int) (
                 $centerX - ($textWidth / 2)
             );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Draw bitmap text
-        |--------------------------------------------------------------------------
-        */
-        imagestring(
+        imagettftext(
             $image,
-            $fontSize,
+            $size,
+            0,
             $x,
-            $y - imagefontheight($fontSize),
-            $value,
-            $ink
+            $y,
+            $ink,
+            $font,
+            $value
+        );
+
+        return;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | GD fallback
+    |--------------------------------------------------------------------------
+    */
+
+    $fontSize = 5;
+
+    $charWidth = imagefontwidth($fontSize);
+
+    $textWidth = $charWidth * strlen($value);
+
+    if ($centerX !== null) {
+        $x = (int) (
+            $centerX - ($textWidth / 2)
         );
     }
+
+    imagestring(
+        $image,
+        $fontSize,
+        $x,
+        $y - imagefontheight($fontSize),
+        $value,
+        $ink
+    );
+}
 
     /**
      * Paste the cashier signature into the By: box (band x 530-1210,
