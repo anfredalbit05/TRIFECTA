@@ -131,11 +131,21 @@ class ApplicationModal extends Component
     | Real-time Format Hook
     |--------------------------------------------------------------------------
     */
-    #[On('delete-beneficiary')]
-    public function deleteBeneficiaryEvent($index)
-    {
-        $this->deleteBeneficiary($index);
-    }
+#[On('delete-beneficiary')]
+public function deleteBeneficiaryEvent($index)
+{
+    Log::info('BENEFICIARY DELETE: delete-beneficiary event received', [
+        'index' => $index,
+        'user_id' => $this->userId,
+        'beneficiary_ids' => $this->beneficiaryIds,
+    ]);
+
+    $this->deleteBeneficiary($index);
+
+    Log::info('BENEFICIARY DELETE: deleteBeneficiary() completed', [
+        'index' => $index,
+    ]);
+}
 
     #[Computed]
 public function previewPolicyNumber(): string
@@ -263,28 +273,48 @@ public function previewPolicyNumber(): string
     | Beneficiary Delete/Clear Confirmation
     |--------------------------------------------------------------------------
     */
-    public function confirmDeleteBeneficiary($index)
-    {
-        $beneficiary = $this->beneficiaries[$index] ?? [];
-        $hasData =
-            ! empty(trim($beneficiary['fullname'] ?? '')) ||
-            ! empty($beneficiary['birthdate'] ?? '') ||
-            ! empty(trim($beneficiary['relationship'] ?? ''));
+ public function confirmDeleteBeneficiary($index)
+{
+    Log::info('BENEFICIARY DELETE: confirmDeleteBeneficiary called', [
+        'index' => $index,
+        'user_id' => $this->userId,
+        'beneficiaries' => $this->beneficiaries,
+        'beneficiary_ids' => $this->beneficiaryIds,
+    ]);
 
-        // Nothing typed and nothing saved — no need to confirm anything.
-        if (! $hasData) {
-            return;
-        }
+    if (! array_key_exists($index, $this->beneficiaries)) {
+        Log::warning('BENEFICIARY DELETE: invalid beneficiary index', [
+            'index' => $index,
+            'available_indexes' => array_keys($this->beneficiaries),
+        ]);
 
-        $isPersisted = ! empty($this->beneficiaryIds[$index]);
-
-        $this->dispatch(
-            'confirm-delete-beneficiary',
-            index: $index + 1,
-            persisted: $isPersisted
-        );
+        return;
     }
 
+    $beneficiaryId = $this->beneficiaryIds[$index] ?? null;
+    $isPersisted = ! empty($beneficiaryId);
+
+    Log::info('BENEFICIARY DELETE: preparing confirmation dispatch', [
+        'index' => $index,
+        'display_index' => $index + 1,
+        'beneficiary_id' => $beneficiaryId,
+        'is_persisted' => $isPersisted,
+        'beneficiary' => $this->beneficiaries[$index] ?? null,
+    ]);
+
+    $this->dispatch(
+        'confirm-delete-beneficiary',
+        index: $index + 1,
+        persisted: $isPersisted
+    );
+
+    Log::info('BENEFICIARY DELETE: confirm-delete-beneficiary dispatched', [
+        'index' => $index,
+        'display_index' => $index + 1,
+        'beneficiary_id' => $beneficiaryId,
+        'is_persisted' => $isPersisted,
+    ]);
+}
     /*
     |--------------------------------------------------------------------------
     | Delete/Clear Beneficiary
@@ -293,31 +323,76 @@ public function previewPolicyNumber(): string
     |   delete the row from the database immediately.
     | - Either way, clear the local fields for that slot.
     */
-    public function deleteBeneficiary($index)
-    {
-        if (! isset($this->beneficiaries[$index])) {
-            return;
-        }
+   public function deleteBeneficiary($index)
+{
+    Log::info('BENEFICIARY DELETE: deleteBeneficiary called', [
+        'index' => $index,
+        'user_id' => $this->userId,
+        'beneficiaries' => $this->beneficiaries,
+        'beneficiary_ids' => $this->beneficiaryIds,
+    ]);
 
-        $wasPersisted = ! empty($this->beneficiaryIds[$index]);
+    if (! isset($this->beneficiaries[$index])) {
+        Log::warning('BENEFICIARY DELETE: beneficiary index does not exist', [
+            'index' => $index,
+            'available_indexes' => array_keys($this->beneficiaries),
+        ]);
 
-        if ($wasPersisted) {
-            Beneficiary::destroy($this->beneficiaryIds[$index]);
-            $this->beneficiaryIds[$index] = null;
-        }
-
-        $this->beneficiaries[$index] = [
-            'fullname' => '',
-            'birthdate' => '',
-            'relationship' => '',
-        ];
-
-        $this->dispatch(
-            'beneficiary-deleted',
-            index: $index + 1,
-            persisted: $wasPersisted
-        );
+        return;
     }
+
+    $beneficiaryId = $this->beneficiaryIds[$index] ?? null;
+    $wasPersisted = ! empty($beneficiaryId);
+
+    Log::info('BENEFICIARY DELETE: resolved beneficiary', [
+        'index' => $index,
+        'beneficiary_id' => $beneficiaryId,
+        'was_persisted' => $wasPersisted,
+    ]);
+
+    if ($wasPersisted) {
+
+        Log::info('BENEFICIARY DELETE: attempting database deletion', [
+            'beneficiary_id' => $beneficiaryId,
+            'user_id' => $this->userId,
+        ]);
+
+        $deleted = Beneficiary::whereKey($beneficiaryId)
+            ->where('UserID', $this->userId)
+            ->delete();
+
+        Log::info('BENEFICIARY DELETE: database deletion completed', [
+            'beneficiary_id' => $beneficiaryId,
+            'user_id' => $this->userId,
+            'deleted_rows' => $deleted,
+        ]);
+
+        $this->beneficiaryIds[$index] = null;
+    }
+
+    $this->beneficiaries[$index] = [
+        'fullname' => '',
+        'birthdate' => '',
+        'relationship' => '',
+    ];
+
+    Log::info('BENEFICIARY DELETE: local beneficiary slot cleared', [
+        'index' => $index,
+        'was_persisted' => $wasPersisted,
+    ]);
+
+    $this->dispatch(
+        'beneficiary-deleted',
+        index: $index + 1,
+        persisted: $wasPersisted
+    );
+
+    Log::info('BENEFICIARY DELETE: success event dispatched', [
+        'index' => $index + 1,
+        'persisted' => $wasPersisted,
+    ]);
+}
+
 
     /*
     |--------------------------------------------------------------------------
@@ -537,21 +612,19 @@ public function previewPolicyNumber(): string
 
             foreach ($this->beneficiaries as $beneficiary) {
 
-                Log::info('Beneficiary data', $beneficiary);
-
-                Log::info('Sending emails');
-
-                foreach ($this->beneficiaries as $beneficiary) {
-                    if (! empty($beneficiary['fullname']) && ! empty($beneficiary['birthdate'])) {
-                        Beneficiary::create([
-                            'UserID' => $user->UserID,
-                            'fullname' => $beneficiary['fullname'],
-                            'birthdate' => $beneficiary['birthdate'],
-                            'relationship' => $beneficiary['relationship'] ?? null,
-                            'status' => true,
-                        ]);
-                    }
+                if (
+                    ! empty($beneficiary['fullname']) &&
+                    ! empty($beneficiary['birthdate'])
+                ) {
+                    Beneficiary::create([
+                        'UserID' => $user->UserID,
+                        'fullname' => $beneficiary['fullname'],
+                        'birthdate' => $beneficiary['birthdate'],
+                        'relationship' => $beneficiary['relationship'] ?? null,
+                        'status' => true,
+                    ]);
                 }
+            }
 
                 /*
                 |--------------------------------------------------------------------------
@@ -709,7 +782,6 @@ public function previewPolicyNumber(): string
                         'message' => $e->getMessage(),
                     ]);
                 }
-            }
 
             /*
             |--------------------------------------------------------------------------

@@ -328,7 +328,7 @@
                     {{-- =================================================
                          2. POLICY INFORMATION
                     ================================================== --}}
-                    @if ($isEditMode)
+                    @if ($isEditMode && $activationId)
     <div class="space-y-4">
 
         {{-- HEADER --}}
@@ -1187,6 +1187,7 @@
                CONFIRM CLEAR / DELETE BENEFICIARY
             ========================================================== */
             Livewire.on('confirm-delete-beneficiary', (data) => {
+
                 const beneficiaryNumber = Number(data.index ?? 1);
                 const isPersisted = !!data.persisted;
 
