@@ -23,7 +23,7 @@
                         {{ $isForgotPassword ? 'Reset Password' : 'Welcome Back' }}
                     </h2>
                     <p class="text-xs text-slate-300 mt-1">
-                        {{ $isForgotPassword ? 'Enter your email to receive a password reset link' : 'Access your Dayongan member portal' }}
+                        {{ $isForgotPassword ? 'Enter your email to receive a password reset link' : 'Access your TRUELIFE member portal' }}
                     </p>
                 </div>
 
