@@ -18,87 +18,32 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-/*
-|--------------------------------------------------------------------------
-| Activation Approval Service
-|--------------------------------------------------------------------------
-| Single source of truth for approving / rejecting a membership activation.
-|
-| Both existing review modals (regular ActivationReviewModal and the
-| satellite SatelliteMembersActivationReview) historically held private
-| copies of this logic, differing only in the commission shape:
-|
-|   • Regular: DR = 90% of the Direct Referral fee + a 10% TX ledger row
-|     (TX is ledger-only, no wallet entry), plus policy/receipt numbers and
-|     cashier snapshot recorded on approval.
-|
-|   • Satellite: DR = 100% of the Direct Referral fee, no TX split.
-|
-| Everything else (activation status, history row, user activation, MF
-| breakdown, CF convenience fee, PF to the recruiter, levels 2-6 overrides,
-| email notifications) is identical. The Transaction List tabs reuse this
-| service so approvals initiated from either screen write the same records.
-|--------------------------------------------------------------------------
-*/
-
 class ActivationApprovalService
 {
-    /** Commission flavors — change only the Level-1 DR treatment. */
     public const TYPE_REGULAR = 'regular';
-
     public const TYPE_SATELLITE = 'satellite';
 
-    /**
-     * Approve a pending activation.
-     *
-     * The caller resolves $activation / $selectedUserID (each screen has its
-     * own loading rules) and handles any typed-confirmation UI; this method
-     * performs the atomic writes + notifications and returns true on success,
-     * false when the activation was no longer pending (or the member vanished).
-     */
+    private const OV_RATES = [
+        2 => 50.00,
+        3 => 40.00,
+        4 => 30.00,
+        5 => 20.00,
+        6 => 10.00,
+    ];
+
     public function approve(
         Activation $activation,
         int $selectedUserID,
         string $type = self::TYPE_REGULAR,
         array $activationAttributes = []
     ): bool {
-        // =====================================================
-        // LOAD SHARED RELATION DATA
-        // =====================================================
+        $referralUser = $this->findReferralUser($activation);
 
-        $referralUser = null;
+        $gcashCF = $this->settingEnabled('gcash_convenience_fee_enabled');
+        $paymayaCF = $this->settingEnabled('paymaya_convenience_fee_enabled');
 
-        if (filled($activation->upline_code)) {
-            $referralUser = User::where(
-                'referralCode',
-                trim((string) $activation->upline_code)
-            )->first();
-        }
-
-        $beneficiaries = Beneficiary::where('UserID', $selectedUserID)
-            ->where('status', true)
-            ->orderBy('BeneficiaryID')
-            ->get()
-            ->toArray();
-
-        $gcashConvenienceFeeEnabled = filter_var(
-            Setting::where('name', 'gcash_convenience_fee_enabled')->value('value'),
-            FILTER_VALIDATE_BOOLEAN
-        );
-
-        $paymayaConvenienceFeeEnabled = filter_var(
-            Setting::where('name', 'paymaya_convenience_fee_enabled')->value('value'),
-            FILTER_VALIDATE_BOOLEAN
-        );
-
-        $totalMembershipFeesCost = (float) MembershipFee::sum('Cost');
-
-        /** @var User|null $activatedUser */
+        $totalMembershipFees = (float) MembershipFee::sum('Cost');
         $activatedUser = null;
-
-        // =====================================================
-        // ATOMIC DATABASE OPERATIONS
-        // =====================================================
 
         try {
             DB::transaction(function () use (
@@ -106,43 +51,58 @@ class ActivationApprovalService
                 $selectedUserID,
                 $type,
                 $referralUser,
-                $gcashConvenienceFeeEnabled,
-                $paymayaConvenienceFeeEnabled,
+                $gcashCF,
+                $paymayaCF,
                 $activationAttributes,
                 &$activatedUser
             ) {
-                Log::info('Starting approval transaction for ActivationID: '.$activation->ActivationID);
+                Log::info('========== ACTIVATION APPROVAL START ==========', [
+                    'ActivationID' => $activation->ActivationID,
+                    'UserID' => $selectedUserID,
+                    'type' => $type,
+                    'upline_code' => $activation->upline_code,
+                    'amount' => $activation->amount,
+                ]);
 
                 /*
-                | Re-check pending status inside the row lock so concurrent
-                | approvals (modal vs transaction list) can never double-pay
-                | commissions.
+                |--------------------------------------------------------------------------
+                | Lock Activation
+                |--------------------------------------------------------------------------
                 */
-                $fresh = Activation::where('ActivationID', $activation->ActivationID)
-                    ->lockForUpdate()
-                    ->first();
+                $activation = Activation::where(
+                    'ActivationID',
+                    $activation->ActivationID
+                )->lockForUpdate()->first();
 
-                if (! $fresh || $fresh->status !== 'Pending') {
-                    throw new \RuntimeException('Activation is no longer pending.');
+                if (! $activation || $activation->status !== 'Pending') {
+                    throw new \RuntimeException(
+                        'Activation is no longer pending.'
+                    );
                 }
 
-                $activation = $fresh;
+                /*
+                |--------------------------------------------------------------------------
+                | Approve Activation
+                |--------------------------------------------------------------------------
+                */
+                $activation->update(array_merge(
+                    ['status' => 'Approved'],
+                    $activationAttributes
+                ));
 
-                // Update Activation Status (+ any extra attributes the
-                // caller stamps at approval time — policy/receipt/cashier)
-                $activation->update(array_merge([
-                    'status' => 'Approved',
-                ], $activationAttributes));
-
-                // Build Admin Name for Log History
+                /*
+                |--------------------------------------------------------------------------
+                | Approval History
+                |--------------------------------------------------------------------------
+                */
                 $admin = Auth::user();
+
                 $adminName = trim(implode(' ', array_filter([
-                    $admin->firstname ?? '',
-                    $admin->middlename ?? '',
-                    $admin->lastname ?? '',
+                    $admin?->firstname,
+                    $admin?->middlename,
+                    $admin?->lastname,
                 ])));
 
-                // Log Approval History
                 ActivationHistory::create([
                     'ActivationID' => $activation->ActivationID,
                     'AdminID' => Auth::id(),
@@ -150,7 +110,11 @@ class ActivationApprovalService
                     'remarks' => "Activation approved by {$adminName}.",
                 ]);
 
-                // Activate User Account
+                /*
+                |--------------------------------------------------------------------------
+                | Activate User
+                |--------------------------------------------------------------------------
+                */
                 User::where('UserID', $selectedUserID)->update([
                     'status' => 'Active',
                 ]);
@@ -159,38 +123,61 @@ class ActivationApprovalService
 
                 /*
                 |--------------------------------------------------------------------------
-                | Membership Fees (MF) Ledger Breakdown
+                | SATELLITE
                 |--------------------------------------------------------------------------
                 */
-                $membershipFees = MembershipFee::all();
+                if ($type === self::TYPE_SATELLITE) {
+                    $this->processSatelliteAccounting(
+                        $activation,
+                        $selectedUserID,
+                        $referralUser
+                    );
 
-                foreach ($membershipFees as $fee) {
-                    Ledger::create([
+                    Log::info('========== SATELLITE APPROVAL FINISHED ==========', [
+                        'ActivationID' => $activation->ActivationID,
+                    ]);
+
+                    return;
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | REGULAR - MEMBERSHIP FEES
+                |--------------------------------------------------------------------------
+                */
+                foreach (MembershipFee::all() as $fee) {
+                    $ledger = Ledger::create([
                         'RefID' => $fee->FeeID,
                         'amount' => $fee->Cost,
                         'Source' => 'MF',
                         'ActivationID' => $activation->ActivationID,
                         'status' => 'Completed',
                     ]);
+
+                    Log::info('MF Ledger created.', [
+                        'LedgerID' => $ledger->getKey(),
+                        'FeeID' => $fee->FeeID,
+                        'amount' => $fee->Cost,
+                    ]);
                 }
 
                 /*
                 |--------------------------------------------------------------------------
-                | GCash / Paymaya Convenience Fee (CF)
-                |--------------------------------------------------------------------------
-                | Only applies when payment_method is Gcash or Paymaya and the
-                | corresponding setting is enabled. CF = 1% of Total Membership Cost.
+                | CONVENIENCE FEE
                 |--------------------------------------------------------------------------
                 */
-
-                $paymentMethod = strtolower(trim((string) $activation->payment_method));
+                $paymentMethod = strtolower(
+                    trim((string) $activation->payment_method)
+                );
 
                 if (
-                    ($paymentMethod === 'gcash' && $gcashConvenienceFeeEnabled)
-                    || ($paymentMethod === 'paymaya' && $paymayaConvenienceFeeEnabled)
+                    ($paymentMethod === 'gcash' && $gcashCF) ||
+                    ($paymentMethod === 'paymaya' && $paymayaCF)
                 ) {
-                    $totalAmount = (float) MembershipFee::sum('Cost');
-                    $cfAmount = round($totalAmount * 0.01, 2);
+                    $cfAmount = round(
+                        MembershipFee::sum('Cost') * 0.01,
+                        2
+                    );
 
                     Ledger::create([
                         'RefID' => $selectedUserID,
@@ -200,175 +187,51 @@ class ActivationApprovalService
                         'status' => 'Completed',
                     ]);
 
-                    Log::info('GCash | Paymaya CF ledger entry created.', [
-                        'UserID' => $selectedUserID,
+                    Log::info('CF Ledger created.', [
                         'ActivationID' => $activation->ActivationID,
-                        'payment_method' => $activation->payment_method,
                         'amount' => $cfAmount,
+                        'payment_method' => $paymentMethod,
                     ]);
                 }
 
                 /*
                 |--------------------------------------------------------------------------
-                | Provident Fund (PF: 50.00) to Direct Recruiter / Upline
+                | PF
                 |--------------------------------------------------------------------------
                 */
                 if ($referralUser) {
-                    Wallet::create([
-                        'UserID' => $referralUser->UserID,
-                        'ActivationID' => $activation->ActivationID,
-                        'amount' => 50.00,
-                        'source' => 'PF',
-                        'status' => 'Active',
-                    ]);
-
-                    Ledger::create([
-                        'RefID' => $referralUser->UserID,
-                        'amount' => -50.00,
-                        'Source' => 'PF',
-                        'ActivationID' => $activation->ActivationID,
-                        'status' => 'Completed',
-                    ]);
-
-                    Log::info("PF entry (50.00) written for referral UserID: {$referralUser->UserID}");
+                    $this->createWalletLedger(
+                        $referralUser->UserID,
+                        $activation->ActivationID,
+                        50.00,
+                        'PF',
+                        -50.00
+                    );
                 }
 
                 /*
                 |--------------------------------------------------------------------------
-                | Multi-Tier Commission Hierarchy
-                |--------------------------------------------------------------------------
-                | Regular flavor: Level 1 DR receives 90% of the Direct Referral
-                | fee, the remaining 10% is a TX ledger-only row.
-                | Satellite flavor: Level 1 DR receives 100% of the fee.
-                | Levels 2-6: fixed overrides (50/40/30/20/10) — OV wallet + ledger.
+                | DR + OV
                 |--------------------------------------------------------------------------
                 */
-
-                $drFee = (float) (
-                    MembershipFee::where('FeeName', 'Direct Referral')->value('Cost')
-                    ?? 400.00
+                $this->processUplineCommissions(
+                    $activation,
+                    $referralUser
                 );
 
-                $levelCommissionRates = [
-                    2 => 50.00, // 1st Level Override
-                    3 => 40.00, // 2nd Level Override
-                    4 => 30.00, // 3rd Level Override
-                    5 => 20.00, // 4th Level Override
-                    6 => 10.00, // 5th Level Override
-                ];
-
-                $drCommissionAmount = $type === self::TYPE_SATELLITE
-                    ? $drFee
-                    : round($drFee * 0.90, 2); // 90% = 360.00
-
-                $txAmount = $type === self::TYPE_SATELLITE
-                    ? 0.00
-                    : round($drFee * 0.10, 2); // 10% = 40.00
-
-                $currentUplineCode = $activation->upline_code;
-                $level = 1;
-                $maxLevels = 6;
-
-                while ($currentUplineCode && $level <= $maxLevels) {
-                    $uplineUser = User::where('referralCode', $currentUplineCode)->first();
-
-                    if (! $uplineUser) {
-                        Log::warning(
-                            "Upline user not found for code: {$currentUplineCode} at Level {$level}"
-                        );
-
-                        break;
-                    }
-
-                    if ($level === 1) {
-                        /*
-                        | Level 1 - Direct Referral (DR wallet + ledger)
-                        */
-                        if ($drCommissionAmount > 0) {
-                            Wallet::create([
-                                'UserID' => $uplineUser->UserID,
-                                'ActivationID' => $activation->ActivationID,
-                                'amount' => $drCommissionAmount,
-                                'source' => 'DR',
-                                'status' => 'Active',
-                            ]);
-
-                            Ledger::create([
-                                'RefID' => $uplineUser->UserID,
-                                'amount' => -$drCommissionAmount,
-                                'Source' => 'DR',
-                                'ActivationID' => $activation->ActivationID,
-                                'status' => 'Completed',
-                            ]);
-
-                            Log::info('Direct Referral commission written.', [
-                                'UserID' => $uplineUser->UserID,
-                                'ActivationID' => $activation->ActivationID,
-                                'amount' => $drCommissionAmount,
-                                'type' => $type,
-                            ]);
-                        }
-
-                        /*
-                        | TX - 10% of Direct Referral (ledger-only, regular flavor)
-                        | No Wallet entry is created for TX.
-                        */
-                        if ($txAmount > 0) {
-                            Ledger::create([
-                                'RefID' => $uplineUser->UserID,
-                                'amount' => $txAmount,
-                                'Source' => 'TX',
-                                'ActivationID' => $activation->ActivationID,
-                                'status' => 'Completed',
-                            ]);
-
-                            Log::info('TX ledger entry created.', [
-                                'UserID' => $uplineUser->UserID,
-                                'ActivationID' => $activation->ActivationID,
-                                'amount' => $txAmount,
-                                'percentage' => '10%',
-                            ]);
-                        }
-                    } else {
-                        /*
-                        | Levels 2-6 - Override (OV wallet + ledger)
-                        */
-                        $commissionAmount = $levelCommissionRates[$level] ?? 0.00;
-
-                        if ($commissionAmount > 0) {
-                            Wallet::create([
-                                'UserID' => $uplineUser->UserID,
-                                'ActivationID' => $activation->ActivationID,
-                                'amount' => $commissionAmount,
-                                'source' => 'OV',
-                                'status' => 'Active',
-                            ]);
-
-                            Ledger::create([
-                                'RefID' => $uplineUser->UserID,
-                                'amount' => -$commissionAmount,
-                                'Source' => 'OV',
-                                'ActivationID' => $activation->ActivationID,
-                                'status' => 'Completed',
-                            ]);
-
-                            Log::info(
-                                "Override commission written for UserID: {$uplineUser->UserID} ".
-                                "at Level {$level}: {$commissionAmount}"
-                            );
-                        }
-                    }
-
-                    // Traverse up to next upline level
-                    $currentUplineCode = $uplineUser->uplineCode ?? null;
-                    $level++;
-                }
+                Log::info('========== REGULAR APPROVAL FINISHED ==========', [
+                    'ActivationID' => $activation->ActivationID,
+                ]);
             });
-        } catch (\RuntimeException $e) {
-            // "No longer pending" race — the caller surfaces a friendly error.
-            Log::warning('Activation approval aborted: '.$e->getMessage(), [
-                'ActivationID' => $activation->ActivationID,
+        } catch (\Throwable $e) {
+            Log::error('========== ACTIVATION APPROVAL FAILED ==========', [
+                'ActivationID' => $activation->ActivationID ?? null,
                 'UserID' => $selectedUserID,
+                'type' => $type,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return false;
@@ -376,43 +239,480 @@ class ActivationApprovalService
 
         /*
         |--------------------------------------------------------------------------
-        | Send Emails OUTSIDE Database Transaction (Prevents SMTP Latency Delays)
+        | EMAILS
         |--------------------------------------------------------------------------
         */
-
-        // Send email to the newly activated user
-        if ($activatedUser && filled($activatedUser->email)) {
+        if ($activatedUser?->email) {
             try {
-                Mail::to($activatedUser->email)
-                    ->send(new ActivationApprovedMail($activatedUser, $activation, $totalMembershipFeesCost));
+                Mail::to($activatedUser->email)->send(
+                    new ActivationApprovedMail(
+                        $activatedUser,
+                        $activation,
+                        $totalMembershipFees
+                    )
+                );
             } catch (\Throwable $e) {
-                Log::error('Failed to send approval email to user.', ['error' => $e->getMessage()]);
+                Log::error('Failed to send member approval email.', [
+                    'email' => $activatedUser->email,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
 
-        // Send email to direct recruiter/upline
-        if ($referralUser && filled($referralUser->email)) {
+        if ($referralUser?->email && $activatedUser) {
             try {
-                Mail::to($referralUser->email)
-                    ->send(new InviteeApprovedMail($referralUser, $activatedUser, $activation));
+                Mail::to($referralUser->email)->send(
+                    new InviteeApprovedMail(
+                        $referralUser,
+                        $activatedUser,
+                        $activation
+                    )
+                );
             } catch (\Throwable $e) {
-                Log::error('Failed to send approval email to upline.', ['error' => $e->getMessage()]);
+                Log::error('Failed to send upline approval email.', [
+                    'email' => $referralUser->email,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
 
         return true;
     }
 
-    /**
-     * Reject a pending activation: status + history + user Inactive + email.
-     * The caller resolves the activation row and handles the remarks prompt.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | FIND DIRECT REFERRAL
+    |--------------------------------------------------------------------------
+    */
+    private function findReferralUser(Activation $activation): ?User
+    {
+        $code = trim((string) $activation->upline_code);
+
+        if ($code === '') {
+            Log::warning('No activation upline_code.', [
+                'ActivationID' => $activation->ActivationID,
+            ]);
+
+            return null;
+        }
+
+        $user = User::where('referralCode', $code)->first();
+
+        Log::info('Direct referral lookup.', [
+            'ActivationID' => $activation->ActivationID,
+            'upline_code' => $code,
+            'found' => (bool) $user,
+            'UserID' => $user?->UserID,
+            'referralCode' => $user?->referralCode,
+            'uplineCode' => $user?->uplineCode,
+        ]);
+
+        return $user;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | REGULAR + SATELLITE UPLINE COMMISSIONS
+    |--------------------------------------------------------------------------
+    */
+    private function processUplineCommissions(
+        Activation $activation,
+        ?User $referralUser
+    ): void {
+        $drFee = (float) (
+            MembershipFee::where(
+                'FeeName',
+                'Direct Referral'
+            )->value('Cost') ?? 400.00
+        );
+
+        $drAmount = round($drFee * 0.90, 2);
+        $txAmount = round($drFee * 0.10, 2);
+
+        $code = trim((string) $activation->upline_code);
+        $level = 1;
+
+        Log::info('========== UPLINE TRAVERSAL START ==========', [
+            'ActivationID' => $activation->ActivationID,
+            'starting_upline_code' => $code,
+            'DR' => $drAmount,
+            'TX' => $txAmount,
+        ]);
+
+        while ($code !== '' && $level <= 6) {
+
+            Log::info('Upline level lookup.', [
+                'ActivationID' => $activation->ActivationID,
+                'level' => $level,
+                'search_referralCode' => $code,
+            ]);
+
+            $user = User::where('referralCode', $code)->first();
+
+            if (! $user) {
+                Log::warning('Upline NOT FOUND - traversal stopped.', [
+                    'ActivationID' => $activation->ActivationID,
+                    'level' => $level,
+                    'search_referralCode' => $code,
+                ]);
+
+                break;
+            }
+
+            Log::info('Upline FOUND.', [
+                'ActivationID' => $activation->ActivationID,
+                'level' => $level,
+                'UserID' => $user->UserID,
+                'referralCode' => $user->referralCode,
+                'uplineCode' => $user->uplineCode,
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | LEVEL 1 = DR + TX
+            |--------------------------------------------------------------------------
+            */
+            if ($level === 1) {
+
+                Log::info('Processing Level 1 DR/TX.', [
+                    'ActivationID' => $activation->ActivationID,
+                    'UserID' => $user->UserID,
+                    'DR' => $drAmount,
+                    'TX' => $txAmount,
+                ]);
+
+                if ($drAmount > 0) {
+                    $this->createWalletLedger(
+                        $user->UserID,
+                        $activation->ActivationID,
+                        $drAmount,
+                        'DR',
+                        -$drAmount
+                    );
+                }
+
+                if ($txAmount > 0) {
+                    $ledger = Ledger::create([
+                        'RefID' => $user->UserID,
+                        'amount' => $txAmount,
+                        'Source' => 'TX',
+                        'ActivationID' => $activation->ActivationID,
+                        'status' => 'Completed',
+                    ]);
+
+                    Log::info('TX Ledger created.', [
+                        'LedgerID' => $ledger->getKey(),
+                        'UserID' => $user->UserID,
+                        'amount' => $txAmount,
+                    ]);
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | LEVEL 2-6 = OV
+            |--------------------------------------------------------------------------
+            */
+            if ($level >= 2) {
+
+                $ovAmount = self::OV_RATES[$level] ?? 0;
+
+                Log::info('OV LEVEL DETECTED.', [
+                    'ActivationID' => $activation->ActivationID,
+                    'level' => $level,
+                    'UserID' => $user->UserID,
+                    'referralCode' => $user->referralCode,
+                    'uplineCode' => $user->uplineCode,
+                    'OV' => $ovAmount,
+                ]);
+
+                if ($ovAmount <= 0) {
+                    Log::warning('OV amount is zero.', [
+                        'ActivationID' => $activation->ActivationID,
+                        'level' => $level,
+                    ]);
+                } else {
+                    $this->createOV(
+                        $user->UserID,
+                        $activation->ActivationID,
+                        $level,
+                        $ovAmount
+                    );
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | NEXT UPLINE
+            |--------------------------------------------------------------------------
+            */
+            $nextCode = trim((string) $user->uplineCode);
+
+            Log::info('Moving to next upline.', [
+                'ActivationID' => $activation->ActivationID,
+                'current_level' => $level,
+                'current_UserID' => $user->UserID,
+                'current_referralCode' => $user->referralCode,
+                'next_upline_code' => $nextCode,
+            ]);
+
+            $code = $nextCode;
+            $level++;
+        }
+
+        if ($level > 6) {
+            Log::info('OV traversal reached maximum Level 6.', [
+                'ActivationID' => $activation->ActivationID,
+            ]);
+        }
+
+        Log::info('========== UPLINE TRAVERSAL END ==========', [
+            'ActivationID' => $activation->ActivationID,
+            'last_level' => $level - 1,
+            'remaining_code' => $code,
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CREATE OV WALLET + LEDGER
+    |--------------------------------------------------------------------------
+    */
+    private function createOV(
+        int $userID,
+        int $activationID,
+        int $level,
+        float $amount
+    ): void {
+        Log::info('>>> OV WALLET INSERT START', [
+            'UserID' => $userID,
+            'ActivationID' => $activationID,
+            'level' => $level,
+            'amount' => $amount,
+        ]);
+
+        try {
+            $wallet = Wallet::create([
+                'UserID' => $userID,
+                'ActivationID' => $activationID,
+                'amount' => $amount,
+                'source' => 'OV',
+                'status' => 'Active',
+            ]);
+
+            Log::info('>>> OV WALLET INSERT SUCCESS', [
+                'WalletID' => $wallet->getKey(),
+                'UserID' => $userID,
+                'ActivationID' => $activationID,
+                'level' => $level,
+                'amount' => $amount,
+            ]);
+
+            $ledger = Ledger::create([
+                'RefID' => $userID,
+                'amount' => -$amount,
+                'Source' => 'OV',
+                'ActivationID' => $activationID,
+                'status' => 'Completed',
+            ]);
+
+            Log::info('>>> OV LEDGER INSERT SUCCESS', [
+                'LedgerID' => $ledger->getKey(),
+                'RefID' => $userID,
+                'ActivationID' => $activationID,
+                'level' => $level,
+                'amount' => -$amount,
+            ]);
+
+        } catch (\Throwable $e) {
+
+            Log::error('>>> OV INSERT FAILED', [
+                'UserID' => $userID,
+                'ActivationID' => $activationID,
+                'level' => $level,
+                'amount' => $amount,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | WALLET + LEDGER HELPER
+    |--------------------------------------------------------------------------
+    */
+    private function createWalletLedger(
+        int $userID,
+        int $activationID,
+        float $walletAmount,
+        string $source,
+        float $ledgerAmount
+    ): void {
+        $wallet = Wallet::create([
+            'UserID' => $userID,
+            'ActivationID' => $activationID,
+            'amount' => $walletAmount,
+            'source' => $source,
+            'status' => 'Active',
+        ]);
+
+        Log::info('Wallet created.', [
+            'WalletID' => $wallet->getKey(),
+            'UserID' => $userID,
+            'ActivationID' => $activationID,
+            'source' => $source,
+            'amount' => $walletAmount,
+        ]);
+
+        $ledger = Ledger::create([
+            'RefID' => $userID,
+            'amount' => $ledgerAmount,
+            'Source' => $source,
+            'ActivationID' => $activationID,
+            'status' => 'Completed',
+        ]);
+
+        Log::info('Ledger created.', [
+            'LedgerID' => $ledger->getKey(),
+            'RefID' => $userID,
+            'ActivationID' => $activationID,
+            'Source' => $source,
+            'amount' => $ledgerAmount,
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SATELLITE ACCOUNTING
+    |--------------------------------------------------------------------------
+    */
+    private function processSatelliteAccounting(
+        Activation $activation,
+        int $selectedUserID,
+        ?User $referralUser
+    ): void {
+        $activationAmount = (float) $activation->amount;
+
+        $sfAmount = round($activationAmount * 0.90, 2);
+        $csAmount = round($activationAmount * 0.10, 2);
+
+        Log::info('Satellite accounting.', [
+            'ActivationID' => $activation->ActivationID,
+            'activationAmount' => $activationAmount,
+            'SF' => $sfAmount,
+            'CS' => $csAmount,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | SF
+        |--------------------------------------------------------------------------
+        */
+        if ($sfAmount > 0) {
+            Ledger::create([
+                'RefID' => $selectedUserID,
+                'amount' => $sfAmount,
+                'Source' => 'SF',
+                'ActivationID' => $activation->ActivationID,
+                'status' => 'Completed',
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | CS
+        |--------------------------------------------------------------------------
+        */
+        if ($csAmount > 0) {
+            Ledger::create([
+                'RefID' => $selectedUserID,
+                'amount' => -$csAmount,
+                'Source' => 'CS',
+                'ActivationID' => $activation->ActivationID,
+                'status' => 'Completed',
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | UPLINE DR / TX / OV / PF
+        |--------------------------------------------------------------------------
+        */
+        if ($referralUser) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | CS WALLET
+            |--------------------------------------------------------------------------
+            */
+            if ($csAmount > 0) {
+                Wallet::create([
+                    'UserID' => $referralUser->UserID,
+                    'ActivationID' => $activation->ActivationID,
+                    'amount' => $csAmount,
+                    'source' => 'CS',
+                    'status' => 'Active',
+                ]);
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | DR + TX + OV
+            |--------------------------------------------------------------------------
+            */
+            $this->processUplineCommissions(
+                $activation,
+                $referralUser
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | PF
+            |--------------------------------------------------------------------------
+            */
+            $this->createWalletLedger(
+                $referralUser->UserID,
+                $activation->ActivationID,
+                50.00,
+                'PF',
+                -50.00
+            );
+        }
+            }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SETTING
+    |--------------------------------------------------------------------------
+    */
+    private function settingEnabled(string $name): bool
+    {
+        return filter_var(
+            Setting::where('name', $name)->value('value'),
+            FILTER_VALIDATE_BOOLEAN
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | REJECT
+    |--------------------------------------------------------------------------
+    */
     public function reject(
         Activation $activation,
         int $selectedUserID,
         string $remarks
     ): void {
-        DB::transaction(function () use ($activation, $selectedUserID, $remarks) {
+        DB::transaction(function () use (
+            $activation,
+            $selectedUserID,
+            $remarks
+        ) {
             $activation->update([
                 'status' => 'Rejected',
             ]);
@@ -431,7 +731,7 @@ class ActivationApprovalService
 
         $user = User::find($selectedUserID);
 
-        if ($user && filled($user->email)) {
+        if ($user?->email) {
             $beneficiaries = Beneficiary::where('UserID', $selectedUserID)
                 ->where('status', true)
                 ->orderBy('BeneficiaryID')
@@ -448,7 +748,9 @@ class ActivationApprovalService
                     )
                 );
             } catch (\Throwable $e) {
-                Log::error('Failed to send rejection email.', ['error' => $e->getMessage()]);
+                Log::error('Failed to send rejection email.', [
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
     }

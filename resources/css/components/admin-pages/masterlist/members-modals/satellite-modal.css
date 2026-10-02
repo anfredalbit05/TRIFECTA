@@ -40,6 +40,23 @@
     justify-content: center;
 }
 
+.payment-method__image {
+    width: 180px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.payment-method__image img {
+    width: 120px;
+    height: 90px;
+    object-fit: contain;
+    display: block;
+}
+
 .account-card,
 .payment-card,
 .summary-card {
