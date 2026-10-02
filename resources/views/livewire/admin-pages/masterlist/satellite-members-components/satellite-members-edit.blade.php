@@ -454,10 +454,16 @@
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
-        let map = null;
-        let marker = null;
+        {{-- Scoped in an IIFE: top-level `let map` here clashes with the same
+             declarations in application-modal.blade.php when both components are
+             mounted on one page (e.g. Masterlist). A classic-script redeclaration
+             throws a SyntaxError that kills this whole block, silently disabling
+             every Livewire.on listener below. --}}
+        (() => {
+            let map = null;
+            let marker = null;
 
-        document.addEventListener('livewire:initialized', () => {
+            document.addEventListener('livewire:initialized', () => {
 
             Livewire.on('destroy-map', () => {
                 if (map) {
@@ -669,6 +675,7 @@
                     timerProgressBar: true
                 });
             });
-        });
+            });
+        })();
     </script>
 </div>
