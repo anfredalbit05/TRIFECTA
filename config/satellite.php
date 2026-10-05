@@ -36,4 +36,10 @@ return [
         'Gold' => 80,
     ],
 
+        'sdr_rates' => [
+        'Bronze' => 50.00,
+        'Silver' => 75.00,
+        'Gold' => 100.00,
+    ],
+
 ];

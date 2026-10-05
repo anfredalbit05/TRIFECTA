@@ -41,6 +41,7 @@ class ActivationApprovalService
         6 => 10.00,
     ];
 
+
     public function approve(
         Activation $activation,
         int $selectedUserID,
@@ -492,6 +493,7 @@ class ActivationApprovalService
         Activation $activation,
         ?User $referralUser
     ): void {
+
         /*
         |--------------------------------------------------------------------------
         | MEMBERSHIP FEES
@@ -504,6 +506,7 @@ class ActivationApprovalService
         ]);
 
         foreach ($membershipFees as $fee) {
+
             Ledger::create([
                 'RefID' => $fee->FeeID,
                 'amount' => $fee->Cost,
@@ -515,11 +518,15 @@ class ActivationApprovalService
 
         /*
         |--------------------------------------------------------------------------
-        | NO REFERRAL = NO COMMISSION BREAKDOWN
+        | FIND SATELLITE OWNER
         |--------------------------------------------------------------------------
+        |
+        | For a free member, $referralUser is the satellite owner.
+        |
         */
 
         if (! $referralUser) {
+
             Log::warning(
                 'Free member pending breakdown created without referral owner.',
                 [
@@ -533,12 +540,63 @@ class ActivationApprovalService
 
         /*
         |--------------------------------------------------------------------------
+        | SDR
+        |--------------------------------------------------------------------------
+        |
+        | The satellite owner receives SDR based on the satellite tier.
+        |
+        | Bronze = 50
+        | Silver = 75
+        | Gold   = 100
+        |
+        | SDR is Pending until this free member is approved.
+        |
+        */
+
+        $satellite = Satellite::find(
+            (int) $activation->satelliteID
+        );
+
+        if ($satellite) {
+
+            $tier = config('satellite.tier_by_type')[
+                (int) $satellite->satellite_typeID
+            ] ?? null;
+
+            $sdrAmount = $tier
+                ? (float) (
+                    config('satellite.sdr_rates')[$tier] ?? 0
+                )
+                : 0;
+
+            if ($sdrAmount > 0) {
+
+                Ledger::create([
+                    'RefID' => $referralUser->UserID,
+                    'amount' => -$sdrAmount,
+                    'Source' => 'SDR',
+                    'ActivationID' => $activation->ActivationID,
+                    'status' => 'Pending',
+                ]);
+
+                Log::info('Pending SDR ledger created for free member.', [
+                    'ActivationID' => $activation->ActivationID,
+                    'satelliteID' => $satellite->satelliteID,
+                    'satellite_owner_UserID' => $referralUser->UserID,
+                    'satellite_typeID' => $satellite->satellite_typeID,
+                    'tier' => $tier,
+                    'SDR' => $sdrAmount,
+                ]);
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
         | DR
         |--------------------------------------------------------------------------
-        | Direct Referral:
         |
         | 400 × 90% = 360
-        |--------------------------------------------------------------------------
+        |
         */
 
         $drFee = (float) (
@@ -552,9 +610,10 @@ class ActivationApprovalService
         $txAmount = round($drFee * 0.10, 2);
 
         if ($drAmount > 0) {
+
             Ledger::create([
                 'RefID' => $referralUser->UserID,
-                'amount' => $drAmount,
+                'amount' => -$drAmount,
                 'Source' => 'DR',
                 'ActivationID' => $activation->ActivationID,
                 'status' => 'Pending',
@@ -568,6 +627,7 @@ class ActivationApprovalService
         */
 
         if ($txAmount > 0) {
+
             Ledger::create([
                 'RefID' => $referralUser->UserID,
                 'amount' => $txAmount,
@@ -585,7 +645,7 @@ class ActivationApprovalService
 
         Ledger::create([
             'RefID' => $referralUser->UserID,
-            'amount' => 50.00,
+            'amount' => -50.00,
             'Source' => 'PF',
             'ActivationID' => $activation->ActivationID,
             'status' => 'Pending',
@@ -810,11 +870,45 @@ class ActivationApprovalService
             ->where('status', 'Completed')
             ->first();
 
-        if ($drLedger && $drLedger->amount > 0) {
-            $this->createWalletFromLedger(
-                $drLedger,
-                $referralUser->UserID
-            );
+        if ($drLedger) {
+            $walletAmount = abs((float) $drLedger->amount);
+
+            if ($walletAmount > 0) {
+                $this->createWalletFromLedger(
+                    $drLedger,
+                    $referralUser->UserID,
+                    $walletAmount
+                );
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | SDR
+        |--------------------------------------------------------------------------
+        |
+        | SDR was created as Pending when the free member was provisioned.
+        | Once the free member is approved, the Pending SDR becomes Completed
+        | and the satellite owner receives the SDR amount in their wallet.
+        |
+        */
+
+        $sdrLedger = Ledger::query()
+            ->where('ActivationID', $activation->ActivationID)
+            ->where('Source', 'SDR')
+            ->where('status', 'Completed')
+            ->first();
+
+        if ($sdrLedger) {
+            $walletAmount = abs((float) $sdrLedger->amount);
+
+            if ($walletAmount > 0) {
+                $this->createWalletFromLedger(
+                    $sdrLedger,
+                    (int) $sdrLedger->RefID,
+                    $walletAmount
+                );
+            }
         }
 
         /*
@@ -829,11 +923,16 @@ class ActivationApprovalService
             ->where('status', 'Completed')
             ->first();
 
-        if ($pfLedger && $pfLedger->amount > 0) {
-            $this->createWalletFromLedger(
-                $pfLedger,
-                $referralUser->UserID
-            );
+        if ($pfLedger) {
+            $walletAmount = abs((float) $pfLedger->amount);
+
+            if ($walletAmount > 0) {
+                $this->createWalletFromLedger(
+                    $pfLedger,
+                    $referralUser->UserID,
+                    $walletAmount
+                );
+            }
         }
 
         /*
