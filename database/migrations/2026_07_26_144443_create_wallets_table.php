@@ -27,6 +27,7 @@ return new class extends Migration
                 'OV', // Overrides
                 'PF', // Provident Fund
                 'WD', // Withdrawal
+                'CS', // Company Share (satellite activation split, 10%)
             ])->nullable();
 
             $table->boolean('isWithdrawable')

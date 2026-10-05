@@ -226,7 +226,11 @@
         </div>
 
 
-        {{-- POLICY + RECEIPT --}}
+        {{-- POLICY + RECEIPT
+             Free members (provisioned when their satellite was approved)
+             never get these: no payment was collected, so their approval is
+             a one-click confirmation. --}}
+        @if (! ($activation?->isFree ?? false))
         <div class="grid grid-cols-1 gap-5 border-t border-slate-100 pt-5 lg:grid-cols-2">
 
             {{-- POLICY NUMBER --}}
@@ -338,6 +342,16 @@
             </div>
 
         </div>
+        @else
+            <div class="mt-5 border-t border-slate-100 pt-5">
+                <p class="rounded-xl bg-emerald-50 px-4 py-3 text-xs font-semibold text-emerald-700">
+                    Free member — provisioned by their satellite. No payment was
+                    collected, so no policy or receipt number is issued: approving
+                    only completes their membership-fee ledger and credits the
+                    satellite owner.
+                </p>
+            </div>
+        @endif
 
     </div>
 </section>

@@ -580,6 +580,59 @@ class SatelliteMembers extends Component
     }
 
     // =====================================================
+    // OPEN FREE MEMBERS MODAL
+    // =====================================================
+
+    /**
+     * Lists the free members (RoleID 4, isFree) provisioned under this
+     * satellite member so an admin can activate them from the table.
+     */
+    public function openFreeMembers(int|string $id): void
+    {
+        if (! $this->canUpdate) {
+            $this->dispatch('swal:error', [
+                'title' => 'Not Allowed',
+                'text' => 'You do not have permission to manage free members.',
+            ]);
+
+            return;
+        }
+
+        Log::info(
+            'Satellite admin free members clicked',
+            [
+                'target_UserID' => $id,
+                'processed_by' => Auth::id(),
+            ]
+        );
+
+        $member = User::where('UserID', $id)
+            ->where('RoleID', 8)
+            ->first();
+
+        if (! $member) {
+            Log::warning(
+                'Free members modal blocked: member not found or invalid role.',
+                [
+                    'target_UserID' => $id,
+                ]
+            );
+
+            $this->dispatch('swal:error', [
+                'title' => 'Invalid Member',
+                'text' => 'This user is not a satellite member.',
+            ]);
+
+            return;
+        }
+
+        $this->dispatch(
+            'open-free-members',
+            UserID: $member->UserID
+        );
+    }
+
+    // =====================================================
     // EDIT SATELLITE MEMBER
     // =====================================================
 

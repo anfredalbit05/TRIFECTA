@@ -35,8 +35,9 @@ return new class extends Migration
                 'CF', // Convenience Fee
                 'PK', // Pangkabuhayan (Spin the Wheel prize expense)
                 'OT', // Others
+                'SF', // Satellite Fund (satellite activation split, 90%)
+                'CS', // Company Share (satellite activation split, 10%)
             ])->default('OT');
-
 
             $table->foreignId('ActivationID')
                 ->nullable()

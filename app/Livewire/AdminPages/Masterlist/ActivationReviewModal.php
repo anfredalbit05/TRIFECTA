@@ -368,6 +368,44 @@ class ActivationReviewModal extends Component
         $this->loadPaymentSettings();
 
         // ==========================================================
+        // FREE MEMBER — ONE-CLICK APPROVAL
+        // ==========================================================
+        // Free members were provisioned when their satellite was approved:
+        // no payment was collected, so no policy or receipt number applies.
+        // Approval completes their Pending membership-fee ledger and pays the
+        // satellite owner the normal DR / TX / OV / PF stack.
+
+        if ($this->activation->isFree) {
+            $approved = app(ActivationApprovalService::class)->approve(
+                $this->activation,
+                $this->selectedUserID,
+                ActivationApprovalService::TYPE_FREE
+            );
+
+            if (! $approved) {
+                Log::warning(
+                    'Free member approval aborted: no longer pending.',
+                    [
+                        'activation_id' => $this->activation->ActivationID,
+                    ]
+                );
+
+                $this->showApprovalValidationError(
+                    'This activation has already been processed.'
+                );
+
+                return;
+            }
+
+            $this->dispatch('members-refresh');
+            $this->broadcastBadgeCounts();
+            $this->dispatch('swal:success', title: 'Success!', message: 'Free member activated successfully.');
+            $this->closeModal();
+
+            return;
+        }
+
+        // ==========================================================
         // NORMALIZE INPUT
         // ==========================================================
 
@@ -611,10 +649,16 @@ class ActivationReviewModal extends Component
         // Only after ALL validation passes do we continue with the actual
         // approval transaction (ActivationApprovalService re-checks the
         // Pending status inside the row lock).
+        // Satellite activations (RoleID 8) keep their own accounting flavor —
+        // a mixed statusFilter can route one through this modal too.
+        $type = filled($this->activation->satelliteID)
+            ? ActivationApprovalService::TYPE_SATELLITE
+            : ActivationApprovalService::TYPE_REGULAR;
+
         $approved = app(ActivationApprovalService::class)->approve(
             $this->activation,
             $this->selectedUserID,
-            ActivationApprovalService::TYPE_REGULAR,
+            $type,
             [
                 'policy_number' => $this->policy_number,
                 'receipt_number' => $this->receipt_number,

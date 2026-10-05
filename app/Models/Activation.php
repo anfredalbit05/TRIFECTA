@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Activation extends Model
 {
@@ -111,8 +113,24 @@ class Activation extends Model
 
         'cashier_name',
         'cashier_signature',
+        'isFree',
 
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attribute Casts
+    |--------------------------------------------------------------------------
+    */
+
+    protected function casts(): array
+    {
+        return [
+            // Free members provisioned when a satellite activation is
+            // approved (everything else is a paid activation).
+            'isFree' => 'boolean',
+        ];
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -120,7 +138,10 @@ class Activation extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function user()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(
             User::class,
@@ -224,7 +245,10 @@ class Activation extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function processedBy()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function processedBy(): BelongsTo
     {
         return $this->belongsTo(
             User::class,
@@ -233,7 +257,10 @@ class Activation extends Model
         );
     }
 
-    public function histories()
+    /**
+     * @return HasMany<ActivationHistory, $this>
+     */
+    public function histories(): HasMany
     {
         return $this->hasMany(
             ActivationHistory::class,

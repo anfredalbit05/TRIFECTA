@@ -203,10 +203,16 @@ class Activations extends Component
         }
 
         // Satellite activations keep their DR=100% commission flavor; all
-        // other activations use the regular DR=90% + 10% TX split.
-        $type = filled($activation->satelliteID)
-            ? ActivationApprovalService::TYPE_SATELLITE
-            : ActivationApprovalService::TYPE_REGULAR;
+        // other activations use the regular DR=90% + 10% TX split. Free
+        // members (provisioned by a satellite) carry no payment at all and
+        // run through the free flavor instead.
+        $type = ActivationApprovalService::TYPE_REGULAR;
+
+        if ($activation->isFree) {
+            $type = ActivationApprovalService::TYPE_FREE;
+        } elseif (filled($activation->satelliteID)) {
+            $type = ActivationApprovalService::TYPE_SATELLITE;
+        }
 
         $approved = app(ActivationApprovalService::class)->approve(
             $activation,
