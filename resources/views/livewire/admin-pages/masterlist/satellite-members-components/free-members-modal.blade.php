@@ -61,7 +61,7 @@
                                     {{ $pendingCount }} pending
                                 </span>
 
-                                <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-[10px] font-bold uppercase text-blue-700">
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-[10px] font-bold uppercase text-[#0B2A5B]">
                                     {{ $approvedCount }} active
                                 </span>
                             </div>
@@ -83,7 +83,7 @@
                     {{-- SUMMARY — blue + yellow only --}}
                     <div class="mb-4 grid grid-cols-3 gap-3">
                         <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-center">
-                            <p class="text-[10px] font-bold uppercase tracking-wider text-blue-500">Total</p>
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-[#0B2A5B]">Total</p>
                             <p class="text-xl font-extrabold text-[#0B2A5B]">{{ count($freeMembers) }}</p>
                         </div>
                         <div class="rounded-xl border border-[#E8B923]/60 bg-[#E8B923]/10 p-3 text-center">
@@ -91,8 +91,8 @@
                             <p class="text-xl font-extrabold text-[#8a6d0b]">{{ $pendingCount }}</p>
                         </div>
                         <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-center">
-                            <p class="text-[10px] font-bold uppercase tracking-wider text-blue-500">Approved</p>
-                            <p class="text-xl font-extrabold text-blue-700">{{ $approvedCount }}</p>
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-[#0B2A5B]">Approved</p>
+                            <p class="text-xl font-extrabold text-[#0B2A5B]">{{ $approvedCount }}</p>
                         </div>
                     </div>
 
@@ -130,14 +130,14 @@
                                             </td>
 
                                             <td class="px-3 py-2.5">
-                                                <span class="inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase {{ $row['user_status'] === 'Active' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">
+                                                <span class="inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase {{ $row['user_status'] === 'Active' ? 'bg-blue-100 text-[#0B2A5B]' : 'bg-slate-100 text-slate-600' }}">
                                                     {{ $row['user_status'] ?: 'Inactive' }}
                                                 </span>
                                             </td>
 
                                             <td class="px-3 py-2.5">
                                                 @if ($row['isFree'])
-                                                    <span class="inline-flex rounded-full bg-blue-600 px-2.5 py-0.5 text-[10px] font-bold uppercase text-white">
+                                                    <span class="inline-flex rounded-full bg-[#0B2A5B] px-2.5 py-0.5 text-[10px] font-bold uppercase text-white">
                                                         FREE
                                                     </span>
                                                 @else
@@ -148,7 +148,7 @@
                                             </td>
 
                                             <td class="px-3 py-2.5">
-                                                <span class="inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase {{ $row['status'] === 'Approved' ? 'bg-blue-100 text-blue-700' : ($row['status'] === 'Pending' ? 'bg-[#E8B923]/25 text-[#8a6d0b]' : 'bg-slate-200 text-slate-600') }}">
+                                                <span class="inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase {{ $row['status'] === 'Approved' ? 'bg-blue-100' : ($row['status'] === 'Pending' ? 'bg-[#E8B923]/25 text-[#8a6d0b]' : 'bg-slate-200 text-slate-600') }}">
                                                     {{ $row['status'] }}
                                                 </span>
                                             </td>
@@ -167,7 +167,7 @@
                                                                 wire:click="confirmApproveFreeMember({{ $row['ActivationID'] }})"
                                                                 wire:loading.attr="disabled"
                                                                 title="Activate Free Member"
-                                                                class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-[#0B2A5B] disabled:opacity-50">
+                                                                class="inline-flex items-center gap-1.5 rounded-lg bg-[#0B2A5B] px-3 py-1.5 text-xs font-bold text-white transition hover:bg-[#0B2A5B] disabled:opacity-50">
                                                                 Activate
                                                             </button>
                                                         @else
@@ -177,7 +177,7 @@
                                                                 wire:click="openRegularMemberReview({{ $row['ActivationID'] }})"
                                                                 wire:loading.attr="disabled"
                                                                 title="Review & Approve Regular Member"
-                                                                class="inline-flex items-center gap-1.5 rounded-lg bg-[#E8B923] px-3 py-1.5 text-xs font-bold text-[#0B2A5B] transition hover:bg-[#d4a71d] disabled:opacity-50">
+                                                                class="inline-flex items-center gap-1.5 rounded-lg bg-[#E8B923] px-3 py-1.5 text-xs font-bold text-white transition hover:bg-[#d4a71d] disabled:opacity-50">
                                                                 Approve
                                                             </button>
                                                         @endif
@@ -193,7 +193,7 @@
                         </div>
 
                         <p class="mt-3 text-xs text-slate-500">
-                            <span class="font-bold text-blue-700">Free members</span> are activated directly
+                            <span class="font-bold text-[#0B2A5B]">Free members</span> are activated directly
                             (their membership-fee ledger completes and the satellite owner earns DR / PF,
                             plus TX / OV up the line).
                             <span class="font-bold text-[#8a6d0b]">Regular members</span> go through the
@@ -222,7 +222,7 @@
                         @if ($satellite)
                             <span class="font-semibold text-slate-700">{{ $satellite->satellite_name }}</span>
                             &middot; {{ count($freeMembers) }} members
-                            &middot; <span class="font-bold text-blue-700">{{ $pendingFreeCount }} free pending</span>
+                            &middot; <span class="font-bold text-[#0B2A5B]">{{ $pendingFreeCount }} free pending</span>
                         @endif
                     </div>
 
