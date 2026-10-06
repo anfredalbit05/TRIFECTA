@@ -51,7 +51,7 @@ class SatelliteMembersSelf extends Component
             ->latest('satelliteID')
             ->get()
             ->map(function (Satellite $satellite) {
-                $activation = Activation::where('satelliteID', $satellite->satelliteID)
+                $activation = Activation::where('UserID', $satellite->UserID)
                     ->latest('ActivationID')
                     ->first();
 
@@ -80,7 +80,7 @@ class SatelliteMembersSelf extends Component
 
         return Activation::query()
             ->where('upline_code', $referralCode)
-            ->whereHas('user', fn ($q) => $q->where('RoleID', 8))
+            ->whereHas('user', fn ($q) => $q->where('RoleID', 4))
             ->with('user')
             ->latest('ActivationID')
             ->get()

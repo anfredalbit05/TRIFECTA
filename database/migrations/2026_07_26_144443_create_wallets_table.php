@@ -28,6 +28,7 @@ return new class extends Migration
                 'PF', // Provident Fund
                 'WD', // Withdrawal
                 'CS', // Company Share (satellite activation split, 10%)
+                'SDR', // Satellite Direct Referral (free member, tier-based)
             ])->nullable();
 
             $table->boolean('isWithdrawable')

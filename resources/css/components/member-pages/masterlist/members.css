@@ -344,11 +344,11 @@
 
 
 /* =========================================================
-   FREE MEMBERS ACTION
+   FREE MEMBERS ACTION (blue + yellow palette)
 ========================================================= */
 
 .member-action-free {
-    @apply bg-emerald-600 text-white hover:bg-emerald-700;
+    @apply bg-blue-600 text-white hover:bg-[#0B2A5B];
 }
 
 

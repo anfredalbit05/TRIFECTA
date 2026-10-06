@@ -526,6 +526,186 @@ class SatelliteFreeMembersTest extends TestCase
     }
 
     // ------------------------------------------------------------------
+    // REGULAR (NON-FREE) MEMBERS UNDER A SATELLITE
+    // ------------------------------------------------------------------
+
+    /**
+     * A regular member invited with the satellite member's referralCode
+     * shows up in the modal too — but with an "Approve" button that opens
+     * the shared ActivationReviewModal instead of one-click activation.
+     */
+    public function test_regular_member_under_a_satellite_gets_the_approve_button_opening_the_review_modal(): void
+    {
+        $this->actingAs($this->admin());
+
+        [$owner, , $satelliteActivation] = $this->makeSatellite(6, 'Bronze Satellite', 'SATBRZ');
+        $this->service->provisionFreeMembers($satelliteActivation);
+
+        // A paid member signs up under the satellite member's code.
+        $regular = $this->plainMember('Regular', 'Invitee', 'REGINV');
+        $regular->update(['uplineCode' => $owner->referralCode]);
+
+        $regularActivation = Activation::create([
+            'UserID' => $regular->UserID,
+            'amount' => 900.00,
+            'type' => 'W',
+            'payment_method' => 'Cash',
+            'upline_code' => $owner->referralCode,
+            'ProcessedBy' => Auth::id(),
+            'status' => 'Pending',
+        ]);
+
+        $component = Livewire::test(FreeMembersModal::class)
+            ->dispatch('open-free-members', UserID: $owner->UserID)
+            ->assertSet('open', true)
+            // 20 free + 1 regular all pending; only 20 are FREE pending.
+            ->assertSet('pendingCount', 21)
+            ->assertSet('pendingFreeCount', 20)
+            ->assertSee('invitee_reginv')
+            ->assertSee('REGULAR')
+            ->assertSee('Approve')
+            ->assertSee('Activate');
+
+        // The Approve button opens the EXACT shared review modal with the
+        // activation ID — same process as approving any normal member.
+        $component
+            ->call('openRegularMemberReview', $regularActivation->ActivationID)
+            ->assertDispatched(
+                'open-activation-review',
+                UserID: $regular->UserID,
+                activationId: $regularActivation->ActivationID,
+            );
+
+        // Nothing was approved by opening the review — it is a review flow.
+        $this->assertSame('Pending', $regularActivation->refresh()->status);
+
+        // ...and the free one-click path refuses the regular activation.
+        $component
+            ->call('confirmApproveFreeMember', $regularActivation->ActivationID)
+            ->assertDispatched('swal:error');
+    }
+
+    /**
+     * A regular pending activation can never be swept up by Activate All —
+     * it only ever touches Pending FREE rows.
+     */
+    public function test_activate_all_never_includes_regular_members(): void
+    {
+        $this->actingAs($this->admin());
+
+        [$owner, , $satelliteActivation] = $this->makeSatellite(6, 'Bronze Satellite', 'SATBRZ');
+        $this->service->provisionFreeMembers($satelliteActivation);
+
+        $regular = $this->plainMember('Regular', 'Invitee', 'REGINV');
+        $regular->update(['uplineCode' => $owner->referralCode, 'status' => 'Inactive']);
+
+        $regularActivation = Activation::create([
+            'UserID' => $regular->UserID,
+            'amount' => 900.00,
+            'type' => 'W',
+            'payment_method' => 'Cash',
+            'upline_code' => $owner->referralCode,
+            'ProcessedBy' => Auth::id(),
+            'status' => 'Pending',
+        ]);
+
+        $component = Livewire::test(FreeMembersModal::class)
+            ->dispatch('open-free-members', UserID: $owner->UserID)
+            ->assertSet('pendingCount', 21)
+            ->assertSet('pendingFreeCount', 20);
+
+        // The batch confirm is typed ("ACTIVATE ALL") and previews only
+        // free usernames — the regular member is not in the payload.
+        $component->call('confirmApproveAllFreeMembers')
+            ->assertDispatched('swal:confirm', function ($event, $params) {
+                $payload = $params[0] ?? $params;
+
+                return ($payload['requireConfirmWord'] ?? null) === 'ACTIVATE ALL'
+                    && ! str_contains($payload['html'] ?? '', 'invitee_reginv');
+            });
+
+        $component->dispatch('free-member-approve-all-confirmed');
+
+        // Every free member was activated...
+        $this->assertSame(
+            20,
+            Activation::where('satelliteID', $satelliteActivation->satelliteID)
+                ->where('isFree', true)
+                ->where('status', 'Approved')
+                ->count()
+        );
+
+        // ...and the regular member is untouched: still Pending.
+        $this->assertSame('Pending', $regularActivation->refresh()->status);
+        $this->assertSame('Inactive', $regular->refresh()->status);
+    }
+
+    /**
+     * Both activation dialogs are typed confirmations with a preview:
+     * the single activate requires the member's username, the batch
+     * requires "ACTIVATE ALL".
+     */
+    public function test_activate_confirmations_require_typed_input(): void
+    {
+        $this->actingAs($this->admin());
+
+        [$owner, , $satelliteActivation] = $this->makeSatellite(6, 'Bronze Satellite', 'SATBRZ');
+        $this->service->provisionFreeMembers($satelliteActivation);
+
+        $freeActivation = Activation::where('isFree', true)->first();
+        $freeUsername = User::find($freeActivation->UserID)->username;
+
+        $component = Livewire::test(FreeMembersModal::class)
+            ->dispatch('open-free-members', UserID: $owner->UserID);
+
+        // Single activate → typed word = the member's own username,
+        // and the dialog previews that same username.
+        $component
+            ->call('confirmApproveFreeMember', $freeActivation->ActivationID)
+            ->assertDispatched('swal:confirm', function ($event, $params) use ($freeUsername) {
+                $payload = $params[0] ?? $params;
+
+                return ($payload['requireConfirmWord'] ?? null) === $freeUsername
+                    && str_contains($payload['html'] ?? '', $freeUsername);
+            });
+
+        // Activate All → typed word = "ACTIVATE ALL" + a preview list.
+        $component
+            ->call('confirmApproveAllFreeMembers')
+            ->assertDispatched('swal:confirm', function ($event, $params) use ($freeUsername) {
+                $payload = $params[0] ?? $params;
+
+                return ($payload['requireConfirmWord'] ?? null) === 'ACTIVATE ALL'
+                    && str_contains($payload['html'] ?? '', $freeUsername);
+            });
+    }
+
+    // ------------------------------------------------------------------
+    // PALETTE — blue + yellow only
+    // ------------------------------------------------------------------
+
+    public function test_the_free_members_modal_uses_only_the_blue_and_yellow_palette(): void
+    {
+        $this->actingAs($this->admin());
+
+        [$owner, , $satelliteActivation] = $this->makeSatellite(6, 'Bronze Satellite', 'SATBRZ');
+        $this->service->provisionFreeMembers($satelliteActivation);
+
+        $html = Livewire::test(FreeMembersModal::class)
+            ->dispatch('open-free-members', UserID: $owner->UserID)
+            ->html();
+
+        // No violet / green / rose / purple / indigo anywhere in the modal.
+        foreach (['emerald', 'violet', 'green', 'purple', 'indigo', 'rose-', 'teal', 'lime'] as $color) {
+            $this->assertStringNotContainsString(
+                $color,
+                $html,
+                "The free members palette must be blue + yellow only — found '{$color}'."
+            );
+        }
+    }
+
+    // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
 
