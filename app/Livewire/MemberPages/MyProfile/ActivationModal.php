@@ -909,6 +909,7 @@ class ActivationModal extends Component
     | Step 1: Validate inputs, then ask for the typed SweetAlert confirmation
     |--------------------------------------------------------------------------
     */
+
     public function confirmActivate(): void
     {
         $this->loadPaymentSettings();
@@ -929,6 +930,33 @@ class ActivationModal extends Component
             throw $e;
         }
 
+        // Find the upline using the entered referral code.
+        $cleanUplineCode = trim($this->upline_code);
+
+        $upline = User::where('referralCode', $cleanUplineCode)->first();
+
+        if (! $upline) {
+            $this->addError('upline_code', 'The referral/upline code is invalid.');
+            return;
+        }
+
+        // Validate that the upline account is active.
+        if ($upline->status !== 'Active') {
+            $this->addError(
+                'upline_code',
+                'This upline account is inactive or suspended and cannot be used.'
+            );
+
+            return;
+        }
+
+        // Build the upline's full name.
+        $uplineFullName = trim(implode(' ', array_filter([
+            $upline->firstname,
+            $upline->middlename,
+            $upline->lastname,
+        ])));
+
         if ($this->isRenewal) {
             $action = 'Renew';
         } elseif ($this->isReactivation) {
@@ -940,7 +968,14 @@ class ActivationModal extends Component
         $this->dispatch('swal:confirm', [
             'title' => "{$action} Account?",
             'html' => 'This will submit the activation request for admin review.'
-                .'<br><br>Type <strong>ACTIVATE</strong> to confirm.',
+                . '<br><br>'
+                . '<strong>Upline:</strong> '
+                . e($uplineFullName ?: $upline->username)
+                . '<br>'
+                . '<strong>Referral Code:</strong> '
+                . e($cleanUplineCode)
+                . '<br><br>'
+                . 'Type <strong>ACTIVATE</strong> to confirm.',
             'icon' => 'question',
             'requireConfirmWord' => 'ACTIVATE',
             'confirmText' => "Yes, {$action}!",
@@ -949,6 +984,7 @@ class ActivationModal extends Component
             'loadingText' => 'Please wait while we process your request.',
         ]);
     }
+
 
     public function render()
     {
