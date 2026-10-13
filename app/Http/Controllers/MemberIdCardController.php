@@ -146,23 +146,48 @@ class MemberIdCardController extends Controller
         |
         */
 
-        $membershipNo = 'TL'.now()->year.str_pad((string) $user->UserID, 3, '0', STR_PAD_LEFT);
 
-        $approvedActivation = Activation::where('UserID', $user->UserID)
-            ->where('status', 'Approved')
-            ->latest('ActivationID')
-            ->first();
+/*
+|--------------------------------------------------------------------------
+| ID DATA — membership no, date of issue, valid until
+|--------------------------------------------------------------------------
+*/
 
-        $issueDate = $user->policy_effectivity_date
-            ?: $approvedActivation?->updated_at;
+$membershipNo = 'TL'
+    . now()->year
+    . str_pad(
+        (string) $user->UserID,
+        3,
+        '0',
+        STR_PAD_LEFT
+    );
 
-        $dateOfIssue = $issueDate
-            ? Carbon::parse($issueDate)->format('F d, Y')
-            : 'N/A';
+// Get the latest approved activation for this member.
+$approvedActivation = Activation::where('UserID', $user->UserID)
+    ->where('status', 'Approved')
+    ->orderByDesc('ActivationID')
+    ->first();
 
-        $validUntil = $user->policy_expiration_date
-            ? Carbon::parse($user->policy_expiration_date)->format('F d, Y')
-            : 'N/A';
+// Date of issue comes from the activation's policy effectivity date.
+$dateOfIssue = $approvedActivation?->policy_effectivity_date
+    ? Carbon::parse(
+        $approvedActivation->policy_effectivity_date
+    )->format('F d, Y')
+    : (
+        $approvedActivation?->updated_at
+            ? Carbon::parse(
+                $approvedActivation->updated_at
+            )->format('F d, Y')
+            : 'N/A'
+    );
+
+// Valid until comes from the activation's policy expiration date.
+$validUntil = $approvedActivation?->policy_expiration_date
+    ? Carbon::parse(
+        $approvedActivation->policy_expiration_date
+    )->format('F d, Y')
+    : 'N/A';
+
 
         /*
         |--------------------------------------------------------------------------
