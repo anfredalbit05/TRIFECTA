@@ -103,7 +103,8 @@
 @import "./pages/member-pages/sidebar.css";
 @import "./pages/member-pages/masterlist.css";
 @import "./pages/member-pages/genealogy.css";
-@import "./pages/member-pages/genealogy-tree.css";
+@import "./pages/member-pages/genealogy/visual-tree.css";
+@import "./pages/member-pages/genealogy/generation-list.css";
 @import "./pages/member-pages/genealogy/board-member.css";
 
 

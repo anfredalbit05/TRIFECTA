@@ -25,11 +25,16 @@
 
                 <article class="member-card {{ ($node['highlighted'] ?? false) ? 'member-card-highlighted' : '' }}" wire:key="gen{{ $generation }}-node{{ $node['id'] }}">
 
-                    <div class="member-card-top">
+                        <span
+                            class="member-status
+                            {{ strtolower($node['status']) === 'active'
+                                ? 'is-active'
+                                : 'is-inactive' }}"
+                        >
+                            {{ $node['status'] }}
+                        </span>
 
-                        <div class="member-avatar">
-                            {{ strtoupper(substr($node['name'], 0, 1)) }}
-                        </div>
+                    <div class="member-card-top">
 
                         <div class="member-info">
 
@@ -50,14 +55,7 @@
 
                         </div>
 
-                        <span
-                            class="member-status
-                            {{ strtolower($node['status']) === 'active'
-                                ? 'is-active'
-                                : 'is-inactive' }}"
-                        >
-                            {{ $node['status'] }}
-                        </span>
+
 
                     </div>
 
