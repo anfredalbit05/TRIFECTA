@@ -123,6 +123,11 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
             // $this->text($image, now()->format('M j, Y'), 1370, 440, 15, self::FONT_BOLD, $ink, 240);
             $this->text($image, $dateReceipt?->format('M j, Y') ?? now()->format('M j, Y'), 1370, 440, 15, self::FONT_BOLD, $ink, 240);
 
+            Log::info('Generated filled acknowledgement receipt.', [
+                'member_UserID' => $user->UserID,
+                'receipt_number' => $receiptNumber
+            ]);
+
             /*
             |----------------------------------------------------------------------
             | Left table (navy) — Cash amount + Total (value cell x 152-428)
