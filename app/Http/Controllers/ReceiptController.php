@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activation;
+use App\Models\ActivationHistory;
 use App\Models\MembershipFee;
 use App\Models\User;
 use App\Services\AcknowledgementReceiptService;
@@ -35,13 +36,18 @@ class ReceiptController extends Controller
             ->latest('ActivationID')
             ->first(['ActivationID', 'receipt_number', 'cashier_name', 'cashier_signature']);
 
+        $history = ActivationHistory::where('ActivationID', $approved->ActivationID)
+            ->where('status', 'Approved')
+            ->latest()
+            ->first();
+
         $path = app(AcknowledgementReceiptService::class)->generate(
             $user,
             $amount,
             $approved?->receipt_number,
             $approved?->cashier_name,
             $approved?->cashier_signature,
-            $approved?->updated_at
+            $history? $history->created_at->format('M j, Y'): null
         );
 
         if ($path === null || ! is_file($path)) {
