@@ -40,7 +40,8 @@ class ReceiptController extends Controller
             $amount,
             $approved?->receipt_number,
             $approved?->cashier_name,
-            $approved?->cashier_signature
+            $approved?->cashier_signature,
+            $approved?->updated_at
         );
 
         if ($path === null || ! is_file($path)) {

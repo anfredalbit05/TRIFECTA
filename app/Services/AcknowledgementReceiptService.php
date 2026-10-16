@@ -66,7 +66,8 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
         float $amount,
         ?string $receiptNumber = null,
         ?string $cashierName = null,
-        ?string $cashierSignature = null
+        ?string $cashierSignature = null,
+        ?string $dateReceipt = null
     ): ?string {
         $templatePath = public_path(self::TEMPLATE);
 
@@ -119,7 +120,8 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
             $this->text($image, (string) ($activationPolicyNumber ?? ''), 295, 440, 15, self::FONT_BOLD, $ink, 400);
 
             // Date
-            $this->text($image, now()->format('M j, Y'), 1370, 440, 15, self::FONT_BOLD, $ink, 240);
+            // $this->text($image, now()->format('M j, Y'), 1370, 440, 15, self::FONT_BOLD, $ink, 240);
+            $this->text($image, $dateReceipt?->format('M j, Y') ?? now()->format('M j, Y'), 1370, 440, 15, self::FONT_BOLD, $ink, 240);
 
             /*
             |----------------------------------------------------------------------
