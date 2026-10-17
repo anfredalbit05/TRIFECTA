@@ -47,7 +47,7 @@ class ReceiptController extends Controller
             $approved?->receipt_number,
             $approved?->cashier_name,
             $approved?->cashier_signature,
-            $$history?->created_at
+            $history?->created_at
         );
 
         if ($path === null || ! is_file($path)) {
