@@ -16,6 +16,13 @@ class Branch extends Model
         'UserID',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean',
+        ];
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'UserID', 'UserID');

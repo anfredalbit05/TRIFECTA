@@ -6,170 +6,180 @@ use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Branch;
 use App\Support\Modules;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class BranchesList extends Component
 {
-    use AuthorizesModules;
-    use WithPagination;
+    use AuthorizesModules, WithPagination;
 
     protected $paginationTheme = 'tailwind';
 
-    public $isOpen = false;
+    public bool $isOpen = false;
+    public $branch_id = null;
 
-    public $branch_id;
+    public string $search = '';
+    public string $dateRange = '';
 
-    public string $search = ''; // Added search property
+    public $branchname = '';
+    public $address = '';
+    public string $status = '1';
+    public $UserID = null;
 
-    public string $dateRange = '';   // e.g. "2026-08-01 to 2026-08-16"
-
-    // Form fields
-    public $branchCode;
-
-    public $branchname;
-
-    public $address;
-
-    public $status = true;
-
-    public $UserID;
-
-    // Validation rules
-    protected $rules = [
-        'branchname' => 'required|string|max:150',
-        'address' => 'required|string',
-        'status' => 'boolean',
-        'UserID' => 'nullable|exists:users,UserID',
-    ];
-
-    public function mount()
+    protected function rules(): array
     {
-        $this->dateRange = '';
+        return [
+            'branchname' => ['required', 'string', 'max:150'],
+            'address' => ['required', 'string'],
+            'status' => ['required', Rule::in(['1', '0'])],
+            'UserID' => ['nullable', 'exists:users,UserID'],
+        ];
     }
-    /*
-    |--------------------------------------------------------------------------
-    | Permission Checkers — global module system (Masterlist - Branches)
-    |--------------------------------------------------------------------------
-    */
 
     protected function module(): int
     {
         return Modules::BRANCHES;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Component Actions
-    |--------------------------------------------------------------------------
-    */
-
-    public function openCreateModal()
+    public function openCreateModal(): void
     {
         if (! $this->canCreate) {
             return;
         }
 
         $this->resetValidation();
-        $this->reset(['branchCode', 'branchname', 'address', 'status', 'UserID', 'branch_id']);
+
+        $this->reset([
+            'branch_id',
+            'branchname',
+            'address',
+            'UserID',
+        ]);
+
+        $this->status = '1';
         $this->isOpen = true;
     }
 
-    public function closeModal()
-    {
-        $this->isOpen = false;
-        $this->resetValidation();
-        $this->reset(['branchCode', 'branchname', 'address', 'status', 'UserID', 'branch_id']);
-    }
-
-    public function editBranch($id)
+    public function editBranch($id): void
     {
         if (! $this->canUpdate) {
             return;
         }
 
-        $this->resetValidation();
         $branch = Branch::findOrFail($id);
 
+        $this->resetValidation();
+
+        $this->branch_id = $branch->BranchID;
         $this->branchname = $branch->branchname;
         $this->address = $branch->address;
-        $this->status = $branch->status;
-        $this->UserID = $branch->UserID;
 
+        // Convert the database Boolean to the select's string value.
+        $this->status = $branch->status ? '1' : '0';
+
+        $this->UserID = $branch->UserID;
         $this->isOpen = true;
     }
 
-    public function saveBranch()
+    public function closeModal(): void
     {
-        if ($this->branch_id && ! $this->canUpdate) {
-            return;
-        }
-        if (! $this->branch_id && ! $this->canCreate) {
-            return;
-        }
+        $this->isOpen = false;
+        $this->resetValidation();
 
-        $this->validate();
+        $this->reset([
+            'branch_id',
+            'branchname',
+            'address',
+            'UserID',
+        ]);
 
-        $data = [
-            'branchname' => $this->branchname,
-            'address' => $this->address,
-            'status' => $this->status,
-            'UserID' => $this->UserID ?: (Auth::id() ?? 1),
-        ];
+        $this->status = '1';
+    }
 
+    public function saveBranch(): void
+    {
         if ($this->branch_id) {
+            if (! $this->canUpdate) {
+                return;
+            }
+
             $branch = Branch::findOrFail($this->branch_id);
-            $branch->update($data);
-            $message = 'Branch successfully updated!';
         } else {
-            Branch::create($data);
-            $message = 'Branch successfully created!';
+            if (! $this->canCreate) {
+                return;
+            }
+
+            $branch = new Branch();
         }
+
+        $validated = $this->validate();
+
+        $branch->branchname = $validated['branchname'];
+        $branch->address = $validated['address'];
+
+        // Save '1' as true and '0' as false.
+        $branch->status = $validated['status'] === '1';
+
+        $branch->UserID = $validated['UserID'] ?: Auth::id();
+
+        $branch->save();
+
+        $message = $this->branch_id
+            ? 'Branch successfully updated!'
+            : 'Branch successfully created!';
 
         $this->closeModal();
+
         session()->flash('message', $message);
     }
 
-    public function confirmDeleteBranch($id)
+    public function confirmDeleteBranch($id): void
     {
-        if (! $this->canDelete) {
-            return;
+        if ($this->canDelete) {
+            $this->dispatch('confirm-delete', id: $id);
         }
-
-        $this->dispatch('confirm-delete', id: $id);
     }
 
-    public function deleteBranch($id)
+    public function deleteBranch($id): void
     {
         if (! $this->canDelete) {
             return;
         }
 
-        $branch = Branch::findOrFail($id);
-        $branch->delete();
+        Branch::findOrFail($id)->delete();
 
+        session()->flash('message', 'Branch successfully deleted!');
         $this->dispatch('branch-deleted');
     }
 
-    public function updatingSearch()
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedDateRange(): void
     {
         $this->resetPage();
     }
 
     protected function parsedDateRange(): array
     {
-        if (blank($this->dateRange) || ! str_contains($this->dateRange, ' to ')) {
+        if (! $this->dateRange || ! str_contains($this->dateRange, ' to ')) {
             return [null, null];
         }
 
         [$from, $to] = explode(' to ', $this->dateRange, 2);
 
-        return [trim($from) ?: null, trim($to) ?: null];
-    }
-
-    public function updatedDateRange()
-    {
-        $this->resetPage();
+        try {
+            return [
+                Carbon::parse(trim($from))->startOfDay(),
+                Carbon::parse(trim($to))->endOfDay(),
+            ];
+        } catch (\Throwable $e) {
+            return [null, null];
+        }
     }
 
     public function clearDateFilter(): void
@@ -191,9 +201,10 @@ class BranchesList extends Component
     {
         [$dateFrom, $dateTo] = $this->parsedDateRange();
 
-        $branches = Branch::where('status', true)
+        $branches = Branch::query()
             ->when(filled($this->search), function ($query) {
                 $search = trim($this->search);
+
                 $query->where(function ($q) use ($search) {
                     $q->where('branchCode', 'like', "%{$search}%")
                         ->orWhere('branchname', 'like', "%{$search}%")
@@ -201,10 +212,7 @@ class BranchesList extends Component
                 });
             })
             ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
-                $query->whereBetween('created_at', [
-                    Carbon::parse($dateFrom)->startOfDay(),
-                    Carbon::parse($dateTo)->endOfDay(),
-                ]);
+                $query->whereBetween('created_at', [$dateFrom, $dateTo]);
             })
             ->latest('BranchID')
             ->paginate(10);
