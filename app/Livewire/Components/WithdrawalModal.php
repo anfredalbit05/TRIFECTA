@@ -366,35 +366,29 @@ class WithdrawalModal extends Component
             |
             */
 
-            $taxRate = 0.10;
-
             /*
             |--------------------------------------------------------------------------
-            | TAX AMOUNT
+            | TAX RATE
             |--------------------------------------------------------------------------
-            |
-            | ₱1,000 × 10% = ₱100
-            |
+            | RoleID 5, 6, and 7 are exempt from withdrawal TX.
+            |--------------------------------------------------------------------------
             */
 
-            $taxAmount = round(
-                $requestedAmount * $taxRate,
-                2
-            );
+            $taxExemptRoles = [5, 6, 7, 9];
+
+            $taxAmount = in_array((int) $user->RoleID, $taxExemptRoles, true)
+                ? 0.00
+                : round($requestedAmount * 0.10, 2);
 
             /*
             |--------------------------------------------------------------------------
             | NET AMOUNT
             |--------------------------------------------------------------------------
-            |
-            | ₱1,000 - ₱100 = ₱900
-            |
+            | Exempt roles receive the full requested amount.
+            |--------------------------------------------------------------------------
             */
 
-            $netAmount = round(
-                $requestedAmount - $taxAmount,
-                2
-            );
+            $netAmount = round($requestedAmount - $taxAmount, 2);
 
             /*
             |--------------------------------------------------------------------------

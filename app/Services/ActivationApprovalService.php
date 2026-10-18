@@ -62,7 +62,9 @@ class ActivationApprovalService
         $gcashCF = $this->settingEnabled('gcash_convenience_fee_enabled');
         $paymayaCF = $this->settingEnabled('paymaya_convenience_fee_enabled');
 
-        $totalMembershipFees = (float) MembershipFee::sum('Cost');
+        $totalMembershipFees = (float) $this
+        ->membershipFeesForActivation($activation)
+        ->sum('Cost');
         $activatedUser = null;
 
         try {
@@ -130,16 +132,46 @@ class ActivationApprovalService
                     'remarks' => "Activation approved by {$adminName}.",
                 ]);
 
+
                 /*
                 |--------------------------------------------------------------------------
-                | Activate User
+                | ACTIVATE USER + INHERIT BRANCH CODE
+                |--------------------------------------------------------------------------
+                | The approved member inherits the branchCode of their direct upline.
+                | First, use activation.upline_code to find the upline by referralCode.
+                | If no upline is found, fall back to the member's uplineCode or
+                | referralCode relationship as appropriate.
                 |--------------------------------------------------------------------------
                 */
-                User::where('UserID', $selectedUserID)->update([
+
+                $approvedMember = User::where('UserID', $selectedUserID)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $approvedMember) {
+                    throw new \RuntimeException(
+                        "User {$selectedUserID} not found during activation approval."
+                    );
+                }
+
+                $uplineCode = trim((string) (
+                    $activation->upline_code
+                    ?: $approvedMember->uplineCode
+                ));
+
+                $upline = $uplineCode !== ''
+                    ? User::where('referralCode', $uplineCode)->first()
+                    : null;
+
+                // Set the member's branchCode to the upline's existing branchCode.
+                // If no upline is found, retain the member's current branchCode.
+                $approvedMember->update([
                     'status' => 'Active',
+                    'branchCode' => $upline?->branchCode ?? $approvedMember->branchCode,
                 ]);
 
-                $activatedUser = User::find($selectedUserID);
+                $activatedUser = $approvedMember;
+
 
                 /*
                 |--------------------------------------------------------------------------
@@ -200,7 +232,7 @@ class ActivationApprovalService
                 | REGULAR - MEMBERSHIP FEES
                 |--------------------------------------------------------------------------
                 */
-                foreach (MembershipFee::all() as $fee) {
+                foreach ($this->membershipFeesForActivation($activation)->get() as $fee) {
                     $ledger = Ledger::create([
                         'RefID' => $fee->FeeID,
                         'amount' => $fee->Cost,
@@ -230,7 +262,7 @@ class ActivationApprovalService
                     ($paymentMethod === 'paymaya' && $paymayaCF)
                 ) {
                     $cfAmount = round(
-                        MembershipFee::sum('Cost') * 0.01,
+                        $this->membershipFeesForActivation($activation)->sum('Cost') * 0.01,
                         2
                     );
 
@@ -428,7 +460,9 @@ class ActivationApprovalService
             ?? 4
         );
 
-        $totalMembershipFees = (float) MembershipFee::sum('Cost');
+        $totalMembershipFees = (float) $this
+        ->membershipFeesForActivation($satelliteActivation)
+        ->sum('Cost');
 
         return DB::transaction(function () use (
             $satellite,
@@ -457,6 +491,7 @@ class ActivationApprovalService
                 $freeActivation = Activation::create([
                     'UserID' => $user->UserID,
                     'satelliteID' => $satelliteID,
+                    'VID' => $satelliteActivation->VID ?? 1,
                     'amount' => $totalMembershipFees,
                     'type' => 'W',
                     'payment_method' => 'Cash',
@@ -500,10 +535,9 @@ class ActivationApprovalService
         |--------------------------------------------------------------------------
         */
 
-        $membershipFees = MembershipFee::all([
-            'FeeID',
-            'Cost',
-        ]);
+        $membershipFees = $this
+            ->membershipFeesForActivation($activation)
+            ->get(['FeeID', 'Cost']);
 
         foreach ($membershipFees as $fee) {
 
@@ -600,10 +634,9 @@ class ActivationApprovalService
         */
 
         $drFee = (float) (
-            MembershipFee::where(
-                'FeeName',
-                'Direct Referral'
-            )->value('Cost') ?? 400.00
+            $this->membershipFeesForActivation($activation)
+                ->where('FeeName', 'Direct Referral')
+                ->value('Cost') ?? 400.00
         );
 
         $drAmount = round($drFee * 0.90, 2);
@@ -1056,10 +1089,9 @@ class ActivationApprovalService
         ?User $referralUser
     ): void {
         $drFee = (float) (
-            MembershipFee::where(
-                'FeeName',
-                'Direct Referral'
-            )->value('Cost') ?? 400.00
+            $this->membershipFeesForActivation($activation)
+                ->where('FeeName', 'Direct Referral')
+                ->value('Cost') ?? 400.00
         );
 
         $drAmount = round($drFee * 0.90, 2);
@@ -1489,4 +1521,15 @@ class ActivationApprovalService
             }
         }
     }
+
+    /**
+     * Get membership fees for the activation's variant.
+     */
+    private function membershipFeesForActivation(Activation $activation)
+    {
+        $vid = $activation->VID ?? 1;
+
+        return MembershipFee::where('VID', $vid);
+    }
+
 }

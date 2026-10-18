@@ -136,6 +136,89 @@
                         </div>
                     </section>
 
+                {{-- =================================================
+                    0. SELECT MEMBERSHIP VARIANT
+                ================================================== --}}
+
+                <section class="space-y-5">
+                    <div class="rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
+                            Select Membership Variant
+                        </h3>
+                        <p class="mt-0.5 text-[10px] text-slate-200">
+                            Please select the variant for this membership application.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3 pt-1 sm:grid-cols-2 lg:grid-cols-2">
+                        @forelse ($variants as $variant)
+                            <div
+                                wire:key="variant-option-{{ $variant['VID'] }}"
+                                class="rounded-xl border p-4 transition
+                                    {{ (string) $selectedVariantId === (string) $variant['VID']
+                                        ? 'border-[#0B2A5B] bg-blue-50 ring-2 ring-[#0B2A5B]/20'
+                                        : 'border-slate-200 bg-white hover:border-slate-400' }}"
+                            >
+                                <label class="flex cursor-pointer items-center gap-3">
+                                    <input
+                                        type="radio"
+                                        wire:model.live="selectedVariantId"
+                                        value="{{ $variant['VID'] }}"
+                                        class="h-4 w-4 shrink-0 border-slate-300 text-[#0B2A5B] focus:ring-[#0B2A5B]"
+                                    >
+
+                                    <div class="min-w-0 flex-1">
+                                        <span class="block text-sm font-semibold text-slate-700">
+                                            {{ $variant['name'] }}
+                                        </span>
+
+                                        <span class="mt-1 block text-lg font-extrabold text-[#0B2A5B]">
+                                            ₱{{ number_format(
+                                                (float) \App\Models\MembershipFee::where('VID', $variant['VID'])->sum('Cost'),
+                                                2
+                                            ) }}
+                                        </span>
+
+                                        <span class="mt-0.5 block text-[10px] text-slate-500">
+                                            Total Membership Fees
+                                        </span>
+                                    </div>
+                                </label>
+
+                                <div class="mt-3 flex justify-end border-t border-slate-200 pt-3">
+                                    <button
+                                        type="button"
+                                        wire:click="viewBenefits({{ $variant['VID'] }})"
+                                        class="inline-flex items-center gap-1 text-xs font-bold text-blue-700 hover:text-blue-900 hover:underline cursor-pointer"
+                                    >
+                                        View Benefits
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="h-3.5 w-3.5"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="col-span-full rounded-xl border border-dashed border-slate-300 p-4 text-sm text-slate-500">
+                                No variants are available.
+                            </p>
+                        @endforelse
+                    </div>
+
+                    @error('selectedVariantId')
+                        <p class="text-xs font-semibold text-red-600">{{ $message }}</p>
+                    @enderror
+                </section>
+
+
+
                     <!-- =================================================
                         PAYMENT INFORMATION
                     ================================================== -->
@@ -244,8 +327,12 @@
                                 <label class="block text-xs font-bold text-slate-700 mb-1">
                                     Activation Amount
                                 </label>
-                                <input wire:model="amount" readonly type="text"
-                                    class="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5 text-sm text-slate-700">
+                                <input
+                                    value="₱{{ number_format((float) $amount, 2) }}"
+                                    readonly
+                                    type="text"
+                                    class="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold text-[#0B2A5B]"
+                                >
                             </div>
 
                             <!-- REFERRAL CODE -->
@@ -557,4 +644,281 @@
             </div>
         </div>
     @endif
+
+
+
+@if ($showBenefitsModal)
+    <div
+        class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm sm:p-6"
+        wire:key="benefits-modal-{{ $benefitsVariantId }}"
+        wire:click.self="closeBenefitsModal"
+    >
+        <div
+            class="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:rounded-3xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="benefits-modal-title"
+        >
+            {{-- HEADER --}}
+            <div class="relative shrink-0 overflow-hidden bg-[#0B2A5B] px-5 py-5 sm:px-7 sm:py-6">
+                <div class="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-white/5"></div>
+                <div class="absolute -bottom-16 right-24 h-32 w-32 rounded-full bg-[#E8B923]/10"></div>
+
+                <div class="relative flex items-start justify-between gap-4">
+                    <div class="flex min-w-0 items-start gap-3 sm:gap-4">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-[#E8B923] sm:h-14 sm:w-14">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-7 w-7" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="1.7">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 3l2.4 4.86L20 8.67l-4 3.9.94 5.5L12 15.47l-4.94 2.6.94-5.5-4-3.9 5.6-.81L12 3Z" />
+                            </svg>
+                        </div>
+
+                        <div class="min-w-0 pt-0.5">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-[#E8B923] sm:text-xs">
+                                Membership Plan
+                            </p>
+
+                            <h2 id="benefits-modal-title"
+                                class="mt-1 text-xl font-extrabold leading-tight text-white sm:text-2xl">
+                                Membership Benefits
+                            </h2>
+
+                            <p class="mt-1.5 break-words text-xs text-blue-100 sm:text-sm">
+                                {{ $benefitsVariantName }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        wire:click="closeBenefitsModal"
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/10 text-white transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-[#E8B923]"
+                        aria-label="Close benefits"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="relative mt-5 flex flex-wrap items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[11px] font-semibold text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-3.5 w-3.5 text-[#E8B923]" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m5 12 4 4L19 6" />
+                        </svg>
+                        Included benefits
+                    </span>
+
+                    <span class="inline-flex items-center rounded-full bg-[#E8B923] px-3 py-1.5 text-[11px] font-bold text-[#0B2A5B]">
+                        Variant #{{ $benefitsVariantId }}
+                    </span>
+                </div>
+            </div>
+
+
+            {{-- BODY --}}
+            <div class="min-h-0 flex-1 space-y-6 overflow-y-auto bg-slate-50 p-4 sm:p-6">
+
+                @php
+                    $benefitGroups = collect($variantBenefits)->groupBy('holdertype');
+                    $totalBenefits = collect($variantBenefits)->count();
+                @endphp
+
+                {{-- INTRODUCTION --}}
+                <div class="flex items-start gap-3 rounded-xl border border-blue-100 bg-white p-4">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-[#0B2A5B]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586A1 1 0 0 1 13.293 3.293L18.707 8.707A1 1 0 0 1 19 9.414V19a2 2 0 0 1-2 2Z" />
+                        </svg>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-extrabold text-[#0B2A5B]">
+                            Membership Benefits Breakdown
+                        </h3>
+                        <p class="mt-1 text-xs leading-5 text-slate-500">
+                            Review the benefits and corresponding amounts included in this membership variant.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- BENEFIT TABLES --}}
+                @forelse ($benefitGroups as $holdertype => $benefits)
+                    <section wire:key="benefit-group-{{ $benefitsVariantId }}-{{ Str::slug($holdertype) }}"
+                        class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+
+                        {{-- TABLE SECTION HEADER --}}
+                        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-[#0B2A5B] px-4 py-3 sm:px-5">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10 text-[#E8B923]">
+                                    @if ($holdertype === 'Primary Owner')
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2m12-13a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm2 4a4 4 0 0 1 4 4v2" />
+                                        </svg>
+                                    @else
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M17 20h5v-2a4 4 0 0 0-5-3.87M9 20H2v-2a4 4 0 0 1 4-4h3m6-9a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm5 4a3 3 0 1 0 0-6" />
+                                        </svg>
+                                    @endif
+                                </div>
+
+                                <div>
+                                    <h3 class="text-sm font-extrabold text-white">
+                                        {{ $holdertype }}
+                                    </h3>
+                                    <p class="mt-0.5 text-[11px] text-slate-300">
+                                        {{ $benefits->count() }}
+                                        {{ $benefits->count() === 1 ? 'benefit' : 'benefits' }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <span class="rounded-full bg-[#E8B923] px-3 py-1 text-xs font-extrabold text-[#0B2A5B]">
+                                {{ $benefits->count() }} items
+                            </span>
+                        </div>
+
+                        {{-- RESPONSIVE TABLE --}}
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[560px] border-collapse text-left">
+                                <thead>
+                                    <tr class="border-b border-slate-200 bg-slate-100">
+                                        <th class="w-12 px-4 py-3 text-center text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+                                            #
+                                        </th>
+                                        <th class="px-4 py-3 text-xs font-extrabold uppercase tracking-wider text-slate-600">
+                                            Benefit Name
+                                        </th>
+                                        <th class="px-4 py-3 text-xs font-extrabold uppercase tracking-wider text-slate-600">
+                                            Details
+                                        </th>
+                                        <th class="px-4 py-3 text-right text-xs font-extrabold uppercase tracking-wider text-slate-600">
+                                            Amount
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody class="divide-y divide-slate-100">
+                                    @foreach ($benefits as $index => $benefit)
+                                        <tr wire:key="benefit-{{ $benefit['BentID'] }}"
+                                            class="transition hover:bg-blue-50/60">
+
+                                            <td class="px-4 py-4 text-center text-xs font-semibold text-slate-400">
+                                                {{ $index + 1 }}
+                                            </td>
+
+                                            <td class="px-4 py-4">
+                                                <div class="flex items-start gap-2.5">
+                                                    <div class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-600">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="m5 12 4 4L19 6" />
+                                                        </svg>
+                                                    </div>
+
+                                                    <span class="pt-1 text-sm font-bold text-slate-800">
+                                                        {{ $benefit['name'] }}
+                                                    </span>
+                                                </div>
+                                            </td>
+
+                                            <td class="max-w-xs whitespace-normal break-words px-4 py-4 text-xs leading-5 text-slate-500">
+                                                {{ !empty($benefit['details']) ? $benefit['details'] : 'No details provided' }}
+                                            </td>
+
+                                            <td class="whitespace-nowrap px-4 py-4 text-right">
+                                                <span class="inline-flex rounded-lg bg-emerald-50 px-3 py-1.5 text-sm font-extrabold tabular-nums text-emerald-700">
+                                                    ₱{{ number_format((float) ($benefit['amount'] ?? 0), 2) }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+
+                                {{-- TABLE TOTAL --}}
+                                <tfoot>
+                                    <tr class="border-t-2 border-slate-200 bg-slate-50">
+                                        <td colspan="3" class="px-4 py-4 text-right text-xs font-extrabold uppercase tracking-wide text-slate-600">
+                                            Total listed benefit amounts
+                                        </td>
+                                        <td class="whitespace-nowrap px-4 py-4 text-right text-sm font-extrabold tabular-nums text-[#0B2A5B]">
+                                            ₱{{ number_format($benefits->sum(fn ($benefit) => (float) ($benefit['amount'] ?? 0)), 2) }}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </section>
+                @empty
+                    <div class="rounded-xl border border-dashed border-slate-300 bg-white px-5 py-12 text-center">
+                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586A1 1 0 0 1 13.293 3.293L18.707 8.707A1 1 0 0 1 19 9.414V19a2 2 0 0 1-2 2Z" />
+                            </svg>
+                        </div>
+
+                        <h3 class="mt-4 text-sm font-extrabold text-slate-800">
+                            No active benefits available
+                        </h3>
+                        <p class="mt-1 text-xs text-slate-500">
+                            No active benefits have been configured for this variant.
+                        </p>
+                    </div>
+                @endforelse
+            </div>
+
+
+            {{-- FOOTER --}}
+            <div class="flex shrink-0 flex-col gap-3 border-t border-slate-200 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+                <div class="flex items-center gap-2 text-xs text-slate-500">
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-[#0B2A5B]">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                    </span>
+                    <span>
+                        {{ $totalBenefits }} total
+                        {{ $totalBenefits === 1 ? 'benefit' : 'benefits' }} listed
+                    </span>
+                </div>
+
+                <button
+                    type="button"
+                    wire:click="closeBenefitsModal"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B2A5B] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-[#0B2A5B] focus:ring-offset-2 sm:w-auto"
+                >
+                    Close Details
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m9 18 6-6-6-6" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+@endif
+
+
 </div>

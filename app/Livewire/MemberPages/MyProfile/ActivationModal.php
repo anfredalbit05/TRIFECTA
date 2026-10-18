@@ -9,6 +9,7 @@ use App\Models\Beneficiary;
 use App\Models\MembershipFee;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\Variant;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -81,6 +82,24 @@ class ActivationModal extends Component
 
     public float $totalMembershipFeesCost = 0.00;
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Membership Variant
+    |--------------------------------------------------------------------------
+    */
+    public $variants = [];
+
+    public $selectedVariantId = null;
+
+    public bool $showBenefitsModal = false;
+
+    public ?int $benefitsVariantId = null;
+
+    public string $benefitsVariantName = '';
+
+    public $variantBenefits = [];
+
     /*
     |--------------------------------------------------------------------------
     | Modal State Variables
@@ -93,12 +112,37 @@ class ActivationModal extends Component
     | Helper to Get Membership Fee Amount
     |--------------------------------------------------------------------------
     */
-    private function getMembershipFee(): string
+    /**
+     * Get the total membership fee for a specific variant.
+     */
+    private function getMembershipFee(?int $variantId = null): string
     {
-        $setting = Setting::where('name', 'Membership Fee')->first();
+        if ($variantId === null) {
+            return '0.00';
+        }
 
-        // Fallback to '1999' if the setting is not found
-        return $setting ? (string) $setting->value : '1999';
+        return number_format(
+            (float) MembershipFee::where('VID', $variantId)->sum('Cost'),
+            2,
+            '.',
+            ''
+        );
+    }
+
+    /**
+     * Update activation amount when membership variant changes.
+     */
+    public function updatedSelectedVariantId($value): void
+    {
+        $variantId = filled($value) ? (int) $value : null;
+
+        $this->amount = $this->getMembershipFee($variantId);
+
+        $this->totalMembershipFeesCost = $variantId
+            ? (float) MembershipFee::where('VID', $variantId)->sum('Cost')
+            : 0.00;
+
+        $this->resetValidation('selectedVariantId');
     }
 
     private function loadPaymentSettings(): void
@@ -128,7 +172,12 @@ class ActivationModal extends Component
             FILTER_VALIDATE_BOOLEAN
         );
 
-        $this->totalMembershipFeesCost = (float) MembershipFee::sum('Cost');
+        $this->totalMembershipFeesCost = filled($this->selectedVariantId)
+            ? (float) MembershipFee::where(
+                'VID',
+                $this->selectedVariantId
+            )->sum('Cost')
+            : 0.00;
     }
 
     /*
@@ -148,6 +197,23 @@ class ActivationModal extends Component
             'opened_by' => Auth::id(),
         ]);
 
+        $this->variants = Variant::query()
+            ->where('status', 'Active')
+            ->orderBy('name')
+            ->get()
+            ->toArray();
+
+        // Default to the first active variant.
+        $this->selectedVariantId = $this->variants[0]['VID'] ?? null;
+
+        $this->amount = $this->getMembershipFee(
+            filled($this->selectedVariantId)
+                ? (int) $this->selectedVariantId
+                : null
+        );
+
+        $this->totalMembershipFeesCost = (float) $this->amount;
+
         $this->selectedUserID = $UserID;
         $this->selectedUserRecord = User::find($UserID);
 
@@ -155,7 +221,12 @@ class ActivationModal extends Component
         $this->activationData = null;
         $this->resetValidation();
         $this->payment_method = '';
-        $this->amount = $this->getMembershipFee();
+            // Calculate the amount using the selected variant.
+        $this->amount = $this->getMembershipFee(
+            filled($this->selectedVariantId)
+                ? (int) $this->selectedVariantId
+                : null
+        );
         $this->upline_code = $this->selectedUserRecord?->uplineCode ?? '';
         $this->reference_code = '';
 
@@ -194,7 +265,28 @@ class ActivationModal extends Component
             $this->loadPaymentDetails(); // <-- add this
         }
 
-        $this->amount = $this->getMembershipFee();
+        $this->variants = Variant::query()
+        ->where('status', 'Active')
+        ->orderBy('name')
+        ->get()
+        ->toArray();
+
+        $activeVariantIds = array_column($this->variants, 'VID');
+
+        $this->selectedVariantId = (
+            $activation
+            && in_array($activation->VID, $activeVariantIds)
+        )
+            ? $activation->VID
+            : ($this->variants[0]['VID'] ?? null);
+
+        $this->amount = $this->getMembershipFee(
+            filled($this->selectedVariantId)
+                ? (int) $this->selectedVariantId
+                : null
+        );
+
+        $this->totalMembershipFeesCost = (float) $this->amount;
         $this->loadBeneficiaries();
         $this->resetValidation();
 
@@ -218,7 +310,9 @@ class ActivationModal extends Component
             ->latest()
             ->first();
 
-        $this->amount = $this->getMembershipFee();
+        $this->amount = $this->activationData
+        ? number_format((float) $this->activationData->amount, 2, '.', '')
+        : '0.00';
         $this->loadBeneficiaries();
 
         $this->open = true;
@@ -352,6 +446,8 @@ class ActivationModal extends Component
             'bankName',
             'bankAccountName',
             'bankAccountNumber',
+            'selectedVariantId',
+            'variants',
         ]);
 
         $this->isReactivation = false;
@@ -359,174 +455,149 @@ class ActivationModal extends Component
         $this->amount = $this->getMembershipFee();
         $this->resetValidation();
         $this->open = false;
+
+        $this->showBenefitsModal = false;
+        $this->benefitsVariantId = null;
+        $this->benefitsVariantName = '';
+        $this->variantBenefits = [];
+
+        $this->amount = '0.00';
     }
 
-    public function approveActivation($UserID = null): void
-    {
-        Log::info('=== APPROVE ACTIVATION STARTED ===', [
-            'received_user_id' => $UserID,
-            'selected_user_id' => $this->selectedUserID,
+
+public function approveActivation($UserID = null): void
+{
+    $userIdToApprove = $UserID ?? $this->selectedUserID;
+
+    $activation = Activation::where('UserID', $userIdToApprove)
+        ->where('status', 'Pending')
+        ->latest()
+        ->first();
+
+    if (! $activation) {
+        Log::warning('Approval failed: pending activation not found.', [
+            'user_id' => $userIdToApprove,
         ]);
 
-        $userIdToApprove = $UserID ?? $this->selectedUserID;
+        $this->dispatch(
+            'toast',
+            type: 'error',
+            message: 'No pending activation request was found.'
+        );
 
-        Log::info('User ID to approve', [
-            'user_id_to_approve' => $userIdToApprove,
-        ]);
+        return;
+    }
 
-        $activation = Activation::where('UserID', $userIdToApprove)
-            ->latest()
-            ->first();
+    $targetUserID = $activation->UserID;
+    $uplineCode = trim((string) $activation->upline_code);
 
-        Log::info('Activation lookup result', [
-            'found' => $activation !== null,
-            'activation_id' => $activation?->ActivationID,
-            'activation_user_id' => $activation?->UserID,
-            'status' => $activation?->status,
-        ]);
+    // Find the direct referral using the submitted referral code.
+    $upline = User::where('referralCode', $uplineCode)->first();
 
-        if (! $activation && ! $UserID) {
-            Log::warning('No activation found. Looking for latest pending activation.');
+    if (! $upline || $upline->status !== 'Active') {
+        $this->dispatch(
+            'toast',
+            type: 'error',
+            message: 'The direct referral is missing or inactive. Approval cannot proceed.'
+        );
 
-            $activation = Activation::where('status', 'Pending')
-                ->latest()
-                ->first();
+        return;
+    }
 
-            Log::info('Fallback activation result', [
-                'found' => $activation !== null,
-                'activation_id' => $activation?->ActivationID,
-                'activation_user_id' => $activation?->UserID,
+    try {
+        DB::transaction(function () use (
+            $activation,
+            $targetUserID,
+            $upline,
+            $uplineCode
+        ) {
+            // Lock and retrieve the member being activated.
+            $user = User::where('UserID', $targetUserID)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            // Assign the same branch as the direct referral.
+            $user->update([
+                'status' => 'Active',
+                'uplineCode' => $uplineCode,
+                'branchCode' => $upline->branchCode,
             ]);
-        }
 
-        if (! $activation) {
-            Log::error('Approval failed: activation not found.');
-
-            return;
-        }
-
-        $targetUserID = $activation->UserID;
-
-        Log::info('Target user determined', [
-            'target_user_id' => $targetUserID,
-        ]);
-
-        DB::transaction(function () use ($activation, $targetUserID) {
-            // 1. Update activation status
+            // Mark the activation request as approved.
             $activation->update([
                 'status' => 'Approved',
             ]);
-
-            // 2. Update user status to Active (and sync uplineCode from activation if available)
-            User::where('UserID', $targetUserID)->update([
-                'status' => 'Active',
-                'uplineCode' => $activation->upline_code,
-            ]);
         });
-
-        $user = User::find($targetUserID);
-
-        Log::info('Selected user information', [
-            'user_exists' => $user !== null,
-            'user_id' => $user?->UserID,
-            'username' => $user?->username,
-            'email' => $user?->email,
+    } catch (\Throwable $e) {
+        Log::error('Activation approval failed.', [
+            'user_id' => $targetUserID,
+            'activation_id' => $activation->ActivationID,
+            'error' => $e->getMessage(),
         ]);
 
-        $upline = User::where(
-            'referralCode',
-            $activation->upline_code
-        )->first();
+        $this->dispatch(
+            'toast',
+            type: 'error',
+            message: 'Approval failed. Please try again.'
+        );
 
-        Log::info('Upline information', [
-            'upline_exists' => $upline !== null,
-            'upline_id' => $upline?->UserID,
-            'upline_username' => $upline?->username,
-            'upline_email' => $upline?->email,
-            'upline_code' => $activation->upline_code,
-        ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Send email to selected user
-        |--------------------------------------------------------------------------
-        */
-        if ($user && filled($user->email)) {
-            Log::info('Attempting to send approval email to selected user', [
-                'to' => $user->email,
-            ]);
-
-            try {
-                Mail::raw(
-                    "Congratulations!\n\n".
-                    "Your account has been activated successfully.\n\n".
-                    'You can now log in and access all features.',
-                    function ($message) use ($user) {
-                        $message->to($user->email)
-                            ->subject('Account Activated');
-                    }
-                );
-
-                Log::info('Approval email sent successfully', [
-                    'to' => $user->email,
-                ]);
-            } catch (\Throwable $e) {
-                Log::error('Failed to send approval email to selected user', [
-                    'user_id' => $user->UserID,
-                    'email' => $user->email,
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                ]);
-            }
-        } else {
-            Log::warning('Selected user email missing', [
-                'user_exists' => $user !== null,
-                'email' => $user?->email,
-            ]);
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Send email to upline
-        |--------------------------------------------------------------------------
-        */
-        if ($upline && filled($upline->email) && $user) {
-            Log::info('Attempting to send email to upline', [
-                'to' => $upline->email,
-            ]);
-
-            try {
-                Mail::raw(
-                    "Your downline {$user->username} has been approved.",
-                    function ($message) use ($upline) {
-                        $message->to($upline->email)
-                            ->subject('Downline Approved');
-                    }
-                );
-
-                Log::info('Upline email sent successfully', [
-                    'to' => $upline->email,
-                ]);
-            } catch (\Throwable $e) {
-                Log::error('Failed to send approval email to upline', [
-                    'upline_id' => $upline->UserID,
-                    'email' => $upline->email,
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                ]);
-            }
-        } else {
-            Log::warning('Cannot send email to upline', [
-                'upline_exists' => $upline !== null,
-                'email' => $upline?->email,
-            ]);
-        }
-
-        Log::info('=== APPROVE ACTIVATION COMPLETED ===');
-
-        $this->dispatch('activation-approved');
-        $this->closeModal();
+        return;
     }
+
+    // Reload the approved member and direct referral for notifications.
+    $user = User::find($targetUserID);
+
+    $upline = User::where('referralCode', $uplineCode)->first();
+
+    // Notify the activated member.
+    if ($user && filled($user->email)) {
+        try {
+            Mail::raw(
+                "Congratulations!\n\n"
+                . "Your account has been activated successfully.\n\n"
+                . 'You can now log in and access all features.',
+                function ($message) use ($user) {
+                    $message->to($user->email)
+                        ->subject('Account Activated');
+                }
+            );
+        } catch (\Throwable $e) {
+            Log::error('Failed to send approval email to member.', [
+                'user_id' => $user->UserID,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    // Notify the direct referral/upline.
+    if ($upline && filled($upline->email) && $user) {
+        try {
+            Mail::raw(
+                "Your downline {$user->username} has been approved.",
+                function ($message) use ($upline) {
+                    $message->to($upline->email)
+                        ->subject('Downline Approved');
+                }
+            );
+        } catch (\Throwable $e) {
+            Log::error('Failed to send approval email to upline.', [
+                'upline_id' => $upline->UserID,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    Log::info('Activation approved and branch assigned.', [
+        'user_id' => $targetUserID,
+        'upline_code' => $uplineCode,
+        'upline_branch_code' => $upline->branchCode,
+        'assigned_branch_code' => $user?->branchCode,
+    ]);
+
+    $this->dispatch('activation-approved');
+    $this->closeModal();
+}
+
 
     /*
     |--------------------------------------------------------------------------
@@ -595,7 +666,15 @@ class ActivationModal extends Component
         }
 
         $this->loadPaymentSettings();
-        $membershipFee = $this->getMembershipFee();
+
+        $variantId = filled($this->selectedVariantId)
+            ? (int) $this->selectedVariantId
+            : null;
+
+        $membershipFee = $this->getMembershipFee($variantId);
+
+        // Always synchronize the amount with the selected variant.
+        $this->amount = $membershipFee;
 
         Log::info('--- ACTIVATION PROCESS STARTED ---', [
             'authenticated' => Auth::check(),
@@ -729,6 +808,7 @@ class ActivationModal extends Component
             if ($rejectedActivation && ! $this->isRenewal) {
                 $rejectedActivation->update([
                     'amount' => (float) $membershipFee,
+                    'VID' => $this->selectedVariantId,
                     'type' => $activationType,
                     'payment_method' => $this->payment_method === 'Maya' ? 'Maya' : $this->payment_method,
                     'upline_code' => $cleanUplineCode,
@@ -743,6 +823,7 @@ class ActivationModal extends Component
                 $adminSubject = 'Activation Request Resubmitted (Admin Notice)';
             } else {
                 Activation::create([
+                    'VID' => $this->selectedVariantId,
                     'UserID' => $selectedUser->UserID,
                     'amount' => (float) $membershipFee,
                     'type' => $activationType,
@@ -832,13 +913,13 @@ class ActivationModal extends Component
                 'payment_method' => $this->payment_method,
             ]);
 
-            // Close the Livewire modal
+            $wasRenewal = $this->isRenewal;
+
             $this->closeModal();
 
-            // Tell JavaScript to replace the loading alert with success
             $this->dispatch('swal:success', [
                 'title' => 'Success!',
-                'text' => $this->isRenewal
+                'text' => $wasRenewal
                     ? 'Membership renewal submitted successfully. A new activation has been filed for review.'
                     : 'Activation request submitted successfully.',
             ]);
@@ -887,6 +968,12 @@ class ActivationModal extends Component
             'beneficiaries.*.fullname' => ['nullable', 'string', 'max:150'],
             'beneficiaries.*.birthdate' => ['nullable', 'date'],
             'beneficiaries.*.relationship' => ['nullable', 'string', 'max:50'],
+            'selectedVariantId' => [
+                'required',
+                'integer',
+                \Illuminate\Validation\Rule::exists('variants', 'VID')
+                    ->where('status', 'Active'),
+            ],
         ];
     }
 
@@ -900,7 +987,9 @@ class ActivationModal extends Component
         };
 
         if ($unavailable !== null) {
-            $this->addError('payment_method', "{$unavailable} is currently unavailable.");
+            throw ValidationException::withMessages([
+                'payment_method' => "{$unavailable} is currently unavailable.",
+            ]);
         }
     }
 
@@ -910,79 +999,150 @@ class ActivationModal extends Component
     |--------------------------------------------------------------------------
     */
 
-    public function confirmActivate(): void
-    {
-        $this->loadPaymentSettings();
 
-        $membershipFee = $this->getMembershipFee();
+public function confirmActivate(): void
+{
+    $this->loadPaymentSettings();
 
-        try {
-            $this->validate($this->activationRules($membershipFee));
-            $this->assertPaymentMethodAvailable();
-        } catch (ValidationException $e) {
-            $this->dispatch('swal:close');
+    // Get the fee for the selected membership variant.
+    // $variantId = filled($this->selectedVariantId)
+    //     ? (int) $this->selectedVariantId
+    //     : null;
 
-            Log::warning('Activation validation failed', [
-                'errors' => $e->errors(),
-                'selected_user_id' => $this->selectedUserID,
-            ]);
+        // TEMPORARY: Force Variant 1 while the variant selector is hidden
+        $variantId = filled($this->selectedVariantId)
+            ? (int) $this->selectedVariantId
+            : null;
 
-            throw $e;
-        }
+    $membershipFee = $this->getMembershipFee($variantId);
 
-        // Find the upline using the entered referral code.
-        $cleanUplineCode = trim($this->upline_code);
+    // Keep the amount synchronized with the selected variant.
+    $this->amount = $membershipFee;
 
-        $upline = User::where('referralCode', $cleanUplineCode)->first();
+    Log::info('Activation confirmation fee check', [
+        'selected_user_id' => $this->selectedUserID,
+        'selected_variant_id' => $this->selectedVariantId,
+        'amount' => $this->amount,
+        'membership_fee' => $membershipFee,
+    ]);
 
-        if (! $upline) {
-            $this->addError('upline_code', 'The referral/upline code is invalid.');
-            return;
-        }
+    try {
+        $this->validate($this->activationRules($membershipFee));
+        $this->assertPaymentMethodAvailable();
+    } catch (ValidationException $e) {
+        $this->dispatch('swal:close');
 
-        // Validate that the upline account is active.
-        if ($upline->status !== 'Active') {
-            $this->addError(
-                'upline_code',
-                'This upline account is inactive or suspended and cannot be used.'
-            );
-
-            return;
-        }
-
-        // Build the upline's full name.
-        $uplineFullName = trim(implode(' ', array_filter([
-            $upline->firstname,
-            $upline->middlename,
-            $upline->lastname,
-        ])));
-
-        if ($this->isRenewal) {
-            $action = 'Renew';
-        } elseif ($this->isReactivation) {
-            $action = 'ReActivate';
-        } else {
-            $action = 'Activate';
-        }
-
-        $this->dispatch('swal:confirm', [
-            'title' => "{$action} Account?",
-            'html' => 'This will submit the activation request for admin review.'
-                . '<br><br>'
-                . '<strong>Upline:</strong> '
-                . e($uplineFullName ?: $upline->username)
-                . '<br>'
-                . '<strong>Referral Code:</strong> '
-                . e($cleanUplineCode)
-                . '<br><br>'
-                . 'Type <strong>ACTIVATE</strong> to confirm.',
-            'icon' => 'question',
-            'requireConfirmWord' => 'ACTIVATE',
-            'confirmText' => "Yes, {$action}!",
-            'method' => 'activate',
-            'loadingTitle' => 'Processing Activation...',
-            'loadingText' => 'Please wait while we process your request.',
+        Log::warning('Activation validation failed', [
+            'errors' => $e->errors(),
+            'selected_user_id' => $this->selectedUserID,
+            'selected_variant_id' => $this->selectedVariantId,
+            'amount' => $this->amount,
+            'membership_fee' => $membershipFee,
         ]);
+
+        throw $e;
+    }
+
+    // Find the upline using the entered referral code.
+    $cleanUplineCode = trim($this->upline_code);
+
+    $upline = User::where('referralCode', $cleanUplineCode)->first();
+
+    if (! $upline) {
+        $this->addError(
+            'upline_code',
+            'The referral/upline code is invalid.'
+        );
+
+        return;
+    }
+
+    if ($upline->status !== 'Active') {
+        $this->addError(
+            'upline_code',
+            'This upline account is inactive or suspended and cannot be used.'
+        );
+
+        return;
+    }
+
+    $uplineFullName = trim(implode(' ', array_filter([
+        $upline->firstname,
+        $upline->middlename,
+        $upline->lastname,
+    ])));
+
+    if ($this->isRenewal) {
+        $action = 'Renew';
+    } elseif ($this->isReactivation) {
+        $action = 'ReActivate';
+    } else {
+        $action = 'Activate';
+    }
+
+    $this->dispatch('swal:confirm', [
+        'title' => "{$action} Account?",
+        'html' => 'This will submit the activation request for admin review.'
+            . '<br><br>'
+            . '<strong>Upline:</strong> '
+            . e($uplineFullName ?: $upline->username)
+            . '<br>'
+            . '<strong>Referral Code:</strong> '
+            . e($cleanUplineCode)
+            . '<br><br>'
+            . 'Type <strong>ACTIVATE</strong> to confirm.',
+        'icon' => 'question',
+        'requireConfirmWord' => 'ACTIVATE',
+        'confirmText' => "Yes, {$action}!",
+        'method' => 'activate',
+        'loadingTitle' => 'Processing Activation...',
+        'loadingText' => 'Please wait while we process your request.',
+    ]);
+}
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | View Benefits for a Membership Variant
+    |--------------------------------------------------------------------------
+    */
+    public function viewBenefits($vid): void
+    {
+        $variant = Variant::where('VID', $vid)->first();
+
+        if (! $variant) {
+            $this->addError('selectedVariantId', 'The selected membership variant was not found.');
+
+            return;
+        }
+
+        $this->benefitsVariantId = (int) $variant->VID;
+        $this->benefitsVariantName = $variant->name;
+
+        $this->variantBenefits = DB::table('benefits')
+            ->where('VID', $variant->VID)
+            ->where('status', 1)
+            ->orderBy('holdertype')
+            ->orderBy('name')
+            ->get()
+            ->map(fn ($benefit) => (array) $benefit)
+            ->all();
+
+        $this->showBenefitsModal = true;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Close Benefits Modal
+    |--------------------------------------------------------------------------
+    */
+    public function closeBenefitsModal(): void
+    {
+        $this->showBenefitsModal = false;
+        $this->benefitsVariantId = null;
+        $this->benefitsVariantName = '';
+        $this->variantBenefits = [];
     }
 
 

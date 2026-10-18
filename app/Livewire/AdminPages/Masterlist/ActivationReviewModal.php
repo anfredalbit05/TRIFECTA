@@ -70,19 +70,27 @@ class ActivationReviewModal extends Component
     |--------------------------------------------------------------------------
     */
 
+
     private function loadPaymentSettings(): void
     {
         $this->gcashConvenienceFeeEnabled = filter_var(
             Setting::where('name', 'gcash_convenience_fee_enabled')->value('value'),
             FILTER_VALIDATE_BOOLEAN
         );
+
         $this->paymayaConvenienceFeeEnabled = filter_var(
             Setting::where('name', 'paymaya_convenience_fee_enabled')->value('value'),
             FILTER_VALIDATE_BOOLEAN
         );
 
-        $this->totalMembershipFeesCost = (float) MembershipFee::sum('Cost');
+        // Calculate the fee using this activation's selected variant.
+        $vid = $this->activation?->VID;
+
+        $this->totalMembershipFeesCost = $vid
+            ? (float) MembershipFee::where('VID', $vid)->sum('Cost')
+            : 0.00;
     }
+
 
     #[On('open-activation-review')]
     public function openModal($UserID, $activationId = null): void
@@ -97,8 +105,6 @@ class ActivationReviewModal extends Component
         | Everyone else gets the details read-only (buttons hidden in blade).
         */
         $this->isPrivileged = $this->can('change_status') || $this->can('delete');
-
-        $this->loadPaymentSettings();
 
         $this->member = User::find($this->selectedUserID);
 
@@ -119,6 +125,9 @@ class ActivationReviewModal extends Component
             )
             ->latest('ActivationID')
             ->first();
+
+            // Load settings and the total for this activation's VID.
+        $this->loadPaymentSettings();
 
         /*
         |--------------------------------------------------------------------------

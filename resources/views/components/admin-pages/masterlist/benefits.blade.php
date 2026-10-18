@@ -26,55 +26,17 @@
         </div>
     @endif
 
-    <!-- SEARCH INPUT & REFRESH BUTTON CONTAINER -->
-    <div class="flex items-center justify-between gap-4 mb-6">
-        <!-- SEARCH INPUT -->
-<div class="relative max-w-sm w-full">
+    <!-- SEARCH, VARIANT FILTER & REFRESH -->
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
 
-    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
-        <svg
-            class="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
-            />
-        </svg>
-    </span>
+        <!-- SEARCH AND VARIANT FILTER -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:max-w-3xl">
 
-    <input
-        type="text"
-        wire:model.live.debounce.300ms="search"
-        placeholder="Search benefits..."
-        class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl
-               focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
-               focus:border-[#0C2C6B]
-               bg-white shadow-sm transition"
-    >
-
-</div>
-
-        <!-- REFRESH BUTTON -->
-            {{-- REFRESH --}}
-            <button
-                type="button"
-                wire:click="resetTable"
-                wire:loading.attr="disabled"
-                title="Refresh Table"
-                class="refresh-btn"
-            >
-
-                <span
-                    wire:loading.remove
-                    wire:target="resetTable"
-                    class="refresh-icon"
-                >
+            <!-- SEARCH INPUT -->
+            <div class="relative w-full sm:flex-1">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
                     <svg
+                        class="h-4 w-4"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -83,39 +45,81 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             stroke-width="2"
-                            d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6.5L20 9M18.5 15A7 7 0 0 1 6 17.5L4 15"
+                            d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
                         />
                     </svg>
                 </span>
 
-                <span
-                    wire:loading
-                    wire:target="resetTable"
-                    class="refresh-loading"
+                <input
+                    type="text"
+                    wire:model.live.debounce.300ms="search"
+                    placeholder="Search benefits..."
+                    class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl
+                        focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
+                        focus:border-[#0C2C6B] bg-white shadow-sm transition"
                 >
-                    <svg
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <circle
-                            cx="12"
-                            cy="12"
-                            r="9"
-                            stroke-width="3"
-                            class="refresh-circle"
-                        />
-                        <path
-                            d="M21 12a9 9 0 0 1-9 9"
-                            stroke-width="3"
-                            stroke-linecap="round"
-                        />
-                    </svg>
-                </span>
+            </div>
 
-                <span>Refresh</span>
+            <!-- VARIANT FILTER -->
+            <div class="w-full sm:w-56 sm:flex-shrink-0">
+                <select
+                    wire:model.live="selectedVariant"
+                    class="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl
+                        focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
+                        focus:border-[#0C2C6B] bg-white shadow-sm transition"
+                >
+                    <option value="">All Variants</option>
 
-            </button>
+                    @foreach ($variants as $variant)
+                        <option value="{{ $variant->VID }}">
+                            {{ $variant->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+        </div>
+
+        <!-- REFRESH BUTTON -->
+        <button
+            type="button"
+            wire:click="resetTable"
+            wire:loading.attr="disabled"
+            wire:target="resetTable"
+            title="Refresh Table"
+            class="refresh-btn self-start lg:self-auto flex-shrink-0"
+        >
+            <span wire:loading.remove wire:target="resetTable" class="refresh-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6.5L20 9M18.5 15A7 7 0 0 1 6 17.5L4 15"
+                    />
+                </svg>
+            </span>
+
+            <span wire:loading wire:target="resetTable" class="refresh-loading">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle
+                        cx="12"
+                        cy="12"
+                        r="9"
+                        stroke-width="3"
+                        class="refresh-circle"
+                    />
+                    <path
+                        d="M21 12a9 9 0 0 1-9 9"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                    />
+                </svg>
+            </span>
+
+            <span>Refresh</span>
+        </button>
+
     </div>
 
     <!-- BENEFITS TABLE -->
@@ -126,6 +130,7 @@
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">Benefit Name</th>
                     <th class="py-3 px-4">Details</th>
+                    <th class="py-3">Variant</th>
                     <th class="py-3 px-4">Holder Type</th>
                     <th class="py-3 px-4">Amount</th>
                      @if($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
@@ -146,6 +151,13 @@
 
                         <td class="py-4 px-4 text-slate-500 max-w-xs truncate">
                             {{ $benefit->details ?? 'No details provided.' }}
+                        </td>
+
+                        <td class="py-4 px-4">
+                            <span class="inline-flex items-center px-3 py-1 rounded-md
+                                        bg-blue-50 text-blue-800 text-xs font-semibold">
+                                {{ $benefit->variant_name }}
+                            </span>
                         </td>
 
                         <td class="py-4 px-4">

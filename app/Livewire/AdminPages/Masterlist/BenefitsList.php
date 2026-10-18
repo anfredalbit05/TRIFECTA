@@ -4,6 +4,7 @@ namespace App\Livewire\AdminPages\Masterlist;
 
 use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Benefit;
+use App\Models\Variant;
 use App\Support\Modules;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -40,6 +41,8 @@ class BenefitsList extends Component
         'holdertype' => 'required|in:Primary Owner,Beneficiaries',
         'status' => 'boolean',
     ];
+
+    public $selectedVariant = '';
 
     /*
     |--------------------------------------------------------------------------
@@ -169,28 +172,48 @@ class BenefitsList extends Component
         $this->resetPage();
     }
 
+    public function updatingSelectedVariant(): void
+    {
+        $this->resetPage();
+    }
+
     public function resetTable(): void
     {
         $this->search = '';
+        $this->selectedVariant = '';
         $this->resetPage();
     }
 
     public function render()
-    {
-        $benefits = Benefit::where('status', true)
-            ->when(filled($this->search), function ($query) {
-                $search = trim($this->search);
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('details', 'like', "%{$search}%")
-                        ->orWhere('holdertype', 'like', "%{$search}%");
-                });
-            })
-            ->latest('BentID')
-            ->paginate(10);
+{
+    $benefits = Benefit::query()
+        ->join('variants', 'benefits.VID', '=', 'variants.VID')
+        ->where('benefits.status', true)
+        ->select(
+            'benefits.*',
+            'variants.name as variant_name'
+        )
+        ->when(filled($this->search), function ($query) {
+            $search = trim($this->search);
 
-        return view('components.admin-pages.masterlist.benefits', [
-            'benefits' => $benefits,
-        ]);
-    }
+            $query->where(function ($q) use ($search) {
+                $q->where('benefits.name', 'like', "%{$search}%")
+                    ->orWhere('benefits.details', 'like', "%{$search}%")
+                    ->orWhere('benefits.holdertype', 'like', "%{$search}%")
+                    ->orWhere('variants.name', 'like', "%{$search}%");
+            });
+        })
+        ->when(filled($this->selectedVariant), function ($query) {
+            $query->where('benefits.VID', $this->selectedVariant);
+        })
+        ->orderByDesc('benefits.BentID')
+        ->paginate(10);
+
+    $variants = Variant::orderBy('name')->get();
+
+    return view('components.admin-pages.masterlist.benefits', [
+        'benefits' => $benefits,
+        'variants' => $variants,
+    ]);
+}
 }

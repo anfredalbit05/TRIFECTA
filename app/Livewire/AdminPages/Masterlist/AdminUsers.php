@@ -1368,7 +1368,6 @@ class AdminUsers extends Component
             ->latest('UserID')
 
             ->paginate(10);
-
         return view(
             'livewire.admin-pages.masterlist.admin-users',
             [

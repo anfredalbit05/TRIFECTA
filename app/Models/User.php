@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -236,4 +237,5 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->hasMany(Withdrawal::class, 'UserID', 'UserID');
     }
+
 }

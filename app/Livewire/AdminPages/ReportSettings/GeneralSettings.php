@@ -4,6 +4,7 @@ namespace App\Livewire\AdminPages\ReportSettings;
 
 use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Setting;
+use App\Models\Branch;
 use App\Support\Modules;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -37,10 +38,13 @@ class GeneralSettings extends Component
     public $signatureUpload = null;
 
     protected $rules = [
+        'BranchID' => 'required|integer|min:0',
         'name' => 'required|string|max:100',
         'value' => 'nullable|string',
         'signatureUpload' => 'nullable|image|mimes:png,jpg,jpeg|max:5120',
     ];
+
+    public $BranchID  = 0;
 
     public function updatingSearch()
     {
@@ -81,6 +85,8 @@ class GeneralSettings extends Component
             'signatureUpload',
         ]);
 
+        $this->BranchID = 0;
+
         $this->dispatch(
             'setting-modal-type',
             type: 'text'
@@ -104,6 +110,8 @@ class GeneralSettings extends Component
             'setting_id',
             'signatureUpload',
         ]);
+
+        $this->BranchID = 0;
     }
 
     /**
@@ -122,6 +130,7 @@ class GeneralSettings extends Component
         $setting = Setting::findOrFail($id);
 
         $this->setting_id = $setting->SettingsID;
+        $this->BranchID = $setting->BranchID ?? 0;
         $this->name = $setting->name;
         $this->value = $setting->value;
         $this->signatureUpload = null;
@@ -216,6 +225,7 @@ class GeneralSettings extends Component
         }
 
         $this->validate([
+            'BranchID' => 'required|integer|min:0',
             'name' => 'required|string|max:100',
             'value' => 'nullable|string',
         ]);
@@ -266,6 +276,7 @@ class GeneralSettings extends Component
         |--------------------------------------------------------------------------
         */
         Setting::create([
+            'BranchID' => $this->BranchID,
             'name' => $this->name,
             'value' => $this->value,
         ]);
@@ -281,51 +292,71 @@ class GeneralSettings extends Component
     /**
      * Perform confirmed update.
      */
-    public function performUpdate()
-    {
-        if (! $this->setting_id || ! $this->canUpdate) {
-            return;
-        }
 
-        /*
-        |--------------------------------------------------------------------------
-        | If a signature upload exists, save it before update.
-        |--------------------------------------------------------------------------
-        */
-        if ($this->signatureUpload) {
-            $this->saveUploadedSignature();
-        }
+public function performUpdate()
+{
+    if (! $this->setting_id || ! $this->canUpdate) {
+        return;
+    }
 
-        $setting = Setting::findOrFail(
-            $this->setting_id
-        );
+    // Save an uploaded signature first, if present.
+    if ($this->signatureUpload) {
+        $this->saveUploadedSignature();
+    }
 
-        if (
-            $setting->name === $this->name &&
-            $setting->value === $this->value
-        ) {
-            $this->closeModal();
+    // Validate all editable fields.
+    $this->validate([
+        'BranchID' => 'required|integer|min:0',
+        'name' => 'required|string|max:100',
+        'value' => 'nullable|string',
+    ]);
 
-            $this->dispatch('swal:success', [
-                'title' => 'No Changes!',
-                'text' => 'Nothing was changed.',
-            ]);
+    $setting = Setting::findOrFail($this->setting_id);
 
-            return;
-        }
-
-        $setting->update([
-            'name' => $this->name,
-            'value' => $this->value,
-        ]);
-
+    // Check whether ANY field has changed.
+    if (
+        (int) $setting->BranchID === (int) $this->BranchID &&
+        $setting->name === $this->name &&
+        $setting->value === $this->value
+    ) {
         $this->closeModal();
 
         $this->dispatch('swal:success', [
-            'title' => 'Success!',
-            'text' => 'Setting successfully updated!',
+            'title' => 'No Changes!',
+            'text' => 'Nothing was changed.',
         ]);
+
+        return;
     }
+
+    // Prevent duplicate setting names.
+    $existingQuery = Setting::where('name', $this->name)
+        ->where('SettingsID', '!=', $setting->SettingsID);
+
+    if ($existingQuery->exists()) {
+        $this->dispatch('swal:error', [
+            'title' => 'Duplicate Error',
+            'text' => 'A setting with this name already exists.',
+        ]);
+
+        return;
+    }
+
+    // Save the updated variant, name, and value.
+    $setting->update([
+        'BranchID' => $this->BranchID,
+        'name' => $this->name,
+        'value' => $this->value,
+    ]);
+
+    $this->closeModal();
+
+    $this->dispatch('swal:success', [
+        'title' => 'Success!',
+        'text' => 'Setting successfully updated!',
+    ]);
+}
+
 
     /**
      * Save uploaded cashier signature.
@@ -609,37 +640,27 @@ class GeneralSettings extends Component
     public function render()
     {
         $settings = Setting::query()
-            ->when(
-                filled($this->search),
-                function ($query) {
+            ->when(filled($this->search), function ($query) {
+                $search = trim($this->search);
 
-                    $search = trim(
-                        $this->search
-                    );
-
-                    $query->where(
-                        function ($q) use ($search) {
-
-                            $q->where(
-                                'name',
-                                'like',
-                                "%{$search}%"
-                            )->orWhere(
-                                'value',
-                                'like',
-                                "%{$search}%"
-                            );
-                        }
-                    );
-                }
-            )
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('value', 'like', "%{$search}%");
+                });
+            })
             ->latest('SettingsID')
             ->paginate(10);
+
+        $branches = Branch::orderBy('branchname')->get();
+
+        $branchNames = $branches->pluck('branchname', 'BranchID');
 
         return view(
             'livewire.admin-pages.report-settings.general',
             [
                 'settings' => $settings,
+                'branches' => $branches,
+                'branchNames' => $branchNames,
             ]
         );
     }

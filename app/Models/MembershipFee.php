@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MembershipFee extends Model
 {
@@ -26,4 +27,16 @@ class MembershipFee extends Model
     protected $casts = [
         'Cost' => 'decimal:2',
     ];
+
+        /**
+     * Each membership fee belongs to one variant.
+     */
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(
+            Variant::class,
+            'VID',
+            'VID'
+        );
+    }
 }

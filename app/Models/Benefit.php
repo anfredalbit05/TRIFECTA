@@ -14,6 +14,8 @@ class Benefit extends Model
 
         'details',
 
+        'VID',
+
         'amount',
 
         'holdertype',

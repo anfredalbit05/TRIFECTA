@@ -9,6 +9,7 @@ class Setting extends Model
     protected $primaryKey = 'SettingsID';
 
     protected $fillable = [
+        'BranchID',
         'name',
         'value',
     ];

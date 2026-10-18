@@ -119,6 +119,7 @@
             <thead>
                 <tr>
                     <th>#</th>
+                    <th>Variant</th>
                     <th>Setting Name</th>
                     <th>Value</th>
                     @if ($this->canUpdate || $this->canDelete)
@@ -135,7 +136,11 @@
 
                         <td class="cell-name">
                             <span class="name-badge">
-                                {{ $setting->name }}
+                                @if ((int) $setting->BranchID === 0)
+                                    All Branches
+                                @else
+                                    {{ $branchNames[$setting->BranchID] ?? 'Unknown Branch' }}
+                                @endif
                             </span>
                         </td>
 
@@ -186,7 +191,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ $this->canUpdate || $this->canDelete ? 4 : 3 }}"
+                        <td colspan="{{ $this->canUpdate || $this->canDelete ? 5 : 4 }}"
                             class="empty-row">
                             No settings configurations found.
                         </td>
@@ -244,6 +249,23 @@
                 <form wire:submit.prevent="saveSetting">
                     <div class="modal-body">
 
+                   <div>
+                    <label class="field-label">Branch</label>
+
+                    <select wire:model="BranchID" class="field-input">
+                        <option value="0">All Branches</option>
+
+                        @foreach ($branches as $branch)
+                            <option value="{{ $branch->BranchID }}">
+                                {{ $branch->branchname }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    @error('BranchID')
+                        <span class="field-error">{{ $message }}</span>
+                    @enderror
+                </div>
                         <!-- Name -->
                         <div>
                             <label class="field-label">Setting

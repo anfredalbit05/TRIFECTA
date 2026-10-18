@@ -103,7 +103,14 @@ class MembershipFeeSeeder extends Seeder
             [
                 'FeeID' => 'FEE013',
                 'FeeName' => 'Admin',
-                'Cost' => 300.00,
+                'Cost' => 250.00,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'FeeID' => 'FEE014',
+                'FeeName' => 'Car Incentives',
+                'Cost' => 50.00,
                 'created_at' => $now,
                 'updated_at' => $now,
             ],

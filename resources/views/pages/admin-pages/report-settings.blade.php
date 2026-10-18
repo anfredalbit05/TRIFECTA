@@ -33,6 +33,15 @@
                 </a>
             @endif
 
+            @if(auth()->user()->RoleID == 1)
+                <a href="#"
+                   @click.prevent="tab='variants'"
+                   :class="{ active: tab==='variants' }">
+                    <span class="report-settings-tab-icon">⚙</span>
+                    <span>Variants</span>
+                </a>
+            @endif
+
             <a href="#"
                @click.prevent="tab='users'"
                :class="{ active: tab==='users' }">
@@ -78,12 +87,21 @@
             </div>
         @endif
 
+        @if(auth()->user()->RoleID == 1)
+            <div x-show="tab==='variants'" x-cloak class="report-settings-main-card">
+                <livewire:admin-pages.report-settings.variants />
+            </div>
+        @endif
 
         @if(auth()->user()->RoleID == 1)
             <div x-show="tab==='general'" x-cloak class="report-settings-main-card">
                 <livewire:admin-pages.report-settings.general-settings />
             </div>
         @endif
+
+
+
+
 
     </div>
 

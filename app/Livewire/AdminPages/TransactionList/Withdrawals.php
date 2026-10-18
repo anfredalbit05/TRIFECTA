@@ -223,7 +223,11 @@ class Withdrawals extends Component
                     'status' => 'Completed',
                 ]);
 
+                // Ledger - tax (TX) is not recorded for RoleID 5, 6, or 7.
+                $memberRoleID = (int) $withdrawal->user()->value('RoleID');
                 // Ledger - tax (returned to the ledger as a TX row).
+
+                if (! in_array($memberRoleID, [5, 6, 7, 9], true)) {
                 Ledger::create([
                     'RefID' => $withdrawal->UserID,
                     'WithdrawID' => $withdrawal->WithdrawID,
@@ -232,7 +236,10 @@ class Withdrawals extends Component
                     'ActivationID' => null,
                     'status' => 'Completed',
                 ]);
+
+                }
             });
+
         } catch (\RuntimeException $e) {
             Log::warning('Transaction-list withdrawal approval aborted.', [
                 'WithdrawID' => $withdrawalId,

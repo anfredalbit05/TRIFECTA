@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
 class Activation extends Model
 {
     /*
@@ -37,6 +38,8 @@ class Activation extends Model
         */
 
         'satelliteID',
+
+         'VID',
 
         /*
         | Activation amount
@@ -266,6 +269,18 @@ class Activation extends Model
             ActivationHistory::class,
             'ActivationID',
             'ActivationID'
+        );
+    }
+
+    /**
+     * Each activation belongs to one variant.
+     */
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(
+            Variant::class,
+            'VID', // Foreign key in activations table
+            'VID'        // Primary key in variants table
         );
     }
 }

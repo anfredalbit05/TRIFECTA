@@ -104,6 +104,10 @@ class ApplicationModal extends Component
      */
     public array $originalData = [];
 
+    public $variants = [];
+
+    public $selectedVariantId = null;
+
     /*
     |--------------------------------------------------------------------------
     | Security Information

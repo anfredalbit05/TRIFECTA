@@ -976,6 +976,23 @@
                                 @enderror
                             </div>
 
+                              <div>
+                                <label class="au-form-label">Branches</label>
+                                <select wire:model="branches"
+                                    class="au-form-select">
+
+                                    <option value="">Select Branch</option>
+                                    @foreach (\App\Models\Branch::all() as $branch)
+                                    <option value="{{ $branch->BranchID }}">{{ $branch->branchname }}</option>
+                                    @endforeach
+
+
+                                </select>
+                                @error('branches')
+                                    <span class="au-form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+
                             <div>
                                 <label class="au-form-label">Role
                                     Name</label>
