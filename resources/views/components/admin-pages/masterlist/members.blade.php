@@ -40,154 +40,118 @@
     {{-- ============================================================ --}}
     {{-- SEARCH / FILTERS / REFRESH --}}
     {{-- ============================================================ --}}
-    <div class="members-toolbar">
 
-        {{-- SEARCH --}}
-        <div class="masterlist-search">
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
 
-            <span class="masterlist-search-icon">
-                <svg
-                    class="masterlist-search-svg"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
-                    />
-                </svg>
+    {{-- SEARCH --}}
+    <div class="relative max-w-sm w-full sm:w-auto flex-1">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+                />
+            </svg>
+        </span>
+
+        <input
+            type="text"
+            wire:model.live.debounce.300ms="search"
+            placeholder="Search by fullname, username, receipt, cocogen, policy"
+            class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl
+                focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
+                focus:border-[#0C2C6B] bg-white shadow-sm transition"
+        >
+    </div>
+
+    {{-- FILTERS AND REFRESH --}}
+    <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
+
+        {{-- STATUS FILTER --}}
+        <select
+            wire:model.live="statusFilter"
+            title="Filter by status"
+            class="border border-slate-200 rounded-xl px-3 py-2.5 text-sm
+                focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
+                focus:border-[#0C2C6B] bg-white font-medium text-slate-700
+                shadow-sm cursor-pointer transition"
+        >
+            <option value="all">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+        </select>
+
+        {{-- DATE RANGE --}}
+        <div wire:ignore class="relative w-full sm:w-72">
+            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none z-10">
+                📅
             </span>
 
             <input
                 type="text"
-                wire:model.live.debounce.300ms="search"
-                placeholder="Search by fullname, username, receipt, cocogen, policy"
+                id="memberDateRange"
+                readonly
+                class="date-range-input pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl
+                    focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
+                    bg-white text-slate-700 shadow-sm cursor-pointer
+                    w-full text-center font-medium"
+                placeholder="Select date range"
             >
-
         </div>
 
-
-        {{-- FILTERS --}}
-        <div class="members-toolbar-actions">
-
-            {{-- STATUS FILTER --}}
-            <select
-                wire:model.live="statusFilter"
-                title="Filter by status"
-                class="text-xs border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-slate-50 font-semibold text-slate-700 shadow-sm cursor-pointer"
-            >
-                <option value="all">All Status</option>
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-            </select>
-
-            {{-- DATE RANGE --}}
-            <div wire:ignore class="date-range-wrapper">
-
-                <span class="date-range-icon">
-                    <svg
-                        class="date-range-svg"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.8"
-                            d="M8 2v4m8-4v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
-                        />
-                    </svg>
-                </span>
-
-                <input
-                    type="text"
-                    id="memberDateRange"
-                    readonly
-                    class="date-range-input"
-                    placeholder="Select date range"
-                >
-
-            </div>
-
-
-            {{-- CLEAR DATE --}}
-            @if ($dateRange)
-                <button
-                    type="button"
-                    wire:click="clearDateFilter"
-                    title="Clear date filter"
-                    class="clear-date-btn"
-                >
-                    <span>&times;</span>
-                    <span class="clear-date-text">Clear Date</span>
-                </button>
-            @endif
-
-
-            {{-- REFRESH --}}
+        {{-- CLEAR DATE --}}
+        @if ($dateRange)
             <button
                 type="button"
-                wire:click="resetTable"
-                wire:loading.attr="disabled"
-                title="Refresh Table"
-                class="refresh-btn"
+                wire:click="clearDateFilter"
+                title="Clear date filter"
+                class="inline-flex items-center justify-center px-3 py-2 text-sm
+                    text-slate-500 hover:text-red-500 hover:border-red-200
+                    hover:bg-red-50 rounded-xl border border-slate-200
+                    bg-white shadow-sm cursor-pointer transition"
             >
-
-                <span
-                    wire:loading.remove
-                    wire:target="resetTable"
-                    class="refresh-icon"
-                >
-                    <svg
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6.5L20 9M18.5 15A7 7 0 0 1 6 17.5L4 15"
-                        />
-                    </svg>
-                </span>
-
-                <span
-                    wire:loading
-                    wire:target="resetTable"
-                    class="refresh-loading"
-                >
-                    <svg
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <circle
-                            cx="12"
-                            cy="12"
-                            r="9"
-                            stroke-width="3"
-                            class="refresh-circle"
-                        />
-                        <path
-                            d="M21 12a9 9 0 0 1-9 9"
-                            stroke-width="3"
-                            stroke-linecap="round"
-                        />
-                    </svg>
-                </span>
-
-                <span>Refresh</span>
-
+                ✕
             </button>
+        @endif
 
-        </div>
+        {{-- REFRESH --}}
+        <button
+            type="button"
+            wire:click="resetTable"
+            wire:loading.attr="disabled"
+            title="Refresh Table"
+            class="refresh-btn"
+        >
+            <span wire:loading.remove wire:target="resetTable" class="refresh-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6.5L20 9M18.5 15A7 7 0 0 1 6 17.5L4 15"
+                    />
+                </svg>
+            </span>
+
+            <span wire:loading wire:target="resetTable" class="refresh-loading">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9" stroke-width="3" class="refresh-circle" />
+                    <path
+                        d="M21 12a9 9 0 0 1-9 9"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                    />
+                </svg>
+            </span>
+
+            <span>Refresh</span>
+        </button>
 
     </div>
+</div>
+
 
 
     {{-- ============================================================ --}}
