@@ -73,7 +73,7 @@ class Home extends Component
 
     public function render()
     {
-        $totalMembers = User::count();
+        $totalMembers = User::where('RoleID', 4)->count();
 
         return view('livewire.landing-page.home', [
             'totalMembers' => $totalMembers,
