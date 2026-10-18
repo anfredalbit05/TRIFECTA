@@ -37,7 +37,7 @@
                 <a href="#"
                    @click.prevent="tab='variants'"
                    :class="{ active: tab==='variants' }">
-                    <span class="report-settings-tab-icon">⚙</span>
+                    <span class="report-settings-tab-icon">▦</span>
                     <span>Variants</span>
                 </a>
             @endif
