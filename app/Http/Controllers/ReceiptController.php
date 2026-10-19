@@ -34,7 +34,17 @@ class ReceiptController extends Controller
             ->where('status', 'Approved')
             ->whereNotNull('receipt_number')
             ->latest('ActivationID')
-            ->first(['ActivationID', 'receipt_number', 'cashier_name', 'cashier_signature']);
+            ->first([
+                'ActivationID',
+                'receipt_number',
+                'cashier_name',
+                'cashier_signature',
+                'amount',
+            ]);
+
+        abort_unless($approved, 404, 'No approved activation receipt is available.');
+
+        $amount = (float) $approved->amount;
 
         $history = ActivationHistory::where('ActivationID', $approved->ActivationID)
             ->where('status', 'Approved')
@@ -92,7 +102,12 @@ public function memberDownload(): StreamedResponse
             'receipt_number',
             'cashier_name',
             'cashier_signature',
+            'amount',
         ]);
+
+    abort_unless($approved, 404, 'No approved activation receipt is available.');
+
+    $amount = (float) $approved->amount;
 
     // No approved activation = no receipt.
     abort_unless($approved, 404, 'No approved activation receipt is available.');
