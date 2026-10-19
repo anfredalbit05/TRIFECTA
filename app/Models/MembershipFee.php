@@ -22,6 +22,7 @@ class MembershipFee extends Model
         'FeeID',
         'FeeName',
         'Cost',
+        'VID',
     ];
 
     protected $casts = [

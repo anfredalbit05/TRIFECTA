@@ -131,7 +131,7 @@
                             </span>
                         </button>
                     </div>
-                    <div wire:ignore x-data="{
+                    {{-- <div wire:ignore x-data="{
                         startDate: @entangle('membershipFeeStart').live,
                         endDate: @entangle('membershipFeeEnd').live,
                         picker: null,
@@ -167,29 +167,70 @@
                             x-ref="input"
                             class="date-range-input"
                             placeholder="Select date range">
-                    </div>
+                    </div> --}}
                 </div>
 
-                <div class="breakdown-list">
+             {{-- <div>
+                <label for="membershipFeeVariant">Filter by Variant</label>
+
+                <select
+                    id="membershipFeeVariant"
+                    wire:model.live="selectedVariant"
+                    class="date-range-input"
+                >
+                    @foreach ($variants as $variant)
+                        <option value="{{ $variant->VID }}">
+                            {{ $variant->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div> --}}
+
+                <div class="breakdown-list membership-fee-card__list">
                     @forelse($membershipFeeCollections as $fee)
                         <div class="breakdown-list__item">
                             <div>
                                 <p class="breakdown-list__name">
                                     {{ $fee->FeeName }}
                                 </p>
+
                                 <p class="breakdown-list__sub">
                                     Fee ID: {{ $fee->FeeID }}
+                                    ·
+                                    {{ $fee->Variant_Name ?? 'No Variant' }}
                                 </p>
+
                             </div>
+
                             <div class="breakdown-list__value-wrap">
                                 <span class="breakdown-list__value">
-                                    ₱{{ number_format($fee->Total_Collection, 2) }}
+                                    ₱{{ number_format((float) $fee->Total_Collection, 2) }}
                                 </span>
                             </div>
                         </div>
                     @empty
-                        <p class="breakdown-list__empty">No membership fees found for this period.</p>
+                        <p class="breakdown-list__empty">
+                            No membership fees found for this period and variant.
+                        </p>
                     @endforelse
+                </div>
+
+                {{-- TOTAL COLLECTION FOOTER --}}
+                <div class="membership-fee-total">
+                    <div>
+                        <span class="membership-fee-total__label">
+                            Total Collection
+                        </span>
+
+                        <span class="membership-fee-total__sub">
+                            {{ $variants->firstWhere('VID', (int) $selectedVariant)->name
+                                ?? 'Selected Variant' }}
+                        </span>
+                    </div>
+
+                    <span class="membership-fee-total__amount">
+                        ₱{{ number_format($membershipFeeTotal, 2) }}
+                    </span>
                 </div>
             </div>
 
@@ -209,20 +250,47 @@
                             <th>#</th>
                             <th>Fee ID</th>
                             <th>Fee Name</th>
+                            <th>Variant</th>
                             <th>Total Collection</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($membershipFeeCollections as $index => $fee)
                             <tr>
-                                <td class="print-table__cell--center">{{ $index + 1 }}</td>
-                                <td class="print-table__cell--center">{{ $fee->FeeID }}</td>
+                                <td class="print-table__cell--center">
+                                    {{ $index + 1 }}
+                                </td>
+
+                                <td class="print-table__cell--center">
+                                    {{ $fee->FeeID }}
+                                </td>
+
                                 <td>{{ $fee->FeeName }}</td>
-                                <td class="print-table__cell--right">₱{{ number_format($fee->Total_Collection, 2) }}</td>
+
+                                <td>{{ $fee->Variant_Name ?? 'No Variant' }}</td>
+
+                                <td class="print-table__cell--right">
+                                    ₱{{ number_format((float) $fee->Total_Collection, 2) }}
+                                </td>
                             </tr>
                         @empty
-                            <tr><td colspan="4" class="print-table__empty">No data for the selected period.</td></tr>
+                            <tr>
+                                <td colspan="5" class="print-table__empty">
+                                    No data for the selected period.
+                                </td>
+                            </tr>
                         @endforelse
+                        <tr>
+                            <td colspan="4" class="print-table__cell--right">
+                                <strong>Total Collection</strong>
+                            </td>
+
+                            <td class="print-table__cell--right">
+                                <strong>
+                                    ₱{{ number_format($membershipFeeTotal, 2) }}
+                                </strong>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -246,7 +314,7 @@
                             </span>
                         </button>
                     </div>
-                    <div wire:ignore x-data="{
+                    {{-- <div wire:ignore x-data="{
                         startDate: @entangle('sourceStart').live,
                         endDate: @entangle('sourceEnd').live,
                         picker: null,
@@ -282,7 +350,7 @@
                             x-ref="input"
                             class="date-range-input"
                             placeholder="Select date range">
-                    </div>
+                    </div> --}}
                 </div>
 
                 <div class="breakdown-list">
@@ -338,6 +406,22 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="membership-fee-total">
+            <div>
+                <span class="membership-fee-total__label">
+                    Total Collection
+                </span>
+
+                <span class="membership-fee-total__sub">
+                    All Sources
+                </span>
+            </div>
+
+            <span class="membership-fee-total__amount">
+                ₱{{ number_format($incomeSourcesTotal, 2) }}
+            </span>
+        </div>
         </div>
 
         <!-- 3. WALLET INCENTIVES BREAKDOWN -->
@@ -358,7 +442,7 @@
                             </span>
                         </button>
                     </div>
-                    <div wire:ignore x-data="{
+                    {{-- <div wire:ignore x-data="{
                         startDate: @entangle('walletStart').live,
                         endDate: @entangle('walletEnd').live,
                         picker: null,
@@ -394,7 +478,7 @@
                             x-ref="input"
                             class="date-range-input"
                             placeholder="Select date range">
-                    </div>
+                    </div> --}}
                 </div>
 
                 <div class="breakdown-list">
@@ -460,7 +544,25 @@
                     </tbody>
                 </table>
             </div>
+
+             <div class="membership-fee-total">
+                <div>
+                    <span class="membership-fee-total__label">
+                        Total Incentives
+                    </span>
+
+                    <span class="membership-fee-total__sub">
+                        All Members
+                    </span>
+                </div>
+
+                <span class="membership-fee-total__amount">
+                    ₱{{ number_format($walletCollectionsTotal, 2) }}
+                </span>
+            </div>
         </div>
+
+
 
     </div>
 
@@ -575,7 +677,7 @@
         document.body.setAttribute('data-print-target', section);
         window.print();
     }
-    
+
     window.addEventListener('afterprint', () => {
         document.body.removeAttribute('data-print-target');
     });

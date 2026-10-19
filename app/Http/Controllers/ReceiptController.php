@@ -26,9 +26,6 @@ class ReceiptController extends Controller
 
         $user = User::findOrFail($userId);
 
-        // Same membership amount the approval email uses (sum of MembershipFee).
-        $amount = (float) MembershipFee::sum('Cost');
-
         // Receipt number + cashier identity from the latest approved activation
         $approved = Activation::where('UserID', $user->UserID)
             ->where('status', 'Approved')

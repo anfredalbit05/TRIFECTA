@@ -535,6 +535,61 @@
     text-align: center;
 }
 
+/* Membership Fee variant filter */
+.membership-fee-variant-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 12px 0;
+}
+
+.membership-fee-variant-filter label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.membership-fee-variant-filter select {
+    width: 100%;
+}
+
+/* Membership Fee total footer */
+.membership-fee-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    margin-top: auto;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+    border-radius: 0 0 12px 12px;
+}
+
+.membership-fee-total > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.membership-fee-total__label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #334155;
+}
+
+.membership-fee-total__sub {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.membership-fee-total__amount {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0c2c6b;
+    white-space: nowrap;
+}
+
 /* ==========================================================================
    Print media rules
    ========================================================================== */

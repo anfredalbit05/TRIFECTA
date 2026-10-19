@@ -8,6 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Illuminate\Support\Facades\Log;
 
 class Overview extends Component
 {
@@ -31,6 +32,8 @@ class Overview extends Component
     public $monthlyStart;
 
     public $monthlyEnd;
+
+    public $selectedVariant = 1;
 
     public function mount()
     {
@@ -106,6 +109,15 @@ class Overview extends Component
         );
     }
 
+    public function updatedSelectedVariant($value): void
+    {
+        $this->selectedVariant = $value;
+
+        Log::info('Selected variant updated', [
+            'selected_variant' => $this->selectedVariant,
+        ]);
+    }
+
     public function render()
     {
         $year = $this->selectedYear;
@@ -130,51 +142,122 @@ class Overview extends Component
         // Monthly Income Chart Data (Guarantees all 12 months for the chosen year)
         $monthlyIncome = $this->getMonthlyIncomeData($year);
 
-        // Membership Fee Collection Breakdown
-        $membershipFeeCollections = DB::table('membership_fees as m')
-            ->leftJoin('ledgers as l', function ($join) {
-                $join->on('l.RefID', '=', 'm.FeeID')
-                    ->whereBetween('l.created_at', [$this->membershipFeeStart.' 00:00:00', $this->membershipFeeEnd.' 23:59:59'])
-                    ->where('l.Source', '=', 'MF')
-                    ->where('l.status', '=', 'Completed');
-            })
-            ->select(
-                'm.FeeID',
-                'm.FeeName',
-                DB::raw('COALESCE(SUM(l.amount), 0) AS Total_Collection')
-            )
-            ->groupBy('m.FeeID', 'm.FeeName')
-            ->orderBy('m.FeeName')
-            ->get();
+        // Membership Fee Breakdown
+        $variants = DB::table('variants')
+            ->orderBy('name')
+            ->get(['VID', 'name']);
 
-        // Collection Summary by Source
-        $incomeSources = DB::table(DB::raw("(
-            SELECT 1 AS SEQUENCE, 'MF' AS Source, 'Membership Fee' AS Collection_Type
-            UNION ALL SELECT 2, 'DR', 'Direct Referral'
-            UNION ALL SELECT 3, 'OV', 'Overrides'
-            UNION ALL SELECT 4, 'PF', 'Provident Fund'
-            UNION ALL SELECT 5, 'CL', 'Claim'
-            UNION ALL SELECT 6, 'RF', 'Refund'
-            UNION ALL SELECT 7, 'CF', 'Convenience Fee'
-            UNION ALL SELECT 8, 'TX', 'TAX'
-            UNION ALL SELECT 9, 'WD', 'Withdrawals'
-            UNION ALL SELECT 10, 'PK', 'Pangkabuhayan'
-            UNION ALL SELECT 11, 'OT', 'Others'
-        ) as s"))
-            ->leftJoin('ledgers as l', function ($join) {
-                $join->on('l.Source', '=', 's.Source')
-                    ->where('l.status', '=', 'Completed')
-                    ->whereBetween('l.created_at', [$this->sourceStart.' 00:00:00', $this->sourceEnd.' 23:59:59']);
-            })
-            ->select(
-                's.Source',
-                's.Collection_Type',
-                DB::raw('COALESCE(SUM(l.amount), 0) AS Total_Collection'),
-                DB::raw('COUNT(l.amount) AS count')
-            )
-            ->groupBy('s.SEQUENCE', 's.Source', 's.Collection_Type')
-            ->orderBy('s.SEQUENCE')
-            ->get();
+            // Membership Fee Collection Breakdown
+            $membershipFeeCollections = DB::table('membership_fees as m')
+                ->leftJoin('variants as v', 'v.VID', '=', 'm.VID')
+                ->leftJoin('ledgers as l', function ($join) {
+                    $join->on('l.RefID', '=', 'm.FeeID')
+                        ->where('l.Source', '=', 'MF')
+                        ->where('l.status', '=', 'Completed')
+                        ->whereBetween('l.created_at', [
+                            $this->membershipFeeStart . ' 00:00:00',
+                            $this->membershipFeeEnd . ' 23:59:59',
+                        ]);
+                })
+                ->where('m.VID', (int) $this->selectedVariant)
+                ->select(
+                    'm.FeeID',
+                    'm.FeeName',
+                    'm.VID',
+                    'v.name as Variant_Name',
+                    'm.Cost',
+                    DB::raw('COALESCE(SUM(l.amount), 0) AS Total_Collection')
+                )
+                ->groupBy(
+                    'm.FeeID',
+                    'm.FeeName',
+                    'm.VID',
+                    'v.name',
+                    'm.Cost'
+                )
+                ->orderBy('m.FeeName')
+                ->get();
+
+            $membershipFeeTotal = (float) $membershipFeeCollections->sum(
+                'Total_Collection'
+            );
+
+            // Collection Summary by Source
+            // 1. Membership Fee collections grouped by variant.
+            $membershipFeeSourceRows = DB::table('membership_fees as m')
+                ->leftJoin('variants as v', 'v.VID', '=', 'm.VID')
+                ->leftJoin('ledgers as l', function ($join) {
+                    $join->on('l.RefID', '=', 'm.FeeID')
+                        ->where('l.Source', '=', 'MF')
+                        ->where('l.status', '=', 'Completed')
+                        ->whereBetween('l.created_at', [
+                            $this->sourceStart . ' 00:00:00',
+                            $this->sourceEnd . ' 23:59:59',
+                        ]);
+                })
+                ->selectRaw("
+                    1 AS SEQUENCE,
+                    'MF' AS Source,
+                    CONCAT(
+                        'Membership Fee (',
+                        COALESCE(v.name, 'No Variant'),
+                        ')'
+                    ) AS Collection_Type,
+                    COALESCE(SUM(l.amount), 0) AS Total_Collection,
+                    COUNT(l.amount) AS count
+                ")
+                ->groupBy('m.VID', 'v.name')
+                ->get();
+
+        Log::info('Membership fee variant filter changed', [
+            'selected_variant' => $this->selectedVariant
+
+        ]);
+
+            // 2. Other collection sources remain unchanged.
+            $otherIncomeSources = DB::table(DB::raw("(
+                SELECT 2 AS SEQUENCE, 'DR' AS Source, 'Direct Referral' AS Collection_Type
+                UNION ALL SELECT 3, 'OV', 'Overrides'
+                UNION ALL SELECT 4, 'PF', 'Provident Fund'
+                UNION ALL SELECT 5, 'CL', 'Claim'
+                UNION ALL SELECT 6, 'RF', 'Refund'
+                UNION ALL SELECT 7, 'CF', 'Convenience Fee'
+                UNION ALL SELECT 8, 'TX', 'TAX'
+                UNION ALL SELECT 9, 'WD', 'Withdrawals'
+                UNION ALL SELECT 10, 'PK', 'Pangkabuhayan'
+                UNION ALL SELECT 11, 'OT', 'Others'
+            ) AS s"))
+                ->leftJoin('ledgers as l', function ($join) {
+                    $join->on('l.Source', '=', 's.Source')
+                        ->where('l.status', '=', 'Completed')
+                        ->whereBetween('l.created_at', [
+                            $this->sourceStart . ' 00:00:00',
+                            $this->sourceEnd . ' 23:59:59',
+                        ]);
+                })
+                ->select(
+                    's.SEQUENCE',
+                    's.Source',
+                    's.Collection_Type',
+                    DB::raw('COALESCE(SUM(l.amount), 0) AS Total_Collection'),
+                    DB::raw('COUNT(l.amount) AS count')
+                )
+                ->groupBy('s.SEQUENCE', 's.Source', 's.Collection_Type')
+                ->get();
+
+            // 3. Combine and sort all collection sources.
+            $incomeSources = $membershipFeeSourceRows
+                ->concat($otherIncomeSources)
+                ->sortBy(function ($source) {
+                    return sprintf(
+                        '%02d-%s',
+                        $source->SEQUENCE,
+                        $source->Collection_Type
+                    );
+                })
+                ->values();
+
+            $incomeSourcesTotal = (float) $incomeSources->sum('Total_Collection');
 
         // Wallet Incentives Breakdown Query
         $walletCollections = DB::table(DB::raw("(
@@ -225,6 +308,8 @@ class Overview extends Component
             ->orderBy('x.Sequence')
             ->get();
 
+            $walletCollectionsTotal = (float) $walletCollections->sum('Total_Collection');
+
         return view('livewire.admin-pages.report-settings.overview', [
             'totalIncome' => $totalIncome,
             'totalReportsGenerated' => $totalReportsGenerated,
@@ -235,6 +320,12 @@ class Overview extends Component
             'membershipFeeCollections' => $membershipFeeCollections,
             'incomeSources' => $incomeSources,
             'walletCollections' => $walletCollections,
+
+            'variants' => $variants,
+            'membershipFeeTotal' => $membershipFeeTotal,
+
+            'incomeSourcesTotal' => $incomeSourcesTotal,
+            'walletCollectionsTotal' => $walletCollectionsTotal,
 
             // Formatted labels for the per-card print headers
             'membershipFeeStartLabel' => Carbon::parse($this->membershipFeeStart)->format('M d, Y'),
