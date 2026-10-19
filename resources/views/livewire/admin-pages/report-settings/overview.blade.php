@@ -1,6 +1,4 @@
-{{-- Styles for this component live in overview.css --}}
-<link rel="stylesheet" href="{{ asset('css/overview.css') }}">
-
+{{-- Styles for this component are bundled via resources/css/app.css --}}
 <div class="overview">
 
     <!-- HEADER WITH CONTROLS -->
@@ -170,7 +168,7 @@
                     </div> --}}
                 </div>
 
-             {{-- <div>
+             <div>
                 <label for="membershipFeeVariant">Filter by Variant</label>
 
                 <select
@@ -184,7 +182,7 @@
                         </option>
                     @endforeach
                 </select>
-            </div> --}}
+            </div>
 
                 <div class="breakdown-list membership-fee-card__list">
                     @forelse($membershipFeeCollections as $fee)
