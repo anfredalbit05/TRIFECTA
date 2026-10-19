@@ -144,6 +144,14 @@
                             </span>
                         </td>
 
+                        <td class="cell-name">
+                            <span class="value-text">
+
+                                    {{ $setting->name ?? 'Unknown Name' }}
+
+                            </span>
+                        </td>
+
                         <td class="cell-value">
                             @php
                                 $val = $setting->value;
