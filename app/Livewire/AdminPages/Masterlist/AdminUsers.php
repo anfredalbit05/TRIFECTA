@@ -88,6 +88,10 @@ class AdminUsers extends Component
 
     public string $position = '';
 
+    public string $positionMode = 'select';
+
+    public string $customPosition = '';
+
     public string $referralCode = '';
 
     // =====================================================
@@ -230,6 +234,8 @@ class AdminUsers extends Component
             'position',
             'selectedUserId',
         ]);
+
+          $this->positionMode = 'select';
     }
 
     public function openAddModal(): void
@@ -239,6 +245,7 @@ class AdminUsers extends Component
         $this->resetUserForm();
 
         $this->status = 'Active';
+        $this->positionMode = 'select';
         $this->isAddModalOpen = true;
     }
 
@@ -256,7 +263,9 @@ class AdminUsers extends Component
             'birthdate' => 'nullable|date',
             'address' => 'nullable|string',
             'RoleID' => 'required|exists:roles,RoleID',
-            'position' => 'nullable|string|max:255',
+            'positionMode' => 'required|in:select,custom',
+            'position' => 'nullable|string|max:255|required_if:positionMode,select',
+            'customPosition' => 'nullable|string|max:255|required_if:positionMode,custom',
             'status' => 'required|in:Active,Inactive,Suspended',
         ]);
 
@@ -272,7 +281,7 @@ class AdminUsers extends Component
             'birthdate' => $this->birthdate ?: null,
             'address' => $this->address ?: null,
             'RoleID' => $this->RoleID,
-            'position' => $this->position ?: 'client',
+            'position' => $this->getPositionValue() ?? 'client',
             'status' => $this->status,
             'referralCode' => $this->generateUplineCode(),
         ]);
@@ -310,6 +319,8 @@ class AdminUsers extends Component
         $this->status = $user->status ?? 'Inactive';
         $this->RoleID = $user->RoleID ?? '';
         $this->position = $user->position ?? '';
+        $this->customPosition = '';
+        $this->positionMode = 'select';
 
         $this->isEditModalOpen = true;
     }
@@ -336,7 +347,9 @@ class AdminUsers extends Component
 
             'RoleID' => 'required|exists:roles,RoleID',
 
-            'position' => 'nullable|string|max:255',
+            'positionMode' => 'required|in:select,custom',
+            'position' => 'nullable|string|max:255|required_if:positionMode,select',
+            'customPosition' => 'nullable|string|max:255|required_if:positionMode,custom',
 
             'status' => 'required|in:Active,Inactive,Suspended',
         ]);
@@ -384,9 +397,7 @@ class AdminUsers extends Component
 
             'RoleID' => $this->RoleID,
 
-            'position' => $this->position !== ''
-                    ? $this->position
-                    : null,
+            'position' => $this->getPositionValue(),
         ]);
 
         Log::info(
@@ -1291,6 +1302,26 @@ class AdminUsers extends Component
     | Render
     |----------------------------------------------------------------------
     */
+
+    public function getAvailablePositionsProperty()
+    {
+        return User::query()
+            ->whereNotNull('position')
+            ->whereRaw("TRIM(position) != ''")
+            ->distinct()
+            ->orderBy('position')
+            ->pluck('position');
+    }
+    private function getPositionValue(): ?string
+    {
+        $position = $this->positionMode === 'custom'
+            ? $this->customPosition
+            : $this->position;
+
+        $position = trim($position);
+
+        return $position !== '' ? $position : null;
+    }
 
     public function render()
     {

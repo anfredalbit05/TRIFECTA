@@ -1008,25 +1008,8 @@
                                 @enderror
                             </div>
 
-                            <div>
-                                <label class="au-form-label">Position</label>
-                                <select wire:model="position"
-                                    class="au-form-select">
-                                    <option value="">Select Position</option>
-                                    <option value="CEO">Chief Executive Officer (CEO)</option>
-                                    <option value="COO">Chief Operating Officer (COO)</option>
-                                    <option value="Auditor">Auditor</option>
-                                    <option value="Board of Directors">Board of Directors</option>
-                                    <option value="PIO">PIO</option>
-                                    <option value="Secretary">Secretary</option>
-                                    <option value="Treasurer">Treasurer</option>
-                                </select>
-                                @error('position')
-                                    <span class="au-form-error">{{ $message }}</span>
-                                @enderror
-                            </div>
 
-                            <div class="au-col-span-2">
+                            <div class="space-y-3">
                                 <label class="au-form-label">Status</label>
                                 <select wire:model="status"
                                     class="au-form-select">
@@ -1034,6 +1017,84 @@
                                     <option value="Inactive">Inactive</option>
                                 </select>
                             </div>
+
+
+                            <div class="space-y-3">
+                                <label class="au-form-label">
+                                    Position
+                                </label>
+
+                                {{-- SELECT OR TYPE POSITION --}}
+                                <div class="flex flex-wrap gap-5">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            wire:model.live="positionMode"
+                                            value="select"
+                                            class="text-indigo-600 focus:ring-indigo-500"
+                                        >
+                                        <span class="text-sm text-gray-700">
+                                            Select Position
+                                        </span>
+                                    </label>
+
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            wire:model.live="positionMode"
+                                            value="custom"
+                                            class="text-indigo-600 focus:ring-indigo-500"
+                                        >
+                                        <span class="text-sm text-gray-700">
+                                            Type Position
+                                        </span>
+                                    </label>
+                                </div>
+
+                                {{-- EXISTING POSITIONS --}}
+                                @if ($positionMode === 'select')
+                                    <select
+                                        wire:model="position"
+                                        class="w-full rounded-lg border border-gray-300 px-3 py-2
+                                            focus:border-indigo-500 focus:ring-indigo-500"
+                                    >
+                                        <option value="">Select a position</option>
+
+                                        @if ($position && ! $this->availablePositions->contains($position))
+                                            <option value="{{ $position }}">
+                                                {{ $position }}
+                                            </option>
+                                        @endif
+
+                                        @foreach ($this->availablePositions as $availablePosition)
+                                            <option value="{{ $availablePosition }}">
+                                                {{ $availablePosition }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                    @error('position')
+                                        <p class="text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+
+                                {{-- CUSTOM POSITION --}}
+                                @else
+                                    <input
+                                        type="text"
+                                        wire:model="customPosition"
+                                        placeholder="Enter a new position"
+                                        maxlength="255"
+                                        class="w-full rounded-lg border border-gray-300 px-3 py-2
+                                            focus:border-indigo-500 focus:ring-indigo-500"
+                                    >
+
+                                    @error('customPosition')
+                                        <p class="text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                @endif
+                            </div>
+
+
                         </div>
                     </div>
 

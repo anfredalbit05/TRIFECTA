@@ -279,6 +279,35 @@
                     <!-- MODAL BODY -->
                     <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
 
+
+
+                        <!-- Variant -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                                Variant
+                            </label>
+
+                            <select
+                                wire:model="benefitVariantID"
+                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg
+                                    focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white"
+                            >
+                                <option value="">Select Variant</option>
+
+                                @foreach ($variants as $variant)
+                                    <option value="{{ $variant->VID }}">
+                                        {{ $variant->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            @error('benefitVariantID')
+                                <span class="text-xs text-red-500 mt-1 block">
+                                    {{ $message }}
+                                </span>
+                            @enderror
+                        </div>
+
                         <!-- Name -->
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Benefit Name</label>
@@ -286,7 +315,7 @@
                             @error('name') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
-                        <!-- Amount -->
+
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Amount (₱)</label>
                             <input type="number" step="0.01" wire:model="amount" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]">

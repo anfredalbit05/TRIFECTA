@@ -40,9 +40,12 @@ class BenefitsList extends Component
         'amount' => 'required|numeric|min:0',
         'holdertype' => 'required|in:Primary Owner,Beneficiaries',
         'status' => 'boolean',
+        'benefitVariantID' => 'required|exists:variants,VID',
     ];
 
     public $selectedVariant = '';
+
+    public $benefitVariantID = '';
 
     /*
     |--------------------------------------------------------------------------
@@ -74,10 +77,12 @@ class BenefitsList extends Component
             'details',
             'amount',
             'benefit_id',
+            'benefitVariantID',
         ]);
 
         $this->holdertype = 'Both';
         $this->status = true;
+        $this->benefitVariantID = '';
 
         $this->isOpen = true;
     }
@@ -86,7 +91,7 @@ class BenefitsList extends Component
     {
         $this->isOpen = false;
         $this->resetValidation();
-        $this->reset(['name', 'details', 'amount', 'holdertype', 'status', 'benefit_id']);
+        $this->reset(['name', 'details', 'amount', 'holdertype', 'status', 'benefit_id', 'benefitVariantID']);
     }
 
     public function editBenefit($id)
@@ -104,6 +109,7 @@ class BenefitsList extends Component
         $this->amount = $benefit->amount;
         $this->holdertype = $benefit->holdertype;
         $this->status = $benefit->status;
+        $this->benefitVariantID = (string) $benefit->VID;
 
         $this->isOpen = true;
     }
@@ -113,34 +119,41 @@ class BenefitsList extends Component
         if ($this->benefit_id && ! $this->canUpdate) {
             return;
         }
+
         if (! $this->benefit_id && ! $this->canCreate) {
             return;
         }
 
-        $this->validate();
+        $validated = $this->validate();
 
         if ($this->benefit_id) {
             $benefit = Benefit::findOrFail($this->benefit_id);
+
             $benefit->update([
-                'name' => $this->name,
-                'details' => $this->details,
-                'amount' => $this->amount,
-                'holdertype' => $this->holdertype,
-                'status' => $this->status,
+                'name' => $validated['name'],
+                'details' => $validated['details'] ?? null,
+                'VID' => $validated['benefitVariantID'],
+                'amount' => $validated['amount'],
+                'holdertype' => $validated['holdertype'],
+                'status' => $validated['status'],
             ]);
+
             $message = 'Benefit successfully updated!';
         } else {
             Benefit::create([
-                'name' => $this->name,
-                'details' => $this->details,
-                'amount' => $this->amount,
-                'holdertype' => $this->holdertype,
-                'status' => $this->status,
+                'name' => $validated['name'],
+                'details' => $validated['details'] ?? null,
+                'VID' => $validated['benefitVariantID'],
+                'amount' => $validated['amount'],
+                'holdertype' => $validated['holdertype'],
+                'status' => $validated['status'],
             ]);
+
             $message = 'Benefit successfully created!';
         }
 
         $this->closeModal();
+
         session()->flash('message', $message);
     }
 
