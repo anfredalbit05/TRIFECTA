@@ -85,6 +85,7 @@ class ReceiptController extends Controller
  * Download the currently authenticated member's latest approved
  * acknowledgement receipt.
  */
+
 public function memberDownload(): StreamedResponse
 {
     abort_unless(Auth::check(), 403);
@@ -92,7 +93,7 @@ public function memberDownload(): StreamedResponse
     /** @var User $user */
     $user = Auth::user();
 
-    // Only use the member's latest approved activation.
+    // Get this member's latest approved activation.
     $approved = Activation::where('UserID', $user->UserID)
         ->where('status', 'Approved')
         ->whereNotNull('receipt_number')
@@ -105,15 +106,14 @@ public function memberDownload(): StreamedResponse
             'amount',
         ]);
 
-    abort_unless($approved, 404, 'No approved activation receipt is available.');
+    abort_unless(
+        $approved,
+        404,
+        'No approved activation receipt is available.'
+    );
 
+    // Use the amount stored on this specific activation.
     $amount = (float) $approved->amount;
-
-    // No approved activation = no receipt.
-    abort_unless($approved, 404, 'No approved activation receipt is available.');
-
-    // Same membership amount used by the approval process.
-    $amount = (float) MembershipFee::sum('Cost');
 
     $path = app(AcknowledgementReceiptService::class)->generate(
         $user,
@@ -129,7 +129,9 @@ public function memberDownload(): StreamedResponse
 
     Log::info('Member downloaded acknowledgement receipt.', [
         'member_UserID' => $user->UserID,
+        'activation_id' => $approved->ActivationID,
         'receipt_number' => $approved->receipt_number,
+        'amount' => $amount,
     ]);
 
     $filename = 'Acknowledgement-Receipt-'
@@ -149,4 +151,5 @@ public function memberDownload(): StreamedResponse
         'Content-Type' => 'image/jpeg',
     ]);
 }
+
 }
