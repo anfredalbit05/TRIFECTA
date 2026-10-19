@@ -40,10 +40,13 @@
                     <span>Activity</span>
                 </a> --}}
 
+                 @if(auth()->user()->RoleID == 1 || auth()->user()->RoleID == 4)
                 <a href="#" @click.prevent="tab='certificate'" :class="{active:tab==='certificate'}">
                     <span class="my-profile-tab-icon">▣</span>
                     <span>Certificate</span>
                 </a>
+                @endif
+
 
             </div>
 
@@ -68,9 +71,11 @@
             <livewire:member-pages.my-profile.activity />
         </div>
 
+        @if(auth()->user()->RoleID == 1 || auth()->user()->RoleID == 4)
         <div x-show="tab==='certificate'" x-cloak class="my-profile-main-card">
             <livewire:member-pages.my-profile.certificate />
         </div>
+        @endif
 
     </main>
 
