@@ -5,16 +5,16 @@ namespace App\Livewire\AdminPages\ReportSettings;
 use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Ledger;
 use App\Models\User;
-use App\Models\Wallet;
 use App\Support\Modules;
 use Carbon\Carbon;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class SalesConsultantReport extends Component
 {
-    use AuthorizesModules;
-    use WithPagination;
+    use AuthorizesModules, WithPagination;
 
     protected function module(): int
     {
@@ -24,15 +24,11 @@ class SalesConsultantReport extends Component
     protected $paginationTheme = 'tailwind';
 
     public string $search = '';
-
     public string $roleFilter = '';
-
     public string $statusFilter = '';
-
-    public string $dateRange = ''; // e.g. "2026-08-01 to 2026-08-16"
+    public string $dateRange = '';
 
     public ?int $selectedUserLedgerID = null;
-
     public bool $isLedgerModalOpen = false;
 
     protected $queryString = [
@@ -42,25 +38,15 @@ class SalesConsultantReport extends Component
         'dateRange' => ['except' => ''],
     ];
 
-    public function mount()
+    public function mount(): void
     {
-        $this->dateRange = '';
+        // Keep a date range supplied through the URL, if any.
     }
 
-    public function updatingSearch()
-    {
-        $this->resetPage();
-    }
-
-    public function updatingRoleFilter()
-    {
-        $this->resetPage();
-    }
-
-    public function updatingStatusFilter()
-    {
-        $this->resetPage();
-    }
+    public function updatingSearch(): void { $this->resetPage(); }
+    public function updatingRoleFilter(): void { $this->resetPage(); }
+    public function updatingStatusFilter(): void { $this->resetPage(); }
+    public function updatedDateRange(): void { $this->resetPage(); }
 
     protected function parsedDateRange(): array
     {
@@ -73,11 +59,6 @@ class SalesConsultantReport extends Component
         return [trim($from) ?: null, trim($to) ?: null];
     }
 
-    public function updatedDateRange()
-    {
-        $this->resetPage();
-    }
-
     public function clearDateFilter(): void
     {
         $this->dateRange = '';
@@ -87,244 +68,139 @@ class SalesConsultantReport extends Component
 
     public function resetTable(): void
     {
-        $this->search = '';
-        $this->roleFilter = '';
-        $this->statusFilter = '';
-        $this->dateRange = '';
+        $this->reset(['search', 'roleFilter', 'statusFilter', 'dateRange']);
         $this->resetPage();
         $this->dispatch('ranges-reset');
     }
 
-    public function viewLedger(int $userId)
+    public function viewLedger(int $userId): void
     {
         $this->selectedUserLedgerID = $userId;
         $this->isLedgerModalOpen = true;
     }
 
-    public function closeLedgerModal()
+    public function closeLedgerModal(): void
     {
-        $this->isLedgerModalOpen = false;
-        $this->selectedUserLedgerID = null;
+        $this->reset(['isLedgerModalOpen', 'selectedUserLedgerID']);
     }
 
     /**
-     * Shared filtered query so the paginated table and the print export
-     * always reflect identical search/role/status/date filters.
+     * Daily totals for RoleID 4. The date filter is applied before the
+     * running total, so a selected range starts its balance at that range.
      */
- protected function baseQuery()
-{
-    [$dateFrom, $dateTo] = $this->parsedDateRange();
+    protected function dailyLedgerQuery(): Builder
+    {
+        [$dateFrom, $dateTo] = $this->parsedDateRange();
 
-    return User::with(['role', 'wallets' => fn ($q) => $q->where('status', 'Active')])
-     ->whereHas('wallets', fn ($q) => $q->where('status', 'Active'))
-        ->when($this->search, function ($query) {
-            $query->where(function ($q) {
-                $q->where('firstname', 'like', '%'.$this->search.'%')
-                    ->orWhere('lastname', 'like', '%'.$this->search.'%')
-                    ->orWhere('email', 'like', '%'.$this->search.'%')
-                    ->orWhere('referralCode', 'like', '%'.$this->search.'%');
-            });
-        })
-
-
-
-        ->when($this->roleFilter, fn ($query) => $query->where('RoleID', $this->roleFilter))
-        ->when($this->statusFilter, fn ($query) => $query->where('status', $this->statusFilter))
-        // date range now applies to the withdrawal date
-        ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
-            $query->whereHas('wallets', function ($w) use ($dateFrom, $dateTo) {
-                $w->where('status', 'Active')
-                    ->where('source', 'WD')
-                    ->whereBetween('created_at', [
-                        Carbon::parse($dateFrom)->startOfDay(),
-                        Carbon::parse($dateTo)->endOfDay(),
-                    ]);
-            });
-        });
-}
-
-
-/**
- * Build report rows per ActivationID.
- *
- * DR, PF, and OV are calculated separately for each activation.
- * Withdrawals remain individual entries.
- */
-protected function buildRows($users)
-{
-    [$dateFrom, $dateTo] = $this->parsedDateRange();
-
-    $from = $dateFrom
-        ? Carbon::parse($dateFrom)->startOfDay()
-        : null;
-
-    $to = $dateTo
-        ? Carbon::parse($dateTo)->endOfDay()
-        : null;
-
-    return $users->flatMap(function (User $user) use ($from, $to) {
-        $wallets = $user->wallets->where('status', 'Active');
-
-        // Commission wallets grouped by ActivationID.
-        $commissionGroups = $wallets
-            ->whereIn('source', ['DR', 'PF', 'OV'])
-            ->groupBy(function ($wallet) {
-                // Avoid combining unrelated wallets whose ActivationID is null.
-                return $wallet->ActivationID !== null
-                    ? 'activation_'.$wallet->ActivationID
-                    : 'wallet_'.$wallet->WalletID;
-            });
-
-        // Keep withdrawals as individual records.
-        $withdrawals = $wallets
-            ->where('source', 'WD')
-            ->filter(function ($wallet) use ($from, $to) {
-                if (! $from || ! $to) {
-                    return true;
-                }
-
-                return $wallet->created_at
-                    && $wallet->created_at->between($from, $to);
+        return DB::table('wallets as w')
+            ->join('users as u', 'u.UserID', '=', 'w.UserID')
+            ->join('roles as r', 'r.RoleID', '=', 'u.RoleID')
+            ->where('u.RoleID', 4)
+            ->whereIn('w.source', ['DR', 'PF', 'CS', 'SDR', 'WD'])
+            ->when($this->search !== '', function (Builder $q) {
+                $term = '%'.$this->search.'%';
+                $q->where(function (Builder $sub) use ($term) {
+                    $sub->where('u.firstname', 'like', $term)
+                        ->orWhere('u.lastname', 'like', $term)
+                        ->orWhere('u.middlename', 'like', $term)
+                        ->orWhere('u.email', 'like', $term)
+                        ->orWhere('u.referralCode', 'like', $term);
+                });
             })
-            ->sortByDesc('created_at')
-            ->values();
+            ->when($this->statusFilter !== '', fn (Builder $q) => $q->where('u.status', $this->statusFilter))
+            // The report is restricted to RoleID 4, so only accept that role filter.
+            ->when($this->roleFilter !== '', fn (Builder $q) => $q->where('u.RoleID', $this->roleFilter))
+            ->when($dateFrom && $dateTo, fn (Builder $q) => $q->whereBetween('w.created_at', [
+                Carbon::parse($dateFrom)->startOfDay(),
+                Carbon::parse($dateTo)->endOfDay(),
+            ]))
+            ->selectRaw('DATE(w.created_at) as created_date')
+            ->addSelect([
+                'u.UserID',
+                'u.referralCode',
+                'u.lastname',
+                'u.firstname',
+                'u.middlename',
+                'r.rolename',
+            ])
+            ->selectRaw("CONCAT(IFNULL(u.lastname, ''), ', ', IFNULL(u.firstname, ''), ' ', IFNULL(u.middlename, '')) as name")
+            ->selectRaw("SUM(CASE WHEN w.source = 'DR' THEN w.amount ELSE 0 END) as DR")
+            ->selectRaw("SUM(CASE WHEN w.source = 'PF' THEN w.amount ELSE 0 END) as PF")
+            ->selectRaw("SUM(CASE WHEN w.source = 'CS' THEN w.amount ELSE 0 END) as CS")
+            ->selectRaw("SUM(CASE WHEN w.source = 'SDR' THEN w.amount ELSE 0 END) as SDR")
+            ->selectRaw("SUM(CASE WHEN w.source = 'WD' THEN w.amount ELSE 0 END) as WD")
+            ->selectRaw('SUM(w.amount) as TOTAL')
+            ->groupBy(
+                DB::raw('DATE(w.created_at)'),
+                'u.UserID',
+                'u.referralCode',
+                'u.lastname',
+                'u.firstname',
+                'u.middlename',
+                'r.rolename'
+            );
+    }
 
-        $rows = collect();
+    protected function reportQuery(): Builder
+    {
+        $daily = $this->dailyLedgerQuery();
 
-        // One commission row per activation.
-        foreach ($commissionGroups as $group) {
-            $firstWallet = $group->first();
+        return DB::query()
+            ->fromSub($daily, 'daily_ledger')
+            ->select('daily_ledger.*')
+            ->selectRaw(
+                'SUM(TOTAL) OVER (
+                    PARTITION BY UserID
+                    ORDER BY created_date ASC
+                    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                ) as RUNNING_BALANCE'
+            );
+    }
 
-            $dr = (float) $group
-                ->where('source', 'DR')
-                ->sum('amount');
+    public function render()
+    {
+        [$dateFrom, $dateTo] = $this->parsedDateRange();
 
-            $pf = (float) $group
-                ->where('source', 'PF')
-                ->sum('amount');
+        $query = $this->reportQuery();
 
-            $ov = (float) $group
-                ->where('source', 'OV')
-                ->sum('amount');
-                $latestDate = $group
-                    ->pluck('created_at')
-                    ->filter()
-                    ->sortDesc()
-                    ->first();
+        $rows = (clone $query)
+            ->orderBy('name')
+            ->orderByDesc('created_date')
+            ->paginate(10);
 
-                $rows->push([
-                    'user' => $user,
-                    'activation_id' => $firstWallet->ActivationID,
-                    'first' => true,
-                    'dr' => $dr,
-                    'pf' => $pf,
-                    'ov' => $ov,
-                    'tc' => $dr + $pf + $ov,
-                    'tax' => 0,
-                    'wd' => 0,
-                    'date' => $latestDate,
-                ]);
-        }
+        $printRows = (clone $query)
+            ->orderBy('name')
+            ->orderByDesc('created_date')
+            ->get();
 
-        // One separate row per withdrawal.
-        foreach ($withdrawals as $withdrawal) {
-            $wd = abs((float) $withdrawal->amount);
+        $selectedUser = $this->selectedUserLedgerID
+            ? User::with(['role', 'wallets', 'ledgers'])
+                ->where('RoleID', 4)
+                ->find($this->selectedUserLedgerID)
+            : null;
 
-            $rows->push([
-                'user' => $user,
-                'activation_id' => $withdrawal->ActivationID,
-                'first' => false,
-                'dr' => 0,
-                'pf' => 0,
-                'ov' => 0,
-                'tc' => 0,
-                'tax' => round($wd * 0.10, 2),
-                'wd' => $wd,
-                'date' => $withdrawal->created_at,
-            ]);
-        }
+        $prizeLedgers = $selectedUser
+            ? Ledger::with('draw')
+                ->where('Source', 'PK')
+                ->where('RefID', (string) $selectedUser->UserID)
+                ->orderBy('TransactionID')
+                ->get()
+            : collect();
 
-        // Preserve users that have neither commission nor withdrawal records.
-        if ($rows->isEmpty()) {
-            $rows->push([
-                'user' => $user,
-                'activation_id' => null,
-                'first' => true,
-                'dr' => 0,
-                'pf' => 0,
-                'ov' => 0,
-                'tc' => 0,
-                'tax' => 0,
-                'wd' => 0,
-                'date' => null,
-            ]);
-        }
+        $statementLedgers = $selectedUser
+            ? $selectedUser->ledgers->concat($prizeLedgers)
+                ->sortBy('TransactionID')->values()
+            : collect();
 
-        return $rows;
-    })->values();
-}
-
-
-public function render()
-{
-    [$dateFrom, $dateTo] = $this->parsedDateRange();
-
-    $allUsers = (clone $this->baseQuery())
-        ->latest('UserID')
-        ->get();
-
-    $allRows = $this->buildRows($allUsers)
-    ->sortByDesc(function ($row) {
-        return $row['date'] ?? null;
-    })
-    ->values();
-
-    // Paginate the generated report rows, not the users.
-    $perPage = 10;
-    $currentPage = $this->getPage();
-
-    $rows = new \Illuminate\Pagination\LengthAwarePaginator(
-        $allRows->forPage($currentPage, $perPage)->values(),
-        $allRows->count(),
-        $perPage,
-        $currentPage,
-        [
-            'path' => request()->url(),
-            'query' => request()->query(),
-            'pageName' => 'page',
-        ]
-    );
-
-    $printRows = $allRows;
-
-    $selectedUser = $this->selectedUserLedgerID
-        ? User::with(['wallets', 'ledgers'])->find($this->selectedUserLedgerID)
-        : null;
-
-    $prizeLedgers = $selectedUser
-        ? Ledger::with('draw')
-            ->where('Source', 'PK')
-            ->where('RefID', (string) $selectedUser->UserID)
-            ->orderBy('TransactionID')
-            ->get()
-        : collect();
-
-    $statementLedgers = $selectedUser
-        ? $selectedUser->ledgers
-            ->concat($prizeLedgers)
-            ->sortBy(fn (Ledger $ledger) => $ledger->TransactionID)
-            ->values()
-        : collect();
-
-    return view('livewire.admin-pages.report-settings.sales-consultant-report', [
-        'rows' => $rows,
-        'printRows' => $printRows,
-        'selectedUser' => $selectedUser,
-        'prizeLedgers' => $prizeLedgers,
-        'statementLedgers' => $statementLedgers,
-        'dateRangeLabel' => $dateFrom && $dateTo
-            ? Carbon::parse($dateFrom)->format('M d, Y').' — '.Carbon::parse($dateTo)->format('M d, Y')
-            : 'All Time',
-    ]);
-}
+        return view('livewire.admin-pages.report-settings.sales-consultant-report', [
+            'rows' => $rows,
+            'printRows' => $printRows,
+            'selectedUser' => $selectedUser,
+            'prizeLedgers' => $prizeLedgers,
+            'statementLedgers' => $statementLedgers,
+            'dateRangeLabel' => $dateFrom && $dateTo
+                ? Carbon::parse($dateFrom)->format('M d, Y').' — '.Carbon::parse($dateTo)->format('M d, Y')
+                : 'All Time',
+        ]);
+    }
 }
