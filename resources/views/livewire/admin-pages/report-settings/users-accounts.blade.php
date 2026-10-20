@@ -168,7 +168,7 @@
                         </td>
 
                         <td class="py-4 px-4 font-bold text-[#0B2A5B]">
-                            ₱{{ number_format($total, 2) }}
+                            ₱{{ number_format($total - (-$walletWD), 2) }}
                         </td>
 
                         <td class="py-4 px-4">
