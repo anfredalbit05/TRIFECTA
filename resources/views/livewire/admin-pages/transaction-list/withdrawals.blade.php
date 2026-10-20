@@ -84,6 +84,7 @@
                         <th>Member</th>
                         <th>Type</th>
                         <th>Requested</th>
+                        <th>Tax 10%</th>
                         <th>Net Paid</th>
                         <th>Method</th>
                         <th>Reference</th>
@@ -102,6 +103,7 @@
                             </td>
                             <td data-label="Type">{{ $w->type ?: '—' }}</td>
                             <td data-label="Requested" class="txn-amount">₱{{ number_format((float) $w->requested_amount, 2) }}</td>
+                            <td data-label="Tax" class="txn-amount">₱{{ number_format((float) - $w->tax_amount, 2) }}</td>
                             <td data-label="Net Paid" class="txn-amount">₱{{ number_format((float) $w->amount, 2) }}</td>
                             <td data-label="Method">{{ $w->withdrawal_method ?: '—' }}</td>
                             <td data-label="Reference">{{ $w->payment_reference ?: '—' }}</td>

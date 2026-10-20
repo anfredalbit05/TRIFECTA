@@ -238,4 +238,9 @@ class User extends Authenticatable implements PasskeyUser
         return $this->hasMany(Withdrawal::class, 'UserID', 'UserID');
     }
 
+        public function user()
+    {
+        return $this->belongsTo(User::class, 'UserID', 'UserID');
+    }
+
 }

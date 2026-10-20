@@ -139,7 +139,8 @@
                     <th class="au-th">Name</th>
                     <th class="au-th">Username</th>
                     <th class="au-th">Contact</th>
-                    <th class="au-th">Gender</th>
+                    <th class="au-th">Position</th>
+                    <th class="au-th">Branch</th>
                     <th class="au-th">Birthday</th>
                     <th class="au-th">Status</th>
                     <th class="au-th">Role ID</th>
@@ -157,7 +158,9 @@
                         </td>
                         <td class="au-td">{{ $user->username }}</td>
                         <td class="au-td">{{ $user->contactno ?? '-' }}</td>
-                        <td class="au-td">{{ $user->gender ?? '-' }}</td>
+                        <td class="au-td">{{ $user->position ?? '-' }}</td>
+
+                        <td class="au-td">{{ $branchNames[$user->branchCode] ?? '-' }}</td>
                         <td class="au-td">
                             {{ $user->birthdate ? \Carbon\Carbon::parse($user->birthdate)->format('F d, Y') : '-' }}
                         </td>
@@ -269,7 +272,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ $this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate ? 9 : 8 }}"
+                        <td colspan="{{ $this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate ? 10 : 9 }}"
                             class="au-empty">
                             No users found.
                         </td>
@@ -696,6 +699,10 @@
                                 <span class="au-detail-value">{{ $this->selectedUser->position ?? '-' }}</span>
                             </div>
                             <div class="au-detail-item">
+                                <span class="au-detail-label">Branch</span>
+                                <span class="au-detail-value">{{ $branchNames[$this->selectedUser->branchCode] ?? '-' }}</span>
+                            </div>
+                            <div class="au-detail-item">
                                 <span class="au-detail-label">Referral
                                     Code</span>
                                 <span class="au-detail-value font-mono">{{ $this->selectedUser->referralCode ?? '-' }}</span>
@@ -978,17 +985,13 @@
 
                               <div>
                                 <label class="au-form-label">Branches</label>
-                                <select wire:model="branches"
-                                    class="au-form-select">
-
+                                <select wire:model="branch" class="au-form-select">
                                     <option value="">Select Branch</option>
-                                    @foreach (\App\Models\Branch::all() as $branch)
-                                    <option value="{{ $branch->BranchID }}">{{ $branch->branchname }}</option>
+                                    @foreach ($this->branches as $branchOption)
+                                        <option value="{{ $branchOption->BranchID }}">{{ $branchOption->branchname }}</option>
                                     @endforeach
-
-
                                 </select>
-                                @error('branches')
+                                @error('branch')
                                     <span class="au-form-error">{{ $message }}</span>
                                 @enderror
                             </div>

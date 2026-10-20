@@ -127,13 +127,12 @@
                 @forelse($users as $index => $user)
                     @php
                         $walletDR = $user->wallets->where('status', 'Active')->where('source', 'DR')->sum('amount');
-                        $providentFund = $user->wallets
-                            ->where('status', 'Active')
-                            ->where('source', 'PF')
-                            ->sum('amount');
+                        $providentFund = $user->wallets->where('status', 'Active')->where('source', 'PF')->sum('amount');
                         $walletOV = $user->wallets->where('status', 'Active')->where('source', 'OV')->sum('amount');
                         $walletWD = $user->wallets->where('status', 'Active')->where('source', 'WD')->sum('amount');
                         $ledgerFund = $user->ledgers->sum('amount');
+                        $total = $providentFund + $walletOV + $walletDR;
+
                     @endphp
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="py-4 px-4 font-medium text-slate-500">
@@ -169,7 +168,7 @@
                         </td>
 
                         <td class="py-4 px-4 font-bold text-[#0B2A5B]">
-                            ₱{{ number_format($walletDR + $providentFund + $walletOV - $walletWD, 2) }}
+                            ₱{{ number_format($total, 2) }}
                         </td>
 
                         <td class="py-4 px-4">

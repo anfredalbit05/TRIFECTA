@@ -11,6 +11,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
+use App\Models\Branch;
 use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -85,6 +86,8 @@ class AdminUsers extends Component
     public string $status = 'Inactive';
 
     public string $RoleID = '';
+
+    public string $branch = '';
 
     public string $position = '';
 
@@ -231,7 +234,9 @@ class AdminUsers extends Component
             'address',
             'status',
             'RoleID',
+            'branch',
             'position',
+            'customPosition',
             'selectedUserId',
         ]);
 
@@ -284,6 +289,7 @@ class AdminUsers extends Component
             'position' => $this->getPositionValue() ?? 'client',
             'status' => $this->status,
             'referralCode' => $this->generateUplineCode(),
+            'branchCode' => $this->branch !== '' ? $this->branch : null,
         ]);
 
         session()->flash(
@@ -295,6 +301,11 @@ class AdminUsers extends Component
 
         $this->status = 'Active';
         $this->isAddModalOpen = false;
+    }
+
+    public function getBranchesProperty()
+    {
+        return Branch::orderBy('branchname')->get(['BranchID', 'branchname']);
     }
 
     public function editUser(User $user): void
@@ -318,6 +329,9 @@ class AdminUsers extends Component
         $this->address = $user->address ?? '';
         $this->status = $user->status ?? 'Inactive';
         $this->RoleID = $user->RoleID ?? '';
+
+        $this->branch = (string) ($user->branchCode ?? '');
+
         $this->position = $user->position ?? '';
         $this->customPosition = '';
         $this->positionMode = 'select';
@@ -352,6 +366,8 @@ class AdminUsers extends Component
             'customPosition' => 'nullable|string|max:255|required_if:positionMode,custom',
 
             'status' => 'required|in:Active,Inactive,Suspended',
+
+            'branch' => 'nullable',
         ]);
 
         $user = User::find($this->selectedUserId);
@@ -398,6 +414,8 @@ class AdminUsers extends Component
             'RoleID' => $this->RoleID,
 
             'position' => $this->getPositionValue(),
+
+            'branchCode' => $this->branch,
         ]);
 
         Log::info(
@@ -1405,6 +1423,8 @@ class AdminUsers extends Component
                 'users' => $users,
 
                 'isWithdrawalActive' => $this->isWithdrawalActive(),
+
+                 'branchNames' => Branch::pluck('branchname', 'BranchID'),
             ]
         );
     }

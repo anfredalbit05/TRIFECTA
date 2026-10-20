@@ -65,6 +65,15 @@
                 </a>
             @endif
 
+            @if(in_array(auth()->user()->RoleID, [1,2,]))
+                <a href="#"
+                   @click.prevent="tab='sales'"
+                   :class="{ active: tab==='sales' }">
+                    <span class="report-settings-tab-icon">▤</span>
+                    <span>Sales Consultant Report</span>
+                </a>
+            @endif
+
         </div>
 
         <div x-show="tab==='overview'" x-cloak class="report-settings-main-card">
@@ -80,6 +89,12 @@
         <div x-show="tab==='reports'" x-cloak class="report-settings-main-card">
             <livewire:admin-pages.report-settings.reports />
         </div>
+
+
+        <div x-show="tab==='sales'" x-cloak class="report-settings-main-card">
+            <livewire:admin-pages.report-settings.sales-consultant-report />
+        </div>
+
 
         @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
             <div x-show="tab==='pangkabuhayan'" x-cloak class="report-settings-main-card">
