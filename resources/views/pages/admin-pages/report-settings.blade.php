@@ -65,7 +65,7 @@
                 </a>
             @endif
 
-            @if(in_array(auth()->user()->RoleID, [1,2,]))
+            @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
                 <a href="#"
                    @click.prevent="tab='sales'"
                    :class="{ active: tab==='sales' }">
