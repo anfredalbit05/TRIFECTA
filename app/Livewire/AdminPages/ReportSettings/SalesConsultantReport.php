@@ -173,6 +173,8 @@ class SalesConsultantReport extends Component
             ->orderByDesc('created_date')
             ->get();
 
+        //Update lang sa live
+
         $selectedUser = $this->selectedUserLedgerID
             ? User::with(['role', 'wallets', 'ledgers'])
                 ->where('RoleID', 4)
