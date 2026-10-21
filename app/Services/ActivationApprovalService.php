@@ -724,27 +724,59 @@ class ActivationApprovalService
                 break;
             }
 
+
             $ovAmount = self::OV_RATES[$level] ?? 0;
 
+            $netOV = round($ovAmount * 0.90, 2);
+            $txAmount = round($ovAmount * 0.10, 2);
+
             if ($ovAmount > 0) {
+                // OV ledger: deduct 10% from the original OV amount.
                 Ledger::create([
                     'RefID' => $user->UserID,
-
-                    // Keep the same sign convention as createOV().
-                    'amount' => -$ovAmount,
-
+                    'amount' => -$netOV,
                     'Source' => 'OV',
                     'ActivationID' => $activation->ActivationID,
                     'status' => 'Pending',
                 ]);
 
-                Log::info('Pending free member OV ledger created.', [
+                // TX ledger: the same upline receives the separate TX entry.
+                if ($txAmount > 0) {
+                    Ledger::create([
+                        'RefID' => $user->UserID,
+                        'amount' => $txAmount,
+                        'Source' => 'TX',
+                        'ActivationID' => $activation->ActivationID,
+                        'status' => 'Pending',
+                    ]);
+                }
+
+                Log::info('Pending free member OV and TX ledgers created.', [
                     'ActivationID' => $activation->ActivationID,
                     'UserID' => $user->UserID,
                     'level' => $level,
-                    'amount' => $ovAmount,
+                    'original_OV' => $ovAmount,
+                    'net_OV' => $netOV,
+                    'TX' => $txAmount,
                 ]);
             }
+
+    /*
+        |--------------------------------------------------------------------------
+        | TX
+        |--------------------------------------------------------------------------
+        */
+
+        if ($txAmount > 0) {
+
+            Ledger::create([
+                'RefID' => $referralUser->UserID,
+                'amount' => $txAmount,
+                'Source' => 'TX',
+                'ActivationID' => $activation->ActivationID,
+                'status' => 'Pending',
+            ]);
+        }
 
             $code = trim((string) $user->uplineCode);
             $level++;
@@ -1246,67 +1278,58 @@ class ActivationApprovalService
     | CREATE OV WALLET + LEDGER
     |--------------------------------------------------------------------------
     */
+
     private function createOV(
         int $userID,
         int $activationID,
         int $level,
         float $amount
     ): void {
-        Log::info('>>> OV WALLET INSERT START', [
-            'UserID' => $userID,
-            'ActivationID' => $activationID,
-            'level' => $level,
-            'amount' => $amount,
-        ]);
+        // Deduct 10% TX from the original OV commission.
+        $ovAmount = round($amount * 0.90, 2);
+        $txAmount = round($amount * 0.10, 2);
 
-        try {
-            $wallet = Wallet::create([
+        // OV wallet receives only 90%.
+        if ($ovAmount > 0) {
+            Wallet::create([
                 'UserID' => $userID,
                 'ActivationID' => $activationID,
-                'amount' => $amount,
+                'amount' => $ovAmount,
                 'source' => 'OV',
                 'status' => 'Active',
             ]);
 
-            Log::info('>>> OV WALLET INSERT SUCCESS', [
-                'WalletID' => $wallet->getKey(),
-                'UserID' => $userID,
-                'ActivationID' => $activationID,
-                'level' => $level,
-                'amount' => $amount,
-            ]);
-
-            $ledger = Ledger::create([
+            // Negative ledger amount follows the existing OV convention.
+            Ledger::create([
                 'RefID' => $userID,
-                'amount' => -$amount,
+                'amount' => -$ovAmount,
                 'Source' => 'OV',
                 'ActivationID' => $activationID,
                 'status' => 'Completed',
             ]);
-
-            Log::info('>>> OV LEDGER INSERT SUCCESS', [
-                'LedgerID' => $ledger->getKey(),
-                'RefID' => $userID,
-                'ActivationID' => $activationID,
-                'level' => $level,
-                'amount' => -$amount,
-            ]);
-
-        } catch (\Throwable $e) {
-
-            Log::error('>>> OV INSERT FAILED', [
-                'UserID' => $userID,
-                'ActivationID' => $activationID,
-                'level' => $level,
-                'amount' => $amount,
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ]);
-
-            throw $e;
         }
+
+        // Record the deducted 10% as a separate TX ledger entry.
+        if ($txAmount > 0) {
+            Ledger::create([
+                'RefID' => $userID,
+                'amount' => $txAmount,
+                'Source' => 'TX',
+                'ActivationID' => $activationID,
+                'status' => 'Completed',
+            ]);
+        }
+
+        Log::info('OV and TX ledgers created.', [
+            'UserID' => $userID,
+            'ActivationID' => $activationID,
+            'level' => $level,
+            'original_OV' => $amount,
+            'net_OV' => $ovAmount,
+            'TX' => $txAmount,
+        ]);
     }
+
 
     /*
     |--------------------------------------------------------------------------

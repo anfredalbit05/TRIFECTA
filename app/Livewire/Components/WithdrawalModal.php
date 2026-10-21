@@ -374,7 +374,7 @@ class WithdrawalModal extends Component
             |--------------------------------------------------------------------------
             */
 
-            $taxExemptRoles = [5, 6, 7, 9];
+            $taxExemptRoles = [1,2,3,4,5,6,7,8,9];
 
             $taxAmount = in_array((int) $user->RoleID, $taxExemptRoles, true)
                 ? 0.00
@@ -388,8 +388,8 @@ class WithdrawalModal extends Component
             |--------------------------------------------------------------------------
             */
 
+            $netAmount = $requestedAmount;
             $netAmount = round($requestedAmount - $taxAmount, 2);
-
             /*
             |--------------------------------------------------------------------------
             | WHO CREATED THE WITHDRAWAL
@@ -405,8 +405,9 @@ class WithdrawalModal extends Component
             DB::transaction(function () use (
                 $userID,
                 $processedBy,
-                $requestedAmount,
                 $taxAmount,
+                $requestedAmount,
+
                 $netAmount
             ) {
 
@@ -530,7 +531,7 @@ class WithdrawalModal extends Component
             $this->dispatch(
                 'withdrawal-submitted',
                 amount: number_format($requestedAmount, 2),
-                taxAmount: number_format($taxAmount, 2),
+                // taxAmount: number_format($taxAmount, 2),
                 netAmount: number_format($netAmount, 2)
             );
 
