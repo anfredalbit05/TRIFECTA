@@ -54,14 +54,28 @@
                 @endif
             </div>
 
+
             <div class="mobile-profile-info">
                 <span class="mobile-profile-name">
-                    {{ $user?->firstname ?? 'Member' }} {{ $user?->lastname ?? '' }}
+                    {{ $user?->firstname ?? 'Member' }}
+                    {{ $user?->lastname ?? '' }}
                 </span>
-                <span class="mobile-profile-status">
-                    {{ $user?->status ?? 'Inactive' }} Member
-                </span>
+
+                @if ($user?->RoleID == 4)
+                    <span class="mobile-profile-status">
+                        {{ $user?->status ?? 'Inactive' }} Member
+                    </span>
+                @elseif ($user?->RoleID == 8)
+                    <span class="mobile-profile-status">
+                        {{ $user?->status ?? 'Inactive' }} Satellite Member
+                    </span>
+                @elseif ($user)
+                    <span class="mobile-profile-status">
+                        {{ $user->status ?? 'Inactive' }} - {{ $user->position ?? '--' }}
+                    </span>
+                @endif
             </div>
+
         </a>
 
         <a href="{{ route('home') }}" class="mobile-truelife">
@@ -79,28 +93,40 @@
         <div class="sidebar-content">
             <div class="profile-card sidebar-scroll">
 
-                {{-- PROFILE --}}
-                <div class="profile-section">
-                    <div class="profile-image-box">
-                        @if (!$profilePic || $profilePic === $defaultAvatar)
-                            <img src="{{ asset($defaultAvatar) }}" class="profile-image" alt="Default profile picture">
-                        @else
-                            <img
-                                src="{{ Str::startsWith($profilePic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic) }}"
-                                class="profile-image"
-                                alt="Profile picture">
-                        @endif
-                    </div>
+            {{-- DESKTOP PROFILE STATUS --}}
+            <div class="profile-section">
+                <div class="profile-image-box">
+                    @if (!$profilePic || $profilePic === $defaultAvatar)
+                        <img src="{{ asset($defaultAvatar) }}"
+                            class="profile-image"
+                            alt="Default profile picture">
+                    @else
+                        <img
+                            src="{{ Str::startsWith($profilePic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic) }}"
+                            class="profile-image"
+                            alt="Profile picture">
+                    @endif
+                </div>
 
-                    <h2 class="profile-name">
-                        <span>{{ $user?->firstname ?? 'Member' }}</span>
-                        <span>{{ $user?->lastname ?? '' }}</span>
-                    </h2>
+                <h2 class="profile-name">
+                    <span>{{ $user?->firstname ?? 'Member' }}</span>
+                    <span>{{ $user?->lastname ?? '' }}</span>
+                </h2>
 
+                @if ($user?->RoleID == 4)
                     <p class="profile-status">
                         {{ $user?->status ?? 'Inactive' }} Member
                     </p>
-                </div>
+                @elseif ($user?->RoleID == 8)
+                    <p class="profile-status">
+                        {{ $user?->status ?? 'Inactive' }} Satellite Member
+                    </p>
+                @elseif ($user)
+                    <p class="profile-status">
+                        {{ $user->status ?? 'Inactive' }} - {{ $user->position ?? '--' }}
+                    </p>
+                @endif
+            </div>
 
                 {{-- DESKTOP MENU --}}
                 <nav class="menu-list">
