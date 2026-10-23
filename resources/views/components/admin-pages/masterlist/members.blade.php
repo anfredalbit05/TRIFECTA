@@ -208,6 +208,7 @@
                                     {{ $member->middlename }}
                                     {{ $member->lastname }}
                                 </div>
+                            <small class="text-slate-400 ">  {{ $member->referralCode }} </small>
 
                             </td>
 
