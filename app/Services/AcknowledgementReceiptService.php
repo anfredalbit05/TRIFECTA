@@ -192,7 +192,7 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
                     $image,
                     (string) $cashierName,
                     530,
-                    772,
+                    760,
                     18, // slightly larger
                     self::FONT_BOLD,
                     $ink,
@@ -362,25 +362,56 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
         }
 
         try {
-            if (! Storage::disk('public')->exists($storagePath)) {
-                Log::warning('Cashier signature file missing; receipt signed without signature.', [
-                    'path' => $storagePath,
-                ]);
 
-                return;
-            }
+        // Normalize the path stored in the settings table.
+        $storagePath = ltrim(str_replace('\\', '/', trim($storagePath)), '/');
 
+        // Support both storage locations:
+        // 1. storage/app/public/images/...
+        // 2. public/images/...
+        $binary = null;
+        $resolvedPath = null;
+
+        if (Storage::disk('public')->exists($storagePath)) {
             $binary = Storage::disk('public')->get($storagePath);
+            $resolvedPath = Storage::disk('public')->path($storagePath);
+        } else {
+            // Prevent paths from escaping the public/images directory.
+            $filename = basename($storagePath);
 
-            $signature = @imagecreatefromstring($binary);
+            $publicImagePath = public_path('images/' . $filename);
 
-            if ($signature === false) {
-                Log::warning('Cashier signature file could not be decoded; skipped.', [
-                    'path' => $storagePath,
-                ]);
-
-                return;
+            if (is_file($publicImagePath)) {
+                $binary = file_get_contents($publicImagePath);
+                $resolvedPath = $publicImagePath;
             }
+        }
+
+        if ($binary === null || $binary === false) {
+            Log::warning('Cashier signature file missing; receipt signed without signature.', [
+                'path' => $storagePath,
+                'storage_path' => Storage::disk('public')->path($storagePath),
+                'public_images_path' => public_path('images/' . basename($storagePath)),
+            ]);
+
+            return;
+        }
+
+        Log::info('Cashier signature loaded for receipt.', [
+            'path' => $storagePath,
+            'resolved_path' => $resolvedPath,
+        ]);
+
+        $signature = @imagecreatefromstring($binary);
+
+        if ($signature === false) {
+            Log::warning('Cashier signature file could not be decoded; skipped.', [
+                'path' => $storagePath,
+                'resolved_path' => $resolvedPath,
+            ]);
+
+            return;
+        }
 
             $srcWidth = imagesx($signature);
             $srcHeight = imagesy($signature);
