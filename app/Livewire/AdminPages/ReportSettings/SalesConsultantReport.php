@@ -96,7 +96,15 @@ class SalesConsultantReport extends Component
             ->join('users as u', 'u.UserID', '=', 'w.UserID')
             ->join('roles as r', 'r.RoleID', '=', 'u.RoleID')
             ->where('u.RoleID', 4)
-            ->whereIn('w.source', ['DR', 'PF', 'CS', 'SDR', 'WD'])
+            ->whereIn('w.source', [
+                'DR',
+                'PF',
+                'CS',
+                'SDR',
+                'WD',
+                'OV',
+                'TX',
+            ])
             ->when($this->search !== '', function (Builder $q) {
                 $term = '%'.$this->search.'%';
                 $q->where(function (Builder $sub) use ($term) {
@@ -128,6 +136,8 @@ class SalesConsultantReport extends Component
             ->selectRaw("SUM(CASE WHEN w.source = 'PF' THEN w.amount ELSE 0 END) as PF")
             ->selectRaw("SUM(CASE WHEN w.source = 'CS' THEN w.amount ELSE 0 END) as CS")
             ->selectRaw("SUM(CASE WHEN w.source = 'SDR' THEN w.amount ELSE 0 END) as SDR")
+            ->selectRaw("SUM(CASE WHEN w.source = 'OV' THEN w.amount ELSE 0 END) as OV")
+            ->selectRaw("SUM(CASE WHEN w.source = 'TX' THEN w.amount ELSE 0 END) as TX")
             ->selectRaw("SUM(CASE WHEN w.source = 'WD' THEN w.amount ELSE 0 END) as WD")
             ->selectRaw('SUM(w.amount) as TOTAL')
             ->groupBy(

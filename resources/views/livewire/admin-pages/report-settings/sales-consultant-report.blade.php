@@ -63,6 +63,8 @@
                     <th class="px-4 py-3 text-right">PF</th>
                     <th class="px-4 py-3 text-right">CS</th>
                     <th class="px-4 py-3 text-right">SDR</th>
+                    <th class="px-4 py-3 text-right">OV</th>
+                    <th class="px-4 py-3 text-right">TX</th>
                     <th class="px-4 py-3 text-right">WD</th>
                     <th class="px-4 py-3 text-right">Total</th>
                     <th class="px-4 py-3 text-right">Running Balance</th>
@@ -107,7 +109,7 @@
                                 {{ $row->rolename }}
                             </td>
 
-                            @foreach (['DR', 'PF', 'CS', 'SDR', 'WD', 'TOTAL', 'RUNNING_BALANCE'] as $field)
+                            @foreach (['DR', 'PF', 'CS', 'SDR', 'OV', 'TX', 'WD', 'TOTAL', 'RUNNING_BALANCE'] as $field)
                                 <td
                                     class="whitespace-nowrap px-4 py-3 text-right font-medium
                                 {{ in_array($field, ['TOTAL', 'RUNNING_BALANCE']) ? 'font-bold text-[#0C2C6B]' : '' }}">
@@ -208,7 +210,7 @@
         <table class="w-full border-collapse text-[10px]">
             <thead>
                 <tr class="bg-[#0C2C6B] text-white">
-                    @foreach (['Date', 'Code', 'Sales Consultant', 'Role', 'DR', 'PF', 'CS', 'SDR', 'WD', 'Total', 'Running Balance'] as $heading)
+                    @foreach (['Date', 'Code', 'Sales Consultant', 'Role', 'DR', 'PF', 'CS', 'SDR', 'OV', 'TX', 'WD', 'Total', 'Running Balance'] as $heading)
                         <th class="border border-black p-1">{{ $heading }}</th>
                     @endforeach
                 </tr>
@@ -221,7 +223,7 @@
                         <td class="border border-black p-1">{{ $row->referralCode ?: '-' }}</td>
                         <td class="border border-black p-1">{{ trim($row->name) }}</td>
                         <td class="border border-black p-1">{{ $row->rolename }}</td>
-                        @foreach (['DR', 'PF', 'CS', 'SDR', 'WD', 'TOTAL', 'RUNNING_BALANCE'] as $field)
+                        @foreach (['DR', 'PF', 'CS', 'SDR', 'OV', 'TX', 'WD', 'TOTAL', 'RUNNING_BALANCE'] as $field)
                             <td class="border border-black p-1 text-right">
                                 {{ number_format((float) $row->{$field}, 2) }}</td>
                         @endforeach
