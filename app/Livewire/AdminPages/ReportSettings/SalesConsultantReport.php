@@ -222,7 +222,6 @@ protected function dailyLedgerQueryWithoutDateFilter(): Builder
             + COALESCE(wallet_daily.SDR, 0)
             + COALESCE(wallet_daily.OV, 0)
             + COALESCE(wallet_daily.WD, 0)
-            - COALESCE(tx_ledger.tax_amount, 0)
             as TOTAL
         ")
         ->selectRaw(
