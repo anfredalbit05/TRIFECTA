@@ -140,13 +140,6 @@ protected function dailyLedgerQuery(): Builder
                 'u.RoleID',
                 $this->roleFilter
             )
-        )
-        ->when(
-            $dateFrom && $dateTo,
-            fn (Builder $q) => $q->whereBetween('w.created_at', [
-                Carbon::parse($dateFrom)->startOfDay(),
-                Carbon::parse($dateTo)->endOfDay(),
-            ])
         );
 
     /*
@@ -204,23 +197,42 @@ protected function dailyLedgerQuery(): Builder
         ->addSelect('w.WalletID as report_row_id');
 }
 
+
 protected function reportQuery(): Builder
 {
+    // Get all historical transactions without a date-range filter.
     $transactions = $this->dailyLedgerQuery();
 
-    return DB::query()
-        ->fromSub($transactions, 'daily_ledger')
-        ->select('daily_ledger.*')
-        ->selectRaw(
-            'SUM(TOTAL) OVER (
+    // Calculate the running balance using the full transaction history.
+    $running = DB::query()
+        ->fromSub($transactions, 'transactions')
+        ->select('transactions.*')
+        ->selectRaw('
+            SUM(TOTAL) OVER (
                 PARTITION BY UserID
-                ORDER BY
-                    report_created_at ASC,
-                    report_row_id ASC
+                ORDER BY report_created_at ASC, report_row_id ASC
                 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-            ) as RUNNING_BALANCE'
+            ) as RUNNING_BALANCE
+        ');
+
+    // Apply the selected date range only after calculating the balance.
+    [$dateFrom, $dateTo] = $this->parsedDateRange();
+
+    return DB::query()
+        ->fromSub($running, 'report')
+        ->select('report.*')
+        ->when(
+            $dateFrom && $dateTo,
+            fn (Builder $q) => $q->whereBetween(
+                'report.created_date',
+                [
+                    Carbon::parse($dateFrom)->toDateString(),
+                    Carbon::parse($dateTo)->toDateString(),
+                ]
+            )
         );
 }
+
 
 
     public function render()
