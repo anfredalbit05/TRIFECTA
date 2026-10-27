@@ -88,45 +88,30 @@ class SalesConsultantReport extends Component
      * Daily totals for RoleID 4. The date filter is applied before the
      * running total, so a selected range starts its balance at that range.
      */
+
 protected function dailyLedgerQuery(): Builder
 {
     [$dateFrom, $dateTo] = $this->parsedDateRange();
 
-    // Get TX amounts from the ledger, grouped by consultant and date.
+    // Group TX by consultant and exact transaction timestamp.
     $taxLedger = DB::table('ledgers as l')
         ->where('l.Source', 'TX')
-        ->selectRaw('DATE(l.created_at) as tax_date')
-        ->addSelect('l.RefID as consultant_id')
+        ->selectRaw('l.RefID as consultant_id')
+        ->addSelect('l.created_at as tax_created_at')
         ->selectRaw('SUM(ABS(l.amount)) as TX')
-        ->groupBy(
-            DB::raw('DATE(l.created_at)'),
-            'l.RefID'
-        );
+        ->groupBy('l.RefID', 'l.created_at');
 
-    return DB::table('wallets as w')
+    $baseQuery = DB::table('wallets as w')
         ->join('users as u', 'u.UserID', '=', 'w.UserID')
         ->join('roles as r', 'r.RoleID', '=', 'u.RoleID')
-
-        // Match the ledger tax to the consultant and transaction date.
         ->leftJoinSub($taxLedger, 'tx_ledger', function ($join) {
             $join->on('tx_ledger.consultant_id', '=', 'u.UserID')
-                ->on(
-                    'tx_ledger.tax_date',
-                    '=',
-                    DB::raw('DATE(w.created_at)')
-                );
+                ->on('tx_ledger.tax_created_at', '=', 'w.created_at');
         })
-
         ->where('u.RoleID', 4)
         ->whereIn('w.source', [
-            'DR',
-            'PF',
-            'CS',
-            'SDR',
-            'WD',
-            'OV',
+            'DR', 'PF', 'CS', 'SDR', 'WD', 'OV',
         ])
-
         ->when($this->search !== '', function (Builder $q) {
             $term = '%' . $this->search . '%';
 
@@ -138,31 +123,28 @@ protected function dailyLedgerQuery(): Builder
                     ->orWhere('u.referralCode', 'like', $term);
             });
         })
-
         ->when(
             $this->statusFilter !== '',
-            fn (Builder $q) => $q->where(
-                'u.status',
-                $this->statusFilter
-            )
+            fn (Builder $q) => $q->where('u.status', $this->statusFilter)
         )
-
         ->when(
             $this->roleFilter !== '',
-            fn (Builder $q) => $q->where(
-                'u.RoleID',
-                $this->roleFilter
-            )
+            fn (Builder $q) => $q->where('u.RoleID', $this->roleFilter)
         )
-
         ->when(
             $dateFrom && $dateTo,
             fn (Builder $q) => $q->whereBetween('w.created_at', [
                 Carbon::parse($dateFrom)->startOfDay(),
                 Carbon::parse($dateTo)->endOfDay(),
             ])
-        )
+        );
 
+    /*
+     * OV rows: one row per wallet record.
+     * Match TX using consultant ID + exact created_at.
+     */
+    $ovRows = (clone $baseQuery)
+        ->where('w.source', 'OV')
         ->selectRaw('DATE(w.created_at) as created_date')
         ->addSelect([
             'u.UserID',
@@ -172,7 +154,6 @@ protected function dailyLedgerQuery(): Builder
             'u.middlename',
             'r.rolename',
         ])
-
         ->selectRaw("
             CONCAT(
                 IFNULL(u.lastname, ''),
@@ -182,62 +163,50 @@ protected function dailyLedgerQuery(): Builder
                 IFNULL(u.middlename, '')
             ) as name
         ")
+        ->selectRaw('0 as DR')
+        ->selectRaw('0 as PF')
+        ->selectRaw('0 as CS')
+        ->selectRaw('0 as SDR')
+        ->selectRaw('w.amount as OV')
+        ->selectRaw('COALESCE(tx_ledger.TX, 0) as TX')
+        ->selectRaw('0 as WD')
+        ->selectRaw('w.amount - COALESCE(tx_ledger.TX, 0) as TOTAL')
+        // Unique key for each OV wallet transaction.
+        ->addSelect('w.WalletID as report_row_id');
 
+    /*
+     * Non-OV wallet sources: retain daily grouping.
+     * TX is not deducted from these rows.
+     */
+    $dailyRows = (clone $baseQuery)
+        ->whereIn('w.source', ['DR', 'PF', 'CS', 'SDR', 'WD'])
+        ->selectRaw('DATE(w.created_at) as created_date')
+        ->addSelect([
+            'u.UserID',
+            'u.referralCode',
+            'u.lastname',
+            'u.firstname',
+            'u.middlename',
+            'r.rolename',
+        ])
         ->selectRaw("
-            SUM(CASE WHEN w.source = 'DR'
-                THEN w.amount ELSE 0 END) as DR
+            CONCAT(
+                IFNULL(u.lastname, ''),
+                ', ',
+                IFNULL(u.firstname, ''),
+                ' ',
+                IFNULL(u.middlename, '')
+            ) as name
         ")
-
-        ->selectRaw("
-            SUM(CASE WHEN w.source = 'PF'
-                THEN w.amount ELSE 0 END) as PF
-        ")
-
-        ->selectRaw("
-            SUM(CASE WHEN w.source = 'CS'
-                THEN w.amount ELSE 0 END) as CS
-        ")
-
-        ->selectRaw("
-            SUM(CASE WHEN w.source = 'SDR'
-                THEN w.amount ELSE 0 END) as SDR
-        ")
-
-        ->selectRaw("
-            SUM(CASE WHEN w.source = 'OV'
-                THEN w.amount ELSE 0 END) as OV
-        ")
-
-        // Display the TX tax from ledgers only when an OV exists.
-        ->selectRaw("
-            CASE
-                WHEN SUM(
-                    CASE WHEN w.source = 'OV'
-                        THEN w.amount ELSE 0 END
-                ) <> 0
-                THEN COALESCE(MAX(tx_ledger.TX), 0)
-                ELSE 0
-            END as TX
-        ")
-
-        ->selectRaw("
-            SUM(CASE WHEN w.source = 'WD'
-                THEN w.amount ELSE 0 END) as WD
-        ")
-
-        // Calculate the total using the ledger tax deduction.
-        ->selectRaw("
-            SUM(w.amount)
-            - CASE
-                WHEN SUM(
-                    CASE WHEN w.source = 'OV'
-                        THEN w.amount ELSE 0 END
-                ) <> 0
-                THEN COALESCE(MAX(tx_ledger.TX), 0)
-                ELSE 0
-            END as TOTAL
-        ")
-
+        ->selectRaw("SUM(CASE WHEN w.source = 'DR' THEN w.amount ELSE 0 END) as DR")
+        ->selectRaw("SUM(CASE WHEN w.source = 'PF' THEN w.amount ELSE 0 END) as PF")
+        ->selectRaw("SUM(CASE WHEN w.source = 'CS' THEN w.amount ELSE 0 END) as CS")
+        ->selectRaw("SUM(CASE WHEN w.source = 'SDR' THEN w.amount ELSE 0 END) as SDR")
+        ->selectRaw('0 as OV')
+        ->selectRaw('0 as TX')
+        ->selectRaw("SUM(CASE WHEN w.source = 'WD' THEN w.amount ELSE 0 END) as WD")
+        ->selectRaw('SUM(w.amount) as TOTAL')
+        ->selectRaw('NULL as report_row_id')
         ->groupBy(
             DB::raw('DATE(w.created_at)'),
             'u.UserID',
@@ -247,23 +216,33 @@ protected function dailyLedgerQuery(): Builder
             'u.middlename',
             'r.rolename'
         );
+
+    // Combine daily rows and individual OV rows.
+    return DB::query()
+        ->fromSub(
+            $dailyRows->unionAll($ovRows),
+            'report_rows'
+        )
+        ->select('report_rows.*');
 }
 
-    protected function reportQuery(): Builder
-    {
-        $daily = $this->dailyLedgerQuery();
 
-        return DB::query()
-            ->fromSub($daily, 'daily_ledger')
-            ->select('daily_ledger.*')
-            ->selectRaw(
-                'SUM(TOTAL) OVER (
-                    PARTITION BY UserID
-                    ORDER BY created_date ASC
-                    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-                ) as RUNNING_BALANCE'
-            );
-    }
+protected function reportQuery(): Builder
+{
+    $daily = $this->dailyLedgerQuery();
+
+    return DB::query()
+        ->fromSub($daily, 'daily_ledger')
+        ->select('daily_ledger.*')
+        ->selectRaw(
+            'SUM(TOTAL) OVER (
+                PARTITION BY UserID
+                ORDER BY created_date ASC, report_row_id ASC
+                ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+            ) as RUNNING_BALANCE'
+        );
+}
+
 
     public function render()
     {
