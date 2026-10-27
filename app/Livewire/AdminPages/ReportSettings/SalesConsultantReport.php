@@ -90,28 +90,31 @@ class SalesConsultantReport extends Component
      */
 
 
-protected function dailyLedgerQuery(): Builder
+/**
+ * One row per consultant per date.
+ *
+ * All wallet sources are summed for the day.
+ * TX is grouped by consultant and date, then deducted from the daily total.
+ * No date-range filter is applied here because running balances need
+ * the consultant's complete history.
+ */
+protected function dailyLedgerQueryWithoutDateFilter(): Builder
 {
-    [$dateFrom, $dateTo] = $this->parsedDateRange();
-
-    /*
-     * Group TX only by consultant and exact transaction timestamp.
-     * RefID references the consultant's UserID.
-     */
+    // Sum TX ledger entries by consultant and calendar date.
     $taxLedger = DB::table('ledgers as l')
         ->where('l.Source', 'TX')
         ->selectRaw('l.RefID as consultant_id')
-        ->addSelect('l.created_at as tax_created_at')
-        ->selectRaw('SUM(ABS(l.amount)) as TX')
-        ->groupBy('l.RefID', 'l.created_at');
+        ->selectRaw('DATE(l.created_at) as tax_date')
+        ->selectRaw('SUM(ABS(COALESCE(l.amount, 0))) as tax_amount')
+        ->groupBy(
+            'l.RefID',
+            DB::raw('DATE(l.created_at)')
+        );
 
-    $baseQuery = DB::table('wallets as w')
+    // Sum every wallet source into one row per consultant per date.
+    $walletDaily = DB::table('wallets as w')
         ->join('users as u', 'u.UserID', '=', 'w.UserID')
         ->join('roles as r', 'r.RoleID', '=', 'u.RoleID')
-        ->leftJoinSub($taxLedger, 'tx_ledger', function ($join) {
-            $join->on('tx_ledger.consultant_id', '=', 'u.UserID')
-                ->on('tx_ledger.tax_created_at', '=', 'w.created_at');
-        })
         ->where('u.RoleID', 4)
         ->whereIn('w.source', [
             'DR', 'PF', 'CS', 'SDR', 'OV', 'WD',
@@ -140,13 +143,7 @@ protected function dailyLedgerQuery(): Builder
                 'u.RoleID',
                 $this->roleFilter
             )
-        );
-
-    /*
-     * One report row per wallet transaction.
-     * TX is displayed as negative and deducted from that row's total.
-     */
-    return (clone $baseQuery)
+        )
         ->selectRaw('DATE(w.created_at) as created_date')
         ->addSelect([
             'u.UserID',
@@ -166,56 +163,93 @@ protected function dailyLedgerQuery(): Builder
             ) as name
         ")
         ->selectRaw("
-            CASE WHEN w.source = 'DR'
-                THEN w.amount ELSE 0 END as DR
+            SUM(CASE WHEN w.source = 'DR'
+                THEN COALESCE(w.amount, 0) ELSE 0 END) as DR
         ")
         ->selectRaw("
-            CASE WHEN w.source = 'PF'
-                THEN w.amount ELSE 0 END as PF
+            SUM(CASE WHEN w.source = 'PF'
+                THEN COALESCE(w.amount, 0) ELSE 0 END) as PF
         ")
         ->selectRaw("
-            CASE WHEN w.source = 'CS'
-                THEN w.amount ELSE 0 END as CS
+            SUM(CASE WHEN w.source = 'CS'
+                THEN COALESCE(w.amount, 0) ELSE 0 END) as CS
         ")
         ->selectRaw("
-            CASE WHEN w.source = 'SDR'
-                THEN w.amount ELSE 0 END as SDR
+            SUM(CASE WHEN w.source = 'SDR'
+                THEN COALESCE(w.amount, 0) ELSE 0 END) as SDR
         ")
         ->selectRaw("
-            CASE WHEN w.source = 'OV'
-                THEN w.amount ELSE 0 END as OV
+            SUM(CASE WHEN w.source = 'OV'
+                THEN COALESCE(w.amount, 0) ELSE 0 END) as OV
         ")
-        ->selectRaw('-COALESCE(tx_ledger.TX, 0) as TX')
         ->selectRaw("
-            CASE WHEN w.source = 'WD'
-                THEN w.amount ELSE 0 END as WD
+            SUM(CASE WHEN w.source = 'WD'
+                THEN COALESCE(w.amount, 0) ELSE 0 END) as WD
+        ")
+        ->groupBy(
+            DB::raw('DATE(w.created_at)'),
+            'u.UserID',
+            'u.referralCode',
+            'u.lastname',
+            'u.firstname',
+            'u.middlename',
+            'r.rolename'
+        );
+
+    // Join the daily TX totals AFTER wallet entries have been aggregated.
+    // This prevents TX from multiplying wallet amounts.
+    return DB::query()
+        ->fromSub($walletDaily, 'wallet_daily')
+        ->leftJoinSub($taxLedger, 'tx_ledger', function ($join) {
+            $join->on(
+                'tx_ledger.consultant_id',
+                '=',
+                'wallet_daily.UserID'
+            )->on(
+                'tx_ledger.tax_date',
+                '=',
+                'wallet_daily.created_date'
+            );
+        })
+        ->select('wallet_daily.*')
+        ->selectRaw(
+            '-COALESCE(tx_ledger.tax_amount, 0) as TX'
+        )
+        ->selectRaw("
+            COALESCE(wallet_daily.DR, 0)
+            + COALESCE(wallet_daily.PF, 0)
+            + COALESCE(wallet_daily.CS, 0)
+            + COALESCE(wallet_daily.SDR, 0)
+            + COALESCE(wallet_daily.OV, 0)
+            + COALESCE(wallet_daily.WD, 0)
+            - COALESCE(tx_ledger.tax_amount, 0)
+            as TOTAL
         ")
         ->selectRaw(
-            'COALESCE(w.amount, 0) - COALESCE(tx_ledger.TX, 0) as TOTAL'
-        )
-        ->addSelect('w.created_at as report_created_at')
-        ->addSelect('w.WalletID as report_row_id');
+            "CONCAT(wallet_daily.UserID, '-', wallet_daily.created_date)
+             as report_row_id"
+        );
 }
 
-
+/**
+ * Calculate running balances from all historical daily totals first.
+ * Apply the selected date range afterward.
+ */
 protected function reportQuery(): Builder
 {
-    // Get all historical transactions without a date-range filter.
-    $transactions = $this->dailyLedgerQuery();
+    $transactions = $this->dailyLedgerQueryWithoutDateFilter();
 
-    // Calculate the running balance using the full transaction history.
     $running = DB::query()
         ->fromSub($transactions, 'transactions')
         ->select('transactions.*')
-        ->selectRaw('
+        ->selectRaw("
             SUM(TOTAL) OVER (
                 PARTITION BY UserID
-                ORDER BY report_created_at ASC, report_row_id ASC
+                ORDER BY created_date ASC
                 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
             ) as RUNNING_BALANCE
-        ');
+        ");
 
-    // Apply the selected date range only after calculating the balance.
     [$dateFrom, $dateTo] = $this->parsedDateRange();
 
     return DB::query()
@@ -236,51 +270,60 @@ protected function reportQuery(): Builder
 
 
     public function render()
-    {
-        [$dateFrom, $dateTo] = $this->parsedDateRange();
+{
+    [$dateFrom, $dateTo] = $this->parsedDateRange();
 
-        $query = $this->reportQuery();
+    $query = $this->reportQuery();
 
-        $rows = (clone $query)
-            ->orderBy('name')
-            ->orderByDesc('report_created_at')
-            ->orderByDesc('report_row_id')
-            ->paginate(10);
+    // Screen table: one row per consultant per date.
+    $rows = (clone $query)
+        ->orderBy('name')
+        ->orderByDesc('created_date')
+        ->orderByDesc('report_row_id')
+        ->paginate(10);
 
-        $printRows = (clone $query)
-            ->orderBy('name')
-            ->orderByDesc('report_created_at')
-            ->orderByDesc('report_row_id')
-            ->get();
+    // Print table: include all matching records.
+    $printRows = (clone $query)
+        ->orderBy('name')
+        ->orderByDesc('created_date')
+        ->orderByDesc('report_row_id')
+        ->get();
 
-        $selectedUser = $this->selectedUserLedgerID
-            ? User::with(['role', 'wallets', 'ledgers'])
-                ->where('RoleID', 4)
-                ->find($this->selectedUserLedgerID)
-            : null;
+    $selectedUser = $this->selectedUserLedgerID
+        ? User::with(['role', 'wallets', 'ledgers'])
+            ->where('RoleID', 4)
+            ->find($this->selectedUserLedgerID)
+        : null;
 
-        $prizeLedgers = $selectedUser
-            ? Ledger::with('draw')
-                ->where('Source', 'PK')
-                ->where('RefID', (string) $selectedUser->UserID)
-                ->orderBy('TransactionID')
-                ->get()
-            : collect();
+    $prizeLedgers = $selectedUser
+        ? Ledger::with('draw')
+            ->where('Source', 'PK')
+            ->where('RefID', (string) $selectedUser->UserID)
+            ->orderBy('TransactionID')
+            ->get()
+        : collect();
 
-        $statementLedgers = $selectedUser
-            ? $selectedUser->ledgers->concat($prizeLedgers)
-                ->sortBy('TransactionID')->values()
-            : collect();
+    $statementLedgers = $selectedUser
+        ? $selectedUser->ledgers
+            ->concat($prizeLedgers)
+            ->sortBy('TransactionID')
+            ->values()
+        : collect();
 
-        return view('livewire.admin-pages.report-settings.sales-consultant-report', [
+    return view(
+        'livewire.admin-pages.report-settings.sales-consultant-report',
+        [
             'rows' => $rows,
             'printRows' => $printRows,
             'selectedUser' => $selectedUser,
             'prizeLedgers' => $prizeLedgers,
             'statementLedgers' => $statementLedgers,
             'dateRangeLabel' => $dateFrom && $dateTo
-                ? Carbon::parse($dateFrom)->format('M d, Y').' — '.Carbon::parse($dateTo)->format('M d, Y')
+                ? Carbon::parse($dateFrom)->format('M d, Y')
+                    . ' — '
+                    . Carbon::parse($dateTo)->format('M d, Y')
                 : 'All Time',
-        ]);
-    }
+        ]
+    );
+}
 }
