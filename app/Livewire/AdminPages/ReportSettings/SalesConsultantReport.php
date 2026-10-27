@@ -89,11 +89,15 @@ class SalesConsultantReport extends Component
      * running total, so a selected range starts its balance at that range.
      */
 
+
 protected function dailyLedgerQuery(): Builder
 {
     [$dateFrom, $dateTo] = $this->parsedDateRange();
 
-    // Group TX by consultant and exact transaction timestamp.
+    /*
+     * Group TX only by consultant and exact transaction timestamp.
+     * RefID references the consultant's UserID.
+     */
     $taxLedger = DB::table('ledgers as l')
         ->where('l.Source', 'TX')
         ->selectRaw('l.RefID as consultant_id')
@@ -110,7 +114,7 @@ protected function dailyLedgerQuery(): Builder
         })
         ->where('u.RoleID', 4)
         ->whereIn('w.source', [
-            'DR', 'PF', 'CS', 'SDR', 'WD', 'OV',
+            'DR', 'PF', 'CS', 'SDR', 'OV', 'WD',
         ])
         ->when($this->search !== '', function (Builder $q) {
             $term = '%' . $this->search . '%';
@@ -125,11 +129,17 @@ protected function dailyLedgerQuery(): Builder
         })
         ->when(
             $this->statusFilter !== '',
-            fn (Builder $q) => $q->where('u.status', $this->statusFilter)
+            fn (Builder $q) => $q->where(
+                'u.status',
+                $this->statusFilter
+            )
         )
         ->when(
             $this->roleFilter !== '',
-            fn (Builder $q) => $q->where('u.RoleID', $this->roleFilter)
+            fn (Builder $q) => $q->where(
+                'u.RoleID',
+                $this->roleFilter
+            )
         )
         ->when(
             $dateFrom && $dateTo,
@@ -140,11 +150,10 @@ protected function dailyLedgerQuery(): Builder
         );
 
     /*
-     * OV rows: one row per wallet record.
-     * Match TX using consultant ID + exact created_at.
+     * One report row per wallet transaction.
+     * TX is displayed as negative and deducted from that row's total.
      */
-    $ovRows = (clone $baseQuery)
-        ->where('w.source', 'OV')
+    return (clone $baseQuery)
         ->selectRaw('DATE(w.created_at) as created_date')
         ->addSelect([
             'u.UserID',
@@ -163,83 +172,51 @@ protected function dailyLedgerQuery(): Builder
                 IFNULL(u.middlename, '')
             ) as name
         ")
-        ->selectRaw('0 as DR')
-        ->selectRaw('0 as PF')
-        ->selectRaw('0 as CS')
-        ->selectRaw('0 as SDR')
-        ->selectRaw('w.amount as OV')
+        ->selectRaw("
+            CASE WHEN w.source = 'DR'
+                THEN w.amount ELSE 0 END as DR
+        ")
+        ->selectRaw("
+            CASE WHEN w.source = 'PF'
+                THEN w.amount ELSE 0 END as PF
+        ")
+        ->selectRaw("
+            CASE WHEN w.source = 'CS'
+                THEN w.amount ELSE 0 END as CS
+        ")
+        ->selectRaw("
+            CASE WHEN w.source = 'SDR'
+                THEN w.amount ELSE 0 END as SDR
+        ")
+        ->selectRaw("
+            CASE WHEN w.source = 'OV'
+                THEN w.amount ELSE 0 END as OV
+        ")
         ->selectRaw('-COALESCE(tx_ledger.TX, 0) as TX')
-        ->selectRaw('0 as WD')
-        ->selectRaw('w.amount - COALESCE(tx_ledger.TX, 0) as TOTAL')
-        // Unique key for each OV wallet transaction.
-        ->addSelect('w.WalletID as report_row_id');
-
-    /*
-     * Non-OV wallet sources: retain daily grouping.
-     * TX is not deducted from these rows.
-     */
-    $dailyRows = (clone $baseQuery)
-        ->whereIn('w.source', ['DR', 'PF', 'CS', 'SDR', 'WD'])
-        ->selectRaw('DATE(w.created_at) as created_date')
-        ->addSelect([
-            'u.UserID',
-            'u.referralCode',
-            'u.lastname',
-            'u.firstname',
-            'u.middlename',
-            'r.rolename',
-        ])
         ->selectRaw("
-            CONCAT(
-                IFNULL(u.lastname, ''),
-                ', ',
-                IFNULL(u.firstname, ''),
-                ' ',
-                IFNULL(u.middlename, '')
-            ) as name
+            CASE WHEN w.source = 'WD'
+                THEN w.amount ELSE 0 END as WD
         ")
-        ->selectRaw("SUM(CASE WHEN w.source = 'DR' THEN w.amount ELSE 0 END) as DR")
-        ->selectRaw("SUM(CASE WHEN w.source = 'PF' THEN w.amount ELSE 0 END) as PF")
-        ->selectRaw("SUM(CASE WHEN w.source = 'CS' THEN w.amount ELSE 0 END) as CS")
-        ->selectRaw("SUM(CASE WHEN w.source = 'SDR' THEN w.amount ELSE 0 END) as SDR")
-        ->selectRaw('0 as OV')
-        ->selectRaw('0 as TX')
-        ->selectRaw("SUM(CASE WHEN w.source = 'WD' THEN w.amount ELSE 0 END) as WD")
-        ->selectRaw('SUM(w.amount) as TOTAL')
-        ->selectRaw('NULL as report_row_id')
-        ->groupBy(
-            DB::raw('DATE(w.created_at)'),
-            'u.UserID',
-            'u.referralCode',
-            'u.lastname',
-            'u.firstname',
-            'u.middlename',
-            'r.rolename'
-        );
-
-    // Combine daily rows and individual OV rows.
-    return DB::query()
-        ->fromSub(
-            $dailyRows->unionAll($ovRows),
-            'report_rows'
+        ->selectRaw(
+            'COALESCE(w.amount, 0) - COALESCE(tx_ledger.TX, 0) as TOTAL'
         )
-        ->select('report_rows.*');
+        ->addSelect('w.created_at as report_created_at')
+        ->addSelect('w.WalletID as report_row_id');
 }
-
 
 protected function reportQuery(): Builder
 {
-    $daily = $this->dailyLedgerQuery();
+    $transactions = $this->dailyLedgerQuery();
 
     return DB::query()
-        ->fromSub($daily, 'daily_ledger')
+        ->fromSub($transactions, 'daily_ledger')
         ->select('daily_ledger.*')
         ->selectRaw(
             'SUM(TOTAL) OVER (
                 PARTITION BY UserID
                 ORDER BY
-                    created_date DESC,
-                    report_row_id DESC
+                    report_created_at ASC,
+                    report_row_id ASC
                 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
             ) as RUNNING_BALANCE'
         );
@@ -254,15 +231,15 @@ protected function reportQuery(): Builder
 
         $rows = (clone $query)
             ->orderBy('name')
-            ->orderByDesc('created_date')
+            ->orderByDesc('report_created_at')
+            ->orderByDesc('report_row_id')
             ->paginate(10);
 
         $printRows = (clone $query)
             ->orderBy('name')
-            ->orderByDesc('created_date')
+            ->orderByDesc('report_created_at')
+            ->orderByDesc('report_row_id')
             ->get();
-
-        //Update lang sa live
 
         $selectedUser = $this->selectedUserLedgerID
             ? User::with(['role', 'wallets', 'ledgers'])

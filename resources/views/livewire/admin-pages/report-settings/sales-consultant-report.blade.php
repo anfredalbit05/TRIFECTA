@@ -82,7 +82,7 @@
 
                 @forelse ($groupedRows as $userId => $userRows)
                     @foreach ($userRows as $index => $row)
-                        <tr wire:key="sales-report-{{ $row->UserID }}-{{ $row->created_date }}"
+                        <tr wire:key="sales-report-{{ $row->UserID }}-{{ $row->report_row_id }}"
                             class="hover:bg-slate-50">
 
                             {{-- Date remains separate for every transaction day --}}
