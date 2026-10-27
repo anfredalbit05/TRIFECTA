@@ -157,6 +157,12 @@
                     <strong class="font-semibold text-[#0C2C6B]">SDR:</strong> Satellite Direct Referral
                 </span>
                 <span class="inline-flex items-center gap-1">
+                    <strong class="font-semibold text-[#0C2C6B]">OV:</strong> Overrides
+                </span>
+                <span class="inline-flex items-center gap-1">
+                    <strong class="font-semibold text-[#0C2C6B]">TX:</strong> Tax 10%
+                </span>
+                <span class="inline-flex items-center gap-1">
                     <strong class="font-semibold text-[#0C2C6B]">WD:</strong> Withdrawal
                 </span>
             </div>
