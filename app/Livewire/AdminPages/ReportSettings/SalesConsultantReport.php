@@ -168,7 +168,7 @@ protected function dailyLedgerQuery(): Builder
         ->selectRaw('0 as CS')
         ->selectRaw('0 as SDR')
         ->selectRaw('w.amount as OV')
-        ->selectRaw('COALESCE(tx_ledger.TX, 0) as TX')
+        ->selectRaw('-COALESCE(tx_ledger.TX, 0) as TX')
         ->selectRaw('0 as WD')
         ->selectRaw('w.amount - COALESCE(tx_ledger.TX, 0) as TOTAL')
         // Unique key for each OV wallet transaction.
@@ -237,7 +237,9 @@ protected function reportQuery(): Builder
         ->selectRaw(
             'SUM(TOTAL) OVER (
                 PARTITION BY UserID
-                ORDER BY created_date ASC, report_row_id ASC
+                ORDER BY
+                    created_date DESC,
+                    report_row_id DESC
                 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
             ) as RUNNING_BALANCE'
         );
