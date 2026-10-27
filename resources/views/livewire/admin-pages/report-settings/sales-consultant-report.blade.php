@@ -132,7 +132,7 @@
                     @endforeach
                 @empty
                     <tr>
-                        <td colspan="{{ $this->canRead ? 12 : 11 }}" class="px-4 py-8 text-center text-slate-500">
+                        <td colspan="13" class="px-4 py-8 text-center text-slate-500">
                             No sales consultant records found.
                         </td>
                     </tr>
@@ -230,7 +230,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="11" class="border border-black p-2 text-center">No records found.</td>
+                        <td colspan="13" class="border border-black p-2 text-center">No records found.</td>
                     </tr>
                 @endforelse
             </tbody>

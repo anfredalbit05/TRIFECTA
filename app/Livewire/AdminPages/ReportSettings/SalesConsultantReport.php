@@ -88,68 +88,166 @@ class SalesConsultantReport extends Component
      * Daily totals for RoleID 4. The date filter is applied before the
      * running total, so a selected range starts its balance at that range.
      */
-    protected function dailyLedgerQuery(): Builder
-    {
-        [$dateFrom, $dateTo] = $this->parsedDateRange();
+protected function dailyLedgerQuery(): Builder
+{
+    [$dateFrom, $dateTo] = $this->parsedDateRange();
 
-        return DB::table('wallets as w')
-            ->join('users as u', 'u.UserID', '=', 'w.UserID')
-            ->join('roles as r', 'r.RoleID', '=', 'u.RoleID')
-            ->where('u.RoleID', 4)
-            ->whereIn('w.source', [
-                'DR',
-                'PF',
-                'CS',
-                'SDR',
-                'WD',
-                'OV',
-                'TX',
-            ])
-            ->when($this->search !== '', function (Builder $q) {
-                $term = '%'.$this->search.'%';
-                $q->where(function (Builder $sub) use ($term) {
-                    $sub->where('u.firstname', 'like', $term)
-                        ->orWhere('u.lastname', 'like', $term)
-                        ->orWhere('u.middlename', 'like', $term)
-                        ->orWhere('u.email', 'like', $term)
-                        ->orWhere('u.referralCode', 'like', $term);
-                });
-            })
-            ->when($this->statusFilter !== '', fn (Builder $q) => $q->where('u.status', $this->statusFilter))
-            // The report is restricted to RoleID 4, so only accept that role filter.
-            ->when($this->roleFilter !== '', fn (Builder $q) => $q->where('u.RoleID', $this->roleFilter))
-            ->when($dateFrom && $dateTo, fn (Builder $q) => $q->whereBetween('w.created_at', [
+    // Get TX amounts from the ledger, grouped by consultant and date.
+    $taxLedger = DB::table('ledgers as l')
+        ->where('l.Source', 'TX')
+        ->selectRaw('DATE(l.created_at) as tax_date')
+        ->addSelect('l.RefID as consultant_id')
+        ->selectRaw('SUM(ABS(l.amount)) as TX')
+        ->groupBy(
+            DB::raw('DATE(l.created_at)'),
+            'l.RefID'
+        );
+
+    return DB::table('wallets as w')
+        ->join('users as u', 'u.UserID', '=', 'w.UserID')
+        ->join('roles as r', 'r.RoleID', '=', 'u.RoleID')
+
+        // Match the ledger tax to the consultant and transaction date.
+        ->leftJoinSub($taxLedger, 'tx_ledger', function ($join) {
+            $join->on('tx_ledger.consultant_id', '=', 'u.UserID')
+                ->on(
+                    'tx_ledger.tax_date',
+                    '=',
+                    DB::raw('DATE(w.created_at)')
+                );
+        })
+
+        ->where('u.RoleID', 4)
+        ->whereIn('w.source', [
+            'DR',
+            'PF',
+            'CS',
+            'SDR',
+            'WD',
+            'OV',
+        ])
+
+        ->when($this->search !== '', function (Builder $q) {
+            $term = '%' . $this->search . '%';
+
+            $q->where(function (Builder $sub) use ($term) {
+                $sub->where('u.firstname', 'like', $term)
+                    ->orWhere('u.lastname', 'like', $term)
+                    ->orWhere('u.middlename', 'like', $term)
+                    ->orWhere('u.email', 'like', $term)
+                    ->orWhere('u.referralCode', 'like', $term);
+            });
+        })
+
+        ->when(
+            $this->statusFilter !== '',
+            fn (Builder $q) => $q->where(
+                'u.status',
+                $this->statusFilter
+            )
+        )
+
+        ->when(
+            $this->roleFilter !== '',
+            fn (Builder $q) => $q->where(
+                'u.RoleID',
+                $this->roleFilter
+            )
+        )
+
+        ->when(
+            $dateFrom && $dateTo,
+            fn (Builder $q) => $q->whereBetween('w.created_at', [
                 Carbon::parse($dateFrom)->startOfDay(),
                 Carbon::parse($dateTo)->endOfDay(),
-            ]))
-            ->selectRaw('DATE(w.created_at) as created_date')
-            ->addSelect([
-                'u.UserID',
-                'u.referralCode',
-                'u.lastname',
-                'u.firstname',
-                'u.middlename',
-                'r.rolename',
             ])
-            ->selectRaw("CONCAT(IFNULL(u.lastname, ''), ', ', IFNULL(u.firstname, ''), ' ', IFNULL(u.middlename, '')) as name")
-            ->selectRaw("SUM(CASE WHEN w.source = 'DR' THEN w.amount ELSE 0 END) as DR")
-            ->selectRaw("SUM(CASE WHEN w.source = 'PF' THEN w.amount ELSE 0 END) as PF")
-            ->selectRaw("SUM(CASE WHEN w.source = 'CS' THEN w.amount ELSE 0 END) as CS")
-            ->selectRaw("SUM(CASE WHEN w.source = 'SDR' THEN w.amount ELSE 0 END) as SDR")
-            ->selectRaw("SUM(CASE WHEN w.source = 'OV' THEN w.amount ELSE 0 END) as OV")
-            ->selectRaw("SUM(CASE WHEN w.source = 'TX' THEN w.amount ELSE 0 END) as TX")
-            ->selectRaw("SUM(CASE WHEN w.source = 'WD' THEN w.amount ELSE 0 END) as WD")
-            ->selectRaw('SUM(w.amount) as TOTAL')
-            ->groupBy(
-                DB::raw('DATE(w.created_at)'),
-                'u.UserID',
-                'u.referralCode',
-                'u.lastname',
-                'u.firstname',
-                'u.middlename',
-                'r.rolename'
-            );
-    }
+        )
+
+        ->selectRaw('DATE(w.created_at) as created_date')
+        ->addSelect([
+            'u.UserID',
+            'u.referralCode',
+            'u.lastname',
+            'u.firstname',
+            'u.middlename',
+            'r.rolename',
+        ])
+
+        ->selectRaw("
+            CONCAT(
+                IFNULL(u.lastname, ''),
+                ', ',
+                IFNULL(u.firstname, ''),
+                ' ',
+                IFNULL(u.middlename, '')
+            ) as name
+        ")
+
+        ->selectRaw("
+            SUM(CASE WHEN w.source = 'DR'
+                THEN w.amount ELSE 0 END) as DR
+        ")
+
+        ->selectRaw("
+            SUM(CASE WHEN w.source = 'PF'
+                THEN w.amount ELSE 0 END) as PF
+        ")
+
+        ->selectRaw("
+            SUM(CASE WHEN w.source = 'CS'
+                THEN w.amount ELSE 0 END) as CS
+        ")
+
+        ->selectRaw("
+            SUM(CASE WHEN w.source = 'SDR'
+                THEN w.amount ELSE 0 END) as SDR
+        ")
+
+        ->selectRaw("
+            SUM(CASE WHEN w.source = 'OV'
+                THEN w.amount ELSE 0 END) as OV
+        ")
+
+        // Display the TX tax from ledgers only when an OV exists.
+        ->selectRaw("
+            CASE
+                WHEN SUM(
+                    CASE WHEN w.source = 'OV'
+                        THEN w.amount ELSE 0 END
+                ) <> 0
+                THEN COALESCE(MAX(tx_ledger.TX), 0)
+                ELSE 0
+            END as TX
+        ")
+
+        ->selectRaw("
+            SUM(CASE WHEN w.source = 'WD'
+                THEN w.amount ELSE 0 END) as WD
+        ")
+
+        // Calculate the total using the ledger tax deduction.
+        ->selectRaw("
+            SUM(w.amount)
+            - CASE
+                WHEN SUM(
+                    CASE WHEN w.source = 'OV'
+                        THEN w.amount ELSE 0 END
+                ) <> 0
+                THEN COALESCE(MAX(tx_ledger.TX), 0)
+                ELSE 0
+            END as TOTAL
+        ")
+
+        ->groupBy(
+            DB::raw('DATE(w.created_at)'),
+            'u.UserID',
+            'u.referralCode',
+            'u.lastname',
+            'u.firstname',
+            'u.middlename',
+            'r.rolename'
+        );
+}
 
     protected function reportQuery(): Builder
     {
