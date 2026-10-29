@@ -1369,6 +1369,204 @@
                     timerProgressBar: true,
                 });
             });
+
+
+
+window.addEventListener('confirm-duplicate-member', (event) => {
+    const matches = event.detail.matches || [];
+    const applicant = event.detail.applicant || {};
+
+    const escapeHtml = (value) =>
+        String(value ?? '').replace(/[&<>"']/g, (char) => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        })[char]);
+
+    // NEW APPLICANT: information currently entered in the form.
+    const applicantHtml = `
+        <div style="
+            text-align:left;
+            padding:14px;
+            border:2px solid #2563eb;
+            border-radius:10px;
+            background:#eff6ff;
+            margin-bottom:16px;
+        ">
+            <div style="
+                color:#1d4ed8;
+                font-size:12px;
+                font-weight:800;
+                letter-spacing:0.5px;
+                margin-bottom:10px;
+            ">
+                NEW APPLICANT — CURRENT FORM
+            </div>
+
+            <div style="font-weight:700;color:#1e3a8a;">
+                ${escapeHtml(applicant.name)}
+            </div>
+
+            <div style="font-size:13px;margin-top:6px;">
+                <strong>Contact number:</strong>
+                ${escapeHtml(applicant.mobile || 'Not provided')}
+            </div>
+        </div>
+    `;
+
+    // EXISTING MEMBERS: records already saved in the database.
+    const memberList = matches.map((member, index) => {
+        const reasons = (member.reasons || []).map(reason => `
+            <li style="margin-top:4px;">
+                ${escapeHtml(reason)}
+            </li>
+        `).join('');
+
+        return `
+            <div style="
+                text-align:left;
+                padding:14px;
+                margin-bottom:10px;
+                border:2px solid #d97706;
+                border-radius:10px;
+                background:#fffbeb;
+            ">
+                <div style="
+                    color:#b45309;
+                    font-size:12px;
+                    font-weight:800;
+                    letter-spacing:0.4px;
+                    margin-bottom:9px;
+                ">
+                    EXISTING TRUE LIFE MEMBER ${index + 1}
+                </div>
+
+                <div style="font-weight:700;color:#78350f;">
+                    ${escapeHtml(member.name)}
+                </div>
+
+                <div style="font-size:13px;margin-top:6px;">
+                    <strong>Contact number:</strong>
+                    ${escapeHtml(member.mobile || 'Not provided')}
+                </div>
+
+                <div style="
+                    font-size:12px;
+                    color:#92400e;
+                    font-weight:700;
+                    margin-top:10px;
+                ">
+                    WHY THIS RECORD MATCHED
+                </div>
+
+                <ul style="padding-left:20px;margin:5px 0 0;font-size:13px;">
+                    ${reasons}
+                </ul>
+            </div>
+        `;
+    }).join('');
+
+    Swal.fire({
+        icon: 'warning',
+        title: 'Duplicate Member Verification',
+        width: 600,
+
+        html: `
+            <p style="margin-bottom:16px;font-size:14px;">
+                The applicant may already be registered.
+                Compare the new application with the existing member records.
+            </p>
+
+            ${applicantHtml}
+
+            <div style="
+                text-align:left;
+                font-weight:800;
+                font-size:13px;
+                color:#92400e;
+                margin-bottom:10px;
+            ">
+                MATCHING RECORDS IN TRUE LIFE
+            </div>
+
+            <div style="
+                max-height:220px;
+                overflow-y:auto;
+                padding:2px;
+            ">
+                ${memberList}
+            </div>
+
+            <div style="
+                text-align:left;
+                padding:14px;
+                margin-top:16px;
+                border-radius:10px;
+                background:#f3f4f6;
+            ">
+                <div style="font-weight:800;margin-bottom:6px;">
+                    Confirm before proceeding
+                </div>
+
+                <p style="font-size:13px;margin-bottom:12px;">
+                    If you have verified that this is intentional,
+                    type <strong>YES, PROCEED</strong> in the field below.
+                    Otherwise, cancel and review the application.
+                </p>
+
+                <input
+                    id="duplicate-confirmation-input"
+                    type="text"
+                    class="swal2-input"
+                    placeholder="YES, PROCEED"
+                    autocomplete="off"
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        margin:0;
+                        font-size:15px;
+                    "
+                />
+            </div>
+        `,
+
+        showCancelButton: true,
+        confirmButtonText: 'Confirm & Continue',
+        cancelButtonText: 'Cancel & Review',
+        confirmButtonColor: '#0B2A5B',
+        cancelButtonColor: '#D79B10',
+        reverseButtons: true,
+        focusCancel: true,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+
+        preConfirm: () => {
+            const input = document
+                .getElementById('duplicate-confirmation-input')
+                ?.value.trim();
+
+            if (input !== 'YES, PROCEED') {
+                Swal.showValidationMessage(
+                    'Please type YES, PROCEED exactly to continue.'
+                );
+
+                return false;
+            }
+
+            return true;
+        },
+
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Livewire.dispatch('confirmed-proceed-duplicate-member');
+        }
+    });
+});
+
+
+
             });
         })();
     </script>

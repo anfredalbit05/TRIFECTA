@@ -532,7 +532,43 @@ public function previewPolicyNumber(): string
             return;
         }
 
-        Log::info('=== DISPATCHING SWAL CONFIRMATION ===');
+        /*
+        |--------------------------------------------------------------------------
+        | Check for Existing Member Before Submission Confirmation
+        |--------------------------------------------------------------------------
+        */
+        $existingMembers = $this->findExistingMemberMatches();
+
+        if (! empty($existingMembers)) {
+            $this->dispatch(
+                'confirm-duplicate-member',
+                matches: $existingMembers,
+                applicant: [
+                    'name' => trim(
+                        $this->first_name.' '.
+                        ($this->middle_name
+                            ? $this->middle_name.' '
+                            : '').
+                        $this->surname
+                    ),
+                    'mobile' => $this->mobile,
+                ]
+            );
+
+            return;
+        }
+
+        $this->dispatch('swal-confirm-submission');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Continue Submission After Duplicate Warning
+    |--------------------------------------------------------------------------
+    */
+   #[On('confirmed-proceed-duplicate-member')]
+    public function proceedWithDuplicateMember(): void
+    {
         $this->dispatch('swal-confirm-submission');
     }
 
@@ -1621,4 +1657,87 @@ private function validateManualReceiptNumber(): void
             'beneficiaries' => $this->beneficiaries,
         ];
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Check Existing Member by Name or Contact Number
+    |--------------------------------------------------------------------------
+    */
+    private function findExistingMemberMatches(): array
+    {
+        $firstName = mb_strtolower(trim($this->first_name));
+        $middleName = mb_strtolower(trim($this->middle_name));
+        $surname = mb_strtolower(trim($this->surname));
+        $mobile = preg_replace('/\D/', '', $this->mobile);
+
+        return User::query()
+            ->get([
+                'UserID',
+                'firstname',
+                'middlename',
+                'lastname',
+                'contactno',
+            ])
+            ->map(function ($user) use (
+                $firstName,
+                $middleName,
+                $surname,
+                $mobile
+            ) {
+                $existingFirst = mb_strtolower(trim($user->firstname ?? ''));
+                $existingMiddle = mb_strtolower(trim($user->middlename ?? ''));
+                $existingLast = mb_strtolower(trim($user->lastname ?? ''));
+
+                $existingMobile = preg_replace(
+                    '/\D/',
+                    '',
+                    $user->contactno ?? ''
+                );
+
+                $sameFirstLast =
+                    $firstName === $existingFirst &&
+                    $surname === $existingLast;
+
+                $sameFullName =
+                    $sameFirstLast &&
+                    $middleName === $existingMiddle;
+
+                $sameContact =
+                    $mobile !== '' &&
+                    $mobile === $existingMobile;
+
+                if (! $sameFirstLast && ! $sameContact) {
+                    return null;
+                }
+
+                $reasons = [];
+
+                if ($sameFullName) {
+                    $reasons[] = 'Exact full name match';
+                } elseif ($sameFirstLast) {
+                    $reasons[] = 'First name and last name match';
+                }
+
+                if ($sameContact) {
+                    $reasons[] = 'Contact number already registered';
+                }
+
+                return [
+                    'name' => trim(
+                        $user->firstname.' '.
+                        ($user->middlename ? $user->middlename.' ' : '').
+                        $user->lastname
+                    ),
+                    'mobile' => $user->contactno,
+                    'reasons' => $reasons,
+                ];
+            })
+            ->filter()
+            ->unique(fn ($member) => mb_strtolower($member['name'])
+                .'|'.preg_replace('/\D/', '', $member['mobile'] ?? ''))
+            ->values()
+            ->take(10)
+            ->toArray();
+    }
+
 }
