@@ -681,6 +681,7 @@ class SpinWheelModal extends Component
                 'uid' => $row['user']->UserID,
                 'name' => $service->displayName($row['user']),
                 'code' => (string) ($row['user']->referralCode ?? ''),
+                'address' => $row['user']->address ?? null,
                 'invites' => (int) $row['invites'],
                 'wins' => (int) ($wonByMember[$row['user']->UserID] ?? 0),
             ])
@@ -691,6 +692,7 @@ class SpinWheelModal extends Component
             ->map(fn (SpinWinner $winner) => [
                 'WinnerID' => $winner->WinnerID,
                 'name' => $service->displayName($winner->user),
+                'address' => $winner->user?->address,
                 'code' => (string) ($winner->user->referralCode ?? ''),
                 'invites' => (int) $winner->qualified_invites,
                 'prize_name' => (string) $winner->prize_name,

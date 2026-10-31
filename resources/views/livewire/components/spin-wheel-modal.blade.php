@@ -98,6 +98,7 @@ x-on:close-spin-wheel.window="showModal=false">
                                 <div class="min-w-0 flex-1">
                                     <p class="truncate text-xs font-bold text-gray-800">{{ $member['name'] }}</p>
                                     <p class="text-[10px] text-gray-500">{{ $member['code'] }} · {{ $member['invites'] }} activation(s)</p>
+                                    <p class="text-[10px] text-gray-500">{{ $member['address'] }}</p>
                                 </div>
                                 @if($member['wins']>0)
                                     <span class="shrink-0 rounded-full bg-[#D79B10]/10 px-2 py-0.5 text-[10px] font-bold text-[#D79B10]"
@@ -402,6 +403,25 @@ x-on:close-spin-wheel.window="showModal=false">
                                         {{ $winner['name'] }}
                                         <span class="ml-1 text-[10px] font-medium text-gray-400">{{ $winner['code'] }}</span>
                                     </p>
+                                    <p class="mt-1 flex items-start gap-1 text-[10px] text-gray-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.5"
+                                            stroke="currentColor"
+                                            class="mt-0.5 h-3 w-3 shrink-0">
+
+                                            <path stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M12 21s8-4.5 8-11a8 8 0 1 0-16 0c0 6.5 8 11 8 11Z"/>
+
+                                            <circle cx="12" cy="10" r="2.5"/>
+                                        </svg>
+
+                                        <span class="break-words">
+                                            {{ $winner['address'] ?? 'No address available' }}
+                                        </span>
+                                    </p>
                                     <p class="text-[10px] text-gray-500">
                                         {{ $winner['prize_name'] }} · ₱{{ number_format($winner['prize_amount'],2) }} · {{ $winner['invites'] }} activation(s)
                                     </p>
@@ -436,9 +456,26 @@ x-on:close-spin-wheel.window="showModal=false">
                                         @endif
 
                                         <button type="button"
-                                            wire:click="resendWinnerEmail({{ $winner['WinnerID'] }})"
+                                            @click.prevent="
+                                                Swal.fire({
+                                                    title: 'Resend winner email?',
+                                                    text: 'Send the prize notification email again to {{ addslashes($winner['name']) }}?',
+                                                    icon: 'question',
+                                                    showCancelButton: true,
+                                                    confirmButtonText: 'Yes, send email',
+                                                    cancelButtonText: 'Cancel',
+                                                    confirmButtonColor: '#0C2C6B',
+                                                    cancelButtonColor: '#64748B',
+                                                    reverseButtons: true
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        $wire.resendWinnerEmail({{ $winner['WinnerID'] }});
+                                                    }
+                                                });
+                                            "
                                             title="Email this winner again"
                                             class="rounded-lg border border-gray-200 bg-white px-2 py-1 text-[11px] text-gray-500 transition hover:border-[#0C2C6B] hover:text-[#0C2C6B]">
+
                                             ✉️
                                         </button>
                                     </div>
