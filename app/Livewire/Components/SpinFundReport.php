@@ -76,7 +76,8 @@ class SpinFundReport extends Component
             $name = mb_strtolower(($winner->user->firstname ?? '').' '
                 .($winner->user->lastname ?? '').' '
                 .($winner->user->username ?? '').' '
-                .($winner->user->referralCode ?? ''));
+                .($winner->user->referralCode ?? '').' '
+                .($winner->user->address ?? ''));
 
             return str_contains($name, $search);
         })->values();

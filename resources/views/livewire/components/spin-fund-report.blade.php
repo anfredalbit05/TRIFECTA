@@ -263,6 +263,7 @@
                                             {{ trim(($winner->user->firstname ?? '').' '.($winner->user->lastname ?? '')) ?: ($winner->user->username ?? 'Unknown') }}
                                             <span class="ml-1 text-[10px] font-medium text-gray-400">{{ $winner->user->referralCode }}</span>
                                         </p>
+                                        <small class="italic text-gray-500">{{ $winner->user->address }}</small>
 
                                         <p class="text-[11px] text-gray-500">
                                             {{ $winner->prize_name }}
