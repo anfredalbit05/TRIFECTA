@@ -27,8 +27,8 @@ use Illuminate\Support\Facades\Auth;
  *   11 Post - Testimonials
  *   12 Report & Settings - General
  *   13 Report & Settings - Users Reports
- *   14 Report & Settings - Ledgers
- *   15 Report & Settings - Pangkabuhayan
+ *   14 Report & Settings - Ledgers *   15  Report & Settings - Pangkabuhayan
+ *   16  Transaction List - Disbursement
  */
 final class Modules
 {
@@ -51,6 +51,8 @@ final class Modules
     public const TXN_WITHDRAWALS = 8;
 
     public const TXN_ACTIVATIONS = 9;
+
+    public const TXN_DISBURSEMENTS = 16;
 
     // Post
     public const POST_NEWS = 10;

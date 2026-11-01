@@ -312,7 +312,12 @@
      x-init="window.addEventListener('txn-badges-updated', (e) => {
          pendingActivations = e.detail ? (e.detail.activations ?? pendingActivations) : pendingActivations;
          pendingWithdrawals = e.detail ? (e.detail.withdrawals ?? pendingWithdrawals) : pendingWithdrawals;
-     })">
+     });
+     // Clamp any stale persisted tab (e.g. corrupted localStorage or a tab
+     // that no longer exists) so the page never renders without a panel.
+     if (! ['overview','withdrawals','activations','disbursements'].includes(tab)) {
+         tab = 'overview';
+     }">
 
     <nav class="report-settings-header">
         <div class="report-settings-header-title">
@@ -349,6 +354,13 @@
                       x-text="pendingActivations" x-cloak></span>
             </a>
 
+            <a href="#"
+               @click.prevent="tab='disbursements'"
+               :class="{ active: tab==='disbursements' }">
+                <span class="report-settings-tab-icon">₱</span>
+                <span>Disbursement</span>
+            </a>
+
         </div>
 
         <div x-show="tab==='overview'" x-cloak class="report-settings-main-card">
@@ -361,6 +373,10 @@
 
         <div x-show="tab==='activations'" x-cloak class="report-settings-main-card">
             <livewire:admin-pages.transaction-list.activations />
+        </div>
+
+        <div x-show="tab==='disbursements'" x-cloak class="report-settings-main-card">
+            <livewire:admin-pages.transaction-list.disbursements />
         </div>
 
     </div>

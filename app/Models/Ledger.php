@@ -36,4 +36,19 @@ class Ledger extends Model
     {
         return $this->belongsTo(SpinDraw::class, 'DrawID', 'DrawID');
     }
+
+    /**
+     * The disbursement this row mirrors (Source 'DB' only, RefID = DID).
+     * A helper rather than a belongsTo relation: ledgers.RefID is a
+     * varchar business ref shared by several sources, so an ORM relation
+     * would silently match unrelated rows in cross-database tests.
+     */
+    public function disbursement(): ?Disbursement
+    {
+        if ($this->Source !== 'DB' || ! ctype_digit((string) $this->RefID)) {
+            return null;
+        }
+
+        return Disbursement::find((int) $this->RefID);
+    }
 }

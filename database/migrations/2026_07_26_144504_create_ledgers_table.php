@@ -38,6 +38,7 @@ return new class extends Migration
                 'SF', // Satellite Fund (satellite activation split, 90%)
                 'CS', // Company Share (satellite activation split, 10%)
                 'SDR', // Satellite Direct Referral (free member, tier-based)
+                'DB', // Disbursement (money paid out of a collected fee)
             ])->default('OT');
 
             $table->foreignId('ActivationID')
