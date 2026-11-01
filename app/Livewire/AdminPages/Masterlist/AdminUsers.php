@@ -31,6 +31,9 @@ class AdminUsers extends Component
 
     protected $paginationTheme = 'tailwind';
 
+    /** BranchID of the Main Branch (can see every admin user). */
+    private const MAIN_BRANCH_ID = 1;
+
     // =====================================================
     // Table state
     // =====================================================
@@ -138,6 +141,62 @@ class AdminUsers extends Component
         return Modules::ADMIN_USERS;
     }
 
+    /*
+    |----------------------------------------------------------------------
+    | Branch scoping
+    |
+    | Main Branch users see every admin user. Users from any other
+    | branch only see (and can act on) admin users of their own branch.
+    | A logged-in user with no branch sees nothing.
+    |----------------------------------------------------------------------
+    */
+
+    private function isMainBranchUser(): bool
+    {
+        return (int) Auth::user()?->branchCode === self::MAIN_BRANCH_ID;
+    }
+
+    /**
+     * Base query for every admin user lookup in this component.
+     */
+    private function scopedUsers()
+    {
+        $branchCode = Auth::user()?->branchCode;
+
+        return User::query()
+            ->where('RoleID', '!=', 4)
+            ->when(! $this->isMainBranchUser(), function ($query) use ($branchCode) {
+                if (blank($branchCode)) {
+                    $query->whereRaw('1 = 0');   // no branch = see nothing
+                } else {
+                    $query->where('branchCode', $branchCode);
+                }
+            });
+    }
+
+    /**
+     * Find one admin user inside the logged-in user's branch scope.
+     */
+    private function findScopedUser($id): ?User
+    {
+        return $this->scopedUsers()->where('UserID', $id)->first();
+    }
+
+    /**
+     * The branchCode value to save: Main Branch picks freely,
+     * everyone else is locked to their own branch.
+     */
+    private function branchCodeToSave(): ?string
+    {
+        if ($this->isMainBranchUser()) {
+            return $this->branch !== '' ? $this->branch : null;
+        }
+
+        $own = Auth::user()?->branchCode;
+
+        return filled($own) ? (string) $own : null;
+    }
+
     // ==========================================
     // WITHDRAWAL GLOBAL STATUS
     //
@@ -167,7 +226,7 @@ class AdminUsers extends Component
     public function getSelectedUserProperty(): ?User
     {
         return $this->selectedUserId
-            ? User::where('UserID', $this->selectedUserId)->first()
+            ? $this->findScopedUser($this->selectedUserId)
             : null;
     }
 
@@ -194,8 +253,16 @@ class AdminUsers extends Component
     |----------------------------------------------------------------------
     */
 
-    public function viewUser(User $user): void
+    public function viewUser(int $userId): void
     {
+        $user = $this->findScopedUser($userId);
+
+        if (! $user) {
+            session()->flash('error', 'User not found.');
+
+            return;
+        }
+
         Log::info("Viewing user with ID: {$user->UserID}");
 
         $this->selectedUserId = $user->UserID;
@@ -240,7 +307,7 @@ class AdminUsers extends Component
             'selectedUserId',
         ]);
 
-          $this->positionMode = 'select';
+        $this->positionMode = 'select';
     }
 
     public function openAddModal(): void
@@ -250,6 +317,9 @@ class AdminUsers extends Component
         $this->resetUserForm();
 
         $this->status = 'Active';
+        $this->branch = $this->isMainBranchUser()
+            ? ''
+            : (string) Auth::user()?->branchCode;
         $this->positionMode = 'select';
         $this->isAddModalOpen = true;
     }
@@ -272,6 +342,7 @@ class AdminUsers extends Component
             'position' => 'nullable|string|max:255|required_if:positionMode,select',
             'customPosition' => 'nullable|string|max:255|required_if:positionMode,custom',
             'status' => 'required|in:Active,Inactive,Suspended',
+            'branch' => 'nullable|exists:branches,BranchID',
         ]);
 
         User::create([
@@ -289,7 +360,7 @@ class AdminUsers extends Component
             'position' => $this->getPositionValue() ?? 'client',
             'status' => $this->status,
             'referralCode' => $this->generateUplineCode(),
-            'branchCode' => $this->branch !== '' ? $this->branch : null,
+            'branchCode' => $this->branchCodeToSave(),
         ]);
 
         session()->flash(
@@ -305,11 +376,25 @@ class AdminUsers extends Component
 
     public function getBranchesProperty()
     {
-        return Branch::orderBy('branchname')->get(['BranchID', 'branchname']);
+        return Branch::query()
+            ->when(
+                ! $this->isMainBranchUser(),
+                fn ($q) => $q->where('BranchID', Auth::user()?->branchCode)
+            )
+            ->orderBy('branchname')
+            ->get(['BranchID', 'branchname']);
     }
 
-    public function editUser(User $user): void
+    public function editUser(int $userId): void
     {
+        $user = $this->findScopedUser($userId);
+
+        if (! $user) {
+            session()->flash('error', 'User not found.');
+
+            return;
+        }
+
         Log::info("Initiating edit for user ID: {$user->UserID}");
 
         $this->selectedUserId = $user->UserID;
@@ -367,14 +452,14 @@ class AdminUsers extends Component
 
             'status' => 'required|in:Active,Inactive,Suspended',
 
-            'branch' => 'nullable',
+            'branch' => 'nullable|exists:branches,BranchID',
         ]);
 
-        $user = User::find($this->selectedUserId);
+        $user = $this->findScopedUser($this->selectedUserId);
 
         if (! $user) {
             Log::warning(
-                "updateUser: no user found for ID {$this->selectedUserId}"
+                "updateUser: no user found in scope for ID {$this->selectedUserId}"
             );
 
             $this->isEditModalOpen = false;
@@ -415,7 +500,7 @@ class AdminUsers extends Component
 
             'position' => $this->getPositionValue(),
 
-            'branchCode' => $this->branch,
+            'branchCode' => $this->branchCodeToSave(),
         ]);
 
         Log::info(
@@ -499,7 +584,7 @@ class AdminUsers extends Component
             return;
         }
 
-        $user = User::find($id);
+        $user = $this->findScopedUser($id);
 
         if (! $user) {
             $this->dispatch(
@@ -525,8 +610,9 @@ class AdminUsers extends Component
 
     /**
      * Persist the new password (called from the SweetAlert confirm dialog).
-     * Guarded server-side: permissions, existence, and password rules are
-     * re-validated here so this can never be triggered without authorization.
+     * Guarded server-side: permissions, existence, branch scope, and
+     * password rules are re-validated here so this can never be triggered
+     * without authorization.
      */
     public function resetUserPassword($id, $password): void
     {
@@ -539,7 +625,7 @@ class AdminUsers extends Component
             return;
         }
 
-        $user = User::find($id);
+        $user = $this->findScopedUser($id);
 
         if (! $user) {
             $this->dispatch(
@@ -634,8 +720,16 @@ class AdminUsers extends Component
     |----------------------------------------------------------------------
     */
 
-    public function confirmDelete(User $user): void
+    public function confirmDelete(int $userId): void
     {
+        $user = $this->findScopedUser($userId);
+
+        if (! $user) {
+            session()->flash('error', 'User not found.');
+
+            return;
+        }
+
         Log::info(
             "Confirm deletion requested for user ID: {$user->UserID}"
         );
@@ -716,8 +810,16 @@ class AdminUsers extends Component
         }
     }
 
-    public function openAccessModal(User $user): void
+    public function openAccessModal(int $userId): void
     {
+        $user = $this->findScopedUser($userId);
+
+        if (! $user) {
+            session()->flash('error', 'User not found.');
+
+            return;
+        }
+
         Log::info(
             "Opening access modal for user ID: {$user->UserID}"
         );
@@ -853,7 +955,7 @@ class AdminUsers extends Component
             return;
         }
 
-        $user = User::find($userId);
+        $user = $this->findScopedUser($userId);
 
         if (! $user) {
 
@@ -915,7 +1017,7 @@ class AdminUsers extends Component
             return;
         }
 
-        $user = User::find($userId);
+        $user = $this->findScopedUser($userId);
 
         if (! $user) {
 
@@ -1330,6 +1432,7 @@ class AdminUsers extends Component
             ->orderBy('position')
             ->pluck('position');
     }
+
     private function getPositionValue(): ?string
     {
         $position = $this->positionMode === 'custom'
@@ -1343,9 +1446,7 @@ class AdminUsers extends Component
 
     public function render()
     {
-        $users = User::query()
-
-            ->where('RoleID', '!=', 4)
+        $users = $this->scopedUsers()
 
             ->withExists([
 
@@ -1417,6 +1518,7 @@ class AdminUsers extends Component
             ->latest('UserID')
 
             ->paginate(10);
+
         return view(
             'livewire.admin-pages.masterlist.admin-users',
             [
@@ -1424,7 +1526,7 @@ class AdminUsers extends Component
 
                 'isWithdrawalActive' => $this->isWithdrawalActive(),
 
-                 'branchNames' => Branch::pluck('branchname', 'BranchID'),
+                'branchNames' => Branch::pluck('branchname', 'BranchID'),
             ]
         );
     }

@@ -42,6 +42,15 @@
                 </a>
             @endif
 
+            @if(auth()->user()->RoleID == 1)
+                <a href="#"
+                   @click.prevent="tab='branch-variant-grants'"
+                   :class="{ active: tab==='branch-variant-grants' }">
+                    <span class="report-settings-tab-icon">▦</span>
+                    <span>Branch Variant Grants</span>
+                </a>
+            @endif
+
             <a href="#"
                @click.prevent="tab='users'"
                :class="{ active: tab==='users' }">
@@ -119,6 +128,12 @@
         @if(auth()->user()->RoleID == 1)
             <div x-show="tab==='variants'" x-cloak class="report-settings-main-card">
                 <livewire:admin-pages.report-settings.variants />
+            </div>
+        @endif
+
+        @if(auth()->user()->RoleID == 1)
+            <div x-show="tab==='branch-variant-grants'" x-cloak class="report-settings-main-card">
+                <livewire:admin-pages.report-settings.branch-variant-grants />
             </div>
         @endif
 

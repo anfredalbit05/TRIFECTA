@@ -20,6 +20,17 @@ use Livewire\Component;
 
 class ActivationModal extends Component
 {
+    /**
+     * BranchID => prefix of that branch's rows in the settings table.
+     * Main Branch (1) uses the original un-prefixed names.
+     */
+    private const BRANCH_SETTING_PREFIX = [
+        1 => '',
+        2 => 'san_franz_branch_',
+        3 => 'davao_branch_',
+        4 => 'digos_branch_',
+    ];
+
     public bool $open = false;
 
     public $activationData;
@@ -109,6 +120,130 @@ class ActivationModal extends Component
 
     /*
     |--------------------------------------------------------------------------
+    | Branch Resolution
+    |
+    | Order of priority:
+    |   1. The branch of the entered upline code (referralCode owner)
+    |   2. The member's own branchCode
+    |   3. The logged-in user's branchCode
+    |
+    | Drives both the variant grants and the payment settings below.
+    | No branch = nothing available.
+    |--------------------------------------------------------------------------
+    */
+    private function resolveBranchId(): ?int
+    {
+        // 1. Upline's branch (the member inherits it on activation).
+        $uplineCode = trim($this->upline_code);
+
+        if ($uplineCode !== '') {
+            $uplineBranch = User::where('referralCode', $uplineCode)->value('branchCode');
+
+            if (filled($uplineBranch)) {
+                return (int) $uplineBranch;
+            }
+        }
+
+        // 2. The member's own branch.
+        $branch = $this->selectedUserRecord?->branchCode;
+
+        // 3. The logged-in user's branch.
+        if (blank($branch)) {
+            $branch = Auth::user()?->branchCode;
+        }
+
+        return filled($branch) ? (int) $branch : null;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Branch Payment Settings
+    |
+    | Reads "<branch prefix><name>" from the settings table. A branch with
+    | no matching row gets $default (disabled / empty) — it never falls
+    | back to another branch's account details.
+    |--------------------------------------------------------------------------
+    */
+    private function branchSetting(string $name, $default = null)
+    {
+        $branchId = $this->resolveBranchId();
+
+        if ($branchId === null || ! array_key_exists($branchId, self::BRANCH_SETTING_PREFIX)) {
+            return $default;
+        }
+
+        $value = Setting::where(
+            'name',
+            self::BRANCH_SETTING_PREFIX[$branchId].$name
+        )->value('value');
+
+        return $value ?? $default;
+    }
+
+    private function branchFlag(string $name): bool
+    {
+        return filter_var(
+            $this->branchSetting($name, 'false'),
+            FILTER_VALIDATE_BOOLEAN
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Branch Variant Grants
+    |
+    | Only variants granted to the resolved branch (an Active row in
+    | branch_variant_grants) can be shown or selected.
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Active variants granted to the resolved branch.
+     */
+    private function loadAvailableVariants(): array
+    {
+        $branchId = $this->resolveBranchId();
+
+        if ($branchId === null) {
+            return [];
+        }
+
+        return Variant::query()
+            ->where('status', 'Active')
+            ->whereIn('VID', function ($query) use ($branchId) {
+                $query->select('VID')
+                    ->from('branch_variant_grants')
+                    ->where('BranchID', $branchId)
+                    ->where('status', 'Active');
+            })
+            ->orderBy('name')
+            ->get()
+            ->toArray();
+    }
+
+    /**
+     * VIDs the resolved branch is allowed to use (for server-side validation).
+     *
+     * @return array<int, int>
+     */
+    private function allowedVariantIds(): array
+    {
+        $branchId = $this->resolveBranchId();
+
+        if ($branchId === null) {
+            return [];
+        }
+
+        return DB::table('branch_variant_grants')
+            ->where('BranchID', $branchId)
+            ->where('status', 'Active')
+            ->pluck('VID')
+            ->map(fn ($vid) => (int) $vid)
+            ->all();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Helper to Get Membership Fee Amount
     |--------------------------------------------------------------------------
     */
@@ -145,32 +280,65 @@ class ActivationModal extends Component
         $this->resetValidation('selectedVariantId');
     }
 
+    /**
+     * When the upline code changes, the branch (and therefore the
+     * available variants and payment accounts) may change too —
+     * reload everything that depends on the branch.
+     */
+    public function updatedUplineCode(): void
+    {
+        // Not in the submit form (closed, or read-only "view pending" mode).
+        if (! $this->open || $this->activationData) {
+            return;
+        }
+
+        $this->variants = $this->loadAvailableVariants();
+
+        $allowedIds = array_map('strval', array_column($this->variants, 'VID'));
+
+        // Keep the current variant if the new branch still grants it.
+        if (! in_array((string) $this->selectedVariantId, $allowedIds, true)) {
+            $this->selectedVariantId = $this->variants[0]['VID'] ?? null;
+        }
+
+        $this->amount = $this->getMembershipFee(
+            filled($this->selectedVariantId)
+                ? (int) $this->selectedVariantId
+                : null
+        );
+
+        $this->loadPaymentSettings();
+
+        // Drop the chosen payment method if the new branch doesn't offer it.
+        $stillAvailable = match ($this->payment_method) {
+            'GCash' => $this->gcashEnabled,
+            'Maya' => $this->paymayaEnabled,
+            'Bank Transfer' => $this->bankEnabled,
+            default => true,
+        };
+
+        if (! $stillAvailable) {
+            $this->payment_method = '';
+            $this->reference_code = '';
+        }
+
+        $this->loadPaymentDetails();
+
+        $this->resetValidation('upline_code');
+        $this->resetValidation('selectedVariantId');
+    }
+
     private function loadPaymentSettings(): void
     {
-        $this->gcashEnabled = filter_var(
-            Setting::where('name', 'gcash_payment_enabled')->value('value'),
-            FILTER_VALIDATE_BOOLEAN
-        );
+        $this->gcashEnabled = $this->branchFlag('gcash_payment_enabled');
 
-        $this->paymayaEnabled = filter_var(
-            Setting::where('name', 'paymaya_payment_enabled')->value('value'),
-            FILTER_VALIDATE_BOOLEAN
-        );
+        $this->paymayaEnabled = $this->branchFlag('paymaya_payment_enabled');
 
-        $this->bankEnabled = filter_var(
-            Setting::where('name', 'bank_payment_enabled')->value('value'),
-            FILTER_VALIDATE_BOOLEAN
-        );
+        $this->bankEnabled = $this->branchFlag('bank_payment_enabled');
 
-        $this->gcashConvenienceFeeEnabled = filter_var(
-            Setting::where('name', 'gcash_convenience_fee_enabled')->value('value'),
-            FILTER_VALIDATE_BOOLEAN
-        );
+        $this->gcashConvenienceFeeEnabled = $this->branchFlag('gcash_convenience_fee_enabled');
 
-        $this->paymayaConvenienceFeeEnabled = filter_var(
-            Setting::where('name', 'paymaya_convenience_fee_enabled')->value('value'),
-            FILTER_VALIDATE_BOOLEAN
-        );
+        $this->paymayaConvenienceFeeEnabled = $this->branchFlag('paymaya_convenience_fee_enabled');
 
         $this->totalMembershipFeesCost = filled($this->selectedVariantId)
             ? (float) MembershipFee::where(
@@ -197,13 +365,15 @@ class ActivationModal extends Component
             'opened_by' => Auth::id(),
         ]);
 
-        $this->variants = Variant::query()
-            ->where('status', 'Active')
-            ->orderBy('name')
-            ->get()
-            ->toArray();
+        // The member record and upline code must be set BEFORE the variants
+        // and payment settings, because the branch is resolved from them.
+        $this->selectedUserID = $UserID;
+        $this->selectedUserRecord = User::find($UserID);
+        $this->upline_code = $this->selectedUserRecord?->uplineCode ?? '';
 
-        // Default to the first active variant.
+        $this->variants = $this->loadAvailableVariants();
+
+        // Default to the first granted variant.
         $this->selectedVariantId = $this->variants[0]['VID'] ?? null;
 
         $this->amount = $this->getMembershipFee(
@@ -213,9 +383,6 @@ class ActivationModal extends Component
         );
 
         $this->totalMembershipFeesCost = (float) $this->amount;
-
-        $this->selectedUserID = $UserID;
-        $this->selectedUserRecord = User::find($UserID);
 
         $this->loadPaymentSettings();
         $this->activationData = null;
@@ -227,7 +394,6 @@ class ActivationModal extends Component
                 ? (int) $this->selectedVariantId
                 : null
         );
-        $this->upline_code = $this->selectedUserRecord?->uplineCode ?? '';
         $this->reference_code = '';
 
         $this->loadBeneficiaries();
@@ -244,8 +410,6 @@ class ActivationModal extends Component
         $this->selectedUserID = $UserID;
         $this->selectedUserRecord = User::find($UserID);
 
-        $this->loadPaymentSettings();
-
         $activation = Activation::where('UserID', $UserID)
             ->where('status', 'Rejected')
             ->latest()
@@ -261,15 +425,18 @@ class ActivationModal extends Component
             $this->upline_code = $activation->upline_code ?? '';
             $this->reference_code = $activation->payment_reference ?? '';
             $this->rejectionRemarks = $history?->remarks;
+        }
 
+        // Payment settings/details are loaded AFTER the upline code is set,
+        // because the branch is resolved from it.
+        $this->loadPaymentSettings();
+
+        if ($activation) {
             $this->loadPaymentDetails(); // <-- add this
         }
 
-        $this->variants = Variant::query()
-        ->where('status', 'Active')
-        ->orderBy('name')
-        ->get()
-        ->toArray();
+        // Only variants granted to the branch.
+        $this->variants = $this->loadAvailableVariants();
 
         $activeVariantIds = array_column($this->variants, 'VID');
 
@@ -394,7 +561,7 @@ class ActivationModal extends Component
 
     /*
     |--------------------------------------------------------------------------
-    | Load GCash / Bank Details from Settings
+    | Load GCash / Maya / Bank Details from the Branch's Settings
     |--------------------------------------------------------------------------
     */
     private function loadPaymentDetails(): void
@@ -409,17 +576,23 @@ class ActivationModal extends Component
         $this->bankAccountNumber = '';
 
         if ($this->payment_method === 'GCash') {
-            $this->gcashNumber = Setting::where('name', 'gcash_number1')->value('value') ?? '';
-            $this->gcashName = Setting::where('name', 'gcash_number1_name')->value('value') ?? '';
+            // San Franz currently stores its number as "gcash_number"
+            // (no "1"), so accept both spellings.
+            $this->gcashNumber = (string) (
+                $this->branchSetting('gcash_number1')
+                ?? $this->branchSetting('gcash_number', '')
+            );
+            $this->gcashName = (string) $this->branchSetting('gcash_number1_name', '');
 
         } elseif ($this->payment_method === 'Maya') {
-            $this->paymayaNumber = Setting::where('name', 'paymaya_account_number')->value('value') ?? '';
-            $this->paymayaName = Setting::where('name', 'paymaya_account_name')->value('value') ?? '';
+            $this->paymayaNumber = (string) $this->branchSetting('paymaya_account_number', '');
+            $this->paymayaName = (string) $this->branchSetting('paymaya_account_name', '');
 
         } elseif ($this->payment_method === 'Bank Transfer') {
-            $this->bankName = 'BPI'; // hardcoded since settings only has bpi_* keys right now
-            $this->bankAccountName = Setting::where('name', 'bpi_account_name')->value('value') ?? '';
-            $this->bankAccountNumber = Setting::where('name', 'bpi_account_number')->value('value') ?? '';
+            // Optional "bank_name" setting; plain "Bank" when none exists.
+            $this->bankName = (string) $this->branchSetting('bank_name', 'Bank');
+            $this->bankAccountName = (string) $this->branchSetting('bank_account_name', '');
+            $this->bankAccountNumber = (string) $this->branchSetting('bank_account_number', '');
         }
     }
 
@@ -844,10 +1017,18 @@ public function approveActivation($UserID = null): void
                     : 'New Activation Request Submitted (Admin Notice)';
             }
 
-            // Store/Update uplineCode on the User table column upon submission
-            $selectedUser->update([
+            // Store/Update uplineCode on the User table column upon submission.
+            // The member also inherits the upline's branch right away
+            // (approval assigns it again, so both stay consistent).
+            $memberUpdates = [
                 'uplineCode' => $cleanUplineCode,
-            ]);
+            ];
+
+            if (filled($referralUser->branchCode)) {
+                $memberUpdates['branchCode'] = $referralUser->branchCode;
+            }
+
+            $selectedUser->update($memberUpdates);
 
             $mailData = [
                 'selectedUser' => $selectedUser,
@@ -911,6 +1092,7 @@ public function approveActivation($UserID = null): void
             Log::info('✅ ACTIVATION COMMITTED SUCCESSFULLY', [
                 'selected_user_id' => $selectedUser->UserID,
                 'payment_method' => $this->payment_method,
+                'inherited_branch_code' => $referralUser->branchCode,
             ]);
 
             $wasRenewal = $this->isRenewal;
@@ -955,7 +1137,7 @@ public function approveActivation($UserID = null): void
     |--------------------------------------------------------------------------
     */
     /**
-     * @return array<string, array<int, string>>
+     * @return array<string, array<int, mixed>>
      */
     private function activationRules(string $membershipFee): array
     {
@@ -971,8 +1153,10 @@ public function approveActivation($UserID = null): void
             'selectedVariantId' => [
                 'required',
                 'integer',
+                // Must be an Active variant AND granted to the branch.
                 \Illuminate\Validation\Rule::exists('variants', 'VID')
-                    ->where('status', 'Active'),
+                    ->where('status', 'Active')
+                    ->whereIn('VID', $this->allowedVariantIds()),
             ],
         ];
     }

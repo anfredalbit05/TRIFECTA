@@ -170,7 +170,7 @@
                                             title="Update Variant"
                                             class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow"
                                         >
-                                            ✏️
+                                            ✏️ Edit
                                         </button>
                                     @endif
 

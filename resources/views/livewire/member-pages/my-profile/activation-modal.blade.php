@@ -340,7 +340,7 @@
                                 <label class="block text-xs font-bold text-slate-700 mb-1">
                                     Upline Code *
                                 </label>
-                                <input wire:model="upline_code" type="text" placeholder="Enter upline code"
+                                <input wire:model.live.debounce.500ms="upline_code" type="text" placeholder="Enter upline code"
                                     @readonly($selectedUserRecord?->status === 'Active')
                                     class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm
         focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none

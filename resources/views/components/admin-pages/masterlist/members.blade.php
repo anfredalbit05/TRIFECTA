@@ -69,6 +69,23 @@
     {{-- FILTERS AND REFRESH --}}
     <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
 
+        {{-- BRANCH FILTER (NEW) — Main Branch only --}}
+        @if ($isMainBranch)
+            <select
+                wire:model.live="branchFilter"
+                title="Filter by branch"
+                class="border border-slate-200 rounded-xl px-3 py-2.5 text-sm
+                    focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
+                    focus:border-[#0C2C6B] bg-white font-medium text-slate-700
+                    shadow-sm cursor-pointer transition"
+            >
+                <option value="all">All Branches</option>
+                @foreach ($branches as $branchOption)
+                    <option value="{{ $branchOption->BranchID }}">{{ $branchOption->branchname }}</option>
+                @endforeach
+            </select>
+        @endif
+
         {{-- STATUS FILTER --}}
         <select
             wire:model.live="statusFilter"
@@ -459,7 +476,7 @@
                                                     Approve Membership
                                                 </button>
 
-                                            @elseif (strtolower($member->status) === 'suspended')
+                                            @elseif (strtolower($member->status) === 'suspended' && auth()->user()->RoleID == 1)
 
                                                 {{-- Suspended → unsuspend via the same confirmation dialog --}}
                                                 <button
@@ -500,6 +517,7 @@
 
                                             @else
 
+                                            @if(auth()->user()->RoleID == 1)
                                                 {{-- Active → Suspend (replaces Deactivate) --}}
                                                 <button
                                                     type="button"
@@ -509,6 +527,15 @@
                                                 >
                                                     Suspend Account
                                                 </button>
+                                                @else
+
+                                                <button
+                                                    type="button"
+                                                    class="member-action border border-[#0C2C6B] bg-transparent text-black transition-colors truelife-member"
+                                                >
+                                                    ACTIVATED
+                                                </button>
+                                                @endif
 
                                             @endif
 

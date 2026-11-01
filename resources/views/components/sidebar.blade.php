@@ -74,6 +74,9 @@
                         {{ $user->status ?? 'Inactive' }} - {{ $user->position ?? '--' }}
                     </span>
                 @endif
+                <small class="profile-role">
+                    {{ $user?->branch?->branchname ?? 'N/A' }}
+                </small>
             </div>
 
         </a>
@@ -126,6 +129,10 @@
                         {{ $user->status ?? 'Inactive' }} - {{ $user->position ?? '--' }}
                     </p>
                 @endif
+                    <small class="profile-role">
+                        {{ $user?->branch?->branchname ?? 'N/A' }}
+                    </small>
+
             </div>
 
                 {{-- DESKTOP MENU --}}

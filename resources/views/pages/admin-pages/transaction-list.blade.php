@@ -336,6 +336,7 @@
                 <span>Overview</span>
             </a>
 
+
             <a href="#"
                @click.prevent="tab='withdrawals'"
                :class="{ active: tab==='withdrawals' }">
@@ -344,6 +345,7 @@
                 <span class="txn-tab-badge" x-show="pendingWithdrawals > 0"
                       x-text="pendingWithdrawals" x-cloak></span>
             </a>
+
 
             <a href="#"
                @click.prevent="tab='activations'"
@@ -354,12 +356,14 @@
                       x-text="pendingActivations" x-cloak></span>
             </a>
 
+            @if(auth()->user()->RoleID == 1)
             <a href="#"
                @click.prevent="tab='disbursements'"
                :class="{ active: tab==='disbursements' }">
                 <span class="report-settings-tab-icon">₱</span>
                 <span>Disbursement</span>
             </a>
+            @endif
 
         </div>
 
@@ -375,10 +379,11 @@
             <livewire:admin-pages.transaction-list.activations />
         </div>
 
+        @if(auth()->user()->RoleID == 1)
         <div x-show="tab==='disbursements'" x-cloak class="report-settings-main-card">
             <livewire:admin-pages.transaction-list.disbursements />
         </div>
-
+        @endif
     </div>
 
 </div>

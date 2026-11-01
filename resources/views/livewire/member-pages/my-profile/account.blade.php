@@ -63,6 +63,7 @@
         </form>
     </div>
 
+    @if(auth()->user()->RoleID != 9)
     {{-- ================= 3. READ-ONLY ACCOUNT DETAILS ================= --}}
     <div class="card">
         <div class="card-header">
@@ -132,6 +133,9 @@
             </div>
         </div>
     </div>
+
+    @endif
+
 
     {{-- ==================== 5. TOAST NOTIFICATION ==================== --}}
     <div

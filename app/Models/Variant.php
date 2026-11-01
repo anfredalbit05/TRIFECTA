@@ -18,9 +18,6 @@ class Variant extends Model
 
     protected $primaryKey = 'VID';
 
-    /**
-     * One variant can have many activations.
-     */
     public function activations(): HasMany
     {
         return $this->hasMany(
@@ -30,13 +27,19 @@ class Variant extends Model
         );
     }
 
-        /**
-     * One variant can have many membership fees.
-     */
     public function membershipFees(): HasMany
     {
         return $this->hasMany(
             MembershipFee::class,
+            'VID',
+            'VID'
+        );
+    }
+
+    public function branchGrants(): HasMany
+    {
+        return $this->hasMany(
+            BranchVariantGrants::class,
             'VID',
             'VID'
         );

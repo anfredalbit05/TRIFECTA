@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Livewire\Concerns\AuthorizesModules;
 use App\Mail\PasswordResetConfirmation;
 use App\Models\Activation;
+use App\Models\Branch;
 use App\Models\Ledger;
 use App\Models\Setting;
 use App\Models\User;
@@ -27,6 +28,9 @@ class Members extends Component
     use AuthorizesModules;
     use WithPagination;
 
+    /** BranchID of the Main Branch (can see every branch's members). */
+    private const MAIN_BRANCH_ID = 1;
+
     public string $search = '';
 
     public string $dateRange = '';   // e.g. "2026-08-01 to 2026-08-16"
@@ -34,6 +38,9 @@ class Members extends Component
     public string $summaryFilter = 'all';
 
     public string $statusFilter = 'all';
+
+    // Branch filter (Main Branch only): 'all' or a BranchID
+    public string $branchFilter = 'all';
 
     // Excel Export Filters
     public $exportYear = '';
@@ -79,6 +86,61 @@ class Members extends Component
     protected function module(): int
     {
         return Modules::MEMBERS;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Branch scoping
+    |
+    | Main Branch users see every member and may narrow the list with the
+    | Branch dropdown. Users from any other branch only see (and can act
+    | on) members of their own branch. A logged-in user with no branch
+    | sees nothing.
+    |--------------------------------------------------------------------------
+    */
+
+    private function isMainBranchUser(): bool
+    {
+        return (int) Auth::user()?->branchCode === self::MAIN_BRANCH_ID;
+    }
+
+    /**
+     * Base query for every member lookup in this component.
+     * This is the security boundary — it does NOT depend on the dropdown.
+     */
+    private function scopedMembers()
+    {
+        $branchCode = Auth::user()?->branchCode;
+
+        return User::query()
+            ->where('RoleID', 4)
+            ->when(! $this->isMainBranchUser(), function ($query) use ($branchCode) {
+                if (blank($branchCode)) {
+                    $query->whereRaw('1 = 0');   // no branch = see nothing
+                } else {
+                    $query->where('branchCode', $branchCode);
+                }
+            });
+    }
+
+    /**
+     * Find one member inside the logged-in user's branch scope.
+     */
+    private function findScopedMember($id): ?User
+    {
+        return $this->scopedMembers()->where('UserID', $id)->first();
+    }
+
+    /**
+     * Branch list for the dropdown (Main Branch only).
+     */
+    public function getBranchesProperty()
+    {
+        if (! $this->isMainBranchUser()) {
+            return collect();
+        }
+
+        return Branch::orderBy('branchname')->get(['BranchID', 'branchname']);
     }
 
     /*
@@ -147,8 +209,9 @@ class Members extends Component
 
         [$dateFrom, $dateTo] = $this->parsedDateRange();
 
-        $members = User::query()
-            ->where('RoleID', 4)
+        $isMainBranch = $this->isMainBranchUser();
+
+        $members = $this->scopedMembers()
             ->withExists([
                 'activations as has_pending_activation' => function ($query) {
                     $query->where('status', 'Pending');
@@ -168,6 +231,13 @@ class Members extends Component
                     $query->where('status', 'Pending');
                 },
             ])
+            // Branch dropdown — only honored for Main Branch users.
+            ->when(
+                $isMainBranch && $this->branchFilter !== 'all' && $this->branchFilter !== '',
+                function ($query) {
+                    $query->where('branchCode', $this->branchFilter);
+                }
+            )
             ->when(filled($this->search), function ($query) {
                 $search = trim($this->search);
 
@@ -209,6 +279,8 @@ class Members extends Component
             'members' => $members,
             'isWithdrawalActive' => $this->isWithdrawalActive(),
             'isSatelliteApplicationActive' => $isSatelliteApplicationActive,
+            'isMainBranch' => $isMainBranch,
+            'branches' => $this->branches,
         ]);
     }
 
@@ -229,6 +301,11 @@ class Members extends Component
     }
 
     public function updatedStatusFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedBranchFilter()
     {
         $this->resetPage();
     }
@@ -279,7 +356,7 @@ class Members extends Component
     {
         Log::info('Activation review clicked', ['UserID' => $id, 'reviewed_by' => Auth::id()]);
 
-        $member = User::find($id);
+        $member = $this->findScopedMember($id);
 
         if (! $member) {
             Log::warning('Review failed: member not found.', ['UserID' => $id]);
@@ -298,7 +375,7 @@ class Members extends Component
 
     public function openSatellite($id): void
     {
-        $member = User::find($id);
+        $member = $this->findScopedMember($id);
 
         if (! $member) {
             Log::warning('Satellite modal failed: member not found.', ['UserID' => $id]);
@@ -322,7 +399,7 @@ class Members extends Component
 
     public function confirmStatus($id): void
     {
-        $member = User::find($id);
+        $member = $this->findScopedMember($id);
 
         if (! $member) {
             Log::warning('Status update failed: member not found.', ['UserID' => $id]);
@@ -361,7 +438,7 @@ class Members extends Component
 
         Log::info('Updating member status', ['UserID' => $id, 'updated_by' => Auth::id()]);
 
-        $member = User::find($id);
+        $member = $this->findScopedMember($id);
 
         if (! $member) {
             Log::warning('Status update failed: member not found.', ['UserID' => $id]);
@@ -414,7 +491,7 @@ class Members extends Component
 
         Log::info('Admin renewal clicked', ['target_UserID' => $id, 'opened_by' => Auth::id()]);
 
-        $member = User::find($id);
+        $member = $this->findScopedMember($id);
 
         if (! $member) {
             Log::warning('Renewal failed. Member not found.', ['target_UserID' => $id]);
@@ -443,7 +520,7 @@ class Members extends Component
 
         Log::info('Admin reactivate clicked', ['target_UserID' => $id, 'opened_by' => Auth::id()]);
 
-        $member = User::find($id);
+        $member = $this->findScopedMember($id);
 
         if (! $member) {
             Log::warning('Reactivate failed. Member not found.', ['target_UserID' => $id]);
@@ -465,7 +542,7 @@ class Members extends Component
 
         Log::info('Admin activation clicked', ['target_UserID' => $id, 'processed_by' => Auth::id()]);
 
-        $member = User::find($id);
+        $member = $this->findScopedMember($id);
 
         if (! $member) {
             Log::warning('Activation failed. Member not found.', ['target_UserID' => $id]);
@@ -485,7 +562,7 @@ class Members extends Component
     public function editMember($id): void
     {
 
-        $member = User::find($id);
+        $member = $this->findScopedMember($id);
 
         if (! $member) {
             Log::warning('Edit member not found.', ['UserID' => $id]);
@@ -499,7 +576,7 @@ class Members extends Component
     public function viewMember($id): void
     {
 
-        $member = User::find($id);
+        $member = $this->findScopedMember($id);
 
         if (! $member) {
             return;
@@ -557,7 +634,7 @@ class Members extends Component
     public function promptMemberPasswordReset($id): void
     {
 
-        $member = User::find($id);
+        $member = $this->findScopedMember($id);
 
         if (! $member) {
             $this->dispatch('swal:error', [
@@ -581,13 +658,14 @@ class Members extends Component
 
     /**
      * Persist the new password (called from the SweetAlert confirm dialog).
-     * Guarded server-side: permissions, existence, and password rules are
-     * re-validated here so this can never be triggered without authorization.
+     * Guarded server-side: permissions, existence, branch scope, and
+     * password rules are re-validated here so this can never be triggered
+     * without authorization.
      */
     public function resetMemberPassword($id, $password): void
     {
 
-        $member = User::find($id);
+        $member = $this->findScopedMember($id);
 
         if (! $member) {
             $this->dispatch('swal:error', [
@@ -702,7 +780,7 @@ class Members extends Component
     public function openWithdrawalModal(int $userId): void
     {
 
-        $member = User::find($userId);
+        $member = $this->findScopedMember($userId);
 
         if (! $member) {
 
@@ -725,7 +803,7 @@ class Members extends Component
     public function openWithdrawalApproval($id): void
     {
 
-        $member = User::find($id);
+        $member = $this->findScopedMember($id);
 
         if (! $member) {
             Log::warning('Withdrawal approval failed: member not found.', ['UserID' => $id]);
@@ -1051,6 +1129,7 @@ class Members extends Component
         $this->search = '';
         $this->summaryFilter = 'all';
         $this->statusFilter = 'all';
+        $this->branchFilter = 'all';
         $this->dateRange = '';           // Clear month filter
         $this->exportYear = '';
         $this->exportMonth = '';

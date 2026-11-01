@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
@@ -595,6 +596,16 @@ public function previewPolicyNumber(): string
             */
             DB::beginTransaction();
 
+            // Get the branchCode of the currently authenticated user.
+            $branchCode = Auth::user()?->branchCode;
+
+            // Prevent creating an applicant without an assigned branch.
+            if (blank($branchCode)) {
+                throw ValidationException::withMessages([
+                    'branchCode' => 'Your account is not assigned to a branch.',
+                ]);
+            }
+
             Log::info('=== SAVE APPLICATION STARTED ===', [
                 'username' => $this->username,
                 'email' => $this->email,
@@ -620,6 +631,7 @@ public function previewPolicyNumber(): string
                 'password' => bcrypt($this->password),
                 'referralCode' => $referralCode,
                 'uplineCode' => $this->upline,
+                'branchCode' => $branchCode,
                 'lastname' => $this->surname,
                 'firstname' => $this->first_name,
                 'middlename' => $this->middle_name,
