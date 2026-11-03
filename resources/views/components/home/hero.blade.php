@@ -1,3 +1,13 @@
+
+@php
+    $joinAllow = \Illuminate\Support\Facades\DB::table('settings')
+        ->where('BranchID', 0)
+        ->where('name', 'join_allow')
+        ->value('value');
+
+    $joinAllow = filter_var($joinAllow, FILTER_VALIDATE_BOOLEAN);
+@endphp
+
 <section class="hero-section">
 
     {{-- =========================
@@ -95,16 +105,27 @@
 
                     {{-- Buttons --}}
                     <div class="hero-btn-group">
-                        <a
-                            onclick="Livewire.dispatch('open-application-modal')"
-                            class="hero-btn-primary cursor-pointer">
-                            Join Now
-                        </a>
+
+                        @if($joinAllow)
+                            <a
+                                onclick="Livewire.dispatch('open-application-modal')"
+                                class="hero-btn-primary cursor-pointer">
+                                Join Now
+                            </a>
+                        @else
+                            <a
+                                class="hero-btn-primary cursor-not-allowed opacity-60"
+                                aria-disabled="true">
+                                Join Unavailable
+                            </a>
+                        @endif
+
                         <a
                             href="{{ route('how-it-works') }}"
                             class="hero-btn-secondary">
                             Learn More
                         </a>
+
                     </div>
 
                 </div>

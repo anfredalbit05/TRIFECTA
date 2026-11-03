@@ -1,3 +1,12 @@
+@php
+    $joinAllow = \Illuminate\Support\Facades\DB::table('settings')
+        ->where('BranchID', 0)
+        ->where('name', 'join_allow')
+        ->value('value');
+
+    $joinAllow = filter_var($joinAllow, FILTER_VALIDATE_BOOLEAN);
+@endphp
+
 <div>
 
 <!-- ======================================
@@ -678,14 +687,32 @@
         </p>
 
         <div class="hiw-cta-buttons">
-            <a  onclick="Livewire.dispatch('open-application-modal')" href="#register" class="hiw-btn-primary">
-                <x-editable-text
-                    key="hiw_cta_btn_primary"
-                    :value="$contexts['hiw_cta_btn_primary'] ?? ''"
-                    tag="span"
-                    class="inline-block"
-                />
-            </a>
+            @if($joinAllow)
+                <a
+                    onclick="Livewire.dispatch('open-application-modal')"
+                    href="#register"
+                    class="hiw-btn-primary">
+
+                    <x-editable-text
+                        key="hiw_cta_btn_primary"
+                        :value="$contexts['hiw_cta_btn_primary'] ?? ''"
+                        tag="span"
+                        class="inline-block"
+                    />
+
+                </a>
+            @else
+                <a
+                    href="javascript:void(0)"
+                    aria-disabled="true"
+                    class="hiw-btn-primary cursor-not-allowed opacity-60">
+
+                    <span class="inline-block">
+                        Join Unavailable
+                    </span>
+
+                </a>
+            @endif
 
             <a href="{{ route('contact') }}" class="hiw-btn-secondary">
                 <x-editable-text

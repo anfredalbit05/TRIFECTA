@@ -202,63 +202,76 @@
                         class="inline-block"
                     />
                 </p>
-   <a href="https://www.facebook.com/dayongansolidaritas" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">
-    <x-editable-text
-        key="contact_fb_btn_text"
-        :value="$contexts['contact_fb_btn_text'] ?? 'Facebook'"
-        tag="span"
-        class="inline-block"
-    />
-</a>
+                <a href="https://www.facebook.com/dayongansolidaritas" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">
+                    <x-editable-text
+                        key="contact_fb_btn_text"
+                        :value="$contexts['contact_fb_btn_text'] ?? 'Facebook'"
+                        tag="span"
+                        class="inline-block"
+                    />
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- ===================================================
-        MAP SECTION
-    =================================================== -->
-    <section class="contact-map-section">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="contact-map-header">
-                <span class="contact-map-subtitle">
-                    <x-editable-text
-                        key="contact_map_subtitle"
-                        :value="$contexts['contact_map_subtitle'] ?? ''"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </span>
+        <!-- ===================================================
+            MAP SECTION
+        =================================================== -->
+        <section class="contact-map-section">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="contact-map-header">
+                    <span class="contact-map-subtitle">
+                        <x-editable-text
+                            key="contact_map_subtitle"
+                            :value="$contexts['contact_map_subtitle'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
+                    </span>
 
-                <h2 class="contact-map-title">
-                    <x-editable-text
-                        key="contact_map_title"
-                        :value="$contexts['contact_map_title'] ?? ''"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </h2>
+                    <h2 class="contact-map-title">
+                        <x-editable-text
+                            key="contact_map_title"
+                            :value="$contexts['contact_map_title'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
+                    </h2>
 
-                <p class="contact-map-location">
-                    <x-editable-text
-                        key="contact_map_location"
-                        :value="$contexts['contact_map_location'] ?? ''"
-                        tag="span"
-                        class="inline-block"
-                    />
-                </p>
+                    <p class="contact-map-location">
+                        <x-editable-text
+                            key="contact_map_location"
+                            :value="$contexts['contact_map_location'] ?? ''"
+                            tag="span"
+                            class="inline-block"
+                        />
+                    </p>
+                </div>
+
+                <div class="contact-map-container">
+                    <iframe
+                        src="https://maps.google.com/maps?q=7.449762432011926,125.80273268264297&z=17&output=embed"
+                        class="contact-map-iframe"
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+
+                <!-- Open exact coordinates in Google Maps -->
+                <div class="mt-6 text-center">
+                    <a
+                        href="https://www.google.com/maps/search/?api=1&query=7.449762432011926,125.80273268264297"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="contact-facebook-btn inline-flex items-center justify-center">
+
+                        <flux:icon.map-pin class="w-5 h-5 mr-2" />
+                        Open in Google Maps
+                    </a>
+                </div>
             </div>
-
-            <div class="contact-map-container">
-                <iframe
-                    src="{{ $contexts['contact_map_iframe_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15814.708236166589!2d125.7950!3d7.4478!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32f932e6fffff!2sTagum%20City!5e0!3m2!1sen!2sph!4v1680000000000!5m2!1sen!2sph' }}"
-                    class="contact-map-iframe"
-                    allowfullscreen=""
-                    loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade">
-                </iframe>
-            </div>
-        </div>
-    </section>
+        </section>
 
     <!-- ===================================================
         INQUIRY FORM SECTION

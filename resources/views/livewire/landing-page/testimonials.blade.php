@@ -1,3 +1,12 @@
+@php
+    $joinAllow = \Illuminate\Support\Facades\DB::table('settings')
+        ->where('BranchID', 0)
+        ->where('name', 'join_allow')
+        ->value('value');
+
+    $joinAllow = filter_var($joinAllow, FILTER_VALIDATE_BOOLEAN);
+@endphp
+
 <div>
 
 <!-- ======================================
@@ -257,16 +266,32 @@
         </p>
 
         <div class="testimonials-buttons">
-            <button
-                onclick="Livewire.dispatch('open-application-modal')"
-                class="testimonial-btn-primary">
-                <x-editable-text
-                    key="testimonials_btn_primary"
-                    :value="$contexts['testimonials_btn_primary'] ?? 'Become a Member'"
-                    tag="span"
-                    class="inline-block"
-                />
-            </button>
+            @if($joinAllow)
+                <button
+                    type="button"
+                    onclick="Livewire.dispatch('open-application-modal')"
+                    class="testimonial-btn-primary">
+
+                    <x-editable-text
+                        key="testimonials_btn_primary"
+                        :value="$contexts['testimonials_btn_primary'] ?? 'Become a Member'"
+                        tag="span"
+                        class="inline-block"
+                    />
+
+                </button>
+            @else
+                <button
+                    type="button"
+                    disabled
+                    class="testimonial-btn-primary cursor-not-allowed opacity-60">
+
+                    <span class="inline-block">
+                        Join Unavailable
+                    </span>
+
+                </button>
+            @endif
 
 
         </div>

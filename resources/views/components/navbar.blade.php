@@ -2,6 +2,15 @@
      TRUELIFE NAVBAR
 ========================================================= -->
 
+@php
+    $joinAllow = \Illuminate\Support\Facades\DB::table('settings')
+        ->where('BranchID', 0)
+        ->where('name', 'join_allow')
+        ->value('value');
+
+    $joinAllow = filter_var($joinAllow, FILTER_VALIDATE_BOOLEAN);
+@endphp
+
 <nav
     class="fixed inset-x-0 top-0 z-[1000] border-b border-[#E5B83B]/20 bg-[#0C2C6B]/95 shadow-lg shadow-black/10 backdrop-blur-xl lg:sticky lg:top-0">
 
@@ -144,16 +153,21 @@
 
                 <div class="flex items-center gap-2 lg:gap-3">
 
-                    <!-- JOIN -->
+                @if($joinAllow)
                     <button
                         type="button"
                         onclick="Livewire.dispatch('open-application-modal')"
                         class="cursor-pointer rounded-full bg-[#D79B10] px-3 py-1.5 text-[10px] font-extrabold text-white shadow-md transition hover:bg-[#E5B83B] lg:px-6 lg:py-2.5 lg:text-sm">
-
                         JOIN
-
                     </button>
-
+                @else
+                    <button
+                        type="button"
+                        disabled
+                        class="hero-btn-primary cursor-not-allowed rounded-full bg-gray-400 px-3 py-1.5 text-[10px] font-extrabold text-white opacity-60 shadow-md lg:px-6 lg:py-2.5 lg:text-sm">
+                        JOIN Unavailable
+                    </button>
+                @endif
 
                     <!-- LOGIN -->
                     <button
