@@ -10,44 +10,101 @@
         </div>
     @endif
 
-    <div class="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <input wire:model.live.debounce.300ms="search" type="search" placeholder="Search name or referral code..."
-            class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm shadow-sm focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] lg:max-w-sm">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
 
-        <div class="flex flex-wrap items-center justify-end gap-3">
+    {{-- SEARCH --}}
+    <input
+        wire:model.live.debounce.300ms="search"
+        type="search"
+        placeholder="Search name or referral code..."
+        class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm shadow-sm focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] lg:max-w-sm"
+    >
 
+    <div class="flex flex-wrap items-center gap-3">
 
-            @if ($this->canPrint)
-                <button type="button" onclick="window.print()"
-                    class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-50">
-                    🖨️ Print</button>
-            @endif
+        {{-- DATE RANGE PICKER --}}
+        <div wire:ignore class="relative w-60">
+            <span class="pointer-events-none absolute inset-y-0 left-3 z-10 flex items-center text-slate-400">
+                📅
+            </span>
 
-            {{-- REFRESH TABLE --}}
-            <button type="button" wire:click="resetTable" wire:loading.attr="disabled" title="Refresh Table"
-                class="refresh-btn">
-
-                {{-- NORMAL STATE --}}
-                <span wire:loading.remove wire:target="resetTable" class="refresh-icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6.5L20 9M18.5 15A7 7 0 0 1 6 17.5L4 15" />
-                    </svg>
-                </span>
-
-                {{-- LOADING STATE --}}
-                <span wire:loading wire:target="resetTable" class="refresh-loading">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="9" stroke-width="3" class="refresh-circle" />
-                        <path d="M21 12a9 9 0 0 1-9 9" stroke-width="3" stroke-linecap="round" />
-                    </svg>
-                </span>
-
-                <span class="hidden sm:inline">Refresh</span>
-            </button>
-
+            <input
+                type="text"
+                id="userDateRange"
+                readonly
+                class="date-range-input w-full cursor-pointer rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-center text-sm font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                placeholder="Select date range"
+            >
         </div>
+
+        {{-- CLEAR DATE FILTER --}}
+        @if ($dateRange)
+            <button
+                type="button"
+                wire:click="clearDateFilter"
+                title="Clear date filter"
+                class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-500 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-500"
+            >
+                ✕
+            </button>
+        @endif
+
+        {{-- PRINT REPORT --}}
+        @if ($this->canPrint)
+            <button
+                type="button"
+                wire:click="preparePrint"
+                wire:loading.attr="disabled"
+                wire:target="preparePrint"
+                title="Print Report"
+                class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-[#0C2C6B]"
+            >
+                <span>🖨️</span>
+                <span class="hidden sm:inline">Print</span>
+            </button>
+        @endif
+
+        {{-- REFRESH TABLE --}}
+        <button
+            type="button"
+            wire:click="resetTable"
+            wire:loading.attr="disabled"
+            title="Refresh Table"
+            class="refresh-btn"
+        >
+            <span wire:loading.remove wire:target="resetTable" class="refresh-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6.5L20 9M18.5 15A7 7 0 0 1 6 17.5L4 15"
+                    />
+                </svg>
+            </span>
+
+            <span wire:loading wire:target="resetTable" class="refresh-loading">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle
+                        cx="12"
+                        cy="12"
+                        r="9"
+                        stroke-width="3"
+                        class="refresh-circle"
+                    />
+                    <path
+                        d="M21 12a9 9 0 0 1-9 9"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                    />
+                </svg>
+            </span>
+
+            <span class="hidden sm:inline">Refresh</span>
+        </button>
+
     </div>
+</div>
 
 
     {{-- Screen table --}}
@@ -426,36 +483,69 @@
     </style>
 
     @script
-        <script>
-            const dateInput = $wire.$el.querySelector('#userDateRange');
-            if (dateInput && typeof flatpickr !== 'undefined') {
-                const picker = flatpickr(dateInput, {
-                    mode: 'range',
-                    dateFormat: 'Y-m-d',
-                    altInput: true,
-                    altFormat: 'M d, Y',
-                    maxDate: 'today',
-                    defaultDate: @js($dateRange ? explode(' to ', $dateRange) : []),
-                    onChange: (dates, dateStr, instance) => {
-                        if (dates.length === 2) {
-                            const from = instance.formatDate(dates[0], 'Y-m-d');
-                            const to = instance.formatDate(dates[1], 'Y-m-d');
-                            $wire.set('dateRange', `${from} to ${to}`);
-                        } else if (dates.length === 0) {
-                            $wire.set('dateRange', '');
-                        }
-                    },
-                    onClose: (dates, dateStr, instance) => {
-                        if (dates.length === 1) {
-                            const day = instance.formatDate(dates[0], 'Y-m-d');
-                            instance.setDate([dates[0], dates[0]], false);
-                            $wire.set('dateRange', `${day} to ${day}`);
-                        }
-                    }
-                });
+    <script>
+        const dateInput = $wire.$el.querySelector('#userDateRange');
 
-                $wire.on('ranges-reset', () => picker.clear());
-            }
-        </script>
+        if (dateInput && typeof flatpickr !== 'undefined') {
+            const picker = flatpickr(dateInput, {
+                mode: 'range',
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: 'M d, Y',
+                maxDate: 'today',
+
+                defaultDate: @js(
+                    $dateRange
+                        ? explode(' to ', $dateRange)
+                        : []
+                ),
+
+                onChange: (dates, dateStr, instance) => {
+                    if (dates.length === 2) {
+                        const from = instance.formatDate(
+                            dates[0],
+                            'Y-m-d'
+                        );
+
+                        const to = instance.formatDate(
+                            dates[1],
+                            'Y-m-d'
+                        );
+
+                        $wire.set('dateRange', `${from} to ${to}`);
+                    } else if (dates.length === 0) {
+                        $wire.set('dateRange', '');
+                    }
+                },
+
+                onClose: (dates, dateStr, instance) => {
+                    if (dates.length === 1) {
+                        const day = instance.formatDate(
+                            dates[0],
+                            'Y-m-d'
+                        );
+
+                        instance.setDate(
+                            [dates[0], dates[0]],
+                            false
+                        );
+
+                        $wire.set('dateRange', `${day} to ${day}`);
+                    }
+                }
+            });
+
+            $wire.on('ranges-reset', () => {
+                picker.clear();
+            });
+        }
+
+        // Print the report after Livewire renders the printable table.
+        $wire.on('print-sales-consultant-report', () => {
+            window.print();
+
+            $wire.set('printing', false);
+        });
+    </script>
     @endscript
 </div>

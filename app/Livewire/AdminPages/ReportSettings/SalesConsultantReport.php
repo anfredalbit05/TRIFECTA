@@ -38,6 +38,8 @@ class SalesConsultantReport extends Component
         'dateRange' => ['except' => ''],
     ];
 
+    public bool $printing = false;
+
     public function mount(): void
     {
         // Keep a date range supplied through the URL, if any.
@@ -71,6 +73,14 @@ class SalesConsultantReport extends Component
         $this->reset(['search', 'roleFilter', 'statusFilter', 'dateRange']);
         $this->resetPage();
         $this->dispatch('ranges-reset');
+    }
+
+    public function preparePrint(): void
+    {
+
+        $this->printing = true;
+
+        $this->dispatch('print-sales-consultant-report');
     }
 
     public function viewLedger(int $userId): void
@@ -281,12 +291,14 @@ protected function reportQuery(): Builder
         ->orderByDesc('report_row_id')
         ->paginate(10);
 
-    // Print table: include all matching records.
-    $printRows = (clone $query)
-        ->orderBy('name')
-        ->orderByDesc('created_date')
-        ->orderByDesc('report_row_id')
-        ->get();
+    // Print table: all matching records, without pagination.
+    $printRows = $this->printing
+        ? (clone $query)
+            ->orderBy('name')
+            ->orderByDesc('created_date')
+            ->orderByDesc('report_row_id')
+            ->get()
+        : collect();
 
     $selectedUser = $this->selectedUserLedgerID
         ? User::with(['role', 'wallets', 'ledgers'])
