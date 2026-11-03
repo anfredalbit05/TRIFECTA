@@ -597,14 +597,7 @@ public function previewPolicyNumber(): string
             DB::beginTransaction();
 
             // Get the branchCode of the currently authenticated user.
-            $branchCode = Auth::user()?->branchCode;
-
-            // Prevent creating an applicant without an assigned branch.
-            if (blank($branchCode)) {
-                throw ValidationException::withMessages([
-                    'branchCode' => 'Your account is not assigned to a branch.',
-                ]);
-            }
+            $branchCode = Auth::user()?->branchCode ?? 1;
 
             Log::info('=== SAVE APPLICATION STARTED ===', [
                 'username' => $this->username,
