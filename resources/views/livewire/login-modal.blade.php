@@ -175,6 +175,8 @@
   <!-- SweetAlert Listeners Script -->
     @script
     <script>
+
+        const SWAL_NAVY = '#0B2A5B';
         if (!window.hasSwalListeners) {
             window.hasSwalListeners = true;
 
@@ -206,6 +208,16 @@
                 });
             });
 
+                Livewire.on('swal:warning', (event) => {
+                Swal.fire({
+                    icon: 'warning',
+                    title: event.message,
+                    text: 'Please try again later',
+                    confirmButtonColor: SWAL_NAVY,
+                    confirmButtonText: 'Okay'
+                });
+            });
+
             $wire.on('swal:successed', (event) => {
                 Swal.close();
                 // Properly extract the message sent from Livewire 3 dispatch
@@ -227,6 +239,8 @@
                     }
                 });
             });
+
+
         }
     </script>
     @endscript

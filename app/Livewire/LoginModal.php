@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 
 class LoginModal extends Component
 {
@@ -140,6 +141,32 @@ class LoginModal extends Component
         if (strcasecmp($user->status ?? '', 'Suspended') === 0) {
             $this->dispatch('swal:close');
             $this->addError('email', 'Your account has been suspended. Please contact an administrator.');
+
+            return;
+        }
+
+        // Check if the user's branch is under maintenance.
+        $branchCode = (int) $user->branchCode;
+
+        $maintenance = DB::table('settings')
+            ->where('BranchID', $branchCode)
+            ->where('name', 'like', '%_branch_maintenance_mode')
+            ->where('value', 'true')
+            ->first();
+
+        if ($maintenance) {
+            $branch = DB::table('branches')
+                ->where('BranchID', $branchCode)
+                ->first();
+
+            $branchName = $branch?->branchname ?? 'Your Branch';
+
+            $this->dispatch('swal:close');
+
+            $this->dispatch(
+                'swal:warning',
+                message: "{$branchName} is Under Maintenance"
+            );
 
             return;
         }
