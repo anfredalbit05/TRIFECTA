@@ -157,14 +157,19 @@
                     <button
                         type="button"
                         onclick="Livewire.dispatch('open-application-modal')"
-                        class="cursor-pointer rounded-full bg-[#D79B10] px-3 py-1.5 text-[10px] font-extrabold text-white shadow-md transition hover:bg-[#E5B83B] lg:px-6 lg:py-2.5 lg:text-sm">
+                        class="cursor-pointer whitespace-nowrap rounded-full bg-[#D79B10]
+                            px-2.5 py-1 text-[9px] font-extrabold text-white shadow-md
+                            transition hover:bg-[#E5B83B]
+                            lg:px-6 lg:py-2.5 lg:text-sm">
                         JOIN
                     </button>
                 @else
                     <button
                         type="button"
                         disabled
-                        class="hero-btn-primary cursor-not-allowed rounded-full bg-gray-400 px-3 py-1.5 text-[10px] font-extrabold text-white opacity-60 shadow-md lg:px-6 lg:py-2.5 lg:text-sm">
+                        class="cursor-not-allowed whitespace-nowrap rounded-full bg-[#D79B10]
+                            px-2.5 py-1 text-[9px] font-extrabold text-white opacity-60
+                            shadow-md transition hover:bg-[#E5B83B] lg:px-6 lg:py-2.5 lg:text-sm">
                         JOIN Unavailable
                     </button>
                 @endif
