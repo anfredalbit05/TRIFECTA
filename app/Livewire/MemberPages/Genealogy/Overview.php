@@ -4,6 +4,7 @@ namespace App\Livewire\MemberPages\Genealogy;
 
 use App\Models\Activation;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -17,6 +18,9 @@ use Livewire\Component;
 class Overview extends Component
 {
     public string $memberSearch = '';
+
+    /** "Y-m-d to Y-m-d" (activation date range) */
+    public string $dateRange = '';
 
     #[Locked]
     public ?int $rootUserId = null;
@@ -32,6 +36,12 @@ class Overview extends Component
     public function clearSearch(): void
     {
         $this->memberSearch = '';
+    }
+
+    public function clearDateFilter(): void
+    {
+        $this->dateRange = '';
+        $this->dispatch('ranges-reset');
     }
 
     #[Computed]
@@ -68,6 +78,36 @@ class Overview extends Component
             : null;
     }
 
+    /** [Carbon|null $from, Carbon|null $to] parsed from $dateRange. */
+    private function range(): array
+    {
+        if (! str_contains($this->dateRange, ' to ')) {
+            return [null, null];
+        }
+
+        [$from, $to] = explode(' to ', $this->dateRange, 2);
+
+        try {
+            return [
+                Carbon::parse(trim($from))->startOfDay(),
+                Carbon::parse(trim($to))->endOfDay(),
+            ];
+        } catch (\Throwable) {
+            return [null, null];
+        }
+    }
+
+    /** Printable range label, e.g. "Aug 01, 2026 – Aug 31, 2026". */
+    #[Computed]
+    public function dateLabel(): string
+    {
+        [$from, $to] = $this->range();
+
+        return $from && $to
+            ? $from->format('M d, Y').' – '.$to->format('M d, Y')
+            : '';
+    }
+
     /** Direct (1st level) downlines — Approved activations only. */
     #[Computed]
     public function downlines(): array
@@ -78,10 +118,13 @@ class Overview extends Component
             return [];
         }
 
+        [$from, $to] = $this->range();
+
         return Activation::query()
             ->select('ActivationID', 'UserID', 'created_at')
             ->where('upline_code', $root->referralCode)
             ->where('status', 'Approved')
+            ->when($from && $to, fn ($q) => $q->whereBetween('created_at', [$from, $to]))
             ->orderByRaw('created_at IS NULL, created_at') // dated first, null dates last
             ->with('user:UserID,firstname,middlename,lastname,referralCode,status')
             ->get()

@@ -135,7 +135,12 @@
 
                     <div>
                         <h3>Direct Downlines</h3>
-                        <p>{{ count($downlines) }} approved {{ count($downlines) === 1 ? 'member' : 'members' }}</p>
+                        <p>
+                            {{ count($downlines) }} approved {{ count($downlines) === 1 ? 'member' : 'members' }}
+                            @if ($this->dateLabel)
+                                &middot; Activated {{ $this->dateLabel }}
+                            @endif
+                        </p>
                     </div>
                 </div>
 
@@ -169,56 +174,113 @@
             </section>
 
 
-            {{-- DIRECT DOWNLINES --}}
-            @if ($downlines)
+            {{-- Keyed by member only: the date picker survives range changes; rows carry their own search text --}}
+            <div
+                wire:key="downlines-{{ $root->UserID }}"
+                x-data="{
+                    q: '',
+                    ok(s) {
+                        const words = this.q.toLowerCase().replace(/,/g, ' ').split(/\s+/).filter(Boolean);
+                        return words.every(w => s.includes(w));
+                    },
+                    get shown() {
+                        const rows = this.$refs.body ? Array.from(this.$refs.body.rows) : [];
+                        return rows.filter(r => this.ok(r.dataset.s)).length;
+                    }
+                }"
+            >
 
-                {{-- wire:key recreates this block (and resets the filter) when another member is picked --}}
-                <div
-                    wire:key="downlines-{{ $root->UserID }}"
-                    x-data="{
-                        q: '',
-                        rows: @js(array_column($downlines, 'search')),
-                        ok(i) {
-                            const words = this.q.toLowerCase().replace(/,/g, ' ').split(/\s+/).filter(Boolean);
-                            return words.every(w => this.rows[i].includes(w));
-                        },
-                        get shown() {
-                            return this.rows.filter((_, i) => this.ok(i)).length;
-                        }
-                    }"
-                >
+                {{-- FILTER ROW: name filter, then date range --}}
+                <div class="genealogy-print-hide mb-3 flex flex-wrap items-center gap-3">
 
-                    {{-- TABLE SEARCH --}}
-                    <div class="genealogy-print-hide mb-3 flex items-center justify-between gap-3">
+                    {{-- NAME / REFERRAL FILTER --}}
+                    <div class="relative w-full sm:w-80">
+                        <input
+                            type="text"
+                            x-model="q"
+                            @keydown.escape="q = ''"
+                            placeholder="Filter name or referral code..."
+                            class="w-full rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-9 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]/20"
+                        >
 
-                        <div class="relative w-full sm:w-80">
-                            <input
-                                type="text"
-                                x-model="q"
-                                @keydown.escape="q = ''"
-                                placeholder="Filter by first, middle, last name or referral code..."
-                                class="w-full rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-9 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]/20"
-                            >
-
-                            <button
-                                type="button"
-                                x-show="q"
-                                x-cloak
-                                @click="q = ''"
-                                title="Clear filter"
-                                class="absolute inset-y-0 right-3 flex items-center text-slate-400 transition hover:text-slate-600"
-                            >
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        <p class="shrink-0 text-xs text-slate-400" x-show="q" x-cloak>
-                            <span x-text="shown"></span> of {{ count($downlines) }}
-                        </p>
-
+                        <button
+                            type="button"
+                            x-show="q"
+                            x-cloak
+                            @click="q = ''"
+                            title="Clear filter"
+                            class="absolute inset-y-0 right-3 flex items-center text-slate-400 transition hover:text-slate-600"
+                        >
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
+
+                    {{-- DATE RANGE (activation date) --}}
+                    <div
+                        wire:ignore
+                        class="relative w-full sm:w-72"
+                        x-init="
+                            const picker = flatpickr($refs.range, {
+                                mode: 'range',
+                                dateFormat: 'Y-m-d',
+                                altInput: true,
+                                altFormat: 'M d, Y',
+                                maxDate: 'today',
+                                defaultDate: @js($dateRange ? explode(' to ', $dateRange) : []),
+
+                                onChange(dates, str, inst) {
+                                    if (dates.length === 2) {
+                                        $wire.set('dateRange', inst.formatDate(dates[0], 'Y-m-d') + ' to ' + inst.formatDate(dates[1], 'Y-m-d'));
+                                    } else if (dates.length === 0) {
+                                        $wire.set('dateRange', '');
+                                    }
+                                },
+
+                                onClose(dates, str, inst) {
+                                    if (dates.length === 1) {
+                                        const day = inst.formatDate(dates[0], 'Y-m-d');
+                                        inst.setDate([dates[0], dates[0]], false);
+                                        $wire.set('dateRange', day + ' to ' + day);
+                                    }
+                                }
+                            });
+
+                            $wire.on('ranges-reset', () => picker.clear());
+                        "
+                    >
+                        <span class="pointer-events-none absolute inset-y-0 left-3 z-10 flex items-center text-slate-400">&#128197;</span>
+
+                        <input
+                            x-ref="range"
+                            type="text"
+                            readonly
+                            placeholder="Filter by activation date"
+                            class="date-range-input w-full cursor-pointer rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-center text-sm font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                        >
+                    </div>
+
+                    @if ($dateRange)
+                        <button
+                            type="button"
+                            wire:click="clearDateFilter"
+                            title="Clear date filter"
+                            class="inline-flex cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-500"
+                        >
+                            &#10005;
+                        </button>
+                    @endif
+
+                    <p class="text-xs text-slate-400" x-show="q" x-cloak>
+                        <span x-text="shown"></span> of {{ count($downlines) }}
+                    </p>
+
+                </div>
+
+
+                {{-- DIRECT DOWNLINES --}}
+                @if ($downlines)
 
                     <div class="ov-wrap overflow-x-auto rounded-xl border border-slate-200 bg-white">
                         <table class="ov-table w-full min-w-[700px] border-collapse text-sm">
@@ -233,11 +295,12 @@
                                 </tr>
                             </thead>
 
-                            <tbody class="divide-y divide-slate-100">
+                            <tbody x-ref="body" class="divide-y divide-slate-100">
                                 @foreach ($downlines as $i => $node)
                                     <tr
                                         wire:key="ov-node{{ $node['id'] }}"
-                                        x-show="ok({{ $i }})"
+                                        data-s="{{ $node['search'] }}"
+                                        x-show="ok($el.dataset.s)"
                                         class="transition hover:bg-slate-50"
                                     >
 
@@ -262,22 +325,25 @@
 
                         </table>
 
-                        <p x-show="shown === 0" x-cloak class="px-4 py-6 text-center text-sm text-slate-400">
+                        <p x-show="q && shown === 0" x-cloak class="px-4 py-6 text-center text-sm text-slate-400">
                             No downlines match your filter.
                         </p>
                     </div>
 
-                </div>
+                @else
 
-            @else
+                    <div class="genealogy-empty">
+                        <div class="genealogy-empty-icon">&#129409;</div>
+                        <h3>No direct downlines</h3>
+                        <p>
+                            {{ trim($root->firstname.' '.$root->lastname) }} has no approved direct downlines
+                            {{ $this->dateLabel ? 'activated between '.$this->dateLabel : 'yet' }}.
+                        </p>
+                    </div>
 
-                <div class="genealogy-empty">
-                    <div class="genealogy-empty-icon">&#129409;</div>
-                    <h3>No direct downlines</h3>
-                    <p>{{ trim($root->firstname.' '.$root->lastname) }} has no approved direct downlines yet.</p>
-                </div>
+                @endif
 
-            @endif
+            </div>
 
         </div>
 
