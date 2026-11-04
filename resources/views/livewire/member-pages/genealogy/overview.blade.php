@@ -169,7 +169,7 @@
                                 x-model="q"
                                 @keydown.escape="q = ''"
                                 placeholder="Filter by first, middle, last name or referral code..."
-                                class="w-full rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-9 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]/20"
+                                class="w-full rounded-xl border border-slate-200 bg-white py-2 pl-3 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]/20"
                             >
 
                             <button
