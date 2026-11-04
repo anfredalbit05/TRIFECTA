@@ -127,3 +127,30 @@
 
     .genealogy-layout{padding-left:56px;padding-right:56px;}
 }
+
+/* ==========================================================================
+   OVERVIEW TAB — PRINT
+   Only the .genealogy-print-area (selected member + generation list / tree)
+   is printed; toolbars, radio scopes and the page chrome are hidden.
+   ========================================================================== */
+
+@media print{
+
+    body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+    body *{visibility:hidden !important;}
+
+    .genealogy-print-area,
+    .genealogy-print-area *{visibility:visible !important;}
+
+    .genealogy-print-area{position:absolute;left:0;top:0;width:100%;padding:0;}
+
+    /* Flatten transforms so the visual tree prints at natural size */
+    .genealogy-print-area *{transform:none !important;}
+
+    .genealogy-tree-viewport{overflow:visible !important;height:auto !important;}
+
+    .genealogy-scroll-area{overflow:visible !important;}
+
+    @page{margin:12mm;}
+}

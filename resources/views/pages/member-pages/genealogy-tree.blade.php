@@ -17,6 +17,16 @@
 
         <div class="genealogy-desktop-nav">
 
+            @if (auth()->check() && (int) auth()->user()->RoleID !== 4)
+                {{-- Overview is a leadership tool — not shown to plain Members --}}
+                <a href="#"
+                   @click.prevent="tab='overview'"
+                   :class="{active:tab==='overview'}">
+                    <span class="genealogy-tab-icon">♢</span>
+                    <span>Overview</span>
+                </a>
+            @endif
+
             <a href="#"
                @click.prevent="tab='invitee'"
                :class="{active:tab==='invitee'}">
@@ -32,6 +42,19 @@
             </a>
 
         </div>
+
+        @if (auth()->check() && (int) auth()->user()->RoleID !== 4)
+            <div x-show="tab==='overview'"
+                 x-cloak
+                 x-transition.opacity.duration.200ms
+                 class="genealogy-main-card">
+
+                <div class="genealogy-scroll-area">
+                    <livewire:member-pages.genealogy.overview />
+                </div>
+
+            </div>
+        @endif
 
         <div x-show="tab==='invitee'"
              x-cloak
