@@ -82,7 +82,7 @@ class Overview extends Component
             ->select('ActivationID', 'UserID', 'created_at')
             ->where('upline_code', $root->referralCode)
             ->where('status', 'Approved')
-            ->orderBy('created_at')
+            ->orderByRaw('created_at IS NULL, created_at') // dated first, null dates last
             ->with('user:UserID,firstname,middlename,lastname,referralCode,status')
             ->get()
             ->filter(fn ($a) => $a->user && $a->UserID !== $root->UserID)
