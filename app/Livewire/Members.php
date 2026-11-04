@@ -239,19 +239,29 @@ class Members extends Component
                 }
             )
             ->when(filled($this->search), function ($query) {
-                $search = trim($this->search);
+                $words = array_filter(
+                    explode(' ', trim(preg_replace('/[\s,]+/', ' ', $this->search)))
+                );
 
-                $query->where(function ($q) use ($search) {
-                    $q->where('firstname', 'like', "%{$search}%")
-                        ->orWhere('middlename', 'like', "%{$search}%")
-                        ->orWhere('lastname', 'like', "%{$search}%")
-                        ->orWhere('username', 'like', "%{$search}%")
-                        ->orWhereHas('activations', function ($activation) use ($search) {
-                            $activation->where('policy_number', 'like', "%{$search}%")
-                                ->orWhere('receipt_number', 'like', "%{$search}%")
-                                ->orWhere('cocogen_policy_number', 'like', "%{$search}%");
-                        });
-                });
+                foreach ($words as $word) {
+                    $safe   = addcslashes($word, '%_\\');
+                    $like   = "%{$safe}%";
+                    $prefix = "{$safe}%";
+
+                    $query->where(function ($q) use ($like, $prefix) {
+                        $q->where('firstname', 'like', $like)
+                            ->orWhere('middlename', 'like', $like)
+                            ->orWhere('lastname', 'like', $like)
+                            ->orWhere('username', 'like', $like)
+                            ->orWhere('referralCode', 'like', $prefix)
+                            ->orWhere('policy_number', 'like', $like)
+                            ->orWhereHas('activations', function ($activation) use ($like) {
+                                $activation->where('policy_number', 'like', $like)
+                                    ->orWhere('receipt_number', 'like', $like)
+                                    ->orWhere('cocogen_policy_number', 'like', $like);
+                            });
+                    });
+                }
             })
             ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
                 $query->whereBetween('created_at', [

@@ -56,14 +56,15 @@
             </svg>
         </span>
 
-        <input
-            type="text"
-            wire:model.live.debounce.300ms="search"
-            placeholder="Search by fullname, username, receipt, cocogen, policy"
-            class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl
-                focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
-                focus:border-[#0C2C6B] bg-white shadow-sm transition"
-        >
+<input
+    type="text"
+    wire:model.live.debounce.300ms="search"
+    placeholder="Search members..."
+    title="Search by fullname, username, referral code, receipt number, cocogen policy number, or policy number"
+    class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl
+        focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
+        focus:border-[#0C2C6B] bg-white shadow-sm transition"
+>
     </div>
 
     {{-- FILTERS AND REFRESH --}}
@@ -219,14 +220,13 @@
 
                             {{-- NAME --}}
                             <td class="member-name-cell">
-
                                 <div class="member-name">
                                     {{ $member->firstname }}
                                     {{ $member->middlename }}
                                     {{ $member->lastname }}
+                                    ({{ $member->referralCode }})
                                 </div>
-                            <small class="text-slate-400 ">  {{ $member->referralCode }} </small>
-
+                                <small class="text-slate-400">Upline Code: {{ filled($member->uplineCode) ? $member->uplineCode : '—' }}</small>
                             </td>
 
 
