@@ -68,7 +68,7 @@ class Overview extends Component
             : null;
     }
 
-    /** Direct (1st level) downlines — Approved + Pending activations. */
+    /** Direct (1st level) downlines — Approved activations only. */
     #[Computed]
     public function downlines(): array
     {
@@ -79,23 +79,25 @@ class Overview extends Component
         }
 
         return Activation::query()
+            ->select('ActivationID', 'UserID', 'created_at')
             ->where('upline_code', $root->referralCode)
-            ->whereIn('status', ['Approved', 'Pending'])
+            ->where('status', 'Approved')
+            ->orderBy('created_at')
             ->with('user:UserID,firstname,middlename,lastname,referralCode,status')
             ->get()
-            ->pluck('user')
-            ->filter(fn ($u) => $u && $u->UserID !== $root->UserID)
+            ->filter(fn ($a) => $a->user && $a->UserID !== $root->UserID)
             ->unique('UserID')
-            ->map(fn ($u) => [
-                'id' => $u->UserID,
-                'name' => trim($u->firstname.' '.$u->middlename.' '.$u->lastname),
-                'referral_code' => $u->referralCode,
-                'status' => $u->status,
+            ->map(fn ($a) => [
+                'id' => $a->UserID,
+                'name' => trim($a->user->firstname.' '.$a->user->middlename.' '.$a->user->lastname),
+                'referral_code' => $a->user->referralCode,
+                'status' => $a->user->status,
+                'activated_at' => $a->created_at?->format('M d, Y h:i A'),
                 // lowercase haystack used by the client-side filter
                 'search' => mb_strtolower(trim(preg_replace(
                     '/\s+/',
                     ' ',
-                    "{$u->firstname} {$u->middlename} {$u->lastname} {$u->referralCode}"
+                    "{$a->user->firstname} {$a->user->middlename} {$a->user->lastname} {$a->user->referralCode}"
                 ))),
             ])
             ->values()

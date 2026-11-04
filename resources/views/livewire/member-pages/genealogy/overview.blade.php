@@ -107,7 +107,7 @@
 
                     <div>
                         <h3>Direct Downlines</h3>
-                        <p>{{ count($downlines) }} {{ count($downlines) === 1 ? 'member' : 'members' }}</p>
+                        <p>{{ count($downlines) }} approved {{ count($downlines) === 1 ? 'member' : 'members' }}</p>
                     </div>
                 </div>
 
@@ -169,7 +169,7 @@
                                 x-model="q"
                                 @keydown.escape="q = ''"
                                 placeholder="Filter by first, middle, last name or referral code..."
-                                class="w-full rounded-xl border border-slate-200 bg-white py-2 pl-2 pr-2 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]/20"
+                                class="w-full rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-9 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]/20"
                             >
 
                             <button
@@ -193,7 +193,7 @@
                     </div>
 
                     <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-                        <table class="w-full min-w-[600px] border-collapse text-sm">
+                        <table class="w-full min-w-[700px] border-collapse text-sm">
 
                             <thead class="bg-[#0C2C6B] text-white">
                                 <tr>
@@ -201,6 +201,7 @@
                                     <th class="px-4 py-3 text-left">Member Name</th>
                                     <th class="px-4 py-3 text-left">Referral Code</th>
                                     <th class="px-4 py-3 text-left">Status</th>
+                                    <th class="px-4 py-3 text-left">Activated</th>
                                 </tr>
                             </thead>
 
@@ -225,6 +226,8 @@
                                             </span>
                                         </td>
 
+                                        <td class="whitespace-nowrap px-4 py-3 text-slate-600">{{ $node['activated_at'] ?: '—' }}</td>
+
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -243,7 +246,7 @@
                 <div class="genealogy-empty">
                     <div class="genealogy-empty-icon">&#129409;</div>
                     <h3>No direct downlines</h3>
-                    <p>{{ trim($root->firstname.' '.$root->lastname) }} has no approved or pending direct downlines yet.</p>
+                    <p>{{ trim($root->firstname.' '.$root->lastname) }} has no approved direct downlines yet.</p>
                 </div>
 
             @endif
