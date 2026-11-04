@@ -81,16 +81,22 @@ class Overview extends Component
         return Activation::query()
             ->where('upline_code', $root->referralCode)
             ->whereIn('status', ['Approved', 'Pending'])
-            ->with('user:UserID,firstname,lastname,referralCode,status')
+            ->with('user:UserID,firstname,middlename,lastname,referralCode,status')
             ->get()
             ->pluck('user')
             ->filter(fn ($u) => $u && $u->UserID !== $root->UserID)
             ->unique('UserID')
             ->map(fn ($u) => [
                 'id' => $u->UserID,
-                'name' => trim($u->firstname.' '.$u->lastname),
+                'name' => trim($u->firstname.' '.$u->middlename.' '.$u->lastname),
                 'referral_code' => $u->referralCode,
                 'status' => $u->status,
+                // lowercase haystack used by the client-side filter
+                'search' => mb_strtolower(trim(preg_replace(
+                    '/\s+/',
+                    ' ',
+                    "{$u->firstname} {$u->middlename} {$u->lastname} {$u->referralCode}"
+                ))),
             ])
             ->values()
             ->all();

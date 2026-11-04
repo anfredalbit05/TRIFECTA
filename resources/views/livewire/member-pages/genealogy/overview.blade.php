@@ -144,40 +144,98 @@
             {{-- DIRECT DOWNLINES --}}
             @if ($downlines)
 
-                <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-                    <table class="w-full min-w-[600px] border-collapse text-sm">
+                {{-- wire:key recreates this block (and resets the filter) when another member is picked --}}
+                <div
+                    wire:key="downlines-{{ $root->UserID }}"
+                    x-data="{
+                        q: '',
+                        rows: @js(array_column($downlines, 'search')),
+                        ok(i) {
+                            const words = this.q.toLowerCase().replace(/,/g, ' ').split(/\s+/).filter(Boolean);
+                            return words.every(w => this.rows[i].includes(w));
+                        },
+                        get shown() {
+                            return this.rows.filter((_, i) => this.ok(i)).length;
+                        }
+                    }"
+                >
 
-                        <thead class="bg-[#0C2C6B] text-white">
-                            <tr>
-                                <th class="px-4 py-3 text-left">#</th>
-                                <th class="px-4 py-3 text-left">Member Name</th>
-                                <th class="px-4 py-3 text-left">Referral Code</th>
-                                <th class="px-4 py-3 text-left">Status</th>
-                            </tr>
-                        </thead>
+                    {{-- TABLE SEARCH --}}
+                    <div class="genealogy-print-hide mb-3 flex items-center justify-between gap-3">
 
-                        <tbody class="divide-y divide-slate-100">
-                            @foreach ($downlines as $i => $node)
-                                <tr wire:key="ov-node{{ $node['id'] }}" class="transition hover:bg-slate-50">
+                        <div class="relative w-full sm:w-80">
+                            <input
+                                type="text"
+                                x-model="q"
+                                @keydown.escape="q = ''"
+                                placeholder="Filter by first, middle, last name or referral code..."
+                                class="w-full rounded-xl border border-slate-200 bg-white py-2 pl-2 pr-2 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]/20"
+                            >
 
-                                    <td class="px-4 py-3 text-slate-500">{{ $i + 1 }}</td>
+                            <button
+                                type="button"
+                                x-show="q"
+                                x-cloak
+                                @click="q = ''"
+                                title="Clear filter"
+                                class="absolute inset-y-0 right-3 flex items-center text-slate-400 transition hover:text-slate-600"
+                            >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
 
-                                    <td class="px-4 py-3 font-semibold text-slate-700">{{ $node['name'] }}</td>
+                        <p class="shrink-0 text-xs text-slate-400" x-show="q" x-cloak>
+                            <span x-text="shown"></span> of {{ count($downlines) }}
+                        </p>
 
-                                    <td class="px-4 py-3 font-mono text-slate-600">{{ $node['referral_code'] ?: '—' }}</td>
+                    </div>
 
-                                    <td class="px-4 py-3">
-                                        <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold
-                                            {{ strtolower($node['status']) === 'active' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600' }}">
-                                            {{ $node['status'] }}
-                                        </span>
-                                    </td>
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                        <table class="w-full min-w-[600px] border-collapse text-sm">
 
+                            <thead class="bg-[#0C2C6B] text-white">
+                                <tr>
+                                    <th class="px-4 py-3 text-left">#</th>
+                                    <th class="px-4 py-3 text-left">Member Name</th>
+                                    <th class="px-4 py-3 text-left">Referral Code</th>
+                                    <th class="px-4 py-3 text-left">Status</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
+                            </thead>
 
-                    </table>
+                            <tbody class="divide-y divide-slate-100">
+                                @foreach ($downlines as $i => $node)
+                                    <tr
+                                        wire:key="ov-node{{ $node['id'] }}"
+                                        x-show="ok({{ $i }})"
+                                        class="transition hover:bg-slate-50"
+                                    >
+
+                                        <td class="px-4 py-3 text-slate-500">{{ $i + 1 }}</td>
+
+                                        <td class="px-4 py-3 font-semibold text-slate-700">{{ $node['name'] }}</td>
+
+                                        <td class="px-4 py-3 font-mono text-slate-600">{{ $node['referral_code'] ?: '—' }}</td>
+
+                                        <td class="px-4 py-3">
+                                            <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold
+                                                {{ strtolower($node['status']) === 'active' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600' }}">
+                                                {{ $node['status'] }}
+                                            </span>
+                                        </td>
+
+                                    </tr>
+                                @endforeach
+                            </tbody>
+
+                        </table>
+
+                        <p x-show="shown === 0" x-cloak class="px-4 py-6 text-center text-sm text-slate-400">
+                            No downlines match your filter.
+                        </p>
+                    </div>
+
                 </div>
 
             @else
