@@ -108,7 +108,10 @@ class Overview extends Component
             : '';
     }
 
-    /** Direct (1st level) downlines — Approved activations only. */
+
+    /** Direct (1st level) downlines — Approved activations only.
+     * Date filtering is based on the latest Approved activation history.
+     */
     #[Computed]
     public function downlines(): array
     {
@@ -121,31 +124,66 @@ class Overview extends Component
         [$from, $to] = $this->range();
 
         return Activation::query()
-            ->select('ActivationID', 'UserID', 'created_at')
-            ->where('upline_code', $root->referralCode)
-            ->where('status', 'Approved')
-            ->when($from && $to, fn ($q) => $q->whereBetween('created_at', [$from, $to]))
-            ->orderByRaw('created_at IS NULL, created_at') // dated first, null dates last
+            ->select(
+                'activations.ActivationID',
+                'activations.UserID',
+                'activations.payment_method',
+                'activations.payment_reference'
+            )
+            ->where('activations.upline_code', $root->referralCode)
+            ->where('activations.status', 'Approved')
+
+            // Get only activations whose latest history is Approved.
+            ->whereHas('histories', function ($q) use ($from, $to) {
+                $q->where('status', 'Approved')
+                    ->whereRaw('activation_histories.HistoryID = (
+                        SELECT ah.HistoryID
+                        FROM activation_histories AS ah
+                        WHERE ah.ActivationID = activation_histories.ActivationID
+                        ORDER BY ah.created_at DESC, ah.HistoryID DESC
+                        LIMIT 1
+                    )')
+                    ->when($from && $to, fn ($q) =>
+                        $q->whereBetween('activation_histories.created_at', [$from, $to])
+                    );
+            })
+
             ->with('user:UserID,firstname,middlename,lastname,referralCode,status')
             ->get()
             ->filter(fn ($a) => $a->user && $a->UserID !== $root->UserID)
             ->unique('UserID')
-            ->map(fn ($a) => [
-                'id' => $a->UserID,
-                'name' => trim($a->user->firstname.' '.$a->user->middlename.' '.$a->user->lastname),
-                'referral_code' => $a->user->referralCode,
-                'status' => $a->user->status,
-                'activated_at' => $a->created_at?->format('M d, Y h:i A'),
-                // lowercase haystack used by the client-side filter
-                'search' => mb_strtolower(trim(preg_replace(
-                    '/\s+/',
-                    ' ',
-                    "{$a->user->firstname} {$a->user->middlename} {$a->user->lastname} {$a->user->referralCode}"
-                ))),
-            ])
+            ->map(function ($a) {
+                $latestApproval = $a->histories()
+                    ->where('status', 'Approved')
+                    ->orderByDesc('created_at')
+                    ->orderByDesc('HistoryID')
+                    ->first();
+
+                return [
+                    'id' => $a->UserID,
+                    'name' => trim($a->user->firstname.' '.$a->user->middlename.' '.$a->user->lastname),
+                    'referral_code' => $a->user->referralCode,
+
+                    // Payment information
+                    'payment_method' => $a->payment_method,
+                    'payment_reference' => $a->payment_method === 'Cash'
+                        ? '—'
+                        : ($a->payment_reference ?: '—'),
+
+                    'status' => $a->user->status,
+                    'activated_at' => $latestApproval?->created_at?->format('M d, Y h:i A'),
+
+                    'search' => mb_strtolower(trim(preg_replace(
+                        '/\s+/',
+                        ' ',
+                        "{$a->user->firstname} {$a->user->middlename} {$a->user->lastname} {$a->user->referralCode} {$a->payment_method} {$a->payment_reference}"
+                    ))),
+                ];
+            })
             ->values()
             ->all();
     }
+
 
     public function render()
     {

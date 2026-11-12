@@ -283,13 +283,15 @@
                 @if ($downlines)
 
                     <div class="ov-wrap overflow-x-auto rounded-xl border border-slate-200 bg-white">
-                        <table class="ov-table w-full min-w-[700px] border-collapse text-sm">
+                        <table class="ov-table w-full min-w-[1050px] border-collapse text-sm">
 
                             <thead class="bg-[#0C2C6B] text-white">
                                 <tr>
                                     <th class="px-4 py-3 text-left">#</th>
                                     <th class="px-4 py-3 text-left">Member Name</th>
                                     <th class="px-4 py-3 text-left">Referral Code</th>
+                                    <th class="px-4 py-3 text-left">Payment Method</th>
+                                    <th class="px-4 py-3 text-left">Reference Number</th>
                                     <th class="px-4 py-3 text-left">Status</th>
                                     <th class="px-4 py-3 text-left">Activated</th>
                                 </tr>
@@ -309,6 +311,21 @@
                                         <td class="px-4 py-3 font-semibold text-slate-700">{{ $node['name'] }}</td>
 
                                         <td class="px-4 py-3 font-mono text-slate-600">{{ $node['referral_code'] ?: '—' }}</td>
+
+                                        {{-- Payment Method --}}
+                                        <td class="px-4 py-3">
+                                            <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold
+                                                {{ $node['payment_method'] === 'Cash'
+                                                    ? 'bg-green-100 text-green-700'
+                                                    : 'bg-blue-100 text-blue-700' }}">
+                                                {{ $node['payment_method'] ?: '—' }}
+                                            </span>
+                                        </td>
+
+                                        {{-- Reference Number --}}
+                                        <td class="px-4 py-3 font-mono text-slate-600">
+                                            {{ $node['payment_reference'] }}
+                                        </td>
 
                                         <td class="px-4 py-3">
                                             <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold
