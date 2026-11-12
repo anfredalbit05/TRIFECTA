@@ -16,11 +16,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (! Schema::hasTable('Disburstment') || Schema::hasColumn('Disburstment', 'CreatedBy')) {
+        if (! Schema::hasTable('Disburstments') || Schema::hasColumn('Disburstment', 'CreatedBy')) {
             return;
         }
 
-        Schema::table('Disburstment', function (Blueprint $table) {
+        Schema::table('Disburstments', function (Blueprint $table) {
             $table->unsignedBigInteger('CreatedBy')->nullable()->after('status');
             $table->index('CreatedBy', 'disbursement_createdby_index');
         });
@@ -28,7 +28,7 @@ return new class extends Migration
         // SQLite cannot add a foreign key to an existing table, so the
         // constraint is built only where the engine supports it.
         if (DB::getDriverName() === 'mysql') {
-            Schema::table('Disburstment', function (Blueprint $table) {
+            Schema::table('Disburstments', function (Blueprint $table) {
                 $table->foreign('CreatedBy', 'disbursement_createdby_foreign')
                     ->references('UserID')->on('users')
                     ->cascadeOnUpdate()
@@ -39,17 +39,17 @@ return new class extends Migration
 
     public function down(): void
     {
-        if (! Schema::hasTable('Disburstment') || ! Schema::hasColumn('Disburstment', 'CreatedBy')) {
+        if (! Schema::hasTable('Disburstments') || ! Schema::hasColumn('Disburstment', 'CreatedBy')) {
             return;
         }
 
         if (DB::getDriverName() === 'mysql') {
-            Schema::table('Disburstment', function (Blueprint $table) {
+            Schema::table('Disburstments', function (Blueprint $table) {
                 $table->dropForeign('disbursement_createdby_foreign');
             });
         }
 
-        Schema::table('Disburstment', function (Blueprint $table) {
+        Schema::table('Disburstments', function (Blueprint $table) {
             $table->dropIndex('disbursement_createdby_index');
             $table->dropColumn('CreatedBy');
         });
