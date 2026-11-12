@@ -953,6 +953,7 @@
                                 @enderror
                             </div>
 
+                            @if($isAddModalOpen && !$isEditModalOpen)
                             <div x-data="{ showPassword: false }">
                                 <label class="au-form-label">Password</label>
                                 <div class="au-password-wrap">
@@ -982,6 +983,7 @@
                                     <span class="au-form-error">{{ $message }}</span>
                                 @enderror
                             </div>
+                            @endif
 
                               <div>
                                 <label class="au-form-label">Branches</label>

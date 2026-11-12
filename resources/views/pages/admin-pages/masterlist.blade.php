@@ -20,6 +20,13 @@
                 <span class="masterlist-tab-label">Overview</span>
             </a>
 
+            @if(auth()->user()->RoleID == 1)
+            <a href="#" @click.prevent="tab = 'roles'" :class="tab === 'roles' ? 'active' : ''">
+                <span class="masterlist-tab-icon">♙</span>
+                <span class="masterlist-tab-label">Roles</span>
+            </a>
+            @endif
+
             <a href="#" @click.prevent="tab = 'admin-users'" :class="tab === 'admin-users' ? 'active' : ''">
                 <span class="masterlist-tab-icon">♙</span>
                 <span class="masterlist-tab-label">Admin Users</span>
@@ -59,6 +66,10 @@
 
         <div x-show="tab === 'overview'" x-cloak class="masterlist-main-card">
             <livewire:admin-pages.masterlist.dashboard />
+        </div>
+
+        <div x-show="tab === 'roles'" x-cloak class="masterlist-main-card">
+            <livewire:admin-pages.masterlist.roles />
         </div>
 
         <div x-show="tab === 'admin-users'" x-cloak class="masterlist-main-card">

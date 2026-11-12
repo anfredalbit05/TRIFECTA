@@ -31,18 +31,14 @@
                     <span class="report-settings-tab-icon">⚙</span>
                     <span>General</span>
                 </a>
-            @endif
 
-            @if(auth()->user()->RoleID == 1)
                 <a href="#"
                    @click.prevent="tab='variants'"
                    :class="{ active: tab==='variants' }">
                     <span class="report-settings-tab-icon">▦</span>
                     <span>Variants</span>
                 </a>
-            @endif
 
-            @if(auth()->user()->RoleID == 1)
                 <a href="#"
                    @click.prevent="tab='branch-variant-grants'"
                    :class="{ active: tab==='branch-variant-grants' }">
@@ -102,7 +98,6 @@
         <div x-show="tab==='overview'" x-cloak class="report-settings-main-card">
             <livewire:admin-pages.report-settings.overview />
         </div>
-
 
 
         <div x-show="tab==='users'" x-cloak class="report-settings-main-card">

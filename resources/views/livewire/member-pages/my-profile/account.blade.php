@@ -72,27 +72,27 @@
         </div>
 
         <div class="grid divide-y divide-slate-200 md:grid-cols-3 md:divide-x md:divide-y-0">
-    {{-- Status --}}
-    <div class="account-detail-cell">
-        <p class="account-detail-label">Account Status</p>
-        <div class="mt-3">
-            @if (auth()->user()->RoleID == 1)
-                <select wire:model="status" class="status-select">
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </select>
-            @else
-                <span @class([
-                    'status-badge',
-                    'status-badge--active' => auth()->user()->status === 'Active',
-                    'status-badge--inactive' => auth()->user()->status === 'Inactive',
-                    'status-badge--suspended' => auth()->user()->status === 'Suspended',
-                ])>
-                    {{ auth()->user()->status }}
-                </span>
-            @endif
+        {{-- Status --}}
+        <div class="account-detail-cell">
+            <p class="account-detail-label">Account Status</p>
+            <div class="mt-3">
+                @if (auth()->user()->RoleID == 1)
+                    <select wire:model="status" class="status-select">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                @else
+                    <span @class([
+                        'status-badge',
+                        'status-badge--active' => auth()->user()->status === 'Active',
+                        'status-badge--inactive' => auth()->user()->status === 'Inactive',
+                        'status-badge--suspended' => auth()->user()->status === 'Suspended',
+                    ])>
+                        {{ auth()->user()->status }}
+                    </span>
+                @endif
+            </div>
         </div>
-    </div>
 
     {{-- Referral Code --}}
     <div class="account-detail-cell">

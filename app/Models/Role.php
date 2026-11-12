@@ -13,8 +13,13 @@ class Role extends Model
     protected $primaryKey = 'RoleID';
 
     protected $fillable = [
-        'name',
-        // Add any other fillable columns your 'roles' table contains (e.g., description)
+        'rolename',
+        'description',
+        'status',
+    ];
+
+    protected $casts = [
+        'status' => 'boolean',
     ];
 
     /**
