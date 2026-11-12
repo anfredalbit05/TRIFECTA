@@ -86,6 +86,7 @@ class Overview extends Component
     {
         $rawMonthlyIncome = Ledger::selectRaw('MONTH(created_at) as month_num, SUM(amount) as total')
             ->whereYear('created_at', $year)
+            ->whereNot('source', 'DB')
             ->where('status', 'Completed')
             ->groupBy('month_num')
             ->pluck('total', 'month_num');
@@ -142,6 +143,7 @@ class Overview extends Component
         // Monthly Income Chart Data (Guarantees all 12 months for the chosen year)
         $monthlyIncome = $this->getMonthlyIncomeData($year);
 
+        
         // Membership Fee Breakdown
         $variants = DB::table('variants')
             ->orderBy('name')
@@ -226,6 +228,7 @@ class Overview extends Component
                 UNION ALL SELECT 9, 'WD', 'Withdrawals'
                 UNION ALL SELECT 10, 'PK', 'Pangkabuhayan'
                 UNION ALL SELECT 11, 'OT', 'Others'
+                UNION ALL SELECT 12, 'DB', 'Disbursement'
             ) AS s"))
                 ->leftJoin('ledgers as l', function ($join) {
                     $join->on('l.Source', '=', 's.Source')

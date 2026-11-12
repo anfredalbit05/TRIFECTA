@@ -21,6 +21,8 @@ class Disbursement extends Model
         'amount',
         'remarks',
         'status',
+        'CreatedBy', // audit: users.UserID of whoever recorded the row
+        'created_at', // optional manual record date (editable while Unposted only)
     ];
 
     protected $casts = [
@@ -46,6 +48,12 @@ class Disbursement extends Model
         return $this->belongsTo(MembershipFee::class, 'FeeID', 'FeeID');
     }
 
+    /** The user who created (recorded) this disbursement. */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'CreatedBy', 'UserID');
+    }
+
     /**
      * Ledger status that mirrors this disbursement's status:
      * 0 (Unposted) -> Pending, 1 (Posted) -> Completed, 2 (Void) -> Cancelled.
@@ -60,13 +68,17 @@ class Disbursement extends Model
     }
 
     /**
-     * The ledger row this disbursement mirrors:
-     * Source 'DB', RefID = DID, amount NEGATIVE (expenses).
+     * The ledger row mirroring this disbursement's fund:
+     * per fee fund — Source 'DB', RefID = FeeID (one rollup row per fund).
      */
     public function ledgerEntry()
     {
+        if (! $this->FeeID) {
+            return null;
+        }
+
         return Ledger::where('Source', 'DB')
-            ->where('RefID', (string) $this->DID)
+            ->where('RefID', $this->FeeID)
             ->first();
     }
 
@@ -83,9 +95,18 @@ class Disbursement extends Model
 
     protected static function booted(): void
     {
-        // Creation + every lawful update keeps the ledger mirror in step.
+        // Creation + every lawful update re-rolls the fee fund's single
+        // ledger mirror (created / edited / posted / voided alike). Editing
+        // a fund that changed re-rolls BOTH funds — money moved out of one
+        // and into the other.
         static::saved(function (Disbursement $disbursement) {
-            $disbursement->syncLedger();
+            $originalFee = $disbursement->getOriginal('FeeID');
+
+            if ($originalFee && $originalFee !== $disbursement->FeeID) {
+                static::syncLedgerForFee($originalFee);
+            }
+
+            static::syncLedgerForFee((string) $disbursement->FeeID);
         });
 
         static::updating(function (Disbursement $disbursement) {
@@ -127,19 +148,39 @@ class Disbursement extends Model
     }
 
     /**
-     * Create (or keep in step) the mirrored ledger entry:
-     * one row per disbursement, Source 'DB', RefID = DID, negative amount.
+     * The fee fund's single ledger mirror (Source 'DB', RefID = FeeID):
+     *
+     *   amount  = -(total non-void disbursements of the fund)
+     *   status  = Cancelled when every disbursement is voided (fund intact)
+     *             Pending   while any non-void row is still Unposted
+     *             Completed once every non-void row is Posted
+     *
+     * Rolling up per FUND (instead of per disbursement) keeps RefID equal
+     * to the membership_fees ID so ledger reports can attribute DB
+     * expenses straight to a fee, with no identical duplicate rows and
+     * no lost mirrors when a disbursement is edited.
      */
-    public function syncLedger(): void
+    public static function syncLedgerForFee(string $feeId): void
     {
+        $rows = static::query()
+            ->where('FeeID', $feeId)
+            ->whereIn('status', [self::STATUS_UNPOSTED, self::STATUS_POSTED])
+            ->get(['amount', 'status']);
+
+        $status = $rows->isEmpty()
+            ? 'Cancelled'
+            : ($rows->contains(fn ($row) => (int) $row->status === self::STATUS_UNPOSTED)
+                ? 'Pending'
+                : 'Completed');
+
         Ledger::updateOrCreate(
             [
                 'Source' => 'DB',
-                'RefID' => (string) $this->DID,
+                'RefID' => $feeId,
             ],
             [
-                'amount' => -$this->amount,
-                'status' => self::ledgerStatusFor((int) $this->status),
+                'amount' => -(float) $rows->sum('amount'),
+                'status' => $status,
             ]
         );
     }

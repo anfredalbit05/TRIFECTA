@@ -38,10 +38,13 @@ class Ledger extends Model
     }
 
     /**
-     * The disbursement this row mirrors (Source 'DB' only, RefID = DID).
-     * A helper rather than a belongsTo relation: ledgers.RefID is a
-     * varchar business ref shared by several sources, so an ORM relation
-     * would silently match unrelated rows in cross-database tests.
+     * The disbursement a legacy mirror row pointed at (Source 'DB' with
+     * a numeric RefID = DID). New mirrors roll up per fee fund instead
+     * (RefID = FeeID), so this resolves only rows saved before that
+     * change; a helper rather than a belongsTo relation because
+     * ledgers.RefID is a varchar business ref shared by several sources
+     * and an ORM relation would silently match unrelated rows in
+     * cross-database tests.
      */
     public function disbursement(): ?Disbursement
     {

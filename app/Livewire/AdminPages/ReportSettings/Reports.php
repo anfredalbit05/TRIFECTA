@@ -65,6 +65,7 @@ class Reports extends Component
         'PK' => 'Pangkabuhayan',
         'SC' => 'Satellite Commission',
         'OT' => 'Others',
+        'DB' => 'Disbursement',
     ];
 
     /**
@@ -135,7 +136,7 @@ class Reports extends Component
      *                   not null)
      *  - fee_name     : Source 'MF' + RefID → membership_fees.FeeID
      *  - ref_user_name: RefID → users.UserID when RefID holds a plain user ID
-     *                   (DR / OV / PF / CF / WD / TX / PK entries store the
+     *                   (DB/ DR / OV / PF / CF / WD / TX / PK entries store the
      *                   related user there, so those rows get a name too)
      */
     protected function baseQuery()

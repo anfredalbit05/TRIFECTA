@@ -159,7 +159,7 @@
                         //  - MF rows  → the fee name the RefID points to
                         //  - otherwise → the member behind the activation,
                         //    falling back to the user carried in RefID
-                        //    (DR / OV / PF / CF / WD / TX / PK store a UserID there)
+                        //    (DB / DR / OV / PF / CF / WD / TX / PK store a UserID there)
                         $displayName = $ledger->Source === 'MF'
                             ? ($ledger->fee_name ?: 'N/A')
                             : (trim((string) ($ledger->member_name ?: $ledger->ref_user_name)) ?: 'N/A');

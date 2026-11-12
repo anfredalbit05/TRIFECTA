@@ -6,12 +6,12 @@
  *   status 0 Unposted -> ledger Pending    (amber)
  *   status 1 Posted   -> ledger Completed  (green, expense live)
  *   status 2 Void     -> ledger Cancelled  (grey, money stays in the fund)
+ *
+ * The summary figures come from the component's `statistics` scope: every
+ * disbursement created inside the signed-in user's branch grants, NOT just
+ * the rows of the variant card / filters selected below.
  */
-$totals = [
-    'unposted' => $this->rows->where('status', 0)->sum('amount'),
-    'posted'   => $this->rows->where('status', 1)->sum('amount'),
-    'void'     => $this->rows->where('status', 2)->sum('amount'),
-];
+$stats = $this->statistics;
 ?>
 
 <div class="space-y-4">
@@ -21,54 +21,37 @@ $totals = [
         <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
             <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Unposted</p>
             <p class="mt-1 text-base font-bold text-slate-700">
-                ₱{{ number_format($totals['unposted'], 2) }}
+                ₱{{ number_format($stats['unposted'], 2) }}
             </p>
             <p class="text-[10px] text-slate-400">ledger: Pending</p>
         </div>
         <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
             <p class="text-[10px] font-bold uppercase tracking-wide text-emerald-700">Posted</p>
             <p class="mt-1 text-base font-bold text-emerald-700">
-                ₱{{ number_format($totals['posted'], 2) }}
+                ₱{{ number_format($stats['posted'], 2) }}
             </p>
             <p class="text-[10px] text-emerald-600/70">ledger: Completed — expense live</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
             <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Voided</p>
             <p class="mt-1 text-base font-bold text-slate-500">
-                ₱{{ number_format($totals['void'], 2) }}
+                ₱{{ number_format($stats['void'], 2) }}
             </p>
             <p class="text-[10px] text-slate-400">ledger: Cancelled — money stays in fund</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-white px-4 py-3">
             <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Net Outflow</p>
             <p class="mt-1 text-base font-bold text-[#0B2A5B]">
-                ₱{{ number_format($totals['posted'], 2) }}
+                ₱{{ number_format($stats['posted'], 2) }}
             </p>
-            <p class="text-[10px] text-slate-400">live expense in the ledger</p>
+            <p class="text-[10px] text-slate-400">all created disbursements · live expense</p>
         </div>
     </div>
 
-    {{-- VARIANT FUND CARDS — click a variant to scope both this tab's
-         table and the modal dropdown to its fee funds. --}}
+    {{-- VARIANT FUND CARDS — one card per Active variant, always with one
+         card selected (the first variant that still holds money). --}}
     <div class="flex flex-wrap gap-2">
-        <button
-            type="button"
-            wire:key="variant-card-all"
-            wire:click="selectVariant(null)"
-            class="rounded-2xl border-2 px-4 py-3 text-left transition
-                {{ $variantFilter === null
-                    ? 'border-[#0B2A5B] bg-blue-50 ring-2 ring-[#0B2A5B]/20'
-                    : 'border-slate-200 bg-white hover:border-slate-400' }}"
-        >
-            <span class="block text-xs font-bold text-slate-700">All Variants</span>
-            <span class="mt-0.5 block text-[10px] text-slate-400">
-                ₱{{ number_format($this->variantCards->sum('collected'), 2) }} collected ·
-                ₱{{ number_format($this->variantCards->sum('released') + $this->variantCards->sum('disbursed'), 2) }} released ·
-                ₱{{ number_format($this->variantCards->sum('available'), 2) }} available
-            </span>
-        </button>
-
-        @foreach ($this->variantCards as $card)
+        @forelse ($this->variantCards as $card)
             <button
                 type="button"
                 wire:key="variant-card-{{ $card['VID'] }}"
@@ -98,7 +81,18 @@ $totals = [
                     ₱{{ number_format($card['available'], 2) }} still available
                 </span>
             </button>
-        @endforeach
+        @empty
+            <p class="rounded-xl border border-dashed border-slate-300 px-4 py-3 text-xs text-slate-400">
+                No Active variant is available to your branch yet.
+            </p>
+        @endforelse
+
+        <p class="w-full text-[10px] text-slate-400">
+            Available = Membership Fees + Convenience Fee + TAX − Direct Referral − Overrides −
+            Provident Fund − Claim − Refund − Withdrawals − Pangkabuhayan − Disbursements
+            (voided rows excluded). The selected card only scopes the fund list when creating a
+            new disbursement — this table always lists every disbursement of your branch.
+        </p>
     </div>
 
     {{-- FILTER BAR --}}
@@ -118,6 +112,16 @@ $totals = [
             <option value="0">Unposted (ledger Pending)</option>
             <option value="1">Posted (ledger Completed)</option>
             <option value="2">Void (ledger Cancelled)</option>
+        </select>
+
+        <select
+            wire:model.live="creatorFilter"
+            class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+        >
+            <option value="">All Creators</option>
+            @foreach ($this->creatorOptions as $creator)
+                <option value="{{ $creator['UserID'] }}">{{ $creator['name'] }}</option>
+            @endforeach
         </select>
 
         <div class="ml-auto">
@@ -143,8 +147,8 @@ $totals = [
                         <th class="px-4 py-3 font-bold">Fee / Source Fund</th>
                         <th class="px-4 py-3 text-right font-bold">Amount Out</th>
                         <th class="px-4 py-3 font-bold">Status</th>
-                        <th class="px-4 py-3 font-bold">Ledger (DB source)</th>
                         <th class="px-4 py-3 font-bold">Remarks</th>
+                        <th class="px-4 py-3 font-bold">Created By</th>
                         <th class="px-4 py-3 text-right font-bold">Actions</th>
                     </tr>
                 </thead>
@@ -153,14 +157,20 @@ $totals = [
                         <tr class="hover:bg-slate-50/60">
                             <td class="px-4 py-3 font-mono text-xs text-slate-500">
                                 #{{ $row->DID }}
+                                <div class="font-sans text-[10px] text-slate-400">
+                                    {{ $row->created_at?->format('M j, Y') }}
+                                </div>
                             </td>
                             <td class="px-4 py-3">
-                                <div class="font-semibold text-slate-700">
-                                    {{ $row->fee->FeeName ?? '—' }}
-                                </div>
-                                <div class="text-[11px] text-slate-400">
-                                    {{ $row->fee?->variant?->name ?? 'No variant' }} · {{ $row->fee->FeeID ?? '' }}
-                                </div>
+                                @if ($row->fee)
+                                    <div class="font-semibold text-slate-700">{{ $row->fee->FeeName }}</div>
+                                    <div class="text-[11px] text-slate-400">
+                                        {{ $row->fee->variant?->name ?? 'No variant' }} · {{ $row->fee->FeeID }}
+                                    </div>
+                                @else
+                                    <div class="font-semibold text-amber-600">No fund</div>
+                                    <div class="text-[11px] text-slate-400">edit this row and pick a source fund</div>
+                                @endif
                             </td>
                             <td class="px-4 py-3 text-right font-bold text-slate-800">
                                 ₱{{ number_format((float) $row->amount, 2) }}
@@ -177,16 +187,11 @@ $totals = [
                                     <span class="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-500"> ● Void</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 text-xs text-slate-500">
-                                @if ($entry = $row->ledgerEntry())
-                                    <span class="font-mono">T#{{ $entry->TransactionID }}</span>
-                                    <span class="text-slate-400">· {{ $entry->status }}</span>
-                                @else
-                                    <span class="text-slate-300">—</span>
-                                @endif
-                            </td>
                             <td class="max-w-[16rem] px-4 py-3 text-xs text-slate-500">
                                 <span class="line-clamp-2 whitespace-pre-line">{{ $row->remarks ?: '—' }}</span>
+                            </td>
+                            <td class="px-4 py-3 text-xs text-slate-500">
+                                {{ trim(($row->creator?->firstname ?? '').' '.($row->creator?->lastname ?? '')) ?: '—' }}
                             </td>
                             <td class="px-4 py-3">
                                 <div class="flex justify-end gap-1.5">
@@ -194,14 +199,12 @@ $totals = [
                                         @if ($this->canChangeStatus)
                                             <button
                                                 type="button"
-                                                wire:click="post({{ $row->DID }})"
-                                                wire:confirm="Post disbursement #{{ $row->DID }}? Its ledger entry becomes Completed (live expense)."
+                                                  wire:click="confirmPost({{ $row->DID }})"
                                                 class="rounded-lg bg-emerald-600 px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-emerald-700"
                                             >Post</button>
                                             <button
                                                 type="button"
-                                                wire:click="void({{ $row->DID }})"
-                                                wire:confirm="Void disbursement #{{ $row->DID }}? Its ledger entry becomes Cancelled."
+                                                wire:click="confirmVoid({{ $row->DID }})"
                                                 class="rounded-lg border border-slate-300 px-2.5 py-1.5 text-[11px] font-bold text-slate-600 hover:bg-slate-100"
                                             >Void</button>
                                         @endif
@@ -219,10 +222,23 @@ $totals = [
                                             type="button"
                                             x-data
                                             @click="
-                                                const reason = prompt('Voiding record #{{ $row->DID }} affects live ledger data. State the void reason:');
-                                                if (reason !== null && reason.trim() !== '') {
-                                                    $wire.call('void', {{ $row->DID }}, reason.trim());
-                                                }
+                                                if (! window.SwalFlow) return;
+                                                SwalFlow.prompt({
+                                                    title: 'Void Disbursement #{{ $row->DID }}?',
+                                                    text: 'This expense is already live in the ledger. State the reason before voiding.',
+                                                    icon: 'warning',
+                                                    input: 'textarea',
+                                                    inputLabel: 'Void reason',
+                                                    inputPlaceholder: 'Why is this posted disbursement being voided?',
+                                                    required: true,
+                                                    requiredMessage: 'A void reason is required.',
+                                                    maxLength: 1000,
+                                                    rows: 4,
+                                                    confirmText: 'Void disbursement',
+                                                    cancelText: 'Cancel',
+                                                    loadingTitle: 'Voiding disbursement...',
+                                                    loadingText: 'Cancelling the ledger entry.',
+                                                }, (reason) => $wire.call('void', {{ $row->DID }}, reason));
                                             "
                                             class="rounded-lg border border-slate-300 px-2.5 py-1.5 text-[11px] font-bold text-slate-600 hover:bg-slate-100"
                                         >Void…</button>
@@ -271,13 +287,42 @@ $totals = [
                         </select>
                         @error('fee_id') <p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p> @enderror
 
-                        @if (filled($this->availableForSelectedFee))
+                        @if ($this->selectedFund)
+                            @php($fund = $this->selectedFund)
                             <p class="mt-1 text-[11px] text-slate-500">
                                 Fund available:
-                                <span class="font-bold text-slate-700">₱{{ number_format($this->availableForSelectedFee, 2) }}</span>
-                                <span class="text-slate-400">(collected − disbursed, excl. void)</span>
+                                <span class="font-bold {{ $fund['available'] < 0 ? 'text-red-600' : 'text-slate-700' }}">
+                                    ₱{{ number_format($fund['available'], 2) }}
+                                </span>
+                                <span class="text-slate-400">
+                                    (collected ₱{{ number_format($fund['collected'], 2) }}
+                                    − released ₱{{ number_format($fund['released'], 2) }}
+                                    − disbursed ₱{{ number_format($fund['disbursed'], 2) }}, excl. void)
+                                </span>
+                                @if ($fund['releasedLegacy'] > 0)
+                                    <span class="text-amber-600">
+                                        incl. ₱{{ number_format($fund['releasedLegacy'], 2) }} legacy
+                                    </span>
+                                @endif
+                                <span class="block text-slate-400">
+                                    Amounts above this balance are rejected on save.
+                                </span>
                             </p>
                         @endif
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-bold text-slate-700">Date *</label>
+                        <input
+                            wire:model.live="disbursement_date"
+                            type="date"
+                            max="{{ now()->format('Y-m-d') }}"
+                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+                        >
+                        @error('disbursement_date') <p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p> @enderror
+                        <p class="mt-1 text-[11px] text-slate-400">
+                            Record date — defaults to today; editable only while the disbursement is Unposted.
+                        </p>
                     </div>
 
                     <div>
