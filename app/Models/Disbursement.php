@@ -8,7 +8,7 @@ use LogicException;
 
 class Disbursement extends Model
 {
-    protected $table = 'Disburstments';
+    protected $table = 'disburstments';
 
     protected $primaryKey = 'DID';
 
