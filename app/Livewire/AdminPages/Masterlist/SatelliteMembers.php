@@ -656,7 +656,7 @@ class SatelliteMembers extends Component
         // IMPORTANT:
         // Only allow RoleID 8 members to be edited here.
         $member = User::where('UserID', $id)
-            ->where('RoleID', 8)
+            ->where('RoleID', 9)
             ->first();
 
         if (! $member) {

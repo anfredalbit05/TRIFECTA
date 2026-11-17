@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * The Disburstment table (user-specified name, note the "u").
+     * The disburstments table (user-specified name, note the "u").
      *
      * Money paid OUT to implementers/investors, drawn from a collected
      * membership fee (FeeID). Every row is mirrored in `ledgers` with
@@ -27,11 +27,11 @@ return new class extends Migration
         // the user's own DDL, identical shape) — create only when missing so
         // existing environments are not touched, while fresh installs and
         // the SQLite test suite still get the full table + FK.
-        if (Schema::hasTable('Disburstment')) {
+        if (Schema::hasTable('disburstments')) {
             return;
         }
 
-        Schema::create('Disburstment', function (Blueprint $table) {
+        Schema::create('disburstments', function (Blueprint $table) {
             $table->id('DID');
 
             // membership_fees.FeeID is a VARCHAR business key ('FEE001'…),
@@ -45,20 +45,26 @@ return new class extends Migration
             // 0 = Unposted, 1 = Posted, 2 = Void.
             $table->integer('status')->default(0);
 
-            $table->timestamps();
+            // Audit trail: which user recorded the disbursement.
+            $table->unsignedBigInteger('createdby')->nullable();
 
-            $table->index('status');
-            $table->index('FeeID');
+            $table->timestamps();
 
             $table->foreign('FeeID', 'disbursement_FEEID_foreign')
                 ->references('FeeID')->on('membership_fees')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
+
+            $table->foreign('createdby', 'disburstment_created_by_foreign')
+                ->references('UserID')->on('users')
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
+
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('Disburstment');
+        Schema::dropIfExists('disburstments');
     }
 };

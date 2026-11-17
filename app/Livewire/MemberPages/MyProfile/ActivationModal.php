@@ -24,12 +24,6 @@ class ActivationModal extends Component
      * BranchID => prefix of that branch's rows in the settings table.
      * Main Branch (1) uses the original un-prefixed names.
      */
-    private const BRANCH_SETTING_PREFIX = [
-        1 => '',
-        2 => 'san_franz_branch_',
-        3 => 'davao_branch_',
-        4 => 'digos_branch_',
-    ];
 
     public bool $open = false;
 
@@ -164,26 +158,21 @@ class ActivationModal extends Component
     | back to another branch's account details.
     |--------------------------------------------------------------------------
     */
-    private function branchSetting(string $name, $default = null)
+    /*
+    |--------------------------------------------------------------------------
+    | Centralized Payment Settings
+    |--------------------------------------------------------------------------
+    */
+
+    private function setting(string $name, $default = null)
     {
-        $branchId = $this->resolveBranchId();
-
-        if ($branchId === null || ! array_key_exists($branchId, self::BRANCH_SETTING_PREFIX)) {
-            return $default;
-        }
-
-        $value = Setting::where(
-            'name',
-            self::BRANCH_SETTING_PREFIX[$branchId].$name
-        )->value('value');
-
-        return $value ?? $default;
+        return Setting::where('name', $name)->value('value') ?? $default;
     }
 
-    private function branchFlag(string $name): bool
+    private function settingFlag(string $name): bool
     {
         return filter_var(
-            $this->branchSetting($name, 'false'),
+            $this->setting($name, 'false'),
             FILTER_VALIDATE_BOOLEAN
         );
     }
@@ -328,17 +317,17 @@ class ActivationModal extends Component
         $this->resetValidation('selectedVariantId');
     }
 
-    private function loadPaymentSettings(): void
+        private function loadPaymentSettings(): void
     {
-        $this->gcashEnabled = $this->branchFlag('gcash_payment_enabled');
+        $this->gcashEnabled = $this->settingFlag('gcash_payment_enabled');
 
-        $this->paymayaEnabled = $this->branchFlag('paymaya_payment_enabled');
+        $this->paymayaEnabled = $this->settingFlag('paymaya_payment_enabled');
 
-        $this->bankEnabled = $this->branchFlag('bank_payment_enabled');
+        $this->bankEnabled = $this->settingFlag('bank_payment_enabled');
 
-        $this->gcashConvenienceFeeEnabled = $this->branchFlag('gcash_convenience_fee_enabled');
+        $this->gcashConvenienceFeeEnabled = $this->settingFlag('gcash_convenience_fee_enabled');
 
-        $this->paymayaConvenienceFeeEnabled = $this->branchFlag('paymaya_convenience_fee_enabled');
+        $this->paymayaConvenienceFeeEnabled = $this->settingFlag('paymaya_convenience_fee_enabled');
 
         $this->totalMembershipFeesCost = filled($this->selectedVariantId)
             ? (float) MembershipFee::where(
@@ -566,33 +555,57 @@ class ActivationModal extends Component
     */
     private function loadPaymentDetails(): void
     {
-        // reset first so switching methods doesn't leak old values
+        // Reset payment details first.
         $this->gcashName = '';
         $this->gcashNumber = '';
+
         $this->paymayaName = '';
         $this->paymayaNumber = '';
+
         $this->bankName = '';
         $this->bankAccountName = '';
         $this->bankAccountNumber = '';
 
         if ($this->payment_method === 'GCash') {
-            // San Franz currently stores its number as "gcash_number"
-            // (no "1"), so accept both spellings.
+
             $this->gcashNumber = (string) (
-                $this->branchSetting('gcash_number1')
-                ?? $this->branchSetting('gcash_number', '')
+                $this->setting('gcash_number1')
+                ?? $this->setting('gcash_number', '')
             );
-            $this->gcashName = (string) $this->branchSetting('gcash_number1_name', '');
+
+            $this->gcashName = (string) $this->setting(
+                'gcash_number1_name',
+                ''
+            );
 
         } elseif ($this->payment_method === 'Maya') {
-            $this->paymayaNumber = (string) $this->branchSetting('paymaya_account_number', '');
-            $this->paymayaName = (string) $this->branchSetting('paymaya_account_name', '');
+
+            $this->paymayaNumber = (string) $this->setting(
+                'paymaya_account_number',
+                ''
+            );
+
+            $this->paymayaName = (string) $this->setting(
+                'paymaya_account_name',
+                ''
+            );
 
         } elseif ($this->payment_method === 'Bank Transfer') {
-            // Optional "bank_name" setting; plain "Bank" when none exists.
-            $this->bankName = (string) $this->branchSetting('bank_name', 'Bank');
-            $this->bankAccountName = (string) $this->branchSetting('bank_account_name', '');
-            $this->bankAccountNumber = (string) $this->branchSetting('bank_account_number', '');
+
+            $this->bankName = (string) $this->setting(
+                'bank_name',
+                ''
+            );
+
+            $this->bankAccountName = (string) $this->setting(
+                'bank_account_name',
+                ''
+            );
+
+            $this->bankAccountNumber = (string) $this->setting(
+                'bank_account_number',
+                ''
+            );
         }
     }
 

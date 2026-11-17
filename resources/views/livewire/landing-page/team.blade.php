@@ -5,12 +5,10 @@
     ========================== -->
     <section class="tmt-hero">
 
-        <div class="tmt-hero-grid"></div>
-
         <div class="tmt-hero-inner">
 
             <span class="tmt-kicker tmt-kicker-light">
-                <x-editable-text key="team_hero_badge" :value="$contexts['team_hero_badge'] ?? 'TRIFECTA Leadership'" tag="span" class="inline-block" />
+                <x-editable-text key="team_hero_badge" :value="$contexts['team_hero_badge'] ?? 'TRIFECTA Board of Directors'" tag="span" class="inline-block" />
             </span>
 
             <h1 class="tmt-hero-title">
@@ -22,7 +20,7 @@
 
             <p class="tmt-hero-lead">
                 <x-editable-text key="team_hero_description" :value="$contexts['team_hero_description'] ??
-                    'Six offices, one standard of service. Meet the executives and branch managers who stand behind every member file, every release, and every promise we make.'" tag="span"
+                    'The board members and officers of TRIFECTA — insurance professionals and community leaders working together so that every TRIFECTA family is looked after with competence and care.'" tag="span"
                     class="block" />
             </p>
 
@@ -47,7 +45,7 @@
 
 
     <!-- =========================
-         CHIEF EXECUTIVE
+         PRESIDENT / OWNER
     ========================== -->
     <section class="tmt-exec">
 
@@ -55,19 +53,19 @@
 
             <div class="tmt-exec-photo">
                 <span class="tmt-exec-photo-rule"></span>
-                <img src="{{ asset('images/ceo-teams.png') }}" alt="Chief Executive Officer" class="tmt-exec-img">
-                <span class="tmt-exec-photo-tag">President &amp; CEO</span>
+                <img src="{{ asset('images/team-cherry-lynn-dagala.jpg') }}"
+                     alt="Dr. Cherry Lynn Dagala, LFA — Owner and President"
+                     class="tmt-exec-img">
+                <span class="tmt-exec-photo-tag">Owner &amp; President</span>
             </div>
 
             <div class="tmt-exec-body">
 
                 <span class="tmt-kicker">Office of the President</span>
 
-                {{-- <h2 class="tmt-exec-name">
-                    <x-editable-text key="team_ceo_name" :value="$contexts['team_ceo_name'] ?? 'Anfred Albit'" tag="span" />
-                </h2> --}}
+                <h2 class="tmt-exec-name">Dr. Cherry Lynn Dagala, LFA</h2>
 
-                <p class="tmt-exec-role">President &amp; Chief Executive Officer</p>
+                <p class="tmt-exec-role">Owner / President</p>
 
                 <p class="tmt-exec-lead">
                     <x-editable-text key="team_ceo_description" :value="$contexts['team_ceo_description'] ??
@@ -75,9 +73,9 @@
                 </p>
 
                 <ul class="tmt-exec-chips">
-                    <li>Government-Licensed Financial Advisor</li>
-                    <li>Former City Councilor, Tagum City</li>
-                    <li>Professor of Business &amp; Marketing</li>
+                    <li>Radiologist</li>
+                    <li>Licensed Financial Advisor</li>
+                    <li>Three Pillars · One Commitment</li>
                 </ul>
 
             </div>
@@ -88,35 +86,83 @@
 
 
     <!-- =========================
-         LEADERSHIP ROSTER
+         BOARD OF DIRECTORS
     ========================== -->
     <section class="tmt-roster">
 
         <div class="tmt-roster-wrap">
 
             <header class="tmt-roster-head">
-                <span class="tmt-kicker">The Leadership Circle</span>
-                <h2 class="tmt-roster-title">Agency, administration &amp; the branches</h2>
+                <span class="tmt-kicker">Board Members</span>
+                <h2 class="tmt-roster-title">The board &amp; the offices it leads</h2>
                 <p class="tmt-roster-lead">
-                    Each office owns a part of the member journey — from agency partnerships and
-                    records administration to the three branches that serve members face to face.
+                    The board sets the direction of TRIFECTA. Each seat owns a part of the member
+                    journey — from executive management and finance to the branches that serve
+                    members face to face.
                 </p>
             </header>
 
             <div class="tmt-roster-grid">
 
                 <article class="tmt-person">
+                    <img src="{{ asset('images/team-bobby-dagala.jpg') }}"
+                         alt="Mr. Bobby P. Dagala, LFA — Vice President and Chief Operating Officer"
+                         class="tmt-person-photo">
+                    <span class="tmt-person-role">Vice President / COO</span>
+                    <h3 class="tmt-person-name">Mr. Bobby P. Dagala, LFA</h3>
+                    <p class="tmt-person-meta">Management &amp; operations · 20 years in the insurance industry · Founder of Tri Care Community</p>
+                </article>
+
+                <article class="tmt-person">
+                    <img src="{{ asset('images/team-princes-manliguez.jpg') }}"
+                         alt="Ms. Princes Manliguez, LFA — Finance Officer"
+                         class="tmt-person-photo">
+                    <span class="tmt-person-role">Finance</span>
+                    <h3 class="tmt-person-name">Ms. Princes Manliguez, LFA</h3>
+                    <p class="tmt-person-meta">Finance Officer · membership fees, releases &amp; cashiering</p>
+                </article>
+
+                <article class="tmt-person">
+                    <img src="{{ asset('images/team-pierre-hordista.jpg') }}"
+                         alt="Mr. Pierre Hordista, LFA — IT In-Charge"
+                         class="tmt-person-photo">
+                    <span class="tmt-person-role">Technology</span>
+                    <h3 class="tmt-person-name">Mr. Pierre Hordista, LFA</h3>
+                    <p class="tmt-person-meta">IT In-Charge · systems, records security &amp; member data</p>
+                </article>
+
+                <article class="tmt-person">
+                    <img src="{{ asset('images/team-alfe-duron.jpg') }}"
+                         alt="Ms. Alfe S. Duron, LFA — HR Head"
+                         class="tmt-person-photo">
+                    <span class="tmt-person-role">People</span>
+                    <h3 class="tmt-person-name">Ms. Alfe S. Duron, LFA</h3>
+                    <p class="tmt-person-meta">HR Head · recruitment, training &amp; staff welfare</p>
+                </article>
+
+                <article class="tmt-person">
+                    <img src="{{ asset('images/team-jeralyn-gonzales.jpg') }}"
+                         alt="Mrs. Jeralyn B. Gonzales — Cashier and Encoder"
+                         class="tmt-person-photo">
+                    <span class="tmt-person-role">Administration</span>
+                    <h3 class="tmt-person-name">Mrs. Jeralyn B. Gonzales</h3>
+                    <p class="tmt-person-meta">Cashier / Encoder · payments, receipts &amp; member records</p>
+                </article>
+
+                <article class="tmt-person">
+                    <img src="{{ asset('images/team-georgelyn-angeles.jpg') }}"
+                         alt="Ms. Georgelyn Angeles — SFX Branch Secretary"
+                         class="tmt-person-photo">
+                    <span class="tmt-person-role">Branch</span>
+                    <h3 class="tmt-person-name">Ms. Georgelyn Angeles</h3>
+                    <p class="tmt-person-meta">SFX Branch Secretary · walk-in inquiries &amp; renewals</p>
+                </article>
+
+                <article class="tmt-person">
                     <span class="tmt-person-avatar">TA</span>
                     <span class="tmt-person-role">Agency</span>
                     <h3 class="tmt-person-name">TRI CARE AGENCY</h3>
                     <p class="tmt-person-meta">Partner agency · licensing &amp; field coordination</p>
-                </article>
-
-                <article class="tmt-person">
-                    <span class="tmt-person-avatar">BD</span>
-                    <span class="tmt-person-role">Administration</span>
-                    <h3 class="tmt-person-name">Bobby Paulo Dagala, LFA</h3>
-                    <p class="tmt-person-meta">Founder · records, releases &amp; member support</p>
                 </article>
 
                 @foreach ($branches->take(3) as $branch)

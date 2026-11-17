@@ -13,7 +13,7 @@
     $publicLinks = [
         ['label' => 'Home',          'route' => 'home',         'match' => '/'],
         ['label' => 'Our Story',     'route' => 'about',        'match' => 'about*'],
-        ['label' => 'Our People',    'route' => 'team',         'match' => 'team*'],
+        ['label' => 'Board Members', 'route' => 'team',         'match' => 'team*'],
         ['label' => 'Membership',    'route' => 'how-it-works', 'match' => 'how-it-works*'],
         ['label' => 'Member Stories','route' => 'testimonials', 'match' => 'testimonials*'],
         ['label' => 'Announcement',  'route' => 'news',         'match' => 'news*'],

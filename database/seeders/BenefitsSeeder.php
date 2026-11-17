@@ -2,139 +2,163 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class BenefitsSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * The benefit set printed on the TRIFECTA poster:
+     *
+     *   Six-Point Health Benefits (6 months contestability)
+     *   Additional Benefits
+     *   Plus! 3 Beneficiaries Benefits (age 0–100)
+     *
+     * Six-point rows carry the waiting period in `details`; the additional
+     * benefits are the cash-assistance amounts. Every variant gets the same
+     * list, because the poster describes the single ₱1,999 annual plan.
      */
     public function run(): void
     {
         $benefits = [
-            // Primary Owner Benefits (18-65 yrs old)
+            // ============================================
+            // SIX-POINT HEALTH BENEFITS
+            // ============================================
             [
-                'name' => 'TRIFECTA Unnatural Fatality (Disablement) Cash Assistance',
-                'details' => null,
-                'amount' => 65000.00,
+                'name' => 'Preventive Healthcare',
+                'details' => 'Reimbursement of ₱500 · CBC, Urinalysis, Fecalysis, Chest X-ray · 6 months contestability',
+                'amount' => 500.00,
                 'holdertype' => 'Primary Owner',
             ],
             [
-                'name' => 'TRIFECTA Health "Support Accident" Reimbursement',
-                'details' => 'Per occurrence',
+                'name' => 'In-Patient Care',
+                'details' => '₱15,000 consumable · private or semi-private room, doctor\'s fee',
+                'amount' => 15000.00,
+                'holdertype' => 'Primary Owner',
+            ],
+            [
+                'name' => 'Out-Patient Care',
+                'details' => '₱5,000 consumable · check-up and medicine allowance',
+                'amount' => 5000.00,
+                'holdertype' => 'Primary Owner',
+            ],
+            [
+                'name' => 'Emergency Care Through Accident',
+                'details' => '₱13,000 per incident · ambulance, physician services, minor surgery · usable within 72 hours upon approval',
                 'amount' => 13000.00,
                 'holdertype' => 'Primary Owner',
             ],
             [
-                'name' => 'TRIFECTA Financial Support sa Di Tinuyong Pagkamatay',
-                'details' => null,
-                'amount' => 30000.00,
-                'holdertype' => 'Primary Owner',
-            ],
-            [
-                'name' => 'Motorcycling Accident Financial Assistance',
-                'details' => null,
-                'amount' => 15000.00,
-                'holdertype' => 'Primary Owner',
-            ],
-            [
-                'name' => 'TRIFECTA Admission Support Pag Maaksidente',
-                'details' => 'Good for 15 days, ₱500.00 per day',
-                'amount' => 500.00,
-                'holdertype' => 'Primary Owner',
-            ],
-            [
-                'name' => 'TRIFECTA Fire Cash Assistance',
-                'details' => null,
-                'amount' => 5000.00,
-                'holdertype' => 'Primary Owner',
-            ],
-            [
-                'name' => 'TRIFECTA Accidental Burial Assistance',
-                'details' => null,
-                'amount' => 10000.00,
-                'holdertype' => 'Primary Owner',
-            ],
-            [
-                'name' => 'Dental Checkup Cash Reimbursement',
-                'details' => null,
+                'name' => 'Dental Care',
+                'details' => '₱1,000 reimbursement · consultation and examination, single tooth extraction',
                 'amount' => 1000.00,
                 'holdertype' => 'Primary Owner',
             ],
             [
-                'name' => 'Natural Death Cash Assistance',
-                'details' => '3 months contestability',
-                'amount' => 20000.00,
-                'holdertype' => 'Primary Owner',
-            ],
-            [
-                'name' => 'Critical Illness Financial Assistance for Medicine',
-                'details' => 'Consumable, 6 mos contestability',
-                'amount' => 5000.00,
-                'holdertype' => 'Primary Owner',
-            ],
-            [
-                'name' => 'Annual P.E. Health Support Reimbursement',
-                'details' => null,
-                'amount' => 500.00,
-                'holdertype' => 'Primary Owner',
-            ],
-            [
-                'name' => 'TRIFECTA Hospitalization Assistance',
-                'details' => '₱15,000 consumable, upon renew next year no contestability',
-                'amount' => 15000.00,
-                'holdertype' => 'Primary Owner',
-            ],
-            [
-                'name' => '2x Pregnant Evaluation (Ultrasound for Pregnant Women)',
-                'details' => '6 mos contestability',
+                'name' => 'Maternity Care and Ultrasound Services',
+                'details' => 'Reimbursement up to ₱2,000 · physician\'s fee/visit, tetanus injection, ultrasound, vitamins and medicines',
                 'amount' => 2000.00,
                 'holdertype' => 'Primary Owner',
             ],
 
-            // 3 Beneficiaries Benefits (0-100 yrs old)
+            // ============================================
+            // ADDITIONAL BENEFITS
+            // ============================================
             [
-                'name' => 'TRIFECTA Natural Death Claim Financial Assistance',
-                'details' => '3 mos contestability',
+                'name' => 'Accidental Death and Disability',
+                'details' => 'Cash assistance',
+                'amount' => 65000.00,
+                'holdertype' => 'Primary Owner',
+            ],
+            [
+                'name' => 'Unprovoked Murder and Assault',
+                'details' => 'Cash assistance',
+                'amount' => 30000.00,
+                'holdertype' => 'Primary Owner',
+            ],
+            [
+                'name' => 'Natural Death Benefits',
+                'details' => 'Cash assistance · 6 months contestability',
+                'amount' => 20000.00,
+                'holdertype' => 'Primary Owner',
+            ],
+            [
+                'name' => 'Motorcycling Accident',
+                'details' => 'Financial assistance',
+                'amount' => 15000.00,
+                'holdertype' => 'Primary Owner',
+            ],
+            [
+                'name' => 'Hospital Income Benefit',
+                'details' => '₱500 per day for 15 days if admitted through accident',
+                'amount' => 7500.00,
+                'holdertype' => 'Primary Owner',
+            ],
+            [
+                'name' => 'Fire Cash Assistance',
+                'details' => 'Cash assistance',
+                'amount' => 5000.00,
+                'holdertype' => 'Primary Owner',
+            ],
+            [
+                'name' => 'Burial Cash Assistance',
+                'details' => 'Cash assistance',
+                'amount' => 10000.00,
+                'holdertype' => 'Primary Owner',
+            ],
+
+            // ============================================
+            // PLUS! 3 BENEFICIARIES BENEFITS (AGE 0–100)
+            // ============================================
+            [
+                'name' => 'Natural Death Benefit',
+                'details' => 'For each of the 3 beneficiaries · 3 months contestability',
                 'amount' => 10000.00,
                 'holdertype' => 'Beneficiaries',
             ],
             [
-                'name' => 'TRIFECTA Hospitalization Assistance',
-                'details' => '6 mos contestability, upon renewal there will be no contestability, consumable',
+                'name' => 'Medical Hospitalization',
+                'details' => '₱15,000 consumable · 6 months contestability, no contestability upon renewal',
                 'amount' => 15000.00,
                 'holdertype' => 'Beneficiaries',
             ],
             [
-                'name' => '2x Pregnant Evaluation (Ultrasound for Pregnant Women)',
-                'details' => '6 mos contestability',
+                'name' => 'Maternity Care & Ultrasound Services',
+                'details' => '₱2,000 consumable · 6 months contestability',
                 'amount' => 2000.00,
                 'holdertype' => 'Beneficiaries',
             ],
             [
-                'name' => 'Death Burial Assistance',
-                'details' => null,
+                'name' => 'Burial Cash Assistance',
+                'details' => 'For each of the 3 beneficiaries',
                 'amount' => 5000.00,
                 'holdertype' => 'Beneficiaries',
             ],
         ];
 
-        foreach ($benefits as $benefit) {
-            DB::table('benefits')->updateOrInsert(
-                [
+        $variantIDs = DB::table('variants')->orderBy('VID')->pluck('VID')->all();
+
+        if ($variantIDs === []) {
+            $variantIDs = [1];
+        }
+
+        foreach ($variantIDs as $variantID) {
+            // Replace this variant's list so re-running the seeder cannot
+            // leave the old unrelated benefits behind.
+            DB::table('benefits')->where('VID', $variantID)->delete();
+
+            foreach ($benefits as $benefit) {
+                DB::table('benefits')->insert([
                     'name' => $benefit['name'],
-                    'holdertype' => $benefit['holdertype'],
-                ],
-                [
                     'details' => $benefit['details'],
+                    'VID' => $variantID,
                     'amount' => $benefit['amount'],
+                    'holdertype' => $benefit['holdertype'],
                     'status' => true,
-                    'updated_at' => now(),
                     'created_at' => now(),
-                ]
-            );
+                    'updated_at' => now(),
+                ]);
+            }
         }
     }
 }

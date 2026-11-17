@@ -15,6 +15,8 @@ return new class extends Migration
 
             $table->id('ActivationID');
 
+            $table->unsignedBigInteger('VID')->nullable();
+
 
             /*
             |--------------------------------------------------------------------------
@@ -26,6 +28,11 @@ return new class extends Migration
                 ->constrained('users', 'UserID')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
+
+            $table->foreign('VID', 'activations_variantid_foreign')
+                ->references('VID')->on('variants')
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
 
 
             /*
@@ -129,11 +136,31 @@ return new class extends Migration
                 'Pending',
                 'Approved',
                 'Rejected',
-                'Expired',
             ])->default('Pending');
+
+            /*
+            |--------------------------------------------------------------------------
+            | Satellite Provisioning
+            |--------------------------------------------------------------------------
+            | isFree marks the free members created when a satellite approval
+            | provisions them; satelliteID records which satellite the
+            | activation belongs to. The satellite foreign key is attached by
+            | 2026_10_04_000001 once the `satellites` table exists.
+            */
+
+            $table->boolean('isFree')->default(false);
+            $table->unsignedBigInteger('satelliteID')->nullable();
 
 
             $table->timestamps();
+
+            $table->string('cocogen_policy_number', 50)->nullable();
+            $table->string('receipt_number', 50)->nullable();
+            $table->string('policy_number', 50)->nullable();
+            $table->date('policy_effectivity_date')->nullable();
+            $table->date('policy_expiration_date')->nullable();
+            $table->string('cashier_name')->nullable();
+            $table->string('cashier_signature')->nullable();
 
         });
     }

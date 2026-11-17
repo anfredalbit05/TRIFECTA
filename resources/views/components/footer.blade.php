@@ -45,7 +45,7 @@
                 <ul>
                     <li><a href="{{ route('home') }}">Home</a></li>
                     <li><a href="{{ route('about') }}">Our Story</a></li>
-                    <li><a href="{{ route('team') }}">Our People</a></li>
+                    <li><a href="{{ route('team') }}">Board Members</a></li>
                     <li><a href="{{ route('news') }}">Announcements</a></li>
                 </ul>
             </div>

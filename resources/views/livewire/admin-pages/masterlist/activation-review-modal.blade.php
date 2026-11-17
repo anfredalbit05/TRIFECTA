@@ -257,7 +257,7 @@
                     wire:model.live="policy_number"
                     type="text"
                     maxlength="100"
-                    placeholder="TRI-00001-TS2026-1"
+                    placeholder="{{ $this->nextPolicyNumber }}"
                     class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm uppercase focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 >
 

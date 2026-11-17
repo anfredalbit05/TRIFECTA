@@ -85,8 +85,8 @@
        sit on top of the copy the way a pseudo-element overlay would. */
     background-color: var(--color-primary-darker);
     background-image:
-        linear-gradient(to right, rgb(255 255 255 / .05) 1px, transparent 1px),
-        linear-gradient(to bottom, rgb(255 255 255 / .05) 1px, transparent 1px),
+        linear-gradient(to right, rgb(255 255 255 / .06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgb(255 255 255 / .06) 1px, transparent 1px),
         var(--landing-navy);
     background-size: 56px 56px, 56px 56px, cover;
     padding-top: var(--landing-hero-pad-top);
@@ -98,6 +98,42 @@
 .hiw-hero-layout {
     padding-top: 0;
     padding-bottom: 0;
+}
+
+/* One copy column, on the left, on every hero band. The About page used to
+   centre its hero inside a 3xl column, which made the shared grid and the
+   headline sit differently from the rest of the site. */
+.about-hero .about-container-center {
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+    text-align: left;
+}
+
+@media (min-width: 640px) {
+    .about-hero .about-container-center {
+        padding-inline: 2rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .about-hero .about-container-center {
+        padding-inline: 3rem;
+    }
+}
+
+.about-hero .about-hero-title,
+.about-hero .about-hero-description {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.about-hero .about-hero-title {
+    max-width: 46rem;
+}
+
+.about-hero .about-hero-description {
+    max-width: 42rem;
 }
 
 /* Gold rule across the top of every hero band. */

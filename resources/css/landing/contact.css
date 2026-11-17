@@ -45,7 +45,9 @@
 }
 .contact-hero-title-highlight { color: var(--contact-gold); }
 .contact-hero-description {
-    @apply mt-5 text-blue-100 leading-relaxed max-w-2xl mx-auto text-base sm:text-lg;
+    @apply mt-5 text-blue-100 leading-relaxed max-w-2xl text-base sm:text-lg;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 /* =====================================================

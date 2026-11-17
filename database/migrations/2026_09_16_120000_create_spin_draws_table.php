@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -16,6 +17,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('spin_draws')) {
+            return;
+        }
+
         Schema::create('spin_draws', function (Blueprint $table) {
             $table->id('DrawID');
 
@@ -34,8 +39,28 @@ return new class extends Migration
             $table->enum('status', ['Open', 'Completed'])->default('Open');
             $table->timestamp('completed_at')->nullable();
 
+            // News feed announcement that lists this cycle's winners.
+            $table->unsignedBigInteger('AnnouncementID')->nullable();
+            $table->index('AnnouncementID');
+
             $table->timestamps();
         });
+
+        // ledgers.DrawID links a Pangkabuhayan prize row to this cycle. The
+        // column is declared in create_ledgers_table; the constraint is
+        // attached here because `spin_draws` only exists from here on.
+        $hasConstraint = collect(Schema::getForeignKeys('ledgers'))->contains(
+            fn (array $foreignKey) => in_array('DrawID', $foreignKey['columns'], true)
+        );
+
+        if (! $hasConstraint && DB::getDriverName() === 'mysql') {
+            Schema::table('ledgers', function (Blueprint $table) {
+                $table->foreign('DrawID', 'ledgers_drawid_foreign')
+                    ->references('DrawID')->on('spin_draws')
+                    ->cascadeOnUpdate()
+                    ->nullOnDelete();
+            });
+        }
     }
 
     public function down(): void

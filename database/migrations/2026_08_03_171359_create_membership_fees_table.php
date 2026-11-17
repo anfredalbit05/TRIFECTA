@@ -14,8 +14,14 @@ return new class extends Migration
         Schema::create('membership_fees', function (Blueprint $table) {
             $table->string('FeeID')->primary();
             $table->string('FeeName');
+            $table->unsignedBigInteger('VID')->nullable();
             $table->double('Cost')->nullable()->default(0);
             $table->timestamps();
+
+            $table->foreign('VID', 'membership_fees_variantid_foreign')
+                ->references('VID')->on('variants')
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
         });
     }
 

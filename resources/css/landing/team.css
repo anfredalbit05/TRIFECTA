@@ -124,7 +124,11 @@
 }
 
 .tmt-exec-img {
-    @apply block h-[300px] w-full object-cover object-top sm:h-[380px] lg:h-[420px];
+    @apply block h-[300px] w-full object-cover sm:h-[380px] lg:h-[420px];
+    /* Every uploaded banner keeps the portrait on its left side; cropping
+       from the left keeps the face in frame instead of centring on the
+       artwork and slicing it. */
+    object-position: left center;
 }
 
 .tmt-exec-photo-tag {
@@ -199,6 +203,25 @@
     @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-[13px] font-black tracking-wide;
     background: var(--color-primary);
     color: #fff;
+}
+
+/* Board card: the uploaded photo banner sits above the role + name.
+   The banners carry a lot of small artwork, which turned soft when the
+   whole 16:9 sheet was squeezed into a 200px-high strip. Cropping a square
+   from the portrait side renders the face at (almost) source scale, so the
+   photo stays crisp. */
+.tmt-person-photo {
+    display: block;
+    width: calc(100% + 3rem);
+    max-width: none;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    margin: -1.5rem -1.5rem 1.25rem;
+    object-fit: cover;
+    object-position: left center;
+    border-radius: 17px 17px 0 0;
+    border-bottom: 3px solid var(--color-gold);
+    background: var(--color-primary-tint);
 }
 
 .tmt-person-role {

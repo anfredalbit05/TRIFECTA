@@ -497,7 +497,9 @@ body.tf-app {
 
 .tf-app-main {
     position: relative;
-    z-index: 1;
+    /* Above the fixed sidebar (z-index 50) so a modal opened anywhere in the
+       page paints over the rail instead of underneath it. */
+    z-index: 60;
     min-height: 100vh;
 }
 
@@ -871,8 +873,9 @@ body.tf-app {
     background: linear-gradient(160deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .66));
     border: 1px solid rgba(255, 255, 255, .92);
     box-shadow: var(--tf-shadow), var(--tf-inner);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    backdrop-filter: blur(24px) saturate(160%);
+    /* No backdrop-filter here: it makes the panel the containing block for
+       fixed-position descendants, which pinned every modal opened inside a
+       tab to the panel instead of the viewport. */
     overflow: hidden;
 }
 
@@ -923,8 +926,23 @@ body.tf-app {
     border: 1px solid rgba(255, 255, 255, .9) !important;
     border-radius: var(--tf-r-xl) !important;
     box-shadow: var(--tf-shadow), var(--tf-inner) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    backdrop-filter: blur(24px) saturate(160%);
+    /* See .ws-panel — no backdrop-filter, so fixed modals stay viewport-bound. */
+}
+
+/* ------------------------------------------------------------------
+   Every workspace tab uses the card's 20px padding as its only gutter.
+   The tab partials used px-4/px-6 themselves, so Members, Benefits,
+   Branches, FAQs, Roles and Admin Users each had a different left edge
+   inside the same card. Normalising it here keeps one inset for all.
+   ------------------------------------------------------------------ */
+.masterlist-main-card > .members-container,
+.masterlist-main-card > .benefits-container,
+.masterlist-main-card > .branches-container,
+.masterlist-main-card > .faqs-container,
+.masterlist-main-card > .roles-container,
+.masterlist-main-card > .inquiries-container,
+.masterlist-main-card > .admin-users-container {
+    padding: 0 !important;
 }
 
 /* Page title bands are retired in favour of the workspace header. */
@@ -1177,11 +1195,17 @@ body.tf-app {
     isolation: isolate;
     overflow: hidden;
     padding: clamp(38px, 6vw, 84px) 0 clamp(54px, 7vw, 96px);
-    border-radius: 0 0 40px 40px;
-    background:
+    /* Same straight band as every other landing hero (no rounded bottom). */
+    background-color: #04122f;
+    /* Blueprint grid first, brand gradient last — the grid every other
+       landing hero paints into its own band. */
+    background-image:
+        linear-gradient(to right, rgb(255 255 255 / .06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgb(255 255 255 / .06) 1px, transparent 1px),
         radial-gradient(900px 520px at 80% -10%, rgba(58, 130, 206, .55), transparent 60%),
         radial-gradient(700px 420px at 4% 100%, rgba(245, 196, 0, .16), transparent 58%),
         linear-gradient(160deg, #061c4a 0%, #082a63 45%, #04122f 100%);
+    background-size: 56px 56px, 56px 56px, auto, auto, cover;
     color: #fff;
 }
 
@@ -1219,7 +1243,20 @@ body.tf-app {
     position: relative;
     max-width: 1280px;
     margin: 0 auto;
-    padding: 0 clamp(18px, 4vw, 40px);
+    padding: 0 1.5rem;
+}
+
+/* Same gutter as every other landing hero (px-6 / sm:px-8 / lg:px-12). */
+@media (min-width: 640px) {
+    .tf-hero-inner {
+        padding: 0 2rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .tf-hero-inner {
+        padding: 0 3rem;
+    }
 }
 
 .tf-hero-grid {
@@ -1646,10 +1683,16 @@ body.tf-app {
     position: relative;
     overflow: hidden;
     border-radius: 0 0 36px 36px;
+    /* The 56px blueprint grid from consistency.css is part of this stack so
+       every public hero (including the one above) shows the same grid as
+       Our People. */
     background:
+        linear-gradient(to right, rgb(255 255 255 / .06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgb(255 255 255 / .06) 1px, transparent 1px),
         radial-gradient(800px 460px at 84% -12%, rgba(58, 130, 206, .55), transparent 60%),
         radial-gradient(600px 380px at 2% 100%, rgba(245, 196, 0, .14), transparent 58%),
         linear-gradient(155deg, #061c4a, #082a63 55%, #04122f) !important;
+    background-size: 56px 56px, 56px 56px, cover, cover, cover !important;
     color: #fff;
 }
 
@@ -2052,4 +2095,23 @@ body.tf-public::before {
     .tf-public-main {
         padding-bottom: 104px;
     }
+}
+
+/* =========================================================================
+   MODAL BACKDROP — one look for every dialog in the app
+   =========================================================================
+   Every admin/member modal renders its own overlay class. They all get the
+   same dim + blur layer above the sidebar, so a view/edit/withdraw dialog
+   looks identical whichever tab it was opened from. Only paint properties
+   are normalised here (never `display`), because the same classes are toggled
+   with x-cloak / force-hidden. */
+
+.au-modal-overlay,
+.member-modal-overlay,
+.modal-overlay,
+.analytics-modal-overlay {
+    z-index: 99990;
+    background: rgb(2 6 23 / .6);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
 }

@@ -47,6 +47,13 @@ return new class extends Migration
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
 
+            $table->unsignedBigInteger('withdrawID')->nullable();
+
+            // Spin the Wheel cycle that produced a Pangkabuhayan prize row.
+            // Its foreign key is attached by 2026_09_16_140050 once
+            // `spin_draws` exists.
+            $table->unsignedBigInteger('DrawID')->nullable();
+
             $table->enum('status', [
                 'Pending',
                 'Completed',

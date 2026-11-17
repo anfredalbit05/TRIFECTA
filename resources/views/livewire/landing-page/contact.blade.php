@@ -4,7 +4,7 @@
     <section class="contact-hero">
         <div class="contact-hero-glow-left"></div>
         <div class="contact-hero-glow-right"></div>
-        <div class="relative z-10 max-w-7xl mx-auto px-6 text-center">
+        <div class="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 text-left">
             <span class="contact-hero-badge">
                 <x-editable-text key="contact_hero_badge" :value="$contexts['contact_hero_badge'] ?? ''" tag="span" class="inline-block"/>
             </span>

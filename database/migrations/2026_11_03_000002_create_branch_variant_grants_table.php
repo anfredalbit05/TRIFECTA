@@ -21,8 +21,7 @@ return new class extends Migration
             return;
         }
 
-        // `variants` is a production-only structure the migrations do not
-        // define; only constrain the FK where it already exists.
+        // The variants table is created by the earlier variants migration.
         $hasVariants = Schema::hasTable('variants');
 
         Schema::create('branch_variant_grants', function (Blueprint $table) use ($hasVariants) {
@@ -31,23 +30,18 @@ return new class extends Migration
             $table->unsignedBigInteger('BranchID');
             $table->unsignedBigInteger('VID');
 
-            // enum('Active','Inactive') on MySQL; portable string here.
-            $table->string('status', 10)->default('Active');
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
 
             $table->timestamps();
 
             $table->unique(['BranchID', 'VID'], 'unique_branch_variant');
-            $table->index('VID', 'fk_bvg_variant_index');
-
             $table->foreign('BranchID', 'fk_bvg_branch')
                 ->references('BranchID')->on('branches')
-                ->cascadeOnUpdate()
                 ->cascadeOnDelete();
 
             if ($hasVariants) {
                 $table->foreign('VID', 'fk_bvg_variant')
                     ->references('VID')->on('variants')
-                    ->cascadeOnUpdate()
                     ->cascadeOnDelete();
             }
         });

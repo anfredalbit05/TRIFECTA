@@ -31,6 +31,7 @@ return new class extends Migration
             $table->string('contactno', 20)->nullable();
 
             $table->text('address')->nullable();
+            $table->string('occupation')->nullable();
 
             // Emergency Contact Information
             $table->string('emergencyName', 255)->nullable();
@@ -52,7 +53,7 @@ return new class extends Migration
             // Foreign Keys
             $table->unsignedBigInteger('RoleID');
 
-            $table->string('position')->default('client');
+            $table->string('position')->nullable()->default('client');
 
             $table->string('branchCode', 20)->nullable();
 
@@ -66,6 +67,8 @@ return new class extends Migration
             $table->string('signature', 255)->nullable();
 
             $table->string('policy_number', 50)->nullable();
+            $table->date('policy_effectivity_date')->nullable();
+            $table->date('policy_expiration_date')->nullable();
 
             $table->rememberToken();
 

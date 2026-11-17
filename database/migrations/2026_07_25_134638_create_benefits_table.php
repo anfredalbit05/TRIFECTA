@@ -19,6 +19,9 @@ return new class extends Migration
 
             $table->text('details')->nullable();
 
+            // Benefit package / variant this benefit belongs to.
+            $table->unsignedBigInteger('VID')->nullable();
+
             $table->decimal('amount',12,2)->default(0);
 
             $table->enum('holdertype', [

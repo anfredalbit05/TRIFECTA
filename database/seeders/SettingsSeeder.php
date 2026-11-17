@@ -8,155 +8,105 @@ use Illuminate\Support\Facades\DB;
 class SettingsSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Every setting row the application reads, with the values currently
+     * stored in the live `settings` table.
+     *
+     * updateOrInsert keeps this idempotent: running it again refreshes the
+     * description of the system without duplicating rows or wiping values
+     * an admin has since edited.
      */
     public function run(): void
     {
-        DB::table('settings')->insert([
+        $settings = [
 
             // ===========================
             // COMPANY INFORMATION
             // ===========================
-            [
-                'name' => 'company_name',
-                'value' => 'TRIFECTA Health, Wellness & Protection Services, Inc.',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'company_short_name',
-                'value' => 'TRIFECTA',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'company_email',
-                'value' => 'care@trifecta.ph',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'company_contact',
-                'value' => '09278381647',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            'company_name' => 'TRIFECTA HEALTH - WELLNESS - PROTECTION',
+            'company_short_name' => 'TRIFECTA',
+            'company_email' => 'trifecta@gmail.com',
+            'company_contact' => '09278381647',
 
             // ===========================
-            // MEMBERSHIP
+            // MEMBERSHIP & COVERAGE
             // ===========================
-            [
-                'name' => 'membership_validity_months',
-                'value' => '12',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-
-            // ===========================
-            // COVERAGE
-            // ===========================
-            [
-                'name' => 'bronze_coverage',
-                'value' => '75000',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'silver_coverage',
-                'value' => '150000',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'gold_coverage',
-                'value' => '250000',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-
-            // ===========================
-            // AGE LIMITS
-            // ===========================
-            [
-                'name' => 'primary_owner_min_age',
-                'value' => '18',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'primary_owner_max_age',
-                'value' => '65',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'beneficiary_max_age',
-                'value' => '100',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            'membership_validity_months' => '12',
+            'satellite_bronze_coverage' => '75000',
+            'satellite_silver_coverage' => '150000',
+            'satellite_gold_coverage' => '250000',
+            'satellite_bronze_allocated' => '20',
+            'satellite_silver_allocated' => '40',
+            'satellite_gold_allocated' => '80',
+            'primary_owner_min_age' => '18',
+            'primary_owner_max_age' => '65',
+            'beneficiary_max_age' => '100',
 
             // ===========================
             // CLAIMS & WALLET
             // ===========================
-            [
-                'name' => 'claim_processing_days',
-                'value' => '7',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'minimum_wallet_balance',
-                'value' => '0',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'minimum_withdraw_amount',
-                'value' => '500',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            'claim_processing_days' => '7',
+            'minimum_wallet_balance' => '0',
+            'minimum_withdraw_amount' => '500',
+            'activate_withdrawal' => 'true',
+
+            // ===========================
+            // PAYMENT CHANNELS
+            // ===========================
+            'gcash_payment_enabled' => 'false',
+            'gcash_convenience_fee_enabled' => 'false',
+            'gcash_number1' => '09266958032',
+            'gcash_number1_name' => 'Princes Manliguez',
+            'bank_payment_enabled' => 'false',
+            'bpi_account_name' => 'RENANTE S. ROBLES',
+            'bpi_account_number' => '2079539565',
+            'bank_name' => 'BPI',
+            'bank_account_name' => 'Anfred',
+            'bank_account_number' => '12312312',
+            'paymaya_payment_enabled' => 'true',
+            'paymaya_convenience_fee_enabled' => 'false',
+            'paymaya_account_name' => 'Princes Manliguez',
+            'paymaya_account_number' => '09266958032',
+            'cashier_name' => 'Princes Pugasan Manliguez',
+            'cashier_signature' => 'images/CASHIER_SIG_20260926_092346_6ab78f2249d90.jpg',
+
+            // ===========================
+            // SPIN THE WHEEL
+            // ===========================
+            'activate_spin_pangkabuhayan' => 'true',
+            'spin_prize_kilos' => '5',
+            'spin_prize_price_per_kilo' => '56',
+            'spin_draw_day' => '28',
+            'spin_claim_instructions' => 'Present this email together with a valid government-issued ID at our office to claim your prize or contact us to arrange pickup. Prizes are released to the winning member only.',
+
+            // ===========================
+            // SATELLITE / JOIN
+            // ===========================
+            'activate_satellite_application' => 'false',
+            'join_allow' => 'true',
 
             // ===========================
             // SYSTEM
             // ===========================
-            [
-                'name' => 'system_name',
-                'value' => 'TRIFECTA Membership Management System',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'system_version',
-                'value' => '1.0.0',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'maintenance_mode',
-                'value' => 'false',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            'system_name' => 'TRIFECTA Membership Management System',
+            'system_version' => '1.0.0',
+            'maintenance_mode' => 'false',
 
             // ===========================
             // DEFAULT FILES
             // ===========================
-            [
-                'name' => 'default_profile_picture',
-                'value' => 'storage/profiles/default-avatar.png',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'default_news_updates_picture',
-                'value' => 'storage/news-images/default-news.png',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            'default_profile_picture' => 'storage/profiles/default-avatar.png',
+            'default_news_updates_picture' => 'storage/news-images/default-news.png',
+        ];
 
-
-        ]);
+        foreach ($settings as $name => $value) {
+            DB::table('settings')->updateOrInsert(
+                ['name' => $name],
+                [
+                    'value' => $value,
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
+        }
     }
 }

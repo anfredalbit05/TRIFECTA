@@ -41,6 +41,9 @@ return new class extends Migration
                 ->cascadeOnUpdate()
                 ->nullOnDelete();
 
+            // A wallet ledger row may be linked to the withdrawal it settled.
+            $table->unsignedBigInteger('withdrawID')->nullable();
+
             $table->enum('status', [
                 'Active',
                 'Inactive',
