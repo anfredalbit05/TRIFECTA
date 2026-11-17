@@ -1,4 +1,4 @@
-<div>
+<div @if ($referralCode) data-referral-code="{{ $referralCode }}" @endif>
 
     @include('components.home.hero')
 
@@ -9,15 +9,7 @@
     @include('components.home.why-choose')
 
     @if ($referralCode)
-        <script>
-            document.addEventListener('livewire:init', () => {
-                setTimeout(() => {
-                    Livewire.dispatch('open-application-modal', {
-                        upline: @js($referralCode)
-                    });
-                }, 500);
-            });
-        </script>
+        @vite('resources/js/livewire/landing-page/home.js')
     @endif
 
 </div>

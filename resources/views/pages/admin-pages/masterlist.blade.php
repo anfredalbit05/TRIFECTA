@@ -1,106 +1,180 @@
 @extends('layouts.member')
 
-@section('title', 'Masterlist')
+@section('title', 'Member Registry')
+
+@push('styles')
+    @vite('resources/css/admin/print/masterlist.css')
+@endpush
 
 @section('content')
-<div class="masterlist-container" x-data="{ tab: $persist('overview').as('masterlist-tab') }">
 
-    <nav class="masterlist-header">
-        <div class="masterlist-header-title">
-            <h1>Member Masterlist</h1>
-        </div>
-    </nav>
+@php
+    /* Unread inquiries badge on the Inquiries tab (refreshed by the tab via
+       the inquiries-updated browser event after an inquiry is opened). */
+    $unreadInquiriesCount = \App\Models\Inquiry::whereNull('date_read')->count();
+@endphp
 
-    <div class="masterlist-layout">
+<div class="ws-page"
+     x-data="{
+         tab: $persist('overview').as('masterlist-tab'),
+         unreadInquiries: {{ $unreadInquiriesCount }},
+     }"
+     x-init="window.addEventListener('inquiries-updated', (e) => {
+         unreadInquiries = e.detail ? (e.detail.count ?? unreadInquiries) : unreadInquiries;
+     });">
 
-        <div class="masterlist-nav-menu masterlist-desktop-nav">
-
-            <a href="#" @click.prevent="tab = 'overview'" :class="tab === 'overview' ? 'active' : ''">
-                <span class="masterlist-tab-icon">⌂</span>
-                <span class="masterlist-tab-label">Overview</span>
-            </a>
-
-            @if(auth()->user()->RoleID == 1)
-            <a href="#" @click.prevent="tab = 'roles'" :class="tab === 'roles' ? 'active' : ''">
-                <span class="masterlist-tab-icon">♙</span>
-                <span class="masterlist-tab-label">Roles</span>
-            </a>
-            @endif
-
-            <a href="#" @click.prevent="tab = 'admin-users'" :class="tab === 'admin-users' ? 'active' : ''">
-                <span class="masterlist-tab-icon">♙</span>
-                <span class="masterlist-tab-label">Admin Users</span>
-            </a>
-
-            <a href="#" @click.prevent="tab = 'members'" :class="tab === 'members' ? 'active' : ''">
-                <span class="masterlist-tab-icon">♙</span>
-                <span class="masterlist-tab-label">Members</span>
-            </a>
-
-            <a href="#" @click.prevent="tab = 'satellite-members'" :class="tab === 'satellite-members' ? 'active' : ''">
-                <span class="masterlist-tab-icon">◉</span>
-                <span class="masterlist-tab-label">Satellite Members</span>
-            </a>
-
-            <a href="#" @click.prevent="tab = 'branches'" :class="tab === 'branches' ? 'active' : ''">
-                <span class="masterlist-tab-icon">⌖</span>
-                <span class="masterlist-tab-label">Branches</span>
-            </a>
-
-            <a href="#" @click.prevent="tab = 'benefits'" :class="tab === 'benefits' ? 'active' : ''">
-                <span class="masterlist-tab-icon">♡</span>
-                <span class="masterlist-tab-label">Benefits</span>
-            </a>
-
-            <a href="#" @click.prevent="tab = 'faqs'" :class="tab === 'faqs' ? 'active' : ''">
-                <span class="masterlist-tab-icon">?</span>
-                <span class="masterlist-tab-label">FAQs</span>
-            </a>
-
-            <a href="#" @click.prevent="tab = 'inquiries'" :class="tab === 'inquiries' ? 'active' : ''">
-                <span class="masterlist-tab-icon">☷</span>
-                <span class="masterlist-tab-label">Inquiries</span>
-            </a>
-
+    <header class="ws-head">
+        <div>
+            <span class="ws-head-kicker">People · Records</span>
+            <h1>Member Registry</h1>
+            <p>Every member, satellite, branch and membership record in one reviewed workspace.</p>
         </div>
 
-        <div x-show="tab === 'overview'" x-cloak class="masterlist-main-card">
-            <livewire:admin-pages.masterlist.dashboard />
+        <div class="ws-head-side">
+            <span class="ws-head-pill">
+                <strong x-text="unreadInquiries">{{ $unreadInquiriesCount }}</strong> unread inquiries
+            </span>
         </div>
+    </header>
 
-        <div x-show="tab === 'roles'" x-cloak class="masterlist-main-card">
-            <livewire:admin-pages.masterlist.roles />
-        </div>
+    <div class="ws-grid">
 
-        <div x-show="tab === 'admin-users'" x-cloak class="masterlist-main-card">
-            <livewire:admin-pages.masterlist.admin-users />
-        </div>
+        <aside class="ws-rail">
 
-        <div x-show="tab === 'members'" x-cloak class="masterlist-main-card">
-            <livewire:members />
-        </div>
+            <div class="ws-rail-group">
+                <div class="ws-rail-label">Snapshot</div>
+                <a href="#" class="ws-rail-link" :class="tab === 'overview' ? 'is-active' : ''"
+                   @click.prevent="tab = 'overview'">
+                    <span class="ws-rail-icon">⌂</span>
+                    <span>Overview</span>
+                </a>
+            </div>
 
-        <div x-show="tab === 'satellite-members'" x-cloak class="masterlist-main-card">
-            <livewire:admin-pages.masterlist.satellite-members />
-        </div>
+            <div class="ws-rail-group">
+                <div class="ws-rail-label">People</div>
 
-        <div x-show="tab === 'branches'" x-cloak class="masterlist-main-card">
-            <livewire:admin-pages.masterlist.branches-list />
-        </div>
+                <a href="#" class="ws-rail-link" :class="tab === 'members' ? 'is-active' : ''"
+                   @click.prevent="tab = 'members'">
+                    <span class="ws-rail-icon">♙</span>
+                    <span>Members</span>
+                </a>
 
-        <div x-show="tab === 'benefits'" x-cloak class="masterlist-main-card">
-            <livewire:admin-pages.masterlist.benefits-list />
-        </div>
+                <a href="#" class="ws-rail-link" :class="tab === 'satellite-members' ? 'is-active' : ''"
+                   @click.prevent="tab = 'satellite-members'">
+                    <span class="ws-rail-icon">◉</span>
+                    <span>Satellite Members</span>
+                </a>
 
-        <div x-show="tab === 'inquiries'" x-cloak class="masterlist-main-card">
-            <livewire:admin-pages.masterlist.inquiries />
-        </div>
+                <a href="#" class="ws-rail-link" :class="tab === 'admin-users' ? 'is-active' : ''"
+                   @click.prevent="tab = 'admin-users'">
+                    <span class="ws-rail-icon">⚙</span>
+                    <span>Admin Users</span>
+                </a>
 
-        <div x-show="tab === 'faqs'" x-cloak class="masterlist-main-card">
-            <livewire:admin-pages.masterlist.faq-list />
-        </div>
+                @if(auth()->user()->RoleID == 1)
+                    <a href="#" class="ws-rail-link" :class="tab === 'roles' ? 'is-active' : ''"
+                       @click.prevent="tab = 'roles'">
+                        <span class="ws-rail-icon">♜</span>
+                        <span>Roles</span>
+                    </a>
+                @endif
+            </div>
+
+            <div class="ws-rail-group">
+                <div class="ws-rail-label">Operations</div>
+
+                <a href="#" class="ws-rail-link" :class="tab === 'branches' ? 'is-active' : ''"
+                   @click.prevent="tab = 'branches'">
+                    <span class="ws-rail-icon">⌖</span>
+                    <span>Branches</span>
+                </a>
+
+                <a href="#" class="ws-rail-link" :class="tab === 'benefits' ? 'is-active' : ''"
+                   @click.prevent="tab = 'benefits'">
+                    <span class="ws-rail-icon">♡</span>
+                    <span>Benefits</span>
+                </a>
+
+                <a href="#" class="ws-rail-link" :class="tab === 'faqs' ? 'is-active' : ''"
+                   @click.prevent="tab = 'faqs'">
+                    <span class="ws-rail-icon">?</span>
+                    <span>FAQs</span>
+                </a>
+
+                <a href="#" class="ws-rail-link" :class="tab === 'inquiries' ? 'is-active' : ''"
+                   @click.prevent="tab = 'inquiries'">
+                    <span class="ws-rail-icon">☷</span>
+                    <span>Inquiries</span>
+                    <span class="ws-rail-badge" x-show="unreadInquiries > 0"
+                          x-text="unreadInquiries" x-cloak></span>
+                </a>
+            </div>
+
+        </aside>
+
+        <section class="ws-panel">
+
+            <template x-if="tab === 'overview'">
+                <div class="masterlist-main-card">
+                    <livewire:admin-pages.masterlist.dashboard lazy />
+                </div>
+            </template>
+
+            <template x-if="tab === 'roles'">
+                <div class="masterlist-main-card">
+                    <livewire:admin-pages.masterlist.roles lazy />
+                </div>
+            </template>
+
+            <template x-if="tab === 'admin-users'">
+                <div class="masterlist-main-card">
+                    <livewire:admin-pages.masterlist.admin-users lazy />
+                </div>
+            </template>
+
+            <template x-if="tab === 'members'">
+                <div class="masterlist-main-card">
+                    <livewire:members lazy />
+                </div>
+            </template>
+
+            <template x-if="tab === 'satellite-members'">
+                <div class="masterlist-main-card">
+                    <livewire:admin-pages.masterlist.satellite-members lazy />
+                </div>
+            </template>
+
+            <template x-if="tab === 'branches'">
+                <div class="masterlist-main-card">
+                    <livewire:admin-pages.masterlist.branches-list lazy />
+                </div>
+            </template>
+
+            <template x-if="tab === 'benefits'">
+                <div class="masterlist-main-card">
+                    <livewire:admin-pages.masterlist.benefits-list lazy />
+                </div>
+            </template>
+
+            <template x-if="tab === 'inquiries'">
+                <div class="masterlist-main-card">
+                    <livewire:admin-pages.masterlist.inquiries lazy />
+                </div>
+            </template>
+
+            <template x-if="tab === 'faqs'">
+                <div class="masterlist-main-card">
+                    <livewire:admin-pages.masterlist.faq-list lazy />
+                </div>
+            </template>
+
+        </section>
 
     </div>
+
+    {{-- Loaded here (page level) because a lazy component's module script does
+         not execute when Livewire morphs the component in. --}}
+    @vite('resources/js/livewire/admin-pages/masterlist/dashboard.js')
 
     <livewire:admin-pages.masterlist.activation-review-modal />
     <livewire:view-member-modal />

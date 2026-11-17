@@ -45,7 +45,7 @@
 
     {{-- SEARCH --}}
     <div class="relative max-w-sm w-full sm:w-auto flex-1">
-        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                     stroke-linecap="round"
@@ -61,8 +61,8 @@
             wire:model.live.debounce.300ms="search"
             placeholder="Search by fullname or username..."
             class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl
-                focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
-                focus:border-[#0C2C6B] bg-white shadow-sm transition"
+                focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]
+                focus:border-[var(--color-primary)] bg-white shadow-sm transition"
         >
     </div>
 
@@ -71,7 +71,7 @@
 
         {{-- DATE RANGE --}}
         <div wire:ignore class="relative w-full sm:w-72">
-            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none z-10">
+            <span class="absolute inset-y-0 left-3 flex items-center text-slate-500 pointer-events-none z-10">
                 📅
             </span>
 
@@ -80,7 +80,7 @@
                 id="memberDateRange"
                 readonly
                 class="date-range-input pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl
-                    focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
+                    focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]
                     bg-white text-slate-700 shadow-sm cursor-pointer
                     w-full text-center font-medium"
                 placeholder="Select date range"
@@ -253,31 +253,9 @@
                                         {{-- VIEW --}}
                                         @if ($this->canRead)
 
-                                            <button
-                                                type="button"
+                                            <x-action-btn icon="view" tone="view"
                                                 wire:click="viewMember({{ $member->UserID }})"
-                                                title="View Member"
-                                                class="member-action member-action-view"
-                                            >
-                                                <svg
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="1.8"
-                                                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5s8.577 3.01 9.964 7.183a1.012 1.012 0 0 1 0 .639C20.577 16.49 16.64 19.5 12 19.5s-8.577-3.01-9.964-7.178Z"
-                                                    />
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="1.8"
-                                                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                                                    />
-                                                </svg>
-                                            </button>
+                                                title="View Member" />
 
                                         @endif
 
@@ -285,25 +263,9 @@
                                         {{-- EDIT --}}
                                         @if ($this->canUpdate)
 
-                                            <button
-                                                type="button"
+                                            <x-action-btn icon="edit" tone="edit"
                                                 wire:click="editMember({{ $member->UserID }})"
-                                                title="Update Member"
-                                                class="member-action member-action-edit"
-                                            >
-                                                <svg
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="1.8"
-                                                        d="m16.862 3.487 3.65 3.65M4 20l3.75-.75L19.5 7.5a2.121 2.121 0 0 0-3-3L4.75 16.25 4 20Z"
-                                                    />
-                                                </svg>
-                                            </button>
+                                                title="Update Member" />
 
                                         @endif
 
@@ -311,25 +273,9 @@
                                         {{-- PASSWORD --}}
                                         @if ($this->canUpdate)
 
-                                            <button
-                                                type="button"
+                                            <x-action-btn icon="key" tone="key"
                                                 wire:click="promptMemberPasswordReset({{ $member->UserID }})"
-                                                title="Set New Password"
-                                                class="member-action member-action-password"
-                                            >
-                                                <svg
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="1.8"
-                                                        d="M15.75 5.25a3.75 3.75 0 1 1-6.694 2.32L3 13.625V17h3v2h3v-2h2v-3h1.875l2.625-2.625a3.75 3.75 0 0 1 .25-6.125ZM17.25 7.5h.008v.008h-.008V7.5Z"
-                                                    />
-                                                </svg>
-                                            </button>
+                                                title="Set New Password" />
 
                                         @endif
 
@@ -797,7 +743,7 @@
                 SwalFlow.confirm({
                     title: (d.action === 'deactivate' ? 'Deactivate' : 'Activate') + ' Member?',
                     html: 'You are about to <strong>' + d.action + '</strong> the account of '
-                        + '<strong style="color: #0B2A5B;">' + (d.name || 'this member') + '</strong>.'
+                        + '<strong style="color: var(--color-primary);">' + (d.name || 'this member') + '</strong>.'
                         + '<br><br>Type the confirmation text below to continue.',
                     icon: 'warning',
                     requireConfirmWord: actionText,
@@ -864,7 +810,7 @@
 
                                 'Setting a new password for ' +
 
-                                '<b style="color: #0B2A5B;">' +
+                                '<b style="color: var(--color-primary);">' +
 
                                     name +
 
@@ -889,9 +835,9 @@
 
                                         'style="width: 100%; box-sizing: border-box; margin: 0;" ' +
 
-                                        'class="w-full border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:border-[#0B2A5B] focus:outline-none transition">' +
+                                        'class="w-full border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] focus:outline-none transition">' +
 
-                                    '<button type="button" class="swal-pw-toggle absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer" ' +
+                                    '<button type="button" class="swal-pw-toggle absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-600 focus:outline-none cursor-pointer" ' +
 
                                         'data-target="swal-new-password" tabindex="-1" aria-label="Show or hide password">' +
 
@@ -932,9 +878,9 @@
 
                                         'style="width: 100%; box-sizing: border-box; margin: 0;" ' +
 
-                                        'class="w-full border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:border-[#0B2A5B] focus:outline-none transition">' +
+                                        'class="w-full border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] focus:outline-none transition">' +
 
-                                    '<button type="button" class="swal-pw-toggle absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer" ' +
+                                    '<button type="button" class="swal-pw-toggle absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-600 focus:outline-none cursor-pointer" ' +
 
                                         'data-target="swal-confirm-password" tabindex="-1" aria-label="Show or hide password">' +
 
@@ -972,9 +918,9 @@
 
                     confirmButtonText: 'Update Password',
 
-                    confirmButtonColor: '#0B2A5B',
+                    confirmButtonColor: 'var(--color-primary)',
 
-                    cancelButtonColor: '#D79B10',
+                    cancelButtonColor: 'var(--color-accent)',
 
                     focusConfirm: false,
 
@@ -1187,14 +1133,30 @@
             // DATE RANGE PICKER
             // =====================================================
 
-            const dateInput =
-                $wire.$el.querySelector(
-                    '#memberDateRange'
-                );
+            const initSatelliteMemberDateRange = () => {
+
+                // Lazy components run this block before Livewire morphs the
+                // real markup in, so the input is not in the DOM on the first run.
+                const dateInput =
+                    document.getElementById(
+                        'memberDateRange'
+                    );
+
+                if (!dateInput) {
+                    return false;
+                }
+
+                if (dateInput._flatpickr) {
+                    return true;
+                }
+
+                if (typeof flatpickr === 'undefined') {
+                    return false;
+                }
 
 
-            const picker = flatpickr(
-                dateInput,
+                const picker = flatpickr(
+                    dateInput,
                 {
 
                     mode: 'range',
@@ -1294,18 +1256,34 @@
             );
 
 
-            // =====================================================
-            // RESET DATE RANGE
-            // =====================================================
+                // =====================================================
+                // RESET DATE RANGE
+                // =====================================================
 
-            $wire.on(
-                'ranges-reset',
-                () => {
+                $wire.on(
+                    'ranges-reset',
+                    () => {
 
-                    picker.clear();
+                        picker.clear();
 
+                    }
+                );
+
+                return true;
+            };
+
+            initSatelliteMemberDateRange();
+
+            // Finish the job once Livewire has morphed the lazy component in.
+            const stopWaitingForSatelliteMemberDateRange = Livewire.hook('morphed', ({ component }) => {
+                if (component.id !== $wire.$id) {
+                    return;
                 }
-            );
+
+                if (initSatelliteMemberDateRange()) {
+                    stopWaitingForSatelliteMemberDateRange();
+                }
+            });
 
 
             // =====================================================
@@ -1327,9 +1305,9 @@
 
                         showCancelButton: true,
 
-                        confirmButtonColor: '#0B2A5B',
+                        confirmButtonColor: 'var(--color-primary)',
 
-                        cancelButtonColor: '#D79B10',
+                        cancelButtonColor: 'var(--color-accent)',
 
                         confirmButtonText: 'Yes, Reject',
 

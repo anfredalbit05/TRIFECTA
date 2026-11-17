@@ -1,0 +1,38 @@
+/* genealogy.css — genealogy-tree (.gen-), board-structure (.board-), tree-node (.node-) */
+
+/* Shared */
+.is-hidden{display:none!important}
+.truncate-text,.node-name,.node-ref{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ==========================================================================
+   1) GENEALOGY TREE
+   ========================================================================== */
+.gen-panel{position:relative;width:100%;min-height:500px;margin-right:-19.5rem;padding:1.5rem;background:#f8fafc;border:1px solid rgb(226 232 240 / .8);border-radius:1rem;box-shadow:0 1px 2px 0 rgb(0 0 0 / .05)}
+.gen-panel--fullscreen{position:fixed;inset:0;z-index:50;margin-right:0;padding:1rem;overflow-y:auto;background:#f8fafc;border:0;border-radius:0}
+@media (min-width:640px){.gen-panel--fullscreen{padding:1.5rem}}
+
+.gen-header{display:flex;flex-direction:column;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #e2e8f0}
+@media (min-width:640px){.gen-header{flex-direction:row;align-items:center}}
+.gen-title{font-size:1.125rem;line-height:1.75rem;font-weight:700;color:#1e293b}
+.gen-subtitle{font-size:.75rem;line-height:1rem;color:#64748b}
+.gen-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}
+.gen-reset-btn{padding:.375rem .75rem;font-size:.75rem;font-weight:600;color:var(--color-primary-light);background:var(--color-primary-tint);border:1px solid var(--color-primary-tint-border);border-radius:.5rem;cursor:pointer;transition:background-color .15s ease}
+.gen-reset-btn:hover{background:var(--color-primary-tint)}
+
+.gen-viewport{position:relative;width:100%;min-height:480px;padding:3rem 1rem;overflow:hidden;touch-action:none;cursor:pointer;transition:all .2s ease}
+@media (min-width:640px){.gen-viewport{padding-left:3rem;padding-right:3rem}}
+.gen-exit-fullscreen-btn{position:absolute;top:1rem;right:1rem;z-index:30;padding:.375rem .75rem;font-size:.75rem;font-weight:600;color:#fff;background:#1e293b;border:0;border-radius:.5rem;box-shadow:0 4px 6px -1px rgb(0 0 0 / .1),0 2px 4px -2px rgb(0 0 0 / .1);cursor:pointer}
+.gen-canvas-wrap{display:flex;align-items:center;justify-content:center;min-width:max-content;min-height:max-content;margin:auto;transform-origin:center;transition:transform .075s ease-out;will-change:transform}
+
+.gen-empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;padding:4rem 0;color:#94a3b8}
+.gen-empty-icon{width:3rem;height:3rem;color:#cbd5e1}
+.gen-empty-text{font-size:.875rem;font-weight:500}
+
+.gen-toolbar{position:sticky;bottom:1rem;left:0;right:0;z-index:20;display:flex;justify-content:center;margin-top:1rem;pointer-events:none}
+.gen-toolbar-inner{pointer-events:auto;display:flex;align-items:center;gap:.375rem;padding:.5rem;background:rgb(255 255 255 / .9);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid #e2e8f0;border-radius:1rem;box-shadow:0 10px 15px -3px rgb(0 0 0 / .1),0 4px 6px -4px rgb(0 0 0 / .1)}
+.gen-toolbar-btn{padding:.5rem;color:#475569;background:transparent;border:0;border-radius:.75rem;cursor:pointer;transition:background-color .15s ease}
+.gen-toolbar-btn:hover{background:#f1f5f9}
+.gen-toolbar-btn svg{width:1rem;height:1rem}
+
+
+

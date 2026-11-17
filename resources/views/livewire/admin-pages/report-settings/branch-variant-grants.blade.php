@@ -16,7 +16,7 @@
             <button
                 type="button"
                 wire:click="openCreateModal"
-                class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-[#0C2C6B] text-white hover:bg-[#09204f] shadow"
+                class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)] shadow"
             >
                 + Grant Variants
             </button>
@@ -28,7 +28,7 @@
         @if (session()->has($messageType))
             <div @class([
                 'p-4 mb-4 rounded-xl border text-sm font-medium',
-                'bg-emerald-50 text-emerald-700 border-emerald-200'
+                'bg-[var(--color-primary-tint)] text-[var(--color-primary)] border-[var(--color-primary-tint-border)]'
                     => $messageType === 'success',
                 'bg-red-50 text-red-700 border-red-200'
                     => $messageType === 'error',
@@ -54,7 +54,7 @@
             type="text"
             wire:model.live.debounce.300ms="search"
             placeholder="Search branch, variant, or status..."
-            class="w-full sm:flex-1 px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#0C2C6B] focus:outline-none"
+            class="w-full sm:flex-1 px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] focus:outline-none"
         >
 
         <button
@@ -77,7 +77,7 @@
         <table class="w-full min-w-[850px] text-left border-collapse">
 
             <thead>
-                <tr class="bg-[#0C2C6B] text-white text-xs uppercase tracking-wider">
+                <tr class="bg-[var(--color-primary)] text-white text-xs uppercase tracking-wider">
                     <th class="px-4 py-3">#</th>
                     <th class="px-4 py-3">Branch</th>
                     <th class="px-4 py-3">Variant</th>
@@ -116,7 +116,7 @@
                         <td class="px-4 py-4">
                             <span @class([
                                 'inline-flex px-3 py-1 rounded-md text-xs font-semibold',
-                                'bg-emerald-50 text-emerald-700'
+                                'bg-[var(--color-primary-tint)] text-[var(--color-primary)]'
                                     => $grant->status === 'Active',
                                 'bg-slate-100 text-slate-600'
                                     => $grant->status !== 'Active',
@@ -138,36 +138,23 @@
                                 <div class="flex justify-center gap-2">
 
                                     @if ($this->canUpdate)
-                                        <button
-                                            type="button"
+                                        <x-action-btn icon="edit" tone="edit"
                                             wire:click="editGrant({{ $grant->GrantID }})"
-                                            title="Edit grant"
-                                            class="px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f]"
-                                        >
-                                            ✏️ Edit
-                                        </button>
+                                            title="Edit grant" />
 
-                                        <button
-                                            type="button"
+                                        <x-action-btn
+                                            :icon="$grant->status === 'Active' ? 'reject' : 'approve'"
+                                            :tone="$grant->status === 'Active' ? 'delete' : 'approve'"
                                             wire:click="toggleStatus({{ $grant->GrantID }})"
                                             wire:confirm="Change the status of this grant?"
-                                            title="Toggle grant status"
-                                            class="px-3 py-2 rounded-lg text-white {{ $grant->status === 'Active' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-600 hover:bg-emerald-700' }}"
-                                        >
-                                            {{ $grant->status === 'Active' ? 'Disable' : 'Enable' }}
-                                        </button>
+                                            title="{{ $grant->status === 'Active' ? 'Disable grant' : 'Enable grant' }}" />
                                     @endif
 
                                     @if ($this->canDelete)
-                                        <button
-                                            type="button"
+                                        <x-action-btn icon="delete" tone="delete"
                                             wire:click="deleteGrant({{ $grant->GrantID }})"
                                             wire:confirm="Delete this branch variant grant?"
-                                            title="Delete grant"
-                                            class="px-3 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
-                                        >
-                                            Delete
-                                        </button>
+                                            title="Delete grant" />
                                     @endif
 
                                 </div>
@@ -198,7 +185,7 @@
                     type="button"
                     wire:click="previousPage"
                     @disabled($grants->onFirstPage())
-                    class="px-4 py-2 rounded-lg bg-[#D79B10] text-white disabled:opacity-40"
+                    class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-white disabled:opacity-40"
                 >
                     Previous
                 </button>
@@ -211,7 +198,7 @@
                     type="button"
                     wire:click="nextPage"
                     @disabled(!$grants->hasMorePages())
-                    class="px-4 py-2 rounded-lg bg-[#0C2C6B] text-white disabled:opacity-40"
+                    class="px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white disabled:opacity-40"
                 >
                     Next
                 </button>
@@ -225,12 +212,12 @@
 
             <div class="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden my-8">
 
-                <div class="bg-[#0C2C6B] px-6 py-4 text-white flex justify-between items-center">
+                <div class="bg-[var(--color-primary)] px-6 py-4 text-white flex justify-between items-center">
                     <div>
                         <h3 class="text-lg font-bold">
                             {{ $grant_id ? 'Edit Variant Grant' : 'Grant Variants to Branch' }}
                         </h3>
-                        <p class="text-xs text-blue-100 mt-1">
+                        <p class="text-xs text-[var(--color-primary-tint)] mt-1">
                             Select a branch and choose its permitted variants.
                         </p>
                     </div>
@@ -257,7 +244,7 @@
                             <select
                                 id="grant-branch"
                                 wire:model="branch_id"
-                                class="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-[#0C2C6B] focus:outline-none"
+                                class="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-[var(--color-primary)] focus:outline-none"
                             >
                                 <option value="">Select a branch</option>
 
@@ -275,11 +262,11 @@
 
                         {{-- GRANT ALL --}}
                         @if (!$grant_id)
-                            <label class="flex items-start gap-3 p-4 rounded-xl border border-blue-200 bg-blue-50 cursor-pointer">
+                            <label class="flex items-start gap-3 p-4 rounded-xl border border-[var(--color-primary-tint-border)] bg-[var(--color-primary-tint)] cursor-pointer">
                                 <input
                                     type="checkbox"
                                     wire:model.live="grantAllVariants"
-                                    class="mt-1 rounded text-[#0C2C6B] focus:ring-[#0C2C6B]"
+                                    class="mt-1 rounded text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                                 >
 
                                 <span>
@@ -315,7 +302,7 @@
                                                     type="checkbox"
                                                     wire:model="selectedVariantIds"
                                                     value="{{ $variant->VID }}"
-                                                    class="mt-1 rounded text-[#0C2C6B] focus:ring-[#0C2C6B]"
+                                                    class="mt-1 rounded text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                                                 >
 
                                                 <span>
@@ -351,7 +338,7 @@
                             <select
                                 id="grant-status"
                                 wire:model="status"
-                                class="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-[#0C2C6B] focus:outline-none"
+                                class="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-[var(--color-primary)] focus:outline-none"
                             >
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
@@ -376,7 +363,7 @@
                             type="submit"
                             wire:loading.attr="disabled"
                             wire:target="saveGrant"
-                            class="px-4 py-2 text-sm font-semibold text-white bg-[#0C2C6B] rounded-lg hover:bg-[#09204f] disabled:opacity-50"
+                            class="px-4 py-2 text-sm font-semibold text-white bg-[var(--color-primary)] rounded-lg hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
                         >
                             <span wire:loading.remove wire:target="saveGrant">
                                 {{ $grant_id ? 'Save Changes' : 'Save Grants' }}

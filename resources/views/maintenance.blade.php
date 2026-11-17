@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Under Maintenance - True Life Dayongan</title>
+    <title>Under Maintenance - TRIFECTA</title>
 
     @vite(['resources/css/app.css', 'resources/css/maintenance.css'])
 </head>
@@ -44,7 +44,7 @@
 
             <!-- FOOTER META -->
             <div class="maintenance-footer">
-                &copy; {{ date('Y') }} True Life Dayongan. All rights reserved.
+                &copy; {{ date('Y') }} TRIFECTA. All rights reserved.
             </div>
 
         </div>

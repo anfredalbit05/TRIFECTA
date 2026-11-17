@@ -56,11 +56,11 @@
 
         {{-- DATE RANGE FILTER — same flatpickr pattern as the Inquiries tab --}}
         <div wire:ignore class="relative w-60">
-            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none z-10">
+            <span class="absolute inset-y-0 left-3 flex items-center text-slate-500 pointer-events-none z-10">
                 📅
             </span>
             <input type="text" id="activationDateRange" readonly
-                class="date-range-input pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white text-slate-700 shadow-sm cursor-pointer w-full text-center font-medium"
+                class="date-range-input pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-white text-slate-700 shadow-sm cursor-pointer w-full text-center font-medium"
                 placeholder="Select date range">
         </div>
 
@@ -74,7 +74,7 @@
         @if ($this->canPrint)
             {{-- PRINT — prints exactly what the current filters show --}}
             <button type="button" wire:click="preparePrint" title="Print Report"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-[#0C2C6B] text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-[var(--color-primary)] text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
                 <span>🖨️</span>
             <span class="hidden sm:inline">Print</span>
             </button>
@@ -111,7 +111,7 @@
                                 @if ((int) ($a->user?->RoleID ?? 0) === 8)
                                     <span class="txn-type-pill txn-type-satellite">Satellite</span>
                                 @else
-                                    <span class="txn-type-pill txn-type-truelife">TrueLife</span>
+                                    <span class="txn-type-pill txn-type-truelife">TRIFECTA</span>
                                 @endif
                             </td>
                             <td data-label="Receipt No.">{{ $a->receipt_number ?? '—' }}</td>
@@ -124,21 +124,17 @@
                             <td data-label="Date">{{ $a->created_at?->format('M d, Y') }}</td>
                             <td data-label="Actions" class="txn-actions">
                                 @if ($this->canProcess && in_array($a->status, ['Pending', 'Rejected']))
-                                    <button type="button"
+                                    <x-action-btn icon="view" tone="review"
                                         wire:click="reviewActivation({{ $a->ActivationID }})"
-                                        class="txn-action-btn txn-action-review"
-                                        title="Review details"
-                                        aria-label="Review activation for {{ trim($a->user?->lastname.' '.$a->user?->firstname) ?: 'member' }}">👁</button>
+                                        title="Review activation for {{ trim($a->user?->lastname.' '.$a->user?->firstname) ?: 'member' }}" />
                                 @endif
                                 @if ($this->canProcess && $a->status === 'Rejected')
                                     {{-- REJECTED → Resubmit opens the activation form
                                          modal pre-filled from the rejected request; the
                                          typed confirmation happens on submit inside it. --}}
-                                    <button type="button"
+                                    <x-action-btn icon="resubmit" tone="resubmit"
                                         wire:click="resubmitActivationRow({{ $a->ActivationID }})"
-                                        class="txn-action-btn txn-action-resubmit"
-                                        title="Resubmit — reopen the activation form"
-                                        aria-label="Resubmit activation for {{ trim($a->user?->lastname.' '.$a->user?->firstname) ?: 'member' }}">↺</button>
+                                        title="Resubmit activation for {{ trim($a->user?->lastname.' '.$a->user?->firstname) ?: 'member' }}" />
                                 @endif
                                 @if (! ($this->canProcess && (in_array($a->status, ['Pending', 'Rejected']))))
                                     <span class="txn-actions-none">—</span>
@@ -186,12 +182,12 @@
          Report & Settings Ledgers print. --}}
     @if ($printing)
     <div id="printable-activations" class="hidden print:block font-sans">
-        <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#0C2C6B]">
-            <h1 class="m-0 text-2xl font-bold text-[#0C2C6B] font-serif">
-                TRUE LIFE DAYONGAN
+        <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[var(--color-primary)]">
+            <h1 class="m-0 text-2xl font-bold text-[var(--color-primary)] font-serif">
+                TRIFECTA
             </h1>
 
-            <p class="my-1 text-[11px] font-bold text-[#D79B10] uppercase tracking-wider">
+            <p class="my-1 text-[11px] font-bold text-[var(--color-accent)] uppercase tracking-wider">
                 &mdash; S O L I D A R I T A S &mdash;
             </p>
 
@@ -215,7 +211,7 @@
 
         <table class="w-full border-collapse font-sans text-[10px]">
             <thead>
-                <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[22px]">
+                <tr class="bg-[var(--color-primary)] text-white font-bold text-center h-[22px]">
                     <th class="border border-slate-900 p-1">#</th>
                     <th class="border border-slate-900 p-1">Member</th>
                     <th class="border border-slate-900 p-1">Type</th>
@@ -231,7 +227,7 @@
                     <tr>
                         <td class="border border-slate-900 p-1 text-center">{{ $index + 1 }}</td>
                         <td class="border border-slate-900 p-1 text-center">{{ trim($a->user?->lastname.' '.$a->user?->firstname) ?: 'N/A' }}</td>
-                        <td class="border border-slate-900 p-1 text-center">{{ ($a->user?->RoleID ?? 0) === 8 ? 'Satellite' : 'TrueLife' }}</td>
+                        <td class="border border-slate-900 p-1 text-center">{{ ($a->user?->RoleID ?? 0) === 8 ? 'Satellite' : 'TRIFECTA' }}</td>
                         <td class="border border-slate-900 p-1 text-center">{{ $a->receipt_number ?? '—' }}</td>
                         <td class="border border-slate-900 p-1 text-right">{{ number_format((float) $a->amount, 2) }}</td>
                         <td class="border border-slate-900 p-1 text-center">{{ ucfirst($a->payment_method ?? '—') }}</td>
@@ -250,81 +246,69 @@
     </div>
     @endif
 
-    <style>
-        @media print {
-            @page {
-                size: landscape;
-                margin: 8mm;
-            }
-
-            body * {
-                visibility: hidden !important;
-            }
-
-            #printable-activations,
-            #printable-activations * {
-                visibility: visible !important;
-            }
-
-            #printable-activations {
-                display: block !important;
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-            }
-
-            table {
-                border-collapse: collapse !important;
-                width: 100% !important;
-            }
-
-            th,
-            td {
-                border: 1px solid #000 !important;
-                padding: 4px !important;
-            }
-
-            th {
-                background-color: #0C2C6B !important;
-                color: white !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-        }
-    </style>
 
     @script
 <script>
-    const dateInput = $wire.$el.querySelector('#activationDateRange');
+    const initActivationDateRange = () => {
+        // Lazy components run this block before Livewire morphs the
+        // real markup in, so the input is not in the DOM on the first run.
+        const dateInput = document.getElementById('activationDateRange');
 
-    const picker = flatpickr(dateInput, {
-        mode: 'range',
-        dateFormat: 'Y-m-d',
-        altInput: true,
-        altFormat: 'M d, Y',
-        maxDate: 'today',
-        defaultDate: @js($dateRange ? explode(' to ', $dateRange) : []),
-        onChange: (selectedDates, dateStr, instance) => {
-            if (selectedDates.length === 2) {
-                const start = instance.formatDate(selectedDates[0], 'Y-m-d');
-                const end = instance.formatDate(selectedDates[1], 'Y-m-d');
-                $wire.set('dateRange', `${start} to ${end}`);
-            } else if (selectedDates.length === 0) {
-                $wire.set('dateRange', '');
-            }
-        },
-        onClose: (selectedDates, dateStr, instance) => {
-            if (selectedDates.length === 1) {
-                const day = instance.formatDate(selectedDates[0], 'Y-m-d');
-                instance.setDate([selectedDates[0], selectedDates[0]], false);
-                $wire.set('dateRange', `${day} to ${day}`);
-            }
+        if (!dateInput) {
+            return false;
         }
-    });
 
-    $wire.on('ranges-reset', () => {
-        picker.clear();
+        if (dateInput._flatpickr) {
+            return true;
+        }
+
+        if (typeof flatpickr === 'undefined') {
+            return false;
+        }
+
+        const picker = flatpickr(dateInput, {
+            mode: 'range',
+            dateFormat: 'Y-m-d',
+            altInput: true,
+            altFormat: 'M d, Y',
+            maxDate: 'today',
+            defaultDate: @js($dateRange ? explode(' to ', $dateRange) : []),
+            onChange: (selectedDates, dateStr, instance) => {
+                if (selectedDates.length === 2) {
+                    const start = instance.formatDate(selectedDates[0], 'Y-m-d');
+                    const end = instance.formatDate(selectedDates[1], 'Y-m-d');
+                    $wire.set('dateRange', `${start} to ${end}`);
+                } else if (selectedDates.length === 0) {
+                    $wire.set('dateRange', '');
+                }
+            },
+            onClose: (selectedDates, dateStr, instance) => {
+                if (selectedDates.length === 1) {
+                    const day = instance.formatDate(selectedDates[0], 'Y-m-d');
+                    instance.setDate([selectedDates[0], selectedDates[0]], false);
+                    $wire.set('dateRange', `${day} to ${day}`);
+                }
+            }
+        });
+
+        $wire.on('ranges-reset', () => {
+            picker.clear();
+        });
+
+        return true;
+    };
+
+    initActivationDateRange();
+
+    // Finish the job once Livewire has morphed the lazy component in.
+    const stopWaitingForActivationDateRange = Livewire.hook('morphed', ({ component }) => {
+        if (component.id !== $wire.$id) {
+            return;
+        }
+
+        if (initActivationDateRange()) {
+            stopWaitingForActivationDateRange();
+        }
     });
 
     // The printable table is now in the DOM: print it, then remove it again

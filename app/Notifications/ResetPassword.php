@@ -43,7 +43,7 @@ class ResetPassword extends Notification
         ], false));
 
         return (new MailMessage)
-            ->subject('Reset Your Password - DAYONGAN')
+            ->subject('Reset Your Password - TRIFECTA')
             ->view('emails.reset-password', [
                 'user' => $notifiable,
                 'resetUrl' => $resetUrl,

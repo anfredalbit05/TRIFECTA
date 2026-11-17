@@ -4,10 +4,13 @@ namespace App\Livewire\SharePages\Dashboard;
 
 use App\Models\Withdrawal;
 use Illuminate\Support\Facades\Auth;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 
 class Withdrawals extends Component
 {
+    use HasTabSkeleton;
+
     // ==========================================
     // REFRESH
     // ==========================================

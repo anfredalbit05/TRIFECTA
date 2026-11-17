@@ -9,16 +9,16 @@
                 <div class="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
                     <div>
                         <div class="flex items-center gap-2">
-                            <h2 class="text-xl font-extrabold text-[#0B2A5B]">
+                            <h2 class="text-xl font-extrabold text-[var(--color-primary)]">
                                 Withdrawal Review
                             </h2>
                             @if ((int) ($withdrawal->user?->RoleID ?? 0) === 8)
-                                <span class="inline-flex items-center rounded-full bg-[#D79B10] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                                <span class="inline-flex items-center rounded-full bg-[var(--color-accent)] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
                                     Satellite Member
                                 </span>
                             @else
-                                <span class="inline-flex items-center rounded-full bg-[#0B2A5B] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
-                                    TrueLife Member
+                                <span class="inline-flex items-center rounded-full bg-[var(--color-primary)] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                                    TRIFECTA Member
                                 </span>
                             @endif
                         </div>
@@ -43,8 +43,8 @@
                     {{-- MEMBER INFORMATION --}}
                     {{-- ================================================= --}}
                     <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <div class="bg-[#0B2A5B] px-5 py-3">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                        <div class="bg-[var(--color-primary)] px-5 py-3">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">
                                 Member Information
                             </h3>
                         </div>
@@ -52,7 +52,7 @@
                         <div class="grid grid-cols-1 gap-5 p-5 sm:grid-cols-2 lg:grid-cols-3">
                             {{-- FULL NAME --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Full Name
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -62,7 +62,7 @@
 
                             {{-- USERNAME --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Username
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -72,7 +72,7 @@
 
                             {{-- CONTACT NUMBER --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Contact Number
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -86,8 +86,8 @@
                     {{-- WITHDRAWAL INFORMATION --}}
                     {{-- ================================================= --}}
                     <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <div class="bg-[#0B2A5B] px-5 py-3">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                        <div class="bg-[var(--color-primary)] px-5 py-3">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">
                                 Withdrawal Information
                             </h3>
                         </div>
@@ -96,7 +96,7 @@
 
                             {{-- WITHDRAWAL ID --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Withdrawal ID
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -106,7 +106,7 @@
 
                             {{-- WITHDRAWAL TYPE --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Type
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -116,13 +116,13 @@
 
                             {{-- REQUEST STATUS --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Request Status
                                 </p>
                                 <div class="mt-2">
                                     @php
                                         $statusClass = match (strtolower($withdrawal->status ?? 'Pending')) {
-                                            'approved' => 'bg-emerald-100 text-emerald-700',
+                                            'approved' => 'bg-[var(--color-primary-tint)] text-[var(--color-primary)]',
                                             'rejected' => 'bg-red-100 text-red-700',
                                             default => 'bg-amber-100 text-amber-700',
                                         };
@@ -136,7 +136,7 @@
 
                             {{-- WITHDRAWAL METHOD --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Withdrawal Method
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -147,7 +147,7 @@
                             {{-- BANK NAME (bank transfers only) --}}
                             @if (filled($withdrawal->bank_name))
                                 <div>
-                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                         Bank Name
                                     </p>
                                     <p class="mt-1 font-bold text-slate-800">
@@ -159,7 +159,7 @@
                             {{-- ACCOUNT NAME --}}
                             @if (filled($withdrawal->account_name))
                                 <div>
-                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                         Account Name
                                     </p>
                                     <p class="mt-1 font-bold text-slate-800">
@@ -171,7 +171,7 @@
                             {{-- ACCOUNT NUMBER --}}
                             @if (filled($withdrawal->account_number))
                                 <div>
-                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                         Account Number
                                     </p>
                                     <p class="mt-1 break-all font-bold text-slate-800">
@@ -182,7 +182,7 @@
 
                             {{-- PAYMENT REFERENCE --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Reference No.
                                 </p>
                                 <p class="mt-1 break-all font-bold text-slate-800">
@@ -192,7 +192,7 @@
 
                             {{-- REQUEST DATE --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Requested On
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -206,8 +206,8 @@
                     {{-- RELEASE BREAKDOWN --}}
                     {{-- ================================================= --}}
                     <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <div class="bg-[#0B2A5B] px-5 py-3">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                        <div class="bg-[var(--color-primary)] px-5 py-3">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">
                                 Release Breakdown
                             </h3>
                         </div>
@@ -220,7 +220,7 @@
                                     <p class="text-sm font-semibold text-slate-700">
                                         Requested Amount
                                     </p>
-                                    <p class="text-xs text-slate-400">
+                                    <p class="text-xs text-slate-500">
                                         Gross withdrawal request
                                     </p>
                                 </div>
@@ -236,7 +236,7 @@
                                     <p class="text-sm font-semibold text-slate-700">
                                         Withholding Tax (10%)
                                     </p>
-                                    <p class="text-xs text-slate-400">
+                                    <p class="text-xs text-slate-500">
                                         Returned to the member's ledger
                                     </p>
                                 </div>
@@ -249,7 +249,7 @@
                             {{-- NET RELEASE --}}
                             <div class="mt-3 flex items-center justify-between gap-4 rounded-xl bg-slate-50 px-4 py-3">
                                 <div>
-                                    <p class="text-sm font-extrabold text-[#0B2A5B]">
+                                    <p class="text-sm font-extrabold text-[var(--color-primary)]">
                                         Net Amount to Release
                                     </p>
                                     <p class="mt-0.5 text-[11px] text-slate-500">
@@ -257,18 +257,18 @@
                                     </p>
                                 </div>
 
-                                <span class="text-xl font-extrabold text-emerald-600">
+                                <span class="text-xl font-extrabold text-[var(--color-primary)]">
                                     ₱{{ number_format((float) $withdrawal->amount, 2) }}
                                 </span>
                             </div>
 
                             {{-- APPROVAL NOTE --}}
                             @if ($withdrawal->status === 'Pending')
-                                <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
-                                    <p class="text-xs font-semibold text-blue-800">
+                                <div class="mt-4 rounded-lg border border-[var(--color-primary-tint-border)] bg-[var(--color-primary-tint)] px-4 py-3">
+                                    <p class="text-xs font-semibold text-[var(--color-primary-dark)]">
                                         Before You Approve
                                     </p>
-                                    <p class="mt-1 text-[11px] leading-relaxed text-blue-700">
+                                    <p class="mt-1 text-[11px] leading-relaxed text-[var(--color-primary)]">
                                         Approving releases the net amount above: a wallet debit of
                                         ₱{{ number_format((float) $withdrawal->requested_amount, 2) }} and ledger
                                         records for the net release and the tax are written immediately.
@@ -296,14 +296,14 @@
                              on Transaction List - Withdrawal --}}
                         @if (($this->canChangeStatus || $this->canDelete) && $withdrawal->status === 'Pending')
                             <button type="button" wire:click="confirmReject"
-                                class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition cursor-pointer">
+                                class="rounded-xl bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] px-6 py-2.5 text-xs font-bold text-white transition cursor-pointer">
                                 Reject
                             </button>
 
                             {{-- APPROVE — needs can_change_status (or can_delete)
                                  on Transaction List - Withdrawal --}}
                             <button type="button" wire:click="confirmApprove"
-                                class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 cursor-pointer">
+                                class="rounded-xl bg-[var(--color-primary)] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-[var(--color-primary-dark)] cursor-pointer">
                                 Approve & Release
                             </button>
                         @endif

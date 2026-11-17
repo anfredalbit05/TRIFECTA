@@ -19,10 +19,7 @@ class About extends Component
 
     public function loadContexts()
     {
-        $this->contexts = Context::pluck(
-            'details',
-            'context_key'
-        )->toArray();
+        $this->contexts = Context::merged();
     }
 
     #[On('context-updated')]

@@ -6,42 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>
-        @yield('title', 'DAYONGAN')
+        @yield('title', 'TRIFECTA')
     </title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
+    {{-- Page-scoped stylesheets pushed by individual pages --}}
+    @stack('styles')
 
     @livewireStyles
 </head>
 
-<body class="bg-gray-100">
+<body class="tf-app">
 
-    <div class="flex min-h-screen">
+    {{-- Aurora wash behind every authenticated screen --}}
+    <div class="tf-app-canvas" aria-hidden="true"></div>
 
-        <!-- Sidebar -->
-        <x-sidebar />
+    <x-sidebar />
 
-        <!-- Main Content -->
-        <div class="flex-1 lg:ml-72">
-
-            <main class="p-0">
-                @yield('content')
-            </main>
-
-        </div>
-
+    <div class="tf-app-main lg:ml-72">
+        <main class="min-w-0 p-0">
+            @yield('content')
+        </main>
     </div>
 
     <livewire:application-modal />
 
-    <!-- Force SweetAlert to always render above Tailwind modals/sidebars -->
-    <style>
-        .swal2-container {
-            z-index: 99999 !important;
-        }
-    </style>
+    @stack('scripts')
     @livewireScripts
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -50,9 +42,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-    <!-- SweetAlert2 (single shared, reusable handler) -->
-    <x-shared.sweet-alert-handler />
 
 </body>
 

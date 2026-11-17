@@ -6,11 +6,13 @@ use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Testimonial;
 use App\Support\Modules;
 use Illuminate\Support\Facades\Auth;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class ManageTestimonials extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
     use WithPagination;
 
@@ -230,7 +232,7 @@ class ManageTestimonials extends Component
             ->latest('TestimonialsID')
             ->paginate(10);
 
-        return view('components.admin-pages.post.testimonials', [
+        return view('livewire.admin-pages.post.testimonials', [
             'testimonials' => $testimonials,
             'canCreate' => $this->canCreate,
             'canRead' => $this->canRead,

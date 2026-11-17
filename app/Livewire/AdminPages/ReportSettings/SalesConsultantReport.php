@@ -9,11 +9,13 @@ use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class SalesConsultantReport extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules, WithPagination;
 
     protected function module(): int
@@ -275,7 +277,6 @@ protected function reportQuery(): Builder
             )
         );
 }
-
 
 
     public function render()

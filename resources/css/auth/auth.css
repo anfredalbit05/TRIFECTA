@@ -1,0 +1,15 @@
+/* Extracted from resources/views/livewire\auth\forgot-password.blade.php */
+
+#forgot-email::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+}
+
+/* Extracted from resources/views/livewire\auth\reset-password.blade.php */
+
+#reset-email::placeholder,
+#reset-password::placeholder,
+#reset-password-confirm::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+}

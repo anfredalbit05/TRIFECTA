@@ -6,11 +6,13 @@ use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Benefit;
 use App\Models\Variant;
 use App\Support\Modules;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class BenefitsList extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
     use WithPagination;
 
@@ -197,6 +199,7 @@ class BenefitsList extends Component
         $this->resetPage();
     }
 
+
     public function render()
 {
     $benefits = Benefit::query()
@@ -224,7 +227,7 @@ class BenefitsList extends Component
 
     $variants = Variant::orderBy('name')->get();
 
-    return view('components.admin-pages.masterlist.benefits', [
+    return view('livewire.admin-pages.masterlist.benefits', [
         'benefits' => $benefits,
         'variants' => $variants,
     ]);

@@ -32,7 +32,7 @@ class SpinWheelWinner extends Mailable
                 env('MAIL_FROM_ADDRESS'),
                 env('MAIL_FROM_NAME')
             )
-            ->subject('🎉 You won in the '.$this->draw->draw_date->format('F j, Y').' Spin the Wheel - DAYONGAN')
+            ->subject('🎉 You won in the '.$this->draw->draw_date->format('F j, Y').' Spin the Wheel - TRIFECTA')
             ->view('emails.spin-wheel-winner');
     }
 }

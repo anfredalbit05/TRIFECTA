@@ -2,6 +2,7 @@
 
 namespace App\Livewire\AdminPages\Dashboard;
 
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use App\Models\User;
 use App\Models\Branch;
@@ -16,6 +17,8 @@ use Carbon\Carbon;
 
 class OverviewAnalytics extends Component
 {
+    use HasTabSkeleton;
+
     public $selectedYear;
     public array $availableYears = [];
 

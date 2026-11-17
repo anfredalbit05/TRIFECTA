@@ -235,7 +235,7 @@
             <!-- PRINT-ONLY TABLE -->
             <div data-print-section="membership-fee" class="print-section">
                 <div class="print-header">
-                    <h1 class="print-header__logo">TRUELIFE</h1>
+                    <h1 class="print-header__logo">TRIFECTA</h1>
                     <p class="print-header__tagline">&mdash; S O L I D A R I T A S &mdash;</p>
                     <h2 class="print-header__section-title">MEMBERSHIP FEE COLLECTION BREAKDOWN</h2>
                     <p class="print-header__period">
@@ -372,7 +372,7 @@
             <!-- PRINT-ONLY TABLE -->
             <div data-print-section="source" class="print-section">
                 <div class="print-header">
-                    <h1 class="print-header__logo">TRUELIFE</h1>
+                    <h1 class="print-header__logo">TRIFECTA</h1>
                     <p class="print-header__tagline">&mdash; S O L I D A R I T A S &mdash;</p>
                     <h2 class="print-header__section-title">COLLECTION SUMMARY BY SOURCE</h2>
                     <p class="print-header__period">
@@ -508,7 +508,7 @@
             <!-- PRINT-ONLY TABLE -->
             <div data-print-section="wallet" class="print-section">
                 <div class="print-header">
-                    <h1 class="print-header__logo">TRUELIFE</h1>
+                    <h1 class="print-header__logo">TRIFECTA</h1>
                     <p class="print-header__tagline">&mdash; S O L I D A R I T A S &mdash;</p>
                     <h2 class="print-header__section-title">WALLET INCENTIVES BREAKDOWN</h2>
                     <p class="print-header__period">
@@ -568,6 +568,8 @@
     <div class="chart-section">
         <div class="chart-card"
              x-data="monthlyChart()"
+             data-chart-labels="{{ $monthlyIncome->pluck('month')->toJson() }}"
+             data-chart-values="{{ $monthlyIncome->pluck('total')->toJson() }}"
              @chart-data-updated.window="updateChart($event.detail)">
             <div class="chart-card__head">
                 <h3 class="breakdown-card__title">
@@ -592,7 +594,7 @@
             <!-- PRINT-ONLY TABLE -->
             <div data-print-section="monthly" class="print-section">
                 <div class="print-header">
-                    <h1 class="print-header__logo">TRUELIFE</h1>
+                    <h1 class="print-header__logo">TRIFECTA</h1>
                     <p class="print-header__tagline">&mdash; S O L I D A R I T A S &mdash;</p>
                     <h2 class="print-header__section-title">MONTHLY INCOME ANALYTICS</h2>
                     <p class="print-header__period">Year: {{ $selectedYear }}</p>
@@ -618,65 +620,3 @@
     </div>
 
 </div>
-
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('monthlyChart', () => ({
-            chartInstance: null,
-            init() {
-                this.renderChart(
-                    @json($monthlyIncome->pluck('month')),
-                    @json($monthlyIncome->pluck('total'))
-                );
-            },
-            renderChart(labels, data) {
-                const ctx = document.getElementById('monthlyIncomeChart');
-                if (!ctx) return;
-
-                if (this.chartInstance) {
-                    this.chartInstance.destroy();
-                }
-
-                this.chartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Total Income (₱)',
-                            data: data,
-                            backgroundColor: '#0C2C6B',
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function(value) {
-                                        return '₱' + value.toLocaleString();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            },
-            updateChart(detail) {
-                this.renderChart(detail.labels, detail.data);
-            }
-        }));
-    });
-
-    // ---- PER-CARD PRINT ----
-    function printCard(section) {
-        document.body.setAttribute('data-print-target', section);
-        window.print();
-    }
-
-    window.addEventListener('afterprint', () => {
-        document.body.removeAttribute('data-print-target');
-    });
-</script>

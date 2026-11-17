@@ -12,11 +12,11 @@
                 <div
                     class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 sm:px-6 py-4 border-b border-slate-200 sticky top-0 bg-white z-10 shadow-sm">
                     <div class="w-full sm:w-auto">
-                        <h2 class="font-extrabold text-base sm:text-xl text-[#0B2A5B]">
+                        <h2 class="font-extrabold text-base sm:text-xl text-[var(--color-primary)]">
                             Account Activation
                         </h2>
                         <p class="mt-0.5 text-[11px] sm:text-xs text-slate-500">
-                            TRUELIFE • Membership Activation
+                            TRIFECTA • Membership Activation
                         </p>
 
                         @if ($isRenewal)
@@ -36,16 +36,16 @@
                             </div>
                         @endif
                         <div
-                            class="mt-3 flex items-center gap-2.5 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2">
+                            class="mt-3 flex items-center gap-2.5 rounded-xl border border-[var(--color-primary-tint)] bg-[var(--color-primary-tint)] px-3 py-2">
                             <div
-                                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0B2A5B] text-xs font-bold text-[#E8B923]">
+                                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-xs font-bold text-white">
                                 {{ strtoupper(substr($selectedUserRecord?->firstname ?? 'M', 0, 1)) }}
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                                     Activating Member
                                 </p>
-                                <p class="text-xs sm:text-sm font-extrabold text-[#0B2A5B] truncate">
+                                <p class="text-xs sm:text-sm font-extrabold text-[var(--color-primary)] truncate">
                                     {{ trim(($selectedUserRecord?->firstname ?? '') . ' ' . ($selectedUserRecord?->middlename ?? '') . ' ' . ($selectedUserRecord?->lastname ?? '')) ?: 'Member not selected' }}
                                 </p>
                             </div>
@@ -69,7 +69,7 @@
                     @if (!empty($rejectionRemarks))
                         <section class="space-y-4">
                             <h3
-                                class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
+                                class="bg-[var(--color-primary)] text-white px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
                                 Reason For Rejections
                             </h3>
                             <div class="rounded-xl border border-red-200 bg-red-50 p-4">
@@ -85,7 +85,7 @@
                     ================================================== -->
                     <section class="space-y-4">
                         <h3
-                            class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                            class="bg-[var(--color-primary)] text-white px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                             <span>Beneficiary Information</span>
                             <span class="text-[10px] font-normal text-slate-200 uppercase">Maximum 3 Dependents</span>
                         </h3>
@@ -101,7 +101,7 @@
                                         </label>
                                         <input wire:model="beneficiaries.{{ $index }}.fullname" type="text"
                                             placeholder="Full name of beneficiary"
-                                            class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none bg-white">
+                                            class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:outline-none bg-white">
                                         @error("beneficiaries.$index.fullname")
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                         @enderror
@@ -113,7 +113,7 @@
                                             Birthdate
                                         </label>
                                         <input wire:model="beneficiaries.{{ $index }}.birthdate" type="date"
-                                            class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none bg-white">
+                                            class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:outline-none bg-white">
                                         @error("beneficiaries.$index.birthdate")
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                         @enderror
@@ -126,7 +126,7 @@
                                         </label>
                                         <input wire:model="beneficiaries.{{ $index }}.relationship"
                                             type="text" placeholder="Mother, Father, Spouse..."
-                                            class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none bg-white">
+                                            class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:outline-none bg-white">
                                         @error("beneficiaries.$index.relationship")
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                         @enderror
@@ -141,8 +141,8 @@
                 ================================================== --}}
 
                 <section class="space-y-5">
-                    <div class="rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
+                    <div class="rounded-xl bg-[var(--color-primary)] px-4 py-2.5 shadow-sm">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-white sm:text-sm">
                             Select Membership Variant
                         </h3>
                         <p class="mt-0.5 text-[10px] text-slate-200">
@@ -156,7 +156,7 @@
                                 wire:key="variant-option-{{ $variant['VID'] }}"
                                 class="rounded-xl border p-4 transition
                                     {{ (string) $selectedVariantId === (string) $variant['VID']
-                                        ? 'border-[#0B2A5B] bg-blue-50 ring-2 ring-[#0B2A5B]/20'
+                                        ? 'border-[var(--color-primary)] bg-[var(--color-primary-tint)] ring-2 ring-[var(--color-primary)]/20'
                                         : 'border-slate-200 bg-white hover:border-slate-400' }}"
                             >
                                 <label class="flex cursor-pointer items-center gap-3">
@@ -164,7 +164,7 @@
                                         type="radio"
                                         wire:model.live="selectedVariantId"
                                         value="{{ $variant['VID'] }}"
-                                        class="h-4 w-4 shrink-0 border-slate-300 text-[#0B2A5B] focus:ring-[#0B2A5B]"
+                                        class="h-4 w-4 shrink-0 border-slate-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                                     >
 
                                     <div class="min-w-0 flex-1">
@@ -172,7 +172,7 @@
                                             {{ $variant['name'] }}
                                         </span>
 
-                                        <span class="mt-1 block text-lg font-extrabold text-[#0B2A5B]">
+                                        <span class="mt-1 block text-lg font-extrabold text-[var(--color-primary)]">
                                             ₱{{ number_format(
                                                 (float) \App\Models\MembershipFee::where('VID', $variant['VID'])->sum('Cost'),
                                                 2
@@ -189,7 +189,7 @@
                                     <button
                                         type="button"
                                         wire:click="viewBenefits({{ $variant['VID'] }})"
-                                        class="inline-flex items-center gap-1 text-xs font-bold text-blue-700 hover:text-blue-900 hover:underline cursor-pointer"
+                                        class="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] hover:underline cursor-pointer"
                                     >
                                         View Benefits
                                         <svg
@@ -224,7 +224,7 @@
                     ================================================== -->
                     <section class="space-y-5">
                         <h3
-                            class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
+                            class="bg-[var(--color-primary)] text-white px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
                             Payment Information
                         </h3>
 
@@ -237,9 +237,9 @@
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <!-- CASH -->
                                 <label
-                                    class="flex items-center gap-3 cursor-pointer p-3.5 bg-white border border-slate-300 rounded-xl hover:border-[#0B2A5B] hover:bg-slate-50 transition">
+                                    class="flex items-center gap-3 cursor-pointer p-3.5 bg-white border border-slate-300 rounded-xl hover:border-[var(--color-primary)] hover:bg-slate-50 transition">
                                     <input type="radio" wire:model.live="payment_method" value="Cash"
-                                        class="w-4 h-4 text-[#0B2A5B] shrink-0">
+                                        class="w-4 h-4 text-[var(--color-primary)] shrink-0">
                                     <div>
                                         <span class="block text-sm font-bold text-slate-700">Cash</span>
                                         <span class="block text-[11px] text-slate-500">Walk-in Payment</span>
@@ -250,10 +250,10 @@
                                 <label
                                     class="flex items-center gap-3 p-3.5 rounded-xl border transition
                                         {{ $gcashEnabled
-                                            ? 'cursor-pointer bg-white border-slate-300 hover:border-[#0B2A5B] hover:bg-slate-50'
+                                            ? 'cursor-pointer bg-white border-slate-300 hover:border-[var(--color-primary)] hover:bg-slate-50'
                                             : 'cursor-not-allowed bg-slate-100 border-slate-200 opacity-60' }}">
                                     <input type="radio" wire:model.live="payment_method" value="GCash"
-                                        @disabled(!$gcashEnabled) class="w-4 h-4 text-[#0B2A5B] shrink-0">
+                                        @disabled(!$gcashEnabled) class="w-4 h-4 text-[var(--color-primary)] shrink-0">
 
                                     <div>
                                         <span class="block text-sm font-bold text-slate-700">
@@ -273,10 +273,10 @@
                                 <label
                                     class="flex items-center gap-3 p-3.5 rounded-xl border transition
                                         {{ $paymayaEnabled
-                                            ? 'cursor-pointer bg-white border-slate-300 hover:border-[#0B2A5B] hover:bg-slate-50'
+                                            ? 'cursor-pointer bg-white border-slate-300 hover:border-[var(--color-primary)] hover:bg-slate-50'
                                             : 'cursor-not-allowed bg-slate-100 border-slate-200 opacity-60' }}">
                                     <input type="radio" wire:model.live="payment_method" value="Maya"
-                                        @disabled(!$paymayaEnabled) class="w-4 h-4 text-[#0B2A5B] shrink-0">
+                                        @disabled(!$paymayaEnabled) class="w-4 h-4 text-[var(--color-primary)] shrink-0">
 
                                     <div>
                                         <span class="block text-sm font-bold text-slate-700">
@@ -295,10 +295,10 @@
                                 <label
                                     class="flex items-center gap-3 p-3.5 rounded-xl border transition
                                         {{ $bankEnabled
-                                            ? 'cursor-pointer bg-white border-slate-300 hover:border-[#0B2A5B] hover:bg-slate-50'
+                                            ? 'cursor-pointer bg-white border-slate-300 hover:border-[var(--color-primary)] hover:bg-slate-50'
                                             : 'cursor-not-allowed bg-slate-100 border-slate-200 opacity-60' }}">
                                     <input type="radio" wire:model.live="payment_method" value="Bank Transfer"
-                                        @disabled(!$bankEnabled) class="w-4 h-4 text-[#0B2A5B] shrink-0">
+                                        @disabled(!$bankEnabled) class="w-4 h-4 text-[var(--color-primary)] shrink-0">
 
                                     <div>
                                         <span class="block text-sm font-bold text-slate-700">
@@ -331,7 +331,7 @@
                                     value="₱{{ number_format((float) $amount, 2) }}"
                                     readonly
                                     type="text"
-                                    class="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold text-[#0B2A5B]"
+                                    class="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold text-[var(--color-primary)]"
                                 >
                             </div>
 
@@ -343,7 +343,7 @@
                                 <input wire:model.live.debounce.500ms="upline_code" type="text" placeholder="Enter upline code"
                                     @readonly($selectedUserRecord?->status === 'Active')
                                     class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm
-        focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none
+        focus:ring-2 focus:ring-[var(--color-primary)] focus:outline-none
         {{ $selectedUserRecord?->status === 'Active' ? 'bg-slate-100 text-slate-600 cursor-not-allowed' : 'bg-white' }}">
                                 @error('upline_code')
                                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -364,16 +364,16 @@
 
                         <!-- ONLINE PAYMENT REFERENCE -->
                         @if ($payment_method === 'GCash' || $payment_method === 'Maya' || $payment_method === 'Bank Transfer')
-                            <div class="space-y-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
+                            <div class="space-y-3 rounded-xl border border-[var(--color-primary-tint-border)] bg-[var(--color-primary-tint)] p-4">
                                 <div>
-                                    <p class="text-sm font-bold text-blue-800">Online Payment</p>
-                                    <p class="mt-1 text-xs text-blue-700">Complete your payment first, then enter the
+                                    <p class="text-sm font-bold text-[var(--color-primary-dark)]">Online Payment</p>
+                                    <p class="mt-1 text-xs text-[var(--color-primary)]">Complete your payment first, then enter the
                                         transaction reference number below.</p>
                                 </div>
 
                                 {{-- GCASH DETAILS --}}
                                 @if ($payment_method === 'GCash')
-                                    <div class="rounded-lg border border-blue-200 bg-white p-3 text-sm space-y-3">
+                                    <div class="rounded-lg border border-[var(--color-primary-tint-border)] bg-white p-3 text-sm space-y-3">
 
                                         <!-- GCASH ACCOUNT -->
                                         <div>
@@ -423,11 +423,11 @@
                                                     <!-- TOTAL -->
                                                     <div
                                                         class="flex justify-between gap-4 border-t border-slate-200 pt-2 mt-2">
-                                                        <span class="font-extrabold text-[#0B2A5B]">
+                                                        <span class="font-extrabold text-[var(--color-primary)]">
                                                             Total Amount to Pay
                                                         </span>
 
-                                                        <span class="font-extrabold text-[#0B2A5B]">
+                                                        <span class="font-extrabold text-[var(--color-primary)]">
                                                             ₱{{ number_format($totalMembershipFeesCost + $totalMembershipFeesCost * 0.01, 2) }}
                                                         </span>
                                                     </div>
@@ -435,11 +435,11 @@
                                                     <!-- TOTAL WITHOUT CF -->
                                                     <div
                                                         class="flex justify-between gap-4 border-t border-slate-200 pt-2 mt-2">
-                                                        <span class="font-extrabold text-[#0B2A5B]">
+                                                        <span class="font-extrabold text-[var(--color-primary)]">
                                                             Total Amount to Pay
                                                         </span>
 
-                                                        <span class="font-extrabold text-[#0B2A5B]">
+                                                        <span class="font-extrabold text-[var(--color-primary)]">
                                                             ₱{{ number_format($totalMembershipFeesCost, 2) }}
                                                         </span>
                                                     </div>
@@ -461,7 +461,7 @@
                                 @endif
                                 {{-- PAYMAYA DETAILS --}}
                                 @if ($payment_method === 'Maya')
-                                    <div class="rounded-lg border border-blue-200 bg-white p-3 text-sm space-y-3">
+                                    <div class="rounded-lg border border-[var(--color-primary-tint-border)] bg-white p-3 text-sm space-y-3">
 
                                         <!-- PAYMAYA ACCOUNT -->
                                         <div>
@@ -511,11 +511,11 @@
                                                     <!-- TOTAL -->
                                                     <div
                                                         class="flex justify-between gap-4 border-t border-slate-200 pt-2 mt-2">
-                                                        <span class="font-extrabold text-[#0B2A5B]">
+                                                        <span class="font-extrabold text-[var(--color-primary)]">
                                                             Total Amount to Pay
                                                         </span>
 
-                                                        <span class="font-extrabold text-[#0B2A5B]">
+                                                        <span class="font-extrabold text-[var(--color-primary)]">
                                                             ₱{{ number_format($totalMembershipFeesCost + $totalMembershipFeesCost * 0.01, 2) }}
                                                         </span>
                                                     </div>
@@ -523,11 +523,11 @@
                                                     <!-- TOTAL WITHOUT CF -->
                                                     <div
                                                         class="flex justify-between gap-4 border-t border-slate-200 pt-2 mt-2">
-                                                        <span class="font-extrabold text-[#0B2A5B]">
+                                                        <span class="font-extrabold text-[var(--color-primary)]">
                                                             Total Amount to Pay
                                                         </span>
 
-                                                        <span class="font-extrabold text-[#0B2A5B]">
+                                                        <span class="font-extrabold text-[var(--color-primary)]">
                                                             ₱{{ number_format($totalMembershipFeesCost, 2) }}
                                                         </span>
                                                     </div>
@@ -550,7 +550,7 @@
 
                                 {{-- BANK DETAILS --}}
                                 @if ($payment_method === 'Bank Transfer')
-                                    <div class="rounded-lg border border-blue-200 bg-white p-3 text-sm">
+                                    <div class="rounded-lg border border-[var(--color-primary-tint-border)] bg-white p-3 text-sm">
                                         <p class="mb-1"><span class="font-bold text-slate-700">Bank:</span>
                                             {{ $bankName }}</p>
                                         <p class="mb-1"><span class="font-bold text-slate-700">Account Name:</span>
@@ -561,11 +561,11 @@
 
                                     <!-- TOTAL WITHOUT CF -->
                                     <div class="flex justify-between gap-4 border-t border-slate-200 pt-2 mt-2">
-                                        <span class="font-extrabold text-[#0B2A5B]">
+                                        <span class="font-extrabold text-[var(--color-primary)]">
                                             Total Amount to Pay
                                         </span>
 
-                                        <span class="font-extrabold text-[#0B2A5B]">
+                                        <span class="font-extrabold text-[var(--color-primary)]">
                                             ₱{{ number_format($totalMembershipFeesCost, 2) }}
                                         </span>
                                     </div>
@@ -577,13 +577,13 @@
                                     </label>
                                     <input wire:model="reference_code" type="text"
                                         placeholder="Enter reference code where you sent your payment"
-                                        class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#0B2A5B] focus:outline-none">
+                                        class="w-full bg-white border border-[var(--color-primary-light)] rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:outline-none">
                                     @error('reference_code')
                                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
-                                <p class="text-[11px] text-blue-600">Your activation will be recorded as Online (O).
+                                <p class="text-[11px] text-[var(--color-primary)]">Your activation will be recorded as Online (O).
                                 </p>
                             </div>
                         @endif
@@ -594,7 +594,7 @@
                     ================================================== -->
                     <section class="space-y-3">
                         <h3
-                            class="bg-[#0B2A5B] text-[#E8B923] px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
+                            class="bg-[var(--color-primary)] text-white px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
                             Confirmation
                         </h3>
                         <div
@@ -618,13 +618,13 @@
                     <div class="flex flex-col-reverse sm:flex-row gap-2.5 w-full sm:w-auto">
                         <!-- CANCEL BUTTON -->
                         <button wire:click="closeModal" type="button"
-                            class="w-full sm:w-auto px-5 py-2.5 border0 bg-[#D79B10] text-white rounded-xl shadow-md transition cursor-pointer">
+                            class="w-full sm:w-auto px-5 py-2.5 border0 bg-[var(--color-accent)] text-white rounded-xl shadow-md transition cursor-pointer">
                             Cancel
                         </button>
 
                         <!-- ACTIVATE BUTTON -->
                         <button type="button" wire:click="confirmActivate" wire:loading.attr="disabled"
-                            class="w-full sm:w-auto px-6 py-2.5 bg-[#0B2A5B] hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center cursor-pointer">
+                            class="w-full sm:w-auto px-6 py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center cursor-pointer">
                             <span wire:loading.remove wire:target="confirmActivate">
                                 @if ($isRenewal)
                                     Renew Activation
@@ -660,13 +660,13 @@
             aria-labelledby="benefits-modal-title"
         >
             {{-- HEADER --}}
-            <div class="relative shrink-0 overflow-hidden bg-[#0B2A5B] px-5 py-5 sm:px-7 sm:py-6">
+            <div class="relative shrink-0 overflow-hidden bg-[var(--color-primary)] px-5 py-5 sm:px-7 sm:py-6">
                 <div class="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-white/5"></div>
-                <div class="absolute -bottom-16 right-24 h-32 w-32 rounded-full bg-[#E8B923]/10"></div>
+                <div class="absolute -bottom-16 right-24 h-32 w-32 rounded-full bg-[var(--color-accent)]/10"></div>
 
                 <div class="relative flex items-start justify-between gap-4">
                     <div class="flex min-w-0 items-start gap-3 sm:gap-4">
-                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-[#E8B923] sm:h-14 sm:w-14">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white sm:h-14 sm:w-14">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 class="h-7 w-7" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor" stroke-width="1.7">
@@ -676,7 +676,7 @@
                         </div>
 
                         <div class="min-w-0 pt-0.5">
-                            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-[#E8B923] sm:text-xs">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white sm:text-xs">
                                 Membership Plan
                             </p>
 
@@ -685,7 +685,7 @@
                                 Membership Benefits
                             </h2>
 
-                            <p class="mt-1.5 break-words text-xs text-blue-100 sm:text-sm">
+                            <p class="mt-1.5 break-words text-xs text-[var(--color-primary-tint)] sm:text-sm">
                                 {{ $benefitsVariantName }}
                             </p>
                         </div>
@@ -694,7 +694,7 @@
                     <button
                         type="button"
                         wire:click="closeBenefitsModal"
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/10 text-white transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-[#E8B923]"
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/10 text-white transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                         aria-label="Close benefits"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -709,7 +709,7 @@
                 <div class="relative mt-5 flex flex-wrap items-center gap-2">
                     <span class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[11px] font-semibold text-white">
                         <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-3.5 w-3.5 text-[#E8B923]" fill="none"
+                            class="h-3.5 w-3.5 text-white" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="m5 12 4 4L19 6" />
@@ -717,7 +717,7 @@
                         Included benefits
                     </span>
 
-                    <span class="inline-flex items-center rounded-full bg-[#E8B923] px-3 py-1.5 text-[11px] font-bold text-[#0B2A5B]">
+                    <span class="inline-flex items-center rounded-full bg-[var(--color-accent)] px-3 py-1.5 text-[11px] font-bold text-white">
                         Variant #{{ $benefitsVariantId }}
                     </span>
                 </div>
@@ -733,8 +733,8 @@
                 @endphp
 
                 {{-- INTRODUCTION --}}
-                <div class="flex items-start gap-3 rounded-xl border border-blue-100 bg-white p-4">
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-[#0B2A5B]">
+                <div class="flex items-start gap-3 rounded-xl border border-[var(--color-primary-tint)] bg-white p-4">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary-tint)] text-[var(--color-primary)]">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
                             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -743,7 +743,7 @@
                     </div>
 
                     <div>
-                        <h3 class="text-sm font-extrabold text-[#0B2A5B]">
+                        <h3 class="text-sm font-extrabold text-[var(--color-primary)]">
                             Membership Benefits Breakdown
                         </h3>
                         <p class="mt-1 text-xs leading-5 text-slate-500">
@@ -758,9 +758,9 @@
                         class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
                         {{-- TABLE SECTION HEADER --}}
-                        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-[#0B2A5B] px-4 py-3 sm:px-5">
+                        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-[var(--color-primary)] px-4 py-3 sm:px-5">
                             <div class="flex items-center gap-3">
-                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10 text-[#E8B923]">
+                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white">
                                     @if ($holdertype === 'Primary Owner')
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
                                             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -780,14 +780,14 @@
                                     <h3 class="text-sm font-extrabold text-white">
                                         {{ $holdertype }}
                                     </h3>
-                                    <p class="mt-0.5 text-[11px] text-slate-300">
+                                    <p class="mt-0.5 text-[11px] text-white">
                                         {{ $benefits->count() }}
                                         {{ $benefits->count() === 1 ? 'benefit' : 'benefits' }}
                                     </p>
                                 </div>
                             </div>
 
-                            <span class="rounded-full bg-[#E8B923] px-3 py-1 text-xs font-extrabold text-[#0B2A5B]">
+                            <span class="rounded-full bg-[var(--color-accent)] px-3 py-1 text-xs font-extrabold text-white">
                                 {{ $benefits->count() }} items
                             </span>
                         </div>
@@ -815,7 +815,7 @@
                                 <tbody class="divide-y divide-slate-100">
                                     @foreach ($benefits as $index => $benefit)
                                         <tr wire:key="benefit-{{ $benefit['BentID'] }}"
-                                            class="transition hover:bg-blue-50/60">
+                                            class="transition hover:bg-[var(--color-primary-tint)]/60">
 
                                             <td class="px-4 py-4 text-center text-xs font-semibold text-slate-400">
                                                 {{ $index + 1 }}
@@ -823,7 +823,7 @@
 
                                             <td class="px-4 py-4">
                                                 <div class="flex items-start gap-2.5">
-                                                    <div class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-600">
+                                                    <div class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[var(--color-primary-tint)] text-[var(--color-primary)]">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
                                                             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -842,7 +842,7 @@
                                             </td>
 
                                             <td class="whitespace-nowrap px-4 py-4 text-right">
-                                                <span class="inline-flex rounded-lg bg-emerald-50 px-3 py-1.5 text-sm font-extrabold tabular-nums text-emerald-700">
+                                                <span class="inline-flex rounded-lg bg-[var(--color-primary-tint)] px-3 py-1.5 text-sm font-extrabold tabular-nums text-[var(--color-primary)]">
                                                     ₱{{ number_format((float) ($benefit['amount'] ?? 0), 2) }}
                                                 </span>
                                             </td>
@@ -856,7 +856,7 @@
                                         <td colspan="3" class="px-4 py-4 text-right text-xs font-extrabold uppercase tracking-wide text-slate-600">
                                             Total listed benefit amounts
                                         </td>
-                                        <td class="whitespace-nowrap px-4 py-4 text-right text-sm font-extrabold tabular-nums text-[#0B2A5B]">
+                                        <td class="whitespace-nowrap px-4 py-4 text-right text-sm font-extrabold tabular-nums text-[var(--color-primary)]">
                                             ₱{{ number_format($benefits->sum(fn ($benefit) => (float) ($benefit['amount'] ?? 0)), 2) }}
                                         </td>
                                     </tr>
@@ -888,7 +888,7 @@
             {{-- FOOTER --}}
             <div class="flex shrink-0 flex-col gap-3 border-t border-slate-200 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
                 <div class="flex items-center gap-2 text-xs text-slate-500">
-                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-[#0B2A5B]">
+                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-primary-tint)] text-[var(--color-primary)]">
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" stroke-width="1.8">
@@ -905,7 +905,7 @@
                 <button
                     type="button"
                     wire:click="closeBenefitsModal"
-                    class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B2A5B] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-[#0B2A5B] focus:ring-offset-2 sm:w-auto"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[var(--color-primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 sm:w-auto"
                 >
                     Close Details
                     <svg xmlns="http://www.w3.org/2000/svg"

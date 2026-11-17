@@ -7,11 +7,13 @@ use App\Models\Setting;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Illuminate\Support\Facades\Log;
 
 class Overview extends Component
 {
+    use HasTabSkeleton;
     public $selectedYear;
 
     public array $availableYears = [];
@@ -119,6 +121,7 @@ class Overview extends Component
         ]);
     }
 
+
     public function render()
     {
         $year = $this->selectedYear;
@@ -143,7 +146,7 @@ class Overview extends Component
         // Monthly Income Chart Data (Guarantees all 12 months for the chosen year)
         $monthlyIncome = $this->getMonthlyIncomeData($year);
 
-        
+
         // Membership Fee Breakdown
         $variants = DB::table('variants')
             ->orderBy('name')

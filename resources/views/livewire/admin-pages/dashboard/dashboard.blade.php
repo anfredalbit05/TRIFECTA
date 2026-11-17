@@ -149,7 +149,7 @@
                     @forelse($newsUpdates as $news)
                         <tr wire:key="news-row-{{ $news->ID }}">
                             <td>
-                                {{ $news->user ? $news->user->firstname . ' ' . $news->user->lastname : 'TrueLife Dayongan' }}
+                                {{ $news->user ? $news->user->firstname . ' ' . $news->user->lastname : 'TRIFECTA' }}
                             </td>
                             <td>
                                 <strong>{{ $news->title }}</strong>
@@ -162,23 +162,15 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <button
-                                        type="button"
-                                        class="btn-action btn-view"
+                                    <x-action-btn icon="view" tone="view" label="View"
                                         wire:click="openDetails({{ $news->ID }})"
-                                    >
-                                        👁 View
-                                    </button>
+                                        title="View post" />
 
                                     @if(auth()->check() && (int) auth()->user()->RoleID === 1)
-                                        <button
-                                            type="button"
-                                            class="btn-action btn-delete"
+                                        <x-action-btn icon="delete" tone="delete" label="Delete"
                                             wire:click="deletePost({{ $news->ID }})"
                                             wire:confirm="Are you sure you want to delete this post?"
-                                        >
-                                            🗑 Delete
-                                        </button>
+                                            title="Delete post" />
                                     @endif
                                 </div>
                             </td>
@@ -213,7 +205,7 @@
                         <div class="user-details">
                             <div class="user-name-row">
                                 <span class="user-name">
-                                    {{ $selectedPost->user ? $selectedPost->user->firstname . ' ' . $selectedPost->user->lastname : 'TrueLife Dayongan' }}
+                                    {{ $selectedPost->user ? $selectedPost->user->firstname . ' ' . $selectedPost->user->lastname : 'TRIFECTA' }}
                                 </span>
                             </div>
                             <div class="post-meta">

@@ -6,6 +6,7 @@ use App\Models\Activation;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -19,6 +20,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class GenealogyTree extends Component
 {
+    use HasTabSkeleton;
+
     /**
      * Excel supports 16,384 columns.
      * Each leaf occupies 6 columns.

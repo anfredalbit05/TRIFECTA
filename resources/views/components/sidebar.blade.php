@@ -22,6 +22,10 @@
     $profilePic = $user?->profilepic;
     $defaultAvatar = 'images/profiles/default-avatar.png';
 
+    $avatarSrc = (!$profilePic || $profilePic === $defaultAvatar)
+        ? asset($defaultAvatar)
+        : (Str::startsWith($profilePic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic));
+
     /*
     | Pending transaction counts (admin sidebar badges). Only queried for
     | admins — members never see these two links.
@@ -36,303 +40,285 @@
             ->whereHas('user', fn ($q) => $q->where('RoleID', 8))
             ->count()
         : 0;
+
+    $roleLine = match (true) {
+        $user?->RoleID == 4 => ($user?->status ?? 'Inactive') . ' Member',
+        $user?->RoleID == 8 => ($user?->status ?? 'Inactive') . ' Satellite Member',
+        (bool) $user        => ($user->status ?? 'Inactive') . ' · ' . ($user->position ?? '--'),
+        default             => '',
+    };
 @endphp
 
 <div x-data x-on:profile-updated.window="window.location.reload()" class="sidebar-wrapper">
 
-    {{-- MOBILE HEADER --}}
-    <header class="mobile-header">
-        <a href="{{ route('my-profile') }}" class="mobile-profile">
-            <div class="mobile-profile-image-box">
-                @if (!$profilePic || $profilePic === $defaultAvatar)
-                    <img src="{{ asset($defaultAvatar) }}" class="mobile-profile-image" alt="Profile picture">
-                @else
-                    <img
-                        src="{{ Str::startsWith($profilePic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic) }}"
-                        class="mobile-profile-image"
-                        alt="Profile picture">
-                @endif
-            </div>
-
-
-            <div class="mobile-profile-info">
-                <span class="mobile-profile-name">
-                    {{ $user?->firstname ?? 'Member' }}
-                    {{ $user?->lastname ?? '' }}
-                </span>
-
-                @if ($user?->RoleID == 4)
-                    <span class="mobile-profile-status">
-                        {{ $user?->status ?? 'Inactive' }} Member
-                    </span>
-                @elseif ($user?->RoleID == 8)
-                    <span class="mobile-profile-status">
-                        {{ $user?->status ?? 'Inactive' }} Satellite Member
-                    </span>
-                @elseif ($user)
-                    <span class="mobile-profile-status">
-                        {{ $user->status ?? 'Inactive' }} - {{ $user->position ?? '--' }}
-                    </span>
-                @endif
-                <small class="profile-role">
-                    {{ $user?->branch?->branchname ?? 'N/A' }}
+    {{-- =========================================================
+         MOBILE TOP BAR
+    ========================================================== --}}
+    <header class="tf-topbar">
+        <div class="flex items-center gap-2">
+            <a href="{{ route('home') }}" class="tf-topbar-logo">
+                <img src="{{ asset('images/truelife-logo.png') }}" alt="TRIFECTA">
+            </a>
+            <div class="leading-tight">
+                <b class="block text-[12px] font-black tracking-[.16em] text-[var(--tf-ink)]">TRIFECTA</b>
+                <small class="block text-[7.5px] font-extrabold uppercase tracking-[.16em] text-[var(--tf-ink-mute)]">
+                    {{ $isAdmin ? 'Operations' : 'Member Portal' }}
                 </small>
             </div>
+        </div>
 
-        </a>
-
-        <a href="{{ route('home') }}" class="mobile-truelife">
-            <img src="{{ asset('images/truelife-logo.png') }}" class="mobile-truelife-logo" alt="TRUELIFE Logo">
+        <a href="{{ route('my-profile') }}" class="tf-topbar-user">
+            <div class="text-right">
+                <b>{{ $user?->firstname ?? 'Member' }} {{ $user?->lastname ?? '' }}</b>
+                <small>{{ $user?->branch?->branchname ?? 'Member' }}</small>
+            </div>
+            <img src="{{ $avatarSrc }}" alt="Profile picture">
         </a>
     </header>
 
-    {{-- DESKTOP SIDEBAR --}}
-    <aside class="sidebar">
 
-        <a href="{{ route('home') }}" class="sidebar-logo">
-            <img src="{{ asset('images/truelife-logo.png') }}" class="logo-image" alt="TRUELIFE Logo">
+    {{-- =========================================================
+         DESKTOP RAIL
+    ========================================================== --}}
+    <aside class="tf-side">
+
+        <a href="{{ route('home') }}" class="tf-side-brand">
+            <span class="tf-nav-logo">
+                <img src="{{ asset('images/truelife-logo.png') }}" alt="TRIFECTA">
+            </span>
+            <span>
+                <strong>TRIFECTA</strong>
+                <small>Health · Wellness · Protection</small>
+            </span>
         </a>
 
-        <div class="sidebar-content">
-            <div class="profile-card sidebar-scroll">
+        <div class="tf-side-scroll">
 
-            {{-- DESKTOP PROFILE STATUS --}}
-            <div class="profile-section">
-                <div class="profile-image-box">
-                    @if (!$profilePic || $profilePic === $defaultAvatar)
-                        <img src="{{ asset($defaultAvatar) }}"
-                            class="profile-image"
-                            alt="Default profile picture">
-                    @else
-                        <img
-                            src="{{ Str::startsWith($profilePic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic) }}"
-                            class="profile-image"
-                            alt="Profile picture">
-                    @endif
+            {{-- PROFILE CARD --}}
+            <div class="tf-side-profile">
+                <div class="tf-side-avatar">
+                    <img src="{{ $avatarSrc }}" alt="Profile picture">
                 </div>
 
-                <h2 class="profile-name">
-                    <span>{{ $user?->firstname ?? 'Member' }}</span>
-                    <span>{{ $user?->lastname ?? '' }}</span>
-                </h2>
+                <p class="tf-side-name">
+                    {{ $user?->firstname ?? 'Member' }} {{ $user?->lastname ?? '' }}
+                </p>
 
-                @if ($user?->RoleID == 4)
-                    <p class="profile-status">
-                        {{ $user?->status ?? 'Inactive' }} Member
-                    </p>
-                @elseif ($user?->RoleID == 8)
-                    <p class="profile-status">
-                        {{ $user?->status ?? 'Inactive' }} Satellite Member
-                    </p>
-                @elseif ($user)
-                    <p class="profile-status">
-                        {{ $user->status ?? 'Inactive' }} - {{ $user->position ?? '--' }}
-                    </p>
+                @if ($roleLine)
+                    <span class="tf-side-status">{{ $roleLine }}</span>
                 @endif
-                    <small class="profile-role">
-                        {{ $user?->branch?->branchname ?? 'N/A' }}
-                    </small>
 
+                <span class="tf-side-branch">{{ $user?->branch?->branchname ?? 'TRIFECTA' }}</span>
             </div>
 
-                {{-- DESKTOP MENU --}}
-                <nav class="menu-list">
 
-                    <a href="{{ route('dashboard') }}"
-                       class="menu-item {{ request()->routeIs('dashboard') ? 'active-menu' : '' }}">
-                        <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                  d="M3 10.5L12 3l9 7.5M5 9.5V21h14V9.5M9 21v-6h6v6"/>
-                        </svg>
-                        <span>Dashboard</span>
-                    </a>
+            {{-- WORKSPACE --}}
+            <div class="tf-side-group">
+                <div class="tf-side-label">Workspace</div>
 
-                    <a href="{{ route('genealogy-tree') }}"
-                       class="menu-item {{ request()->routeIs('genealogy-tree') ? 'active-menu' : '' }}">
-                        <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                  d="M12 4v16M12 8H7a3 3 0 0 1-3-3M12 8h5a3 3 0 0 0 3-3M12 16H7a3 3 0 0 0-3 3M12 16h5a3 3 0 0 1 3 3"/>
-                            <circle cx="12" cy="4" r="2"/>
-                            <circle cx="4" cy="5" r="2"/>
-                            <circle cx="20" cy="5" r="2"/>
-                            <circle cx="4" cy="19" r="2"/>
-                            <circle cx="20" cy="19" r="2"/>
-                        </svg>
-                        <span>Genealogy</span>
-                    </a>
+                <a href="{{ route('dashboard') }}"
+                   class="tf-side-link {{ request()->routeIs('dashboard') ? 'is-active' : '' }}">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 10.5L12 3l9 7.5M5 9.5V21h14V9.5M9 21v-6h6v6" />
+                    </svg>
+                    <span>Command Center</span>
+                </a>
 
-                    @if ($isAdmin)
-
-                        <a href="{{ route('masterlist') }}"
-                           class="menu-item {{ request()->routeIs('masterlist') ? 'active-menu' : '' }}">
-                            <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                      d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
-                            </svg>
-                            <span>Masterlist</span>
-                            @if ($pendingSatelliteActivations > 0)
-                                <span class="sidebar-badge" title="{{ $pendingSatelliteActivations }} satellite activation(s) pending review">{{ $pendingSatelliteActivations }}</span>
-                            @endif
-                        </a>
-
-                        <a href="{{ route('transaction-list') }}"
-                           class="menu-item {{ request()->routeIs('transaction-list') ? 'active-menu' : '' }}">
-                            <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                      d="M3 6h18M3 12h18M3 18h18M7 3v2M12 3v2M17 3v2"/>
-                            </svg>
-                            <span>Transaction List</span>
-                            @if ($pendingTransactions > 0)
-                                <span class="sidebar-badge" title="{{ $pendingActivations }} pending activation(s), {{ $pendingWithdrawals }} pending withdrawal(s)">{{ $pendingTransactions }}</span>
-                            @endif
-                        </a>
-
-                        <a href="{{ route('post') }}"
-                           class="menu-item {{ request()->routeIs('post') ? 'active-menu' : '' }}">
-                            <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                      d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z"/>
-                            </svg>
-                            <span>Post</span>
-                        </a>
-
-                        <a href="{{ route('report-settings') }}"
-                           class="menu-item {{ request()->routeIs('report-settings') ? 'active-menu' : '' }}">
-                            <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                      d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3M20 16V6"/>
-                            </svg>
-                            <span>Report & Settings</span>
-                        </a>
-
-
-
-                    @endif
-
-                    <a href="{{ route('my-profile') }}"
-                       class="menu-item {{ request()->routeIs('my-profile') ? 'active-menu' : '' }}">
-                        <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                  d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"/>
-                        </svg>
-                        <span>My Profile</span>
-                    </a>
-
-                    @if ($isSatelliteMember)
-                        <a href="{{ route('satellite.portal') }}"
-                           class="menu-item {{ request()->routeIs('satellite.portal') ? 'active-menu' : '' }}">
-                            <svg class="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <circle cx="12" cy="12" r="3" stroke-width="1.8"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                      d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.42 1.42-.06-.06A1.7 1.7 0 0 0 16.44 18a1.7 1.7 0 0 0-1.03 1.56V19.7h-2.02v-.14A1.7 1.7 0 0 0 12.36 18a1.7 1.7 0 0 0-1.88.34l-.06.06L9 16.98l.06-.06A1.7 1.7 0 0 0 9.4 15a1.7 1.7 0 0 0-1.56-1.03H7.7v-2.02h.14A1.7 1.7 0 0 0 9.4 10.92a1.7 1.7 0 0 0-.34-1.88L9 8.98 10.42 7.56l.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 13.39 6.4v-.14h2.02v.14A1.7 1.7 0 0 0 16.44 8a1.7 1.7 0 0 0 1.88-.34l.06-.06 1.42 1.42-.06.06A1.7 1.7 0 0 0 19.4 10.92a1.7 1.7 0 0 0 1.56 1.03h.14v2.02h-.14A1.7 1.7 0 0 0 19.4 15Z"/>
-                            </svg>
-                            <span>Satellite</span>
-                        </a>
-                    @endif
-
-                </nav>
+                <a href="{{ route('genealogy-tree') }}"
+                   class="tf-side-link {{ request()->routeIs('genealogy-tree') ? 'is-active' : '' }}">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 4v16M12 8H7a3 3 0 0 1-3-3M12 8h5a3 3 0 0 0 3-3M12 16H7a3 3 0 0 0-3 3M12 16h5a3 3 0 0 1 3 3" />
+                        <circle cx="12" cy="4" r="2" />
+                        <circle cx="4" cy="5" r="2" />
+                        <circle cx="20" cy="5" r="2" />
+                        <circle cx="4" cy="19" r="2" />
+                        <circle cx="20" cy="19" r="2" />
+                    </svg>
+                    <span>Genealogy Network</span>
+                </a>
             </div>
+
+
+            {{-- ADMINISTRATION --}}
+            @if ($isAdmin)
+                <div class="tf-side-group">
+                    <div class="tf-side-label">Administration</div>
+
+                    <a href="{{ route('masterlist') }}"
+                       class="tf-side-link {{ request()->routeIs('masterlist') ? 'is-active' : '' }}">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+                        </svg>
+                        <span>Member Registry</span>
+                        @if ($pendingSatelliteActivations > 0)
+                            <span class="tf-side-badge"
+                                  title="{{ $pendingSatelliteActivations }} satellite activation(s) pending review">
+                                {{ $pendingSatelliteActivations }}
+                            </span>
+                        @endif
+                    </a>
+
+                    <a href="{{ route('transaction-list') }}"
+                       class="tf-side-link {{ request()->routeIs('transaction-list') ? 'is-active' : '' }}">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18M3 12h18M3 18h18M7 3v2M12 3v2M17 3v2" />
+                        </svg>
+                        <span>Payment Desk</span>
+                        @if ($pendingTransactions > 0)
+                            <span class="tf-side-badge"
+                                  title="{{ $pendingActivations }} pending activation(s), {{ $pendingWithdrawals }} pending withdrawal(s)">
+                                {{ $pendingTransactions }}
+                            </span>
+                        @endif
+                    </a>
+
+                    <a href="{{ route('post') }}"
+                       class="tf-side-link {{ request()->routeIs('post') ? 'is-active' : '' }}">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z" />
+                        </svg>
+                        <span>Publishing Studio</span>
+                    </a>
+
+                    <a href="{{ route('report-settings') }}"
+                       class="tf-side-link {{ request()->routeIs('report-settings') ? 'is-active' : '' }}">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3M20 16V6" />
+                        </svg>
+                        <span>Operations Desk</span>
+                    </a>
+                </div>
+            @endif
+
+
+            {{-- PERSONAL --}}
+            <div class="tf-side-group">
+                <div class="tf-side-label">Personal</div>
+
+                <a href="{{ route('my-profile') }}"
+                   class="tf-side-link {{ request()->routeIs('my-profile') ? 'is-active' : '' }}">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" />
+                    </svg>
+                    <span>Account Settings</span>
+                </a>
+
+                @if ($isSatelliteMember)
+                    <a href="{{ route('satellite.portal') }}"
+                       class="tf-side-link {{ request()->routeIs('satellite.portal') ? 'is-active' : '' }}">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3" />
+                            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.42 1.42-.06-.06A1.7 1.7 0 0 0 16.44 18a1.7 1.7 0 0 0-1.03 1.56V19.7h-2.02v-.14A1.7 1.7 0 0 0 12.36 18a1.7 1.7 0 0 0-1.88.34l-.06.06L9 16.98l.06-.06A1.7 1.7 0 0 0 9.4 15a1.7 1.7 0 0 0-1.56-1.03H7.7v-2.02h.14A1.7 1.7 0 0 0 9.4 10.92a1.7 1.7 0 0 0-.34-1.88L9 8.98 10.42 7.56l.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 13.39 6.4v-.14h2.02v.14A1.7 1.7 0 0 0 16.44 8a1.7 1.7 0 0 0 1.88-.34l.06-.06 1.42 1.42-.06.06A1.7 1.7 0 0 0 19.4 10.92a1.7 1.7 0 0 0 1.56 1.03h.14v2.02h-.14A1.7 1.7 0 0 0 19.4 15Z" />
+                        </svg>
+                        <span>Satellite Hub</span>
+                    </a>
+                @endif
+            </div>
+
         </div>
 
-        <div class="logout-area">
+        <div class="tf-side-foot">
             <livewire:logout-button />
         </div>
+
     </aside>
 
-    {{-- MOBILE BOTTOM NAVIGATION --}}
-    <nav class="member-mobile-nav" aria-label="Member navigation">
 
-        <a href="{{ route('dashboard') }}"
-           class="member-mobile-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                      d="M3 10.5L12 3l9 7.5M5 9.5V21h14V9.5M9 21v-6h6v6"/>
-            </svg>
-            <span>Dashboard</span>
-        </a>
+    {{-- =========================================================
+         MOBILE DOCK
+    ========================================================== --}}
+    <nav class="tf-dock" aria-label="Member navigation">
+        <div class="tf-dock-inner">
 
-        <a href="{{ route('genealogy-tree') }}"
-           class="member-mobile-nav-item {{ request()->routeIs('genealogy-tree') ? 'active' : '' }}">
-            <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                      d="M12 4v16M12 8H7a3 3 0 0 1-3-3M12 8h5a3 3 0 0 0 3-3M12 16H7a3 3 0 0 0-3 3M12 16h5a3 3 0 0 1 3 3"/>
-            </svg>
-            <span>Genealogy</span>
-        </a>
-
-        @if ($isAdmin)
-
-            <a href="{{ route('masterlist') }}"
-               class="member-mobile-nav-item {{ request()->routeIs('masterlist') ? 'active' : '' }}">
-                <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                          d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+            <a href="{{ route('dashboard') }}"
+               class="tf-dock-link {{ request()->routeIs('dashboard') ? 'is-active' : '' }}">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 10.5L12 3l9 7.5M5 9.5V21h14V9.5M9 21v-6h6v6" />
                 </svg>
-                <span>Masterlist</span>
+                <span>Home</span>
             </a>
 
-            <a href="{{ route('transaction-list') }}"
-               class="member-mobile-nav-item {{ request()->routeIs('transaction-list') ? 'active' : '' }}">
-                <span class="member-mobile-nav-badge-anchor">
-                    <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                              d="M3 6h18M3 12h18M3 18h18M7 3v2M12 3v2M17 3v2"/>
+            <a href="{{ route('genealogy-tree') }}"
+               class="tf-dock-link {{ request()->routeIs('genealogy-tree') ? 'is-active' : '' }}">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 4v16M12 8H7a3 3 0 0 1-3-3M12 8h5a3 3 0 0 0 3-3M12 16H7a3 3 0 0 0-3 3M12 16h5a3 3 0 0 1 3 3" />
+                </svg>
+                <span>Network</span>
+            </a>
+
+            @if ($isAdmin)
+                <a href="{{ route('masterlist') }}"
+                   class="tf-dock-link {{ request()->routeIs('masterlist') ? 'is-active' : '' }}">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
                     </svg>
+                    <span>Members</span>
+                </a>
+
+                <a href="{{ route('transaction-list') }}"
+                   class="tf-dock-link {{ request()->routeIs('transaction-list') ? 'is-active' : '' }}">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18M3 12h18M3 18h18M7 3v2M12 3v2M17 3v2" />
+                    </svg>
+                    <span>Payments</span>
                     @if ($pendingTransactions > 0)
-                        <span class="sidebar-badge sidebar-badge-mobile">{{ $pendingTransactions }}</span>
+                        <span class="tf-side-badge">{{ $pendingTransactions }}</span>
                     @endif
-                </span>
-                <span>Transactions</span>
-            </a>
+                </a>
 
-            <a href="{{ route('post') }}"
-               class="member-mobile-nav-item {{ request()->routeIs('post') ? 'active' : '' }}">
-                <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                          d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z"/>
+                <a href="{{ route('post') }}"
+                   class="tf-dock-link {{ request()->routeIs('post') ? 'is-active' : '' }}">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z" />
+                    </svg>
+                    <span>Studio</span>
+                </a>
+
+                <a href="{{ route('report-settings') }}"
+                   class="tf-dock-link {{ request()->routeIs('report-settings') ? 'is-active' : '' }}">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3M20 16V6" />
+                    </svg>
+                    <span>Desk</span>
+                </a>
+            @endif
+
+            <a href="{{ route('my-profile') }}"
+               class="tf-dock-link {{ request()->routeIs('my-profile') ? 'is-active' : '' }}">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" />
                 </svg>
-                <span>Post</span>
+                <span>Account</span>
             </a>
 
-            <a href="{{ route('report-settings') }}"
-               class="member-mobile-nav-item {{ request()->routeIs('report-settings') ? 'active' : '' }}">
-                <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                          d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3M20 16V6"/>
-                </svg>
-                <span>Reports</span>
-            </a>
+            @if ($isSatelliteMember)
+                <a href="{{ route('satellite.portal') }}"
+                   class="tf-dock-link {{ request()->routeIs('satellite.portal') ? 'is-active' : '' }}">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19 5l-2 2m-10 0L5 5m0 14 2-2m10 0 2 2M12 2v3m0 14v3M2 12h3m14 0h3" />
+                    </svg>
+                    <span>Satellite</span>
+                </a>
+            @endif
 
-
-
-        @endif
-
-        <a href="{{ route('my-profile') }}"
-           class="member-mobile-nav-item {{ request()->routeIs('my-profile') ? 'active' : '' }}">
-            <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                      d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"/>
-            </svg>
-            <span>Profile</span>
-        </a>
-
-        @if ($isSatelliteMember)
-            <a href="{{ route('satellite.portal') }}"
-               class="member-mobile-nav-item {{ request()->routeIs('satellite.portal') ? 'active' : '' }}">
-                <svg class="member-mobile-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <circle cx="12" cy="12" r="3" stroke-width="1.8"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                          d="M19 5l-2 2m-10 0L5 5m0 14 2-2m10 0 2 2M12 2v3m0 14v3M2 12h3m14 0h3"/>
-                </svg>
-                <span>Satellite</span>
-            </a>
-        @endif
-
-        {{-- LOGOUT --}}
-        <div class="member-mobile-logout">
-            <livewire:logout-button />
         </div>
-
     </nav>
-</div>
 
+</div>

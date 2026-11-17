@@ -1,0 +1,241 @@
+
+/* =====================================================
+   TRIFECTA TESTIMONIALS — CORPORATE DESIGN
+===================================================== */
+.trifecta-testimonials {
+    --tm-navy: #092F78;
+    --tm-blue: #1260B0;
+    --tm-gold: #F5C400;
+    --tm-royal: #1260B0;
+    --tm-light: #F4F7FC;
+    color: #182B45;
+}
+
+/* HERO */
+.tm-hero {
+    @apply relative overflow-hidden py-16 sm:py-24 bg-white;
+}
+.tm-hero-grid {
+    @apply relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center;
+}
+.tm-hero-content { @apply relative z-10; }
+.tm-eyebrow {
+    @apply flex items-center gap-3 text-xs font-black tracking-[0.18em] uppercase;
+    color: var(--tm-navy);
+}
+.tm-eyebrow-line { @apply w-9 h-1 rounded-full; background: var(--tm-gold); }
+.tm-hero-title {
+    @apply mt-7 text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.06];
+    color: var(--tm-navy);
+}
+.tm-hero-title > span { @apply block; color: var(--tm-blue); }
+.tm-hero-description {
+    @apply mt-6 max-w-xl text-base sm:text-lg leading-8 text-slate-500;
+}
+.tm-hero-button {
+    @apply inline-flex items-center gap-4 mt-8 px-7 py-4 rounded-xl text-sm font-bold text-white transition-all;
+    background: var(--tm-navy);
+}
+.tm-hero-button:hover { background: var(--tm-blue); @apply -translate-y-1; }
+.tm-hero-button span { color: var(--tm-gold); }
+.tm-hero-brand { @apply mt-12 flex flex-wrap items-center gap-3; }
+.tm-hero-brand > span { @apply text-lg font-black tracking-wider; color: var(--tm-navy); }
+.tm-hero-brand i { @apply h-5 w-px bg-slate-300; }
+.tm-hero-brand small { @apply text-[9px] font-bold tracking-widest text-slate-400; }
+.tm-hero-decoration {
+    @apply absolute rounded-full pointer-events-none;
+}
+.tm-decoration-one {
+    @apply -top-40 -right-32 w-96 h-96;
+    background: #1260B008;
+}
+.tm-decoration-two {
+    @apply -bottom-40 left-1/3 w-80 h-80;
+    background: #F5C40008;
+}
+
+/* HERO VISUAL */
+.tm-hero-visual {
+    @apply relative min-h-[380px] sm:min-h-[470px] flex items-center justify-center;
+}
+.tm-visual-main {
+    @apply relative z-10 w-full max-w-lg rounded-[2rem] p-8 sm:p-12 text-white overflow-hidden;
+    background: linear-gradient(145deg, #092F78 0%, #1260B0 100%);
+    box-shadow: 0 25px 60px #092F7828;
+}
+.tm-visual-main::after {
+    content: "";
+    @apply absolute -bottom-24 -right-20 w-64 h-64 rounded-full pointer-events-none;
+    border: 35px solid #FFFFFF0D;
+}
+.tm-visual-top { @apply flex items-center gap-3 text-[10px] font-bold tracking-[0.18em] text-blue-100; }
+.tm-visual-icon {
+    @apply flex items-center justify-center w-11 h-11 rounded-xl;
+    color: var(--tm-navy);
+    background: var(--tm-gold);
+}
+.tm-visual-quote {
+    @apply mt-8 text-8xl font-black leading-none;
+    color: var(--tm-gold);
+}
+.tm-visual-main h2 { @apply text-3xl sm:text-4xl font-black tracking-tight; }
+.tm-visual-main > p { @apply mt-4 max-w-sm text-sm sm:text-base leading-7 text-blue-100; }
+.tm-visual-bottom { @apply flex items-center gap-3 mt-10 text-[9px] font-bold tracking-[0.18em] text-blue-100; }
+.tm-visual-line { @apply w-9 h-1 rounded-full; background: var(--tm-gold); }
+.tm-visual-accent {
+    @apply absolute z-20 w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl;
+    color: var(--tm-navy);
+}
+.tm-visual-gold { @apply top-7 right-3 sm:right-0; background: var(--tm-gold); }
+.tm-visual-navy { @apply bottom-16 left-0 sm:-left-5; background: var(--tm-navy); color: #fff; }
+.tm-visual-caption {
+    @apply absolute bottom-1 right-2 flex items-center gap-2 text-[9px] font-black tracking-widest text-slate-400;
+}
+.tm-caption-dot { @apply w-2 h-2 rounded-full; background: var(--tm-gold); }
+
+/* MEMBER STORIES */
+.tm-stories { @apply py-16 sm:py-24; background: var(--tm-light); }
+.tm-section-heading {
+    @apply flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10 pb-7 border-b border-slate-200;
+}
+.tm-section-label { @apply text-[10px] font-black tracking-[0.2em] uppercase; color: var(--tm-navy); }
+.tm-section-title { @apply mt-3 text-3xl sm:text-4xl font-black tracking-tight; color: var(--tm-navy); }
+.tm-section-description { @apply max-w-md text-sm leading-7 text-slate-500; }
+.tm-stories-grid { @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6; }
+
+/* FEATURED TESTIMONIAL */
+.tm-featured-story {
+    @apply md:col-span-2 rounded-3xl p-7 sm:p-10 flex flex-col justify-between overflow-hidden relative;
+    background: var(--tm-navy);
+    box-shadow: 0 15px 40px #092F7818;
+}
+.tm-featured-story::after {
+    content: "";
+    @apply absolute -right-16 -bottom-24 w-72 h-72 rounded-full pointer-events-none;
+    border: 45px solid #FFFFFF0A;
+}
+.tm-featured-top { @apply flex items-center justify-between relative z-10; }
+.tm-featured-label { @apply flex items-center gap-2 text-[9px] font-black tracking-widest text-blue-100; }
+.tm-featured-label > span { @apply w-2 h-2 rounded-full; background: var(--tm-gold); }
+.tm-featured-quote-mark {
+    @apply text-7xl font-black leading-none;
+    color: var(--tm-gold);
+}
+.tm-featured-rating, .tm-story-rating {
+    @apply flex items-center gap-1 text-lg;
+    color: var(--tm-gold);
+}
+.tm-featured-testimony {
+    @apply relative z-10 mt-5 text-xl sm:text-2xl lg:text-3xl font-semibold leading-relaxed text-white;
+}
+.tm-member-profile {
+    @apply relative z-10 mt-9 pt-6 border-t border-white/15 flex items-center gap-4;
+}
+.tm-member-avatar, .tm-story-avatar {
+    @apply shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-lg font-black;
+    background: var(--tm-gold);
+    color: var(--tm-navy);
+}
+.tm-member-profile h3 { @apply text-sm font-bold text-white; }
+.tm-member-profile p { @apply mt-1 text-xs text-blue-200; }
+.tm-member-verified {
+    @apply ml-auto flex items-center justify-center w-10 h-10 rounded-full;
+    background: #FFFFFF12;
+    color: var(--tm-gold);
+}
+
+/* STANDARD TESTIMONIAL CARDS */
+.tm-story-card {
+    @apply bg-white border border-slate-200 rounded-3xl p-7 flex flex-col justify-between transition-all duration-300;
+    box-shadow: 0 5px 20px #092F7808;
+}
+.tm-story-card:hover {
+    @apply -translate-y-1 border-blue-200;
+    box-shadow: 0 15px 35px #092F7815;
+}
+.tm-story-card-top { @apply flex items-center justify-between; }
+.tm-story-quote { @apply text-6xl font-black leading-none; color: var(--tm-blue); }
+.tm-story-rating { @apply text-sm; }
+.tm-story-testimony { @apply mt-5 text-sm leading-7 text-slate-600 italic; }
+.tm-story-profile { @apply flex items-center gap-3 mt-8 pt-5 border-t border-slate-100; }
+.tm-story-avatar { @apply w-10 h-10 text-sm; background: #E5EEFA; color: var(--tm-blue); }
+.tm-story-profile h3 { @apply text-sm font-bold; color: var(--tm-navy); }
+.tm-story-profile span { @apply block mt-1 text-xs text-slate-400; }
+
+/* EMPTY STATE */
+.tm-empty-state {
+    @apply py-20 px-6 rounded-3xl bg-white border border-slate-200 flex flex-col items-center text-center;
+    color: var(--tm-blue);
+}
+.tm-empty-state h3 { @apply mt-5 text-xl font-black; color: var(--tm-navy); }
+.tm-empty-state p { @apply mt-2 text-sm text-slate-500; }
+
+/* PAGINATION */
+.tm-pagination { @apply mt-12 flex flex-wrap items-center justify-center gap-5; }
+.tm-page-button {
+    @apply px-5 py-3 rounded-xl text-xs font-bold text-white transition-all;
+    background: var(--tm-navy);
+}
+.tm-page-button:hover { background: var(--tm-blue); }
+.tm-page-disabled { @apply px-5 py-3 rounded-xl text-xs font-semibold bg-slate-200 text-slate-400; }
+.tm-page-indicator { @apply text-[10px] tracking-widest text-slate-400; }
+.tm-page-indicator strong { color: var(--tm-navy); }
+
+/* BRAND VALUES */
+.tm-values { @apply py-16 sm:py-20 bg-white; }
+.tm-values-heading { @apply text-center mb-12; }
+.tm-values-heading > span { @apply text-[10px] font-black tracking-[0.2em]; color: var(--tm-navy); }
+.tm-values-heading h2 { @apply mt-3 text-3xl sm:text-4xl font-black; color: var(--tm-navy); }
+.tm-values-grid { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6; }
+.tm-value-item {
+    @apply p-7 rounded-2xl border border-slate-100 bg-white transition-all duration-300;
+}
+.tm-value-item:hover { @apply -translate-y-1 border-blue-100; box-shadow: 0 12px 30px #092F780D; }
+.tm-value-icon { @apply w-14 h-14 rounded-2xl flex items-center justify-center; }
+.tm-icon-gold { background: #FFF5CC; color: #B88B00; }
+.tm-icon-green { background: #EDF3FB; color: var(--tm-navy); }
+.tm-icon-blue { background: #E6EEFA; color: var(--tm-blue); }
+.tm-value-item h3 { @apply mt-5 text-lg font-extrabold; color: var(--tm-navy); }
+.tm-value-item p { @apply mt-2 text-xs leading-6 text-slate-500; }
+
+/* MEMBERSHIP CTA */
+.tm-cta { @apply py-12 sm:py-20; background: var(--tm-light); }
+.tm-cta-panel {
+    @apply relative overflow-hidden rounded-3xl p-8 sm:p-12 lg:p-14 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10;
+    background: linear-gradient(115deg, #092F78, #1260B0);
+    box-shadow: 0 20px 45px #092F781A;
+}
+.tm-cta-decoration {
+    @apply absolute -right-24 -top-32 w-96 h-96 rounded-full pointer-events-none;
+    border: 50px solid #FFFFFF0A;
+}
+.tm-cta-content, .tm-cta-action { @apply relative z-10; }
+.tm-cta-content { @apply max-w-2xl; }
+.tm-cta-label { @apply text-[10px] font-black tracking-[0.2em] text-[var(--color-gold)]; }
+.tm-cta-content h2 { @apply mt-4 text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight; }
+.tm-cta-content p { @apply mt-4 max-w-xl text-sm leading-7 text-blue-100; }
+.tm-cta-action { @apply flex flex-col items-start lg:items-end gap-4 shrink-0; }
+.tm-cta-button {
+    @apply inline-flex items-center gap-5 px-7 py-4 rounded-xl text-sm font-black transition-all;
+    background: var(--tm-gold);
+    color: var(--tm-navy);
+}
+.tm-cta-button:hover { @apply -translate-y-1; background: #FFDA35; }
+.tm-cta-disabled { @apply opacity-60 cursor-not-allowed; }
+.tm-cta-note { @apply text-[9px] font-bold tracking-widest text-blue-200; }
+
+/* RESPONSIVE */
+@media (max-width: 640px) {
+    .tm-hero { @apply py-12; }
+    .tm-hero-title { @apply text-5xl; }
+    .tm-hero-visual { @apply min-h-[340px] mt-4; }
+    .tm-visual-main { @apply p-7; }
+    .tm-featured-story { @apply p-6; }
+    .tm-featured-testimony { @apply text-lg; }
+    .tm-section-heading { @apply mb-7; }
+    .tm-section-title { @apply text-3xl; }
+    .tm-cta-panel { @apply p-7; }
+    .tm-cta-content h2 { @apply text-3xl; }
+    .tm-cta-action { @apply items-stretch; }
+    .tm-cta-button { @apply justify-center; }
+}

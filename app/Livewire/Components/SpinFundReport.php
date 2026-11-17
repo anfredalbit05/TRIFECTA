@@ -3,10 +3,12 @@
 namespace App\Livewire\Components;
 
 use App\Models\SpinDraw;
+use App\Models\User;
 use App\Services\SpinWheelService;
 use App\Support\Modules;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -19,6 +21,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class SpinFundReport extends Component
 {
+    use HasTabSkeleton;
     protected function module(): int
     {
         return Modules::RS_PANGKABUHAYAN;
@@ -64,7 +67,33 @@ class SpinFundReport extends Component
             return collect();
         }
 
-        $winners = app(SpinWheelService::class)->winnersOf($draw);
+        $service = app(SpinWheelService::class);
+
+        $winners = $service->winnersOf($draw)
+            ->sortByDesc('spin_order')
+            ->values();
+
+        // Attach each winner's upline (users.uplineCode -> users.referralCode)
+        // in one query so the modal can show who recruited the winner.
+        $uplineCodes = $winners
+            ->map(fn ($winner) => trim((string) ($winner->user?->uplineCode ?? '')))
+            ->filter()
+            ->unique()
+            ->values();
+
+        $uplines = $uplineCodes->isEmpty()
+            ? collect()
+            : User::whereIn('referralCode', $uplineCodes)
+                ->get(['UserID', 'firstname', 'lastname', 'username', 'referralCode'])
+                ->keyBy('referralCode');
+
+        foreach ($winners as $winner) {
+            $uplineCode = trim((string) ($winner->user?->uplineCode ?? ''));
+            $upline = $uplineCode !== '' ? $uplines->get($uplineCode) : null;
+
+            $winner->setAttribute('upline_code', $uplineCode ?: null);
+            $winner->setAttribute('upline_name', $upline ? $service->displayName($upline) : null);
+        }
 
         $search = mb_strtolower(trim($this->winnerSearch));
 
@@ -119,7 +148,7 @@ class SpinFundReport extends Component
 
             $csv = fopen('php://output', 'w');
 
-            fputcsv($csv, ['TRUE LIFE — Spin the Wheel Winners']);
+            fputcsv($csv, ['TRIFECTA — Spin the Wheel Winners']);
             fputcsv($csv, ['Draw date', $draw->draw_date->format('F j, Y')]);
             fputcsv($csv, ['Period covered', $draw->period_start->format('M j')
                 .' – '.$draw->period_end->format('M j, Y')]);
@@ -159,6 +188,7 @@ class SpinFundReport extends Component
             fclose($csv);
         }, $fileName, $headers);
     }
+
 
     public function render()
     {

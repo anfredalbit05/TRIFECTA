@@ -7,12 +7,14 @@ use App\Models\NewsUpdate;
 use App\Support\Modules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 class CreateNewsUpdates extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
     use WithFileUploads;
     use WithPagination;
@@ -265,7 +267,7 @@ class CreateNewsUpdates extends Component
             ->latest()
             ->paginate(10);
 
-        return view('components.admin-pages.post.news-updates', [
+        return view('livewire.admin-pages.post.news-updates', [
             'newsUpdates' => $newsUpdates,
         ]);
     }

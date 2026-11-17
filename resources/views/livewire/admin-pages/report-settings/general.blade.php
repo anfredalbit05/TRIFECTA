@@ -178,20 +178,16 @@
                                 <div class="actions-row">
                                     {{-- EDIT BUTTON --}}
                                     @if ($this->canUpdate)
-                                        <button wire:click="editSetting({{ $setting->SettingsID }})"
-                                            title="Update Setting"
-                                            class="edit-btn">
-                                            ✏️ Edit
-                                        </button>
+                                        <x-action-btn icon="edit" tone="edit"
+                                            wire:click="editSetting({{ $setting->SettingsID }})"
+                                            title="Update Setting" />
                                     @endif
 
                                     {{-- DELETE BUTTON --}}
                                     @if ($this->canDelete)
-                                        <button wire:click="confirmDeleteSetting({{ $setting->SettingsID }})"
-                                            title="Delete Setting"
-                                            class="delete-btn">
-                                            🗑️ Delete
-                                        </button>
+                                        <x-action-btn icon="delete" tone="delete"
+                                            wire:click="confirmDeleteSetting({{ $setting->SettingsID }})"
+                                            title="Delete Setting" />
                                     @endif
                                 </div>
                             </td>
@@ -349,7 +345,7 @@
                                     >
 
                                     @if ($value)
-                                        <p class="mt-1 text-xs text-emerald-600">
+                                        <p class="mt-1 text-xs text-[var(--color-primary)]">
                                             ✓ Signature path automatically generated
                                         </p>
                                     @endif
@@ -364,7 +360,7 @@
                                             class="h-12 rounded border border-slate-200 bg-white px-3"
                                         >
 
-                                        <span class="text-xs font-semibold text-emerald-600">
+                                        <span class="text-xs font-semibold text-[var(--color-primary)]">
                                             ✓ Current signature
                                         </span>
                                     </div>
@@ -396,7 +392,7 @@
                                         <button
                                             type="button"
                                             @click="save($wire)"
-                                            class="rounded-lg bg-[#0B2A5B] px-3 py-1.5 text-xs font-bold text-white transition hover:bg-[#123c88]"
+                                            class="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-xs font-bold text-white transition hover:bg-[var(--color-primary-mid)]"
                                         >
                                             Use Drawn Signature
                                         </button>
@@ -456,10 +452,10 @@
     {{-- Uploaded successfully --}}
     @if ($signatureUpload)
         <div
-            class="mt-3 rounded-lg border border-emerald-200
-                   bg-emerald-50 p-3"
+            class="mt-3 rounded-lg border border-[var(--color-primary-tint-border)]
+                   bg-[var(--color-primary-tint)] p-3"
         >
-            <div class="mb-2 text-xs font-bold text-emerald-700">
+            <div class="mb-2 text-xs font-bold text-[var(--color-primary)]">
                 Signature selected
             </div>
 
@@ -485,7 +481,7 @@
 
             </div>
 
-            <p class="mt-2 text-xs text-emerald-700">
+            <p class="mt-2 text-xs text-[var(--color-primary)]">
                 Click <strong>Save Setting</strong> or
                 <strong>Update Setting</strong> to store this signature.
             </p>
@@ -517,7 +513,7 @@
 
     @script
         <script>
-            {{-- swal:success and swal:error are handled globally by <x-shared.sweet-alert-handler /> --}}
+            {{-- swal:success and swal:error are handled globally by resources/js/shared/sweet-alert-handler.js --}}
 
             $wire.on('confirm-update', () => {
                 Swal.fire({
@@ -525,8 +521,8 @@
                     text: "Do you want to update this setting?",
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonColor: '#0B2A5B',
-                    cancelButtonColor: '#D79B10',
+                    confirmButtonColor: 'var(--color-primary)',
+                    cancelButtonColor: 'var(--color-accent)',
                     confirmButtonText: 'Yes, update it!'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -542,8 +538,8 @@
                     text: "You won't be able to revert this!",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#0B2A5B',
-                    cancelButtonColor: '#D79B10',
+                    confirmButtonColor: 'var(--color-primary)',
+                    cancelButtonColor: 'var(--color-accent)',
                     confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                     if (result.isConfirmed) {

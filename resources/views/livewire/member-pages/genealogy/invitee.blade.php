@@ -96,7 +96,7 @@
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" /></svg>
             </span>
             <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search member name..."
-                class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-9 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]/20">
+                class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-9 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
             @if (filled($search))
                 <button type="button" wire:click="clearSearch" title="Clear search" class="absolute inset-y-0 right-3 flex items-center text-slate-400 transition hover:text-slate-600">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -114,11 +114,11 @@
 
         <div class="flex items-center gap-3">
             <button wire:click="setViewMode('generation')"
-                class="view-btn rounded-lg px-4 py-2 text-sm font-semibold transition-all {{ $viewMode === 'generation' ? 'bg-[#0C2C6B] text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-[#0C2C6B]' }}">
+                class="view-btn rounded-lg px-4 py-2 text-sm font-semibold transition-all {{ $viewMode === 'generation' ? 'bg-[var(--color-primary)] text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-[var(--color-primary)]' }}">
                 Generation List
             </button>
             <button wire:click="setViewMode('tree')"
-                class="view-btn rounded-lg px-4 py-2 text-sm font-semibold transition-all {{ $viewMode === 'tree' ? 'bg-[#0C2C6B] text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-[#0C2C6B]' }}">
+                class="view-btn rounded-lg px-4 py-2 text-sm font-semibold transition-all {{ $viewMode === 'tree' ? 'bg-[var(--color-primary)] text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-[var(--color-primary)]' }}">
                 Visual Tree
             </button>
         </div>
@@ -127,14 +127,14 @@
         <div x-show="$wire.viewMode === 'tree'" x-cloak class="flex flex-wrap items-center gap-2">
             @if (! empty($tree))
                 <button type="button" wire:click="exportTreeExcel" wire:loading.attr="disabled" wire:target="exportTreeExcel"
-                    class="inline-flex items-center gap-2 rounded-lg border border-[#0C2C6B] bg-white px-4 py-2 text-xs font-semibold text-[#0C2C6B] shadow-sm transition hover:bg-slate-50 disabled:opacity-50">
+                    class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-primary)] bg-white px-4 py-2 text-xs font-semibold text-[var(--color-primary)] shadow-sm transition hover:bg-slate-50 disabled:opacity-50">
                     <span wire:loading.remove wire:target="exportTreeExcel">&#128424; Print (Excel)</span>
                     <span wire:loading wire:target="exportTreeExcel">Preparing...</span>
                 </button>
 
                 <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2 py-1.5 shadow-sm">
                     <button type="button" @click="zoomOut()" title="Zoom out" aria-label="Zoom out" class="{{ $btn }}">−</button>
-                    <span class="min-w-[44px] text-center text-xs font-semibold text-slate-600" x-text="Math.round(scale * 100) + '%'"></span>
+                    <span class="min-w-[44px] text-center text-xs font-semibold text-slate-600" x-text="Math.round(($data.scale ?? 1) * 100) + '%'"></span>
                     <button type="button" @click="zoomIn()" title="Zoom in" aria-label="Zoom in" class="{{ $btn }}">+</button>
                     <button type="button" @click="fitTree()" title="Reset view" aria-label="Reset view" class="{{ $btn }}">↺</button>
                     <button type="button" @click="toggleFullscreen()" title="Enter fullscreen" aria-label="Enter fullscreen" class="{{ $btn }}">⛶</button>
@@ -202,7 +202,7 @@
                 <div x-show="isFullscreen" x-cloak
                     class="absolute right-5 top-5 z-50 flex items-center gap-2 rounded-xl border border-slate-200 bg-white/95 px-3 py-2 shadow-lg backdrop-blur">
                     <button type="button" @click="zoomOut()" title="Zoom out" aria-label="Zoom out" class="{{ $btn }}">−</button>
-                    <span class="min-w-[44px] text-center text-xs font-semibold text-slate-600" x-text="Math.round(scale * 100) + '%'"></span>
+                    <span class="min-w-[44px] text-center text-xs font-semibold text-slate-600" x-text="Math.round(($data.scale ?? 1) * 100) + '%'"></span>
                     <button type="button" @click="zoomIn()" title="Zoom in" aria-label="Zoom in" class="{{ $btn }}">+</button>
                     <button type="button" @click="fitTree()" title="Reset view" aria-label="Reset view" class="{{ $btn }}">↺</button>
                     <button type="button" @click="toggleFullscreen()" title="Exit fullscreen" aria-label="Exit fullscreen" class="{{ $btn }}">⊗</button>

@@ -1,201 +1,487 @@
 /* =========================================================
-   TAILWIND
+   TAILWIND + THIRD-PARTY
 ========================================================= */
 
 @import "tailwindcss";
-/* =========================================================
-   THIRD-PARTY LIBRARIES
-========================================================= */
-
 @import "flatpickr/dist/flatpickr.min.css";
-
-/* SweetAlert2 — brand palette alignment */
-@import "./shared/sweet-alert.css";
+@import "./base/sweet-alert.css";
 
 
 /* =========================================================
-   CUSTOM UTILITIES
+   GLOBAL PALETTE — the only place brand colors are defined.
+
+      Navy Blue    #092F78   -> structure, headings, dark panels
+      Royal Blue   #1260B0   -> links, secondary fills, gradients
+      Gold Yellow  #F5C400   -> primary call-to-action, rules
+
+   The palette is strictly navy + royal blue + gold. There is no
+   green in the system: the "accent" tokens below are a blue
+   alias so older markup that still says accent keeps rendering
+   in the brand palette.
+
+   Change a value here and every button / accent / chart /
+   border that uses the tokens below updates with it.
 ========================================================= */
 
-/* Button base utility */
+:root {
+    /* ---- PRIMARY (navy) ---- */
+    --brand-primary:             #092F78;
+    --brand-primary-rgb:         9 47 120;
+    --brand-primary-mid:         #1260B0;
+    --brand-primary-mid-rgb:     18 96 176;
+    --brand-primary-hover:       #0B3F92;
+    --brand-primary-dark:        #072456;
+    --brand-primary-dark-rgb:    7 36 86;
+    --brand-primary-darker:      #041A40;
+    --brand-primary-darker-rgb:  4 26 64;
+    --brand-primary-light:       #3A82CE;
+    --brand-primary-light-rgb:   58 130 206;
+    --brand-primary-tint:        #EDF3FB;
+    --brand-primary-tint-border: #D3E2F4;
+
+    /* ---- ACCENT (royal blue — alias of the navy family) ---- */
+    --brand-accent:             #1260B0;
+    --brand-accent-rgb:         18 96 176;
+    --brand-accent-hover:       #0B3F92;
+    --brand-accent-dark:        #092F78;
+    --brand-accent-dark-rgb:    9 47 120;
+    --brand-accent-darker:      #072456;
+    --brand-accent-darker-rgb:  7 36 86;
+    --brand-accent-light:       #3A82CE;
+    --brand-accent-light-rgb:   58 130 206;
+    --brand-accent-bright:      #F5C400;
+    --brand-accent-bright-rgb:  245 196 0;
+    --brand-accent-tint:        #EDF3FB;
+    --brand-accent-tint-border: #D3E2F4;
+
+    /* ---- GOLD (call-to-action) ---- */
+    --brand-gold:               #F5C400;
+    --brand-gold-rgb:           245 196 0;
+    --brand-gold-hover:         #DEB100;
+    --brand-gold-dark:          #C09600;
+    --brand-gold-darker:        #8F6F00;
+    --brand-gold-light:         #FFD633;
+    --brand-gold-light-rgb:     255 214 51;
+    --brand-gold-tint:          #FEF7D9;
+    --brand-gold-tint-border:   #F6E6A1;
+
+    /* ---- SPIN-THE-WHEEL SEGMENTS (alternating palette) ---- */
+    --wheel-1: var(--brand-primary);
+    --wheel-2: var(--brand-gold);
+    --wheel-3: var(--brand-primary-mid);
+    --wheel-4: var(--brand-primary-darker);
+    --wheel-5: var(--brand-primary-hover);
+    --wheel-6: var(--brand-gold-dark);
+    --wheel-7: var(--brand-primary-light);
+    --wheel-8: var(--brand-gold-light);
+}
+
+@theme {
+    --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+
+    /* Semantic tokens — every utility and var() in the app points here. */
+    --color-primary:              var(--brand-primary);
+    --color-primary-mid:          var(--brand-primary-mid);
+    --color-primary-hover:        var(--brand-primary-hover);
+    --color-primary-dark:         var(--brand-primary-dark);
+    --color-primary-darker:       var(--brand-primary-darker);
+    --color-primary-light:        var(--brand-primary-light);
+    --color-primary-tint:         var(--brand-primary-tint);
+    --color-primary-tint-border:  var(--brand-primary-tint-border);
+
+    --color-accent:               var(--brand-accent);
+    --color-accent-hover:         var(--brand-accent-hover);
+    --color-accent-dark:          var(--brand-accent-dark);
+    --color-accent-darker:        var(--brand-accent-darker);
+    --color-accent-light:         var(--brand-accent-light);
+    --color-accent-bright:        var(--brand-accent-bright);
+    --color-accent-tint:          var(--brand-accent-tint);
+    --color-accent-tint-border:   var(--brand-accent-tint-border);
+    --color-accent-foreground:    #FFFFFF;
+
+    /* Gold — the action color. */
+    --color-gold:                 var(--brand-gold);
+    --color-gold-hover:           var(--brand-gold-hover);
+    --color-gold-dark:            var(--brand-gold-dark);
+    --color-gold-darker:          var(--brand-gold-darker);
+    --color-gold-light:           var(--brand-gold-light);
+    --color-gold-tint:            var(--brand-gold-tint);
+    --color-gold-tint-border:     var(--brand-gold-tint-border);
+
+    /* Plain names for the two blues used in new layout markup. */
+    --color-navy:                 var(--brand-primary);
+    --color-royal:                var(--brand-primary-mid);
+
+    /* Legacy aliases — kept so older utilities/classes keep working and
+       also inherit the palette above. */
+    --color-brand-navy:       var(--color-primary);
+    --color-brand-navy-dark:  var(--color-primary-dark);
+    --color-brand-navy-light: var(--color-primary-light);
+
+    --color-brand-blue:       var(--color-primary);
+    --color-brand-sky:        var(--color-primary-light);
+
+    --color-brand-green:      var(--color-accent);
+    --color-brand-green-dark: var(--color-accent-dark);
+    --color-brand-lime:       var(--color-accent-light);
+
+    --color-brand-mist:       var(--color-primary-tint);
+
+    --color-brand-gold:       var(--color-gold);
+    --color-brand-gold-light: var(--color-gold-light);
+    --color-brand-gold-dark:  var(--color-gold-dark);
+}
+
+
+/* =========================================================
+   GLOBAL UTILITIES
+========================================================= */
+
+/* Glassmorphism: on photos / dark backgrounds */
+@utility glass {
+    background: linear-gradient(135deg, rgb(255 255 255 / .22), rgb(255 255 255 / .06));
+    border: 1px solid rgb(255 255 255 / .28);
+    backdrop-filter: blur(16px) saturate(160%);
+    box-shadow: 0 8px 32px rgb(var(--brand-primary-darker-rgb) / .25), inset 0 1px 0 rgb(255 255 255 / .35);
+}
+
+/* Glassmorphism: on light backgrounds */
+@utility glass-light {
+    background: linear-gradient(135deg, rgb(255 255 255 / .78), rgb(255 255 255 / .45));
+    border: 1px solid rgb(255 255 255 / .85);
+    backdrop-filter: blur(16px) saturate(160%);
+    box-shadow: 0 8px 32px rgb(var(--brand-primary-rgb) / .10), inset 0 1px 0 #fff;
+}
+
+/* Glassmorphism: primary tint */
+@utility glass-dark {
+    background: linear-gradient(135deg, rgb(var(--brand-primary-rgb) / .85), rgb(var(--brand-primary-darker-rgb) / .7));
+    border: 1px solid rgb(255 255 255 / .15);
+    backdrop-filter: blur(16px) saturate(160%);
+    box-shadow: 0 12px 40px rgb(var(--brand-primary-darker-rgb) / .35), inset 0 1px 0 rgb(255 255 255 / .2);
+}
+
+@utility bg-brand-gradient {
+    background-image: linear-gradient(135deg, var(--color-primary), var(--color-royal));
+}
+
+@utility text-brand-gradient {
+    background-image: linear-gradient(90deg, var(--color-primary), var(--color-royal));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
 @utility btn-base {
     @apply px-4 py-2 rounded-lg font-semibold text-white;
 }
 
-
-/* Form field base utility */
 @utility field-base {
     @apply w-full rounded-xl border border-slate-300
-        px-3.5 py-2.5
-        text-xs sm:px-4 sm:py-3 sm:text-sm
+        px-3.5 py-2.5 text-xs sm:px-4 sm:py-3 sm:text-sm
         outline-none transition
-        focus:border-slate-500
-        focus:ring-4 focus:ring-slate-100;
+        focus:border-primary focus:ring-4 focus:ring-primary/15;
 }
 
 
 /* =========================================================
-   THEME
+   SHARED SECTION BLOCKS (reuse in every landing section)
 ========================================================= */
 
-@theme {
+@layer components {
+    /* Solid navy / light corporate bands instead of photo-glass. */
+    .section-glass {
+        @apply relative overflow-hidden py-20 sm:py-24 lg:py-28;
+        background:
+            radial-gradient(circle at 88% 8%, rgb(var(--brand-primary-rgb) / .10), transparent 42%),
+            radial-gradient(circle at 4% 92%, rgb(var(--brand-accent-rgb) / .07), transparent 40%),
+            #F4F7FC;
+    }
 
-    /* -----------------------------------------------------
-       Font
-    ----------------------------------------------------- */
+    .section-wrap         { @apply relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-12; }
 
-    --font-sans:
-        "Instrument Sans",
-        ui-sans-serif,
-        system-ui,
-        sans-serif;
+    /* Small uppercase label above a heading — green text, gold rule. */
+    .section-tag {
+        @apply inline-flex items-center gap-2.5 text-[11px] font-black uppercase tracking-[0.18em] text-accent sm:text-xs;
+    }
+    .section-tag::before {
+        content: "";
+        display: block;
+        width: 28px;
+        height: 4px;
+        border-radius: 9999px;
+        background: var(--color-gold);
+    }
 
+    .section-title        { @apply text-2xl font-extrabold leading-[1.12] tracking-tight text-primary sm:text-3xl md:text-4xl; }
+    .section-title-accent { @apply text-primary-mid; }
+    .section-lead         { @apply mt-4 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg; }
 
-    /* -----------------------------------------------------
-       Brand Colors
-    ----------------------------------------------------- */
+    .icon-box             { @apply flex h-14 w-14 items-center justify-center rounded-xl bg-primary text-white shadow-sm; }
 
-    --color-brand-navy: #0B2A5B;
-    --color-brand-navy-dark: #071D3F;
-    --color-brand-navy-light: #163E7A;
+    .glass-card           { @apply rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-primary-tint-border hover:shadow-xl; }
+    .card-title           { @apply mt-6 text-xl font-bold text-primary; }
+    .card-text            { @apply mt-3 text-sm leading-relaxed text-slate-600 sm:text-base; }
 
-    --color-brand-gold: #D4A017;
-    --color-brand-gold-light: #E8B923;
-    --color-brand-gold-dark: #A87800;
-
-
-    /* -----------------------------------------------------
-       Accent
-    ----------------------------------------------------- */
-
-    --color-accent: var(--color-brand-gold);
-    --color-accent-content: var(--color-brand-navy);
-    --color-accent-foreground: #FFFFFF;
+    /* ---- Action buttons ---- */
+    .btn-gold {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg bg-gold px-6 py-3
+            text-sm font-extrabold text-primary shadow-sm transition
+            hover:bg-gold-light hover:shadow-md;
+    }
+    .btn-navy {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3
+            text-sm font-extrabold text-white shadow-sm transition hover:bg-primary-hover;
+    }
+    .btn-outline-navy {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg border-2 border-primary/25 bg-white px-6 py-3
+            text-sm font-extrabold text-primary transition hover:border-primary hover:bg-primary-tint;
+    }
+    .btn-outline-light {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg border-2 border-white/40 bg-transparent px-6 py-3
+            text-sm font-extrabold text-white transition hover:border-white hover:bg-white/10;
+    }
 }
 
 
 /* =========================================================
-   ROOT ADMIN
+   TABLE ACTION BUTTONS — one icon language for every table
+
+   Every row action (view / edit / delete / password / review …)
+   renders through <x-action-btn>, so the same 34px square, the
+   same 1.8px outline icon and the same tint-per-action are used
+   in the members, users, settings, post and transaction tables.
 ========================================================= */
 
-/* Home */
-@import "./components/home/hero.css";
-@import "./components/home/details.css";
+.tbl-act {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid #E3E9F2;
+    background: #FFFFFF;
+    color: var(--color-primary);
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgb(var(--brand-primary-rgb) / .06);
+    transition: background .16s ease, color .16s ease, border-color .16s ease,
+        box-shadow .16s ease, transform .16s ease;
+}
 
+.tbl-act:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px -8px rgb(var(--brand-primary-rgb) / .55);
+}
 
-/* Landing Page */
-@import "./livewire/landing-page/testimonials.css";
-@import "./livewire/landing-page/how-it-works.css";
-@import "./livewire/landing-page/about.css";
-@import "./livewire/landing-page/new.css";
-@import "./livewire/landing-page/contact.css";
-@import "./livewire/landing-page/team.css";
+.tbl-act:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgb(var(--brand-primary-rgb) / .16);
+}
+
+.tbl-act:disabled,
+.tbl-act[disabled] {
+    opacity: .45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.tbl-act-icon {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+}
+
+.tbl-act-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .02em;
+    white-space: nowrap;
+}
+
+.tbl-act:has(.tbl-act-label) {
+    width: auto;
+    padding: 0 12px;
+}
+
+/* ---- Action tones (navy = view, gold = edit, red = destructive) ---- */
+
+.tbl-act--view     { color: var(--color-primary); background: var(--color-primary-tint); border-color: var(--color-primary-tint-border); }
+.tbl-act--view:hover { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+
+.tbl-act--edit     { color: var(--color-gold-darker); background: var(--color-gold-tint); border-color: var(--color-gold-tint-border); }
+.tbl-act--edit:hover { background: var(--color-gold); color: #14264e; border-color: var(--color-gold); }
+
+.tbl-act--delete   { color: #B42318; background: #FEF3F2; border-color: #FBD5D2; }
+.tbl-act--delete:hover { background: #B42318; color: #fff; border-color: #B42318; }
+
+.tbl-act--key      { color: var(--color-primary); background: #FFFFFF; border-color: var(--color-primary-tint-border); }
+.tbl-act--key:hover { background: var(--color-primary-tint); }
+
+.tbl-act--access   { color: var(--color-primary-mid); background: #EDF3FB; border-color: var(--color-primary-tint-border); }
+.tbl-act--access:hover { background: var(--color-primary-mid); color: #fff; border-color: var(--color-primary-mid); }
+
+.tbl-act--ledger   { color: var(--color-primary); background: #FFFFFF; border-color: var(--color-primary-tint-border); }
+.tbl-act--ledger:hover { background: var(--color-primary-tint); }
+
+.tbl-act--approve  { color: #fff; background: var(--color-primary); border-color: var(--color-primary); }
+.tbl-act--approve:hover { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+
+.tbl-act--reject   { color: #B42318; background: #FEF3F2; border-color: #FBD5D2; }
+.tbl-act--reject:hover { background: #B42318; color: #fff; border-color: #B42318; }
+
+.tbl-act--review   { color: var(--color-primary); background: var(--color-primary-tint); border-color: var(--color-primary-tint-border); }
+.tbl-act--review:hover { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+
+.tbl-act--resubmit { color: var(--color-gold-darker); background: var(--color-gold-tint); border-color: var(--color-gold-tint-border); }
+.tbl-act--resubmit:hover { background: var(--color-gold); color: #14264e; border-color: var(--color-gold); }
+
+.tbl-act--download { color: var(--color-primary); background: var(--color-primary-tint); border-color: var(--color-primary-tint-border); }
+.tbl-act--download:hover { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+
+.tbl-act--withdraw { color: var(--color-primary); background: #FFFFFF; border-color: var(--color-primary-tint-border); }
+.tbl-act--withdraw:hover { background: var(--color-primary-tint); }
 
 
 /* =========================================================
-   MEMBER PAGES
+   STYLESHEET IMPORTS
 ========================================================= */
 
-/* ---------------------------------------------------------
-   Member Page Layout
---------------------------------------------------------- */
+/* Layout */
+@import "./layout/sidebar.css";
+@import "./layout/shell.css";
 
-@import "./pages/member-pages/sidebar.css";
-@import "./pages/member-pages/masterlist.css";
-@import "./pages/member-pages/genealogy.css";
-@import "./pages/member-pages/genealogy/visual-tree.css";
-@import "./pages/member-pages/genealogy/generation-list.css";
-@import "./pages/member-pages/genealogy/board-member.css";
+/* Auth */
+@import "./auth/auth.css";
 
+/* Landing page */
+@import "./landing/hero.css";
+@import "./landing/details.css";
+@import "./landing/home-sections.css";
+@import "./landing/testimonials.css";
+@import "./landing/how-it-works.css";
+@import "./landing/about.css";
+@import "./landing/news.css";
+@import "./landing/contact.css";
+@import "./landing/team.css";
+@import "./landing/consistency.css";
 
-/* ---------------------------------------------------------
-   Member Page Components — Dashboard
---------------------------------------------------------- */
+/* Member pages */
+@import "./member/masterlist.css";
+@import "./member/genealogy.css";
+@import "./member/genealogy/visual-tree.css";
+@import "./member/genealogy/generation-list.css";
+@import "./member/genealogy/board-member.css";
+@import "./member/dashboard/members.css";
+@import "./member/dashboard/overview.css";
 
-@import "./components/member-pages/dashboard/members.css";
-@import "./components/member-pages/dashboard/overview.css";
+/* Admin: masterlist / post */
+@import "./admin/masterlist/overview.css";
+@import "./admin/masterlist/members.css";
+@import "./admin/masterlist/inquiries.css";
+@import "./admin/masterlist/branches.css";
+@import "./admin/masterlist/benefits.css";
+@import "./admin/post/overview.css";
+@import "./admin/post/news-updates.css";
+@import "./admin/post/testimonials.css";
+@import "./admin/masterlist/satellite-modal.css";
 
+/* Member: profile / satellite / tree */
+@import "./member/my-profile/my-profile.css";
+@import "./member/satellite/satellite-members-self.css";
+@import "./member/genealogy/tree.css";
 
-/* ---------------------------------------------------------
-   Member Page Components — Masterlist
---------------------------------------------------------- */
+/* Admin: shell */
+@import "./admin/shell/masterlist.css";
+@import "./admin/shell/post.css";
+@import "./admin/shell/report-settings.css";
+@import "./admin/shell/transaction-list.css";
+@import "./admin/admin-users.css";
 
-@import "./components/member-pages/masterlist/overview.css";
-@import "./components/member-pages/masterlist/members.css";
-@import "./components/member-pages/masterlist/inquires.css";
-@import "./components/member-pages/masterlist/branches.css";
-@import "./components/member-pages/masterlist/benefits.css";
+/* Admin: report settings */
+@import "./admin/report-settings/overview.css";
+@import "./admin/report-settings/general.css";
+@import "./admin/report-settings/users-accounts.css";
+@import "./admin/report-settings/reports.css";
 
+/* Shared pages */
+@import "./shared/dashboard.css";
+@import "./shared/my-profile.css";
+@import "./shared/withdrawals.css";
 
-/* ---------------------------------------------------------
-   Member Page Components — Post
---------------------------------------------------------- */
-
-@import "./components/member-pages/post/overview.css";
-@import "./components/member-pages/post/news-updates.css";
-@import "./components/member-pages/post/testimonials.css";
-
-
-/* ---------------------------------------------------------
-   Member Page Components — Report & Settings
---------------------------------------------------------- */
-
-@import "./components/member-pages/report-settings/overview.css";
-@import "./components/member-pages/report-settings/general.css";
-@import "./components/member-pages/report-settings/user-accounts.css";
-@import "./components/member-pages/report-settings/reports.css";
-
-/* ---------------------------------------------------------
-   Admin Page Components — Masterlist
---------------------------------------------------------- */
-
-@import "./components/admin-pages/masterlist/members-modals/satellite-modal.css";
-
-
-/* ---------------------------------------------------------
-   Member Page Components — My Profile
---------------------------------------------------------- */
-
-@import "./livewire/member-pages/my-profile/my-profile.css";
-@import "./livewire/member-pages/satellite/satellite-members-self.css";
-
-
-/* ---------------------------------------------------------
-   Member Page Components — Genealogy
---------------------------------------------------------- */
-
-@import "./livewire/member-pages/genealogy/genealogy.css";
+/* TRIFECTA redesign layer — aurora glass system.
+   Loaded last so its tokens, shells and overrides win. */
+@import "./trifecta/aurora.css";
 
 
 /* =========================================================
-   ADMIN PAGES
+   PAGE HEADER BANDS (dashboard, admin + member shells)
+
+   One rule for every page title band so the logged-in app
+   reads as the same brand as the landing page: a navy bar
+   finished with a gold rule along its bottom edge.
 ========================================================= */
 
-/* ---------------------------------------------------------
-   Admin Page Layout
---------------------------------------------------------- */
+.dashboard-header-title,
+.masterlist-header-title,
+.post-header-title,
+.report-settings-header-title,
+.my-profile-header-title,
+.genealogy-header-title {
+    position: relative;
+    background: var(--color-primary);
+}
 
-@import "./pages/admin-pages/masterlist.css";
-@import "./pages/admin-pages/post.css";
-@import "./pages/admin-pages/report-settings.css";
+.dashboard-header-title::after,
+.masterlist-header-title::after,
+.post-header-title::after,
+.report-settings-header-title::after,
+.my-profile-header-title::after,
+.genealogy-header-title::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-gold), var(--color-gold-light), var(--color-gold));
+}
 
+.dashboard-header-title h1,
+.masterlist-header-title h1,
+.post-header-title h1,
+.report-settings-header-title h1,
+.my-profile-header-title h1,
+.genealogy-header-title h1 {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #fff;
+}
 
-/* ---------------------------------------------------------
-   Admin Page Components
---------------------------------------------------------- */
+/* Cards: hairline border + gold cap, matching the landing cards. */
+.dashboard-card,
+.withdrawals-card,
+.tab-card {
+    border: 1px solid #E3E9F2;
+    border-top: 3px solid var(--color-gold);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgb(var(--brand-primary-rgb) / .06);
+}
 
-@import "./livewire/admin-pages/admin-users.css";
-@import "./livewire/admin-pages/report-settings/overview.css";
-@import "./livewire/admin-pages/report-settings/general.css";
-@import "./livewire/admin-pages/report-settings/users-accounts.css";
-@import "./livewire/admin-pages/report-settings/reports.css";
-
-
-/* =========================================================
-   SHARE PAGES
-========================================================= */
-
-@import "./pages/share-pages/dashboard.css";
-@import "./pages/share-pages/my-profile.css";
-@import "./pages/share-pages/withdrawals.css";
-
+/* Underline tab bars read as text on a rule, never as pills: drop any
+   inherited rounding/fill from the older button-styled tabs. */
+.masterlist-nav-menu a,
+.post-desktop-nav a,
+.report-settings-desktop-nav a,
+.dashboard-tabs a,
+.my-profile-tabs-links a,
+.genealogy-desktop-nav a {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}

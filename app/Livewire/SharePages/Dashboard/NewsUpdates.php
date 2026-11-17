@@ -8,12 +8,14 @@ use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Withdrawal;
 
 class NewsUpdates extends Component
 {
+    use HasTabSkeleton;
     use WithFileUploads;
 
     public $title = '';

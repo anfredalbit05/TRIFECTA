@@ -7,11 +7,13 @@ use App\Models\Ledger;
 use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class Reports extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
     use WithPagination;
 
@@ -181,6 +183,7 @@ class Reports extends Component
                 ]);
             });
     }
+
 
     public function render()
     {

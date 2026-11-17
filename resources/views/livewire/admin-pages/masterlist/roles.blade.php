@@ -15,7 +15,7 @@
         <button
             type="button"
             wire:click="openCreateModal"
-            class="rounded-xl bg-[#0C2C6B] px-4 py-2.5 text-sm font-semibold text-white shadow transition hover:bg-[#09204f]"
+            class="rounded-xl bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white shadow transition hover:bg-[var(--color-primary-dark)]"
         >
             + Add Role
         </button>
@@ -23,7 +23,7 @@
 
     {{-- Flash Message --}}
     @if (session()->has('message'))
-        <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+        <div class="mb-4 rounded-xl border border-[var(--color-primary-tint-border)] bg-[var(--color-primary-tint)] p-4 text-sm text-[var(--color-primary)]">
             {{ session('message') }}
         </div>
     @endif
@@ -34,7 +34,7 @@
         {{-- Search --}}
         <div class="relative w-full max-w-sm flex-1 sm:w-auto">
 
-            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                         stroke-linecap="round"
@@ -49,7 +49,7 @@
                 type="text"
                 wire:model.live.debounce.300ms="search"
                 placeholder="Search roles..."
-                class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm shadow-sm transition focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm shadow-sm transition focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
             >
         </div>
 
@@ -59,7 +59,7 @@
             {{-- Date Range --}}
             <div wire:ignore class="relative w-full sm:w-72">
 
-                <span class="pointer-events-none absolute inset-y-0 left-3 z-10 flex items-center text-slate-400">
+                <span class="pointer-events-none absolute inset-y-0 left-3 z-10 flex items-center text-slate-500">
                     📅
                 </span>
 
@@ -67,7 +67,7 @@
                     type="text"
                     id="roleDateRange"
                     readonly
-                    class="date-range-input w-full cursor-pointer rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-center text-sm font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                    class="date-range-input w-full cursor-pointer rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-center text-sm font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                     placeholder="Select date range"
                 >
             </div>
@@ -125,7 +125,7 @@
 
         <table class="w-full border-collapse text-left">
 
-            <thead class="bg-[#0C2C6B] text-xs uppercase tracking-wider text-white">
+            <thead class="bg-[var(--color-primary)] text-xs uppercase tracking-wider text-white">
                 <tr>
                     <th class="px-4 py-3">#</th>
                     <th class="px-4 py-3">Role Name</th>
@@ -166,7 +166,7 @@
 
                             @if ((bool) $role->status)
 
-                                <span class="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                                <span class="inline-flex rounded-full bg-[var(--color-primary-tint)] px-3 py-1 text-xs font-semibold text-[var(--color-primary)]">
                                     Active
                                 </span>
 
@@ -186,24 +186,14 @@
                             <div class="flex justify-center gap-2">
 
                                 {{-- Edit --}}
-                                <button
-                                    type="button"
+                                <x-action-btn icon="edit" tone="edit"
                                     wire:click="editRole({{ $role->RoleID }})"
-                                    title="Update Role"
-                                    class="inline-flex items-center justify-center rounded-lg bg-[#0C2C6B] px-3 py-2 text-xs font-semibold text-white shadow transition hover:bg-[#09204f]"
-                                >
-                                    ✏️
-                                </button>
+                                    title="Update Role" />
 
                                 {{-- Delete --}}
-                                <button
-                                    type="button"
+                                <x-action-btn icon="delete" tone="delete"
                                     wire:click="confirmDeleteRole({{ $role->RoleID }})"
-                                    title="Delete Role"
-                                    class="inline-flex items-center justify-center rounded-lg border border-amber-400 bg-amber-500 px-3 py-2 text-xs font-semibold text-white shadow transition hover:bg-amber-600"
-                                >
-                                    🗑️
-                                </button>
+                                    title="Delete Role" />
 
                             </div>
 
@@ -235,7 +225,7 @@
                     wire:click="previousPage"
                     wire:loading.attr="disabled"
                     @disabled($roles->onFirstPage())
-                    class="rounded-lg bg-[#D79B10] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                    class="rounded-lg bg-[var(--color-accent)] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
                 >
                     Previous
                 </button>
@@ -249,7 +239,7 @@
                     wire:click="nextPage"
                     wire:loading.attr="disabled"
                     @disabled(!$roles->hasMorePages())
-                    class="rounded-lg bg-[#0C2C6B] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                    class="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
                 >
                     Next
                 </button>
@@ -268,14 +258,14 @@
             <div class="my-8 w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl">
 
                 {{-- Modal Header --}}
-                <div class="flex items-center justify-between bg-[#0C2C6B] px-6 py-4 text-white">
+                <div class="flex items-center justify-between bg-[var(--color-primary)] px-6 py-4 text-white">
 
                     <div>
                         <h3 class="text-lg font-bold">
                             {{ $role_id ? 'Edit Role' : 'Add New Role' }}
                         </h3>
 
-                        <p class="text-xs text-blue-100">
+                        <p class="text-xs text-[var(--color-primary-tint)]">
                             Enter the role details below.
                         </p>
                     </div>
@@ -312,7 +302,7 @@
                                 required
                                 maxlength="100"
                                 placeholder="Enter role name"
-                                class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                                class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                             >
 
                             @error('rolename')
@@ -338,7 +328,7 @@
                                 wire:model="description"
                                 rows="4"
                                 placeholder="Enter role description (optional)"
-                                class="w-full resize-y rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                                class="w-full resize-y rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                             ></textarea>
 
                             @error('description')
@@ -362,7 +352,7 @@
                             <select
                                 id="role-status"
                                 wire:model="status"
-                                class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                                class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                             >
                                 <option value="1">Active</option>
                                 <option value="0">Inactive</option>
@@ -393,7 +383,7 @@
                             type="submit"
                             wire:loading.attr="disabled"
                             wire:target="saveRole"
-                            class="rounded-lg bg-[#0C2C6B] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#09204f] disabled:opacity-50"
+                            class="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
                         >
 
                             <span wire:loading.remove wire:target="saveRole">
@@ -421,9 +411,22 @@
         <script>
 
             // Date Range Picker
-            const dateInput = $wire.$el.querySelector('#roleDateRange');
+            const initRoleDateRange = () => {
+                // Lazy components run this block before Livewire morphs the
+                // real markup in, so the input is not in the DOM on the first run.
+                const dateInput = document.getElementById('roleDateRange');
 
-            if (dateInput && typeof flatpickr !== 'undefined') {
+                if (!dateInput) {
+                    return false;
+                }
+
+                if (dateInput._flatpickr) {
+                    return true;
+                }
+
+                if (typeof flatpickr === 'undefined') {
+                    return false;
+                }
 
                 const picker = flatpickr(dateInput, {
 
@@ -498,7 +501,21 @@
                     picker.clear();
                 });
 
-            }
+                return true;
+            };
+
+            initRoleDateRange();
+
+            // Finish the job once Livewire has morphed the lazy component in.
+            const stopWaitingForRoleDateRange = Livewire.hook('morphed', ({ component }) => {
+                if (component.id !== $wire.$id) {
+                    return;
+                }
+
+                if (initRoleDateRange()) {
+                    stopWaitingForRoleDateRange();
+                }
+            });
 
             // Delete Confirmation
             $wire.on('confirm-delete', (event) => {
@@ -513,9 +530,9 @@
 
                     showCancelButton: true,
 
-                    confirmButtonColor: '#0C2C6B',
+                    confirmButtonColor: 'var(--color-primary)',
 
-                    cancelButtonColor: '#D79B10',
+                    cancelButtonColor: 'var(--color-accent)',
 
                     confirmButtonText: 'Yes, delete it!',
 

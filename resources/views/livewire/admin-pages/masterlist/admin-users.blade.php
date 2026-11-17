@@ -178,58 +178,34 @@
                                 <div class="au-actions">
 
                                     @if (auth()->user()->RoleID == 1)
-                                        <button wire:click="openAccessModal({{ $user->UserID }})" title="User Access"
-                                            class="au-action-btn au-action-blue">
-                                            <svg class="au-icon" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                            </svg>
-                                        </button>
+                                        <x-action-btn icon="access" tone="access"
+                                            wire:click="openAccessModal({{ $user->UserID }})"
+                                            title="User Access" />
                                     @endif
 
                                     @if ($this->canRead)
-                                        <button wire:click="viewUser({{ $user->UserID }})" title="View"
-                                            class="au-action-btn au-action-emerald">
-                                            <svg class="au-icon" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                        </button>
+                                        <x-action-btn icon="view" tone="view"
+                                            wire:click="viewUser({{ $user->UserID }})"
+                                            title="View" />
                                     @endif
 
                                     @if ($this->canUpdate)
-                                        <button wire:click="editUser({{ $user->UserID }})" title="Edit"
-                                            class="au-action-btn au-action-amber">
-                                            <svg class="au-icon" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                        </button>
+                                        <x-action-btn icon="edit" tone="edit"
+                                            wire:click="editUser({{ $user->UserID }})"
+                                            title="Edit" />
                                     @endif
 
                                     {{-- SET NEW PASSWORD --}}
                                     @if ($this->canUpdate)
-                                        <button wire:click="promptUserPasswordReset({{ $user->UserID }})"
-                                            title="Set New Password"
-                                            class="au-action-password">
-                                            🔑
-                                        </button>
+                                        <x-action-btn icon="key" tone="key"
+                                            wire:click="promptUserPasswordReset({{ $user->UserID }})"
+                                            title="Set New Password" />
                                     @endif
 
                                     @if ($this->canDelete)
-                                        <button wire:click="confirmDelete({{ $user->UserID }})" title="Delete"
-                                            class="au-action-btn au-action-rose">
-                                            <svg class="au-icon" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
+                                        <x-action-btn icon="delete" tone="delete"
+                                            wire:click="confirmDelete({{ $user->UserID }})"
+                                            title="Delete" />
                                     @endif
 
                                     {{-- ===============================
@@ -291,9 +267,8 @@
                     </span>
                 @else
                     <button wire:click="previousPage" wire:loading.attr="disabled"
-                        class="au-page-btn"
-                        style="background-color: #D79B10;" onmouseover="this.style.backgroundColor='#c58d0f'"
-                        onmouseout="this.style.backgroundColor='#D79B10'">
+                        class="au-page-btn bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)]"
+                        onmouseout="this.style.backgroundColor='var(--color-accent)'">
                         Previous
                     </button>
                 @endif
@@ -304,9 +279,8 @@
 
                 @if ($users->hasMorePages())
                     <button wire:click="nextPage" wire:loading.attr="disabled"
-                        class="au-page-btn"
-                        style="background-color: #0C2C6B;" onmouseover="this.style.backgroundColor='#0a2559'"
-                        onmouseout="this.style.backgroundColor='#0C2C6B'">
+                        class="au-page-btn bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)]"
+                        onmouseout="this.style.backgroundColor='var(--color-primary)'">
                         Next
                     </button>
                 @else
@@ -325,7 +299,7 @@
          WITHDRAWAL APPROVAL MODAL
     ===================================================== --}}    @if ($isWithdrawalModalOpen && $selectedWithdrawalUser && $selectedWithdrawal)
         {{-- Same design as the Transaction List withdrawal review modal:
-             navy sections, gold captions, release breakdown, actions below. --}}
+             primary sections, accent captions, release breakdown, actions below. --}}
         <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm">
             <div class="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
 
@@ -335,16 +309,16 @@
                 <div class="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
                     <div>
                         <div class="flex items-center gap-2">
-                            <h2 class="text-xl font-extrabold text-[#0B2A5B]">
+                            <h2 class="text-xl font-extrabold text-[var(--color-primary)]">
                                 Withdrawal Review
                             </h2>
                             @if ((int) ($selectedWithdrawalUser->RoleID ?? 0) === 8)
-                                <span class="inline-flex items-center rounded-full bg-[#D79B10] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                                <span class="inline-flex items-center rounded-full bg-[var(--color-accent)] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
                                     Satellite Member
                                 </span>
                             @else
-                                <span class="inline-flex items-center rounded-full bg-[#0B2A5B] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
-                                    TrueLife Member
+                                <span class="inline-flex items-center rounded-full bg-[var(--color-primary)] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                                    TRIFECTA Member
                                 </span>
                             @endif
                         </div>
@@ -367,15 +341,15 @@
 
                     {{-- MEMBER INFORMATION --}}
                     <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <div class="bg-[#0B2A5B] px-5 py-3">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                        <div class="bg-[var(--color-primary)] px-5 py-3">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">
                                 Member Information
                             </h3>
                         </div>
 
                         <div class="grid grid-cols-1 gap-5 p-5 sm:grid-cols-3">
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Full Name
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -384,7 +358,7 @@
                             </div>
 
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Username
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -393,7 +367,7 @@
                             </div>
 
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Contact Number
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -405,15 +379,15 @@
 
                     {{-- WITHDRAWAL INFORMATION --}}
                     <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <div class="bg-[#0B2A5B] px-5 py-3">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                        <div class="bg-[var(--color-primary)] px-5 py-3">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">
                                 Withdrawal Information
                             </h3>
                         </div>
 
                         <div class="grid grid-cols-1 gap-5 p-5 sm:grid-cols-2 lg:grid-cols-3">
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Withdrawal ID
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -422,7 +396,7 @@
                             </div>
 
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Type
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -431,7 +405,7 @@
                             </div>
 
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Request Status
                                 </p>
                                 <div class="mt-2">
@@ -442,7 +416,7 @@
                             </div>
 
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Withdrawal Method
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -452,7 +426,7 @@
 
                             @if (filled($selectedWithdrawal->bank_name))
                                 <div>
-                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                         Bank Name
                                     </p>
                                     <p class="mt-1 font-bold text-slate-800">
@@ -463,7 +437,7 @@
 
                             @if (filled($selectedWithdrawal->account_name))
                                 <div>
-                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                         Account Name
                                     </p>
                                     <p class="mt-1 font-bold text-slate-800">
@@ -474,7 +448,7 @@
 
                             @if (filled($selectedWithdrawal->account_number))
                                 <div>
-                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                         Account Number
                                     </p>
                                     <p class="mt-1 break-all font-bold text-slate-800">
@@ -484,7 +458,7 @@
                             @endif
 
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Reference No.
                                 </p>
                                 <p class="mt-1 break-all font-bold text-slate-800">
@@ -493,7 +467,7 @@
                             </div>
 
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Requested On
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -505,8 +479,8 @@
 
                     {{-- RELEASE BREAKDOWN --}}
                     <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <div class="bg-[#0B2A5B] px-5 py-3">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                        <div class="bg-[var(--color-primary)] px-5 py-3">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">
                                 Release Breakdown
                             </h3>
                         </div>
@@ -517,7 +491,7 @@
                                     <p class="text-sm font-semibold text-slate-700">
                                         Requested Amount
                                     </p>
-                                    <p class="text-xs text-slate-400">
+                                    <p class="text-xs text-slate-500">
                                         Gross withdrawal request
                                     </p>
                                 </div>
@@ -532,7 +506,7 @@
                                     <p class="text-sm font-semibold text-slate-700">
                                         Withholding Tax (10%)
                                     </p>
-                                    <p class="text-xs text-slate-400">
+                                    <p class="text-xs text-slate-500">
                                         Returned to the member's ledger
                                     </p>
                                 </div>
@@ -544,7 +518,7 @@
 
                             <div class="mt-3 flex items-center justify-between gap-4 rounded-xl bg-slate-50 px-4 py-3">
                                 <div>
-                                    <p class="text-sm font-extrabold text-[#0B2A5B]">
+                                    <p class="text-sm font-extrabold text-[var(--color-primary)]">
                                         Net Amount to Release
                                     </p>
                                     <p class="mt-0.5 text-[11px] text-slate-500">
@@ -552,16 +526,16 @@
                                     </p>
                                 </div>
 
-                                <span class="text-xl font-extrabold text-emerald-600">
+                                <span class="text-xl font-extrabold text-[var(--color-primary)]">
                                     ₱{{ number_format((float) $selectedWithdrawal->amount, 2) }}
                                 </span>
                             </div>
 
-                            <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
-                                <p class="text-xs font-semibold text-blue-800">
+                            <div class="mt-4 rounded-lg border border-[var(--color-primary-tint-border)] bg-[var(--color-primary-tint)] px-4 py-3">
+                                <p class="text-xs font-semibold text-[var(--color-primary-dark)]">
                                     Before You Approve
                                 </p>
-                                <p class="mt-1 text-[11px] leading-relaxed text-blue-700">
+                                <p class="mt-1 text-[11px] leading-relaxed text-[var(--color-primary)]">
                                     Approving releases the net amount above: a wallet debit of
                                     ₱{{ number_format((float) $selectedWithdrawal->requested_amount, 2) }} and ledger
                                     records for the net release and the tax are written immediately.
@@ -585,13 +559,13 @@
                     <div class="flex flex-col gap-3 sm:flex-row">
                         {{-- REJECT --}}
                         <button type="button" wire:click="confirmWithdrawalRejection" wire:loading.attr="disabled"
-                            class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
+                            class="rounded-xl bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] px-6 py-2.5 text-xs font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
                             Reject
                         </button>
 
                         {{-- APPROVE --}}
                         <button type="button" wire:click="confirmWithdrawalApproval" wire:loading.attr="disabled"
-                            class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
+                            class="rounded-xl bg-[var(--color-primary)] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-[var(--color-primary-dark)] disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
                             Approve &amp; Release
                         </button>
                     </div>
@@ -872,7 +846,7 @@
                                     </svg>
                                 </div>
 
-                                <div x-show="openPicker" @click.away="openPicker = false" style="display: none;"
+                                <div x-show="openPicker" @click.away="openPicker = false" x-cloak
                                     class="au-bday-panel">
                                     <div class="au-bday-panel-header">
                                         <span
@@ -973,7 +947,7 @@
                                         </svg>
                                         <svg x-show="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                            class="au-icon" style="display: none;">
+                                            class="au-icon" x-cloak>
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L9.88 9.88" />
                                         </svg>
@@ -1036,7 +1010,7 @@
                                             type="radio"
                                             wire:model.live="positionMode"
                                             value="select"
-                                            class="text-indigo-600 focus:ring-indigo-500"
+                                            class="text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                                         >
                                         <span class="text-sm text-gray-700">
                                             Select Position
@@ -1048,7 +1022,7 @@
                                             type="radio"
                                             wire:model.live="positionMode"
                                             value="custom"
-                                            class="text-indigo-600 focus:ring-indigo-500"
+                                            class="text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                                         >
                                         <span class="text-sm text-gray-700">
                                             Type Position
@@ -1061,7 +1035,7 @@
                                     <select
                                         wire:model="position"
                                         class="w-full rounded-lg border border-gray-300 px-3 py-2
-                                            focus:border-indigo-500 focus:ring-indigo-500"
+                                            focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                                     >
                                         <option value="">Select a position</option>
 
@@ -1090,7 +1064,7 @@
                                         placeholder="Enter a new position"
                                         maxlength="255"
                                         class="w-full rounded-lg border border-gray-300 px-3 py-2
-                                            focus:border-indigo-500 focus:ring-indigo-500"
+                                            focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                                     >
 
                                     @error('customPosition')
@@ -1168,12 +1142,12 @@
                             <thead>
                                 <tr class="au-access-thead-row">
                                     <th class="au-access-th">Module</th>
-                                    <th class="au-access-th-center">⊕ Create</th>
-                                    <th class="au-access-th-center">📥 Retrieve</th>
-                                    <th class="au-access-th-center">✏️ Update</th>
-                                    <th class="au-access-th-center">🗑️ Delete</th>
-                                    <th class="au-access-th-center">🏷️ Status</th>
-                                    <th class="au-access-th-center">🖨️ PrintAll</th>
+                                    <th class="au-access-th-center">Create</th>
+                                    <th class="au-access-th-center">Retrieve</th>
+                                    <th class="au-access-th-center">Update</th>
+                                    <th class="au-access-th-center">Delete</th>
+                                    <th class="au-access-th-center">Status</th>
+                                    <th class="au-access-th-center">Print All</th>
                                 </tr>
                             </thead>
                             <tbody class="au-access-tbody">
@@ -1295,7 +1269,7 @@
 
                     <br><br>
 
-                    <strong style="font-size: 20px; color: #0B2A5B;">
+                    <strong style="font-size: 20px; color: var(--color-primary);">
                         ₱${event.amount}
                     </strong>
 
@@ -1306,11 +1280,11 @@
                     <br><br>
 
                     <div style="
-                        background: #FFF8E7;
-                        border: 1px solid #D79B10;
+                        background: var(--color-accent-tint);
+                        border: 1px solid var(--color-accent);
                         padding: 12px;
                         border-radius: 8px;
-                        color: #0B2A5B;
+                        color: var(--color-primary);
                     ">
                         Type <strong>APPROVE</strong> below to confirm.
                     </div>
@@ -1324,8 +1298,8 @@
                     cancelButtonText: 'Cancel',
 
                     // YOUR PALETTE
-                    confirmButtonColor: '#0B2A5B',
-                    cancelButtonColor: '#D79B10',
+                    confirmButtonColor: 'var(--color-primary)',
+                    cancelButtonColor: 'var(--color-accent)',
 
                     reverseButtons: true,
                     focusCancel: true,
@@ -1363,18 +1337,18 @@
 
                     <br><br>
 
-                    <strong style="font-size: 20px; color: #0B2A5B;">
+                    <strong style="font-size: 20px; color: var(--color-primary);">
                         ₱${event.amount}
                     </strong>
 
                     <br><br>
 
                     <div style="
-                        background: #FFF8E7;
-                        border: 1px solid #D79B10;
+                        background: var(--color-accent-tint);
+                        border: 1px solid var(--color-accent);
                         padding: 12px;
                         border-radius: 8px;
-                        color: #0B2A5B;
+                        color: var(--color-primary);
                     ">
                         Type <strong>REJECT</strong> below to confirm.
                     </div>
@@ -1389,8 +1363,8 @@
                     cancelButtonText: 'Cancel',
 
                     // YOUR PALETTE
-                    confirmButtonColor: '#0B2A5B',
-                    cancelButtonColor: '#D79B10',
+                    confirmButtonColor: 'var(--color-primary)',
+                    cancelButtonColor: 'var(--color-accent)',
 
                     reverseButtons: true,
                     focusCancel: true,
@@ -1427,7 +1401,7 @@
                     text: 'The withdrawal has been successfully approved, released, and deducted from the user wallet.',
 
                     // YOUR PALETTE
-                    confirmButtonColor: '#0B2A5B',
+                    confirmButtonColor: 'var(--color-primary)',
 
                     confirmButtonText: 'OK'
                 });
@@ -1449,7 +1423,7 @@
                         'Something went wrong while approving the withdrawal.',
 
                     // YOUR PALETTE
-                    confirmButtonColor: '#0B2A5B',
+                    confirmButtonColor: 'var(--color-primary)',
 
                     confirmButtonText: 'OK'
                 });
@@ -1478,7 +1452,7 @@
                     html:
                         '<div style="text-align: left;">' +
                             '<p class="au-swal-intro">' +
-                                'Setting a new password for <b style="color: #0B2A5B;">' + name + '</b>.' +
+                                'Setting a new password for <b style="color: var(--color-primary);">' + name + '</b>.' +
                             '</p>' +
 
                             '<div class="au-swal-field">' +
@@ -1494,7 +1468,7 @@
                                             '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />' +
                                             '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />' +
                                         '</svg>' +
-                                        '<svg data-ico="hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="au-icon" style="display: none;">' +
+                                        '<svg data-ico="hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="au-icon" x-cloak>' +
                                             '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L9.88 9.88" />' +
                                         '</svg>' +
                                     '</button>' +
@@ -1514,7 +1488,7 @@
                                             '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />' +
                                             '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />' +
                                         '</svg>' +
-                                        '<svg data-ico="hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="au-icon" style="display: none;">' +
+                                        '<svg data-ico="hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="au-icon" x-cloak>' +
                                             '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L9.88 9.88" />' +
                                         '</svg>' +
                                     '</button>' +
@@ -1525,8 +1499,8 @@
                         '</div>',
                     showCancelButton: true,
                     confirmButtonText: 'Update Password',
-                    confirmButtonColor: '#0C2C6B',
-                    cancelButtonColor: '#D79B10',
+                    confirmButtonColor: 'var(--color-primary)',
+                    cancelButtonColor: 'var(--color-accent)',
                     focusConfirm: false,
                     allowOutsideClick: false,
                     didOpen: (modal) => {
@@ -1616,7 +1590,7 @@
                     icon: 'error',
                     title: 'Password Update Failed',
                     text: event.message || 'Something went wrong while updating the password.',
-                    confirmButtonColor: '#0C2C6B',
+                    confirmButtonColor: 'var(--color-primary)',
                     confirmButtonText: 'OK'
                 });
             });

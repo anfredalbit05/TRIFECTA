@@ -5,10 +5,13 @@ namespace App\Livewire\AdminPages\TransactionList;
 use App\Models\Activation;
 use App\Models\Withdrawal;
 use Illuminate\Support\Facades\DB;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 
 class Overview extends Component
 {
+    use HasTabSkeleton;
+
     public function render()
     {
         return view('livewire.admin-pages.transaction-list.overview', [

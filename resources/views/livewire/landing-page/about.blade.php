@@ -23,7 +23,7 @@
         <span class="about-hero-badge">
             <x-editable-text
                 key="about_hero_badge"
-                :value="$contexts['about_hero_badge'] ?? 'TrueLife Dayongan Solidaritas Social Welfare Services, Inc.'"
+                :value="$contexts['about_hero_badge'] ?? 'TRIFECTA · Health, Wellness & Protection'"
                 tag="span"
                 class="inline-block"
             />
@@ -56,7 +56,7 @@
         <p class="about-hero-description">
             <x-editable-text
                 key="about_hero_description"
-                :value="$contexts['about_hero_description'] ?? 'TRUELIFE DAYONGAN SOLIDARITAS Social Welfare Services and Financial Literacy Inc. is committed to providing affordable community-based protection and financial assistance for Filipino families. Through solidarity, compassion, protection, and hope, we empower communities to build a safer and stronger future.'"
+                :value="$contexts['about_hero_description'] ?? 'TRIFECTA is a community-rooted protection programme built on three simple promises: health, wellness and protection. We help Filipino families prepare for life\'s hardest moments with affordable cover and honest service.'"
                 tag="span"
                 class="block"
             />
@@ -67,9 +67,9 @@
 </section>
 
 <!-- =========================
-     ABOUT DAYONGAN
+     ABOUT TRIFECTA
 ========================= -->
-<section class="py-20 bg-white">
+<section class="about-band bg-white">
     <div class="about-container">
         <div class="about-container-center">
             <span class="about-section-label-gold">
@@ -84,7 +84,7 @@
             <h2 class="about-section-title-dark">
                 <x-editable-text
                     key="about_who_we_are_title"
-                    :value="$contexts['about_who_we_are_title'] ?? 'About DAYONGAN'"
+                    :value="$contexts['about_who_we_are_title'] ?? 'About TRIFECTA'"
                     tag="span"
                     class="inline-block"
                 />
@@ -93,7 +93,7 @@
             <p class="mt-6 text-slate-600 text-lg leading-8">
                 <x-editable-text
                     key="about_who_we_are_text"
-                    :value="$contexts['about_who_we_are_text'] ?? 'DAYONGAN believes that every Filipino family deserves affordable protection, dignity, and hope. Through community cooperation and financial literacy, we provide accessible welfare services that strengthen families during life\'s most difficult moments.'"
+                    :value="$contexts['about_who_we_are_text'] ?? 'TRIFECTA believes that every Filipino family deserves affordable protection, dignity, and hope. Through community cooperation and financial literacy, we provide accessible welfare services that strengthen families during life\'s most difficult moments.'"
                     tag="span"
                     class="block"
                 />
@@ -106,7 +106,7 @@
 <!-- =========================
      DTI REGISTRATION CERTIFICATE
 ========================= -->
-<section class="py-20 bg-white">
+<section class="about-band bg-[#F4F7FC]">
     <div class="about-container">
 
         <!-- Section Header -->
@@ -133,7 +133,7 @@
             <p class="mt-5 max-w-3xl mx-auto text-lg text-slate-600 leading-8">
                 <x-editable-text
                     key="about_dti_description"
-                    :value="$contexts['about_dti_description'] ?? 'TrueLife Dayongan Solidaritas Social Welfare Services is officially registered with the Department of Trade and Industry (DTI). This certificate demonstrates our legal compliance, commitment to transparency, and dedication to providing trusted community-based welfare services for Filipino families.'"
+                    :value="$contexts['about_dti_description'] ?? 'TRIFECTA is officially registered with the Department of Trade and Industry (DTI). This certificate demonstrates our legal compliance, commitment to transparency, and dedication to providing trusted community-based protection for Filipino families.'"
                     tag="span"
                     class="block"
                 />
@@ -147,29 +147,29 @@
             <!-- Information Cards -->
             <div class="grid md:grid-cols-3 gap-5 mb-8">
 
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 text-center">
-                    <p class="text-xs uppercase tracking-widest text-slate-400">
+                <div class="about-fact-card">
+                    <p class="text-xs uppercase tracking-widest text-slate-500">
                         Business Name
                     </p>
-                    <p class="mt-2 font-bold text-[#0B2A5B]">
-                        TRUELIFE
+                    <p class="mt-2 font-bold text-[var(--color-primary)]">
+                        TRIFECTA
                     </p>
                 </div>
 
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 text-center">
-                    <p class="text-xs uppercase tracking-widest text-slate-400">
+                <div class="about-fact-card">
+                    <p class="text-xs uppercase tracking-widest text-slate-500">
                         Registration No.
                     </p>
-                    <p class="mt-2 font-bold text-[#0B2A5B]">
+                    <p class="mt-2 font-bold text-[var(--color-primary)]">
                         8404829
                     </p>
                 </div>
 
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 text-center">
-                    <p class="text-xs uppercase tracking-widest text-slate-400">
+                <div class="about-fact-card">
+                    <p class="text-xs uppercase tracking-widest text-slate-500">
                         Valid Until
                     </p>
-                    <p class="mt-2 font-bold text-[#0B2A5B]">
+                    <p class="mt-2 font-bold text-[var(--color-primary)]">
                         August 06, 2026 to August 06, 2031
                     </p>
                 </div>
@@ -189,7 +189,7 @@
                 <a
                     href="{{ asset('images/dti-certificate.jpg') }}"
                     download
-                    class="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-[#0B2A5B] hover:bg-[#123B78] text-white font-semibold shadow-lg transition">
+                    class="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-[var(--color-primary)] hover:bg-[var(--color-primary-mid)] text-white font-semibold shadow-lg transition">
 
                     <svg xmlns="http://www.w3.org/2000/svg"
                         class="w-5 h-5"
@@ -215,7 +215,7 @@
 <!-- =========================
      VISION & MISSION
 ========================= -->
-<section class="py-20 bg-slate-50">
+<section class="about-band bg-white">
     <div class="about-container">
         <div class="about-vm-grid">
 
@@ -262,7 +262,7 @@
                 <p class="about-vm-text">
                     <x-editable-text
                         key="about_mission_text"
-                        :value="$contexts['about_mission_text'] ?? 'Ang DAYONGAN ay nagsisikap na magbigay ng abot-kaya at nakabatay sa komunidad na proteksyon at mga benepisyo upang matulungan, maprotektahan, at mapatatag ang buhay ng bawat pamilya sa pamamagitan ng diwa ng Pagtutulungan at Pagkakaisa.'"
+                        :value="$contexts['about_mission_text'] ?? 'Ang TRIFECTA ay nagsisikap na magbigay ng abot-kaya at nakabatay sa komunidad na proteksyon at mga benepisyo upang matulungan, maprotektahan, at mapatatag ang buhay ng bawat pamilya sa pamamagitan ng diwa ng Pagtutulungan at Pagkakaisa.'"
                         tag="span"
                         class="block"
                     />
@@ -276,7 +276,7 @@
 <!-- =========================
      CORE VALUES
 ========================= -->
-<section class="py-20 bg-white">
+<section class="about-band bg-[#F4F7FC]">
     <div class="about-container">
 
         <div class="text-center">
@@ -311,6 +311,7 @@
         <div class="about-values-grid">
 
             <div class="about-value-card">
+                <span class="about-value-number">01</span>
                 <div class="about-value-icon-blue">
                     <flux:icon.user-group class="w-8 h-8" />
                 </div>
@@ -323,6 +324,7 @@
             </div>
 
             <div class="about-value-card">
+                <span class="about-value-number">02</span>
                 <div class="about-value-icon-gold">
                     <flux:icon.shield-check class="w-8 h-8" />
                 </div>
@@ -335,6 +337,7 @@
             </div>
 
             <div class="about-value-card">
+                <span class="about-value-number">03</span>
                 <div class="about-value-icon-blue">
                     <flux:icon.home-modern class="w-8 h-8" />
                 </div>
@@ -347,6 +350,7 @@
             </div>
 
             <div class="about-value-card">
+                <span class="about-value-number">04</span>
                 <div class="about-value-icon-gold">
                     <flux:icon.check-badge class="w-8 h-8" />
                 </div>
@@ -359,6 +363,7 @@
             </div>
 
             <div class="about-value-card">
+                <span class="about-value-number">05</span>
                 <div class="about-value-icon-blue">
                     <flux:icon.heart class="w-8 h-8" />
                 </div>
@@ -445,7 +450,7 @@
             <div>
                 <img
                     src="{{ asset('images/dayongan-objectives.jpg') }}"
-                    alt="DAYONGAN Objectives"
+                    alt="TRIFECTA Objectives"
                     class="about-hero-img">
             </div>
 
@@ -454,16 +459,16 @@
 </section>
 
 <!-- =========================
-     WHY CHOOSE DAYONGAN
+     WHY CHOOSE TRIFECTA
 ========================= -->
-<section class="py-20 bg-slate-50">
+<section class="about-band bg-white">
     <div class="about-container">
 
         <div class="about-container-center">
             <span class="about-section-label-gold">
                 <x-editable-text
                     key="about_why_label"
-                    :value="$contexts['about_why_label'] ?? 'Why Choose DAYONGAN'"
+                    :value="$contexts['about_why_label'] ?? 'Why Choose TRIFECTA'"
                     tag="span"
                     class="inline-block"
                 />
@@ -481,7 +486,7 @@
             <p class="mt-5 text-lg text-slate-600 leading-8">
                 <x-editable-text
                     key="about_why_desc"
-                    :value="$contexts['about_why_desc'] ?? 'DAYONGAN is more than a membership program. It is a community built on compassion, protection, and solidarity. We strive to ensure that every Filipino family has access to affordable assistance during life\'s most difficult moments.'"
+                    :value="$contexts['about_why_desc'] ?? 'TRIFECTA is more than a membership program. It is a community built on compassion, protection, and solidarity. We strive to ensure that every Filipino family has access to affordable assistance during life\'s most difficult moments.'"
                     tag="span"
                     class="block"
                 />
@@ -535,7 +540,7 @@
 </section>
 
 <!-- =========================
-     DAYONGAN HIGHLIGHTS
+     TRIFECTA HIGHLIGHTS
 ========================= -->
 <section class="about-highlights-section">
     <div class="about-container">
@@ -544,7 +549,7 @@
             <span class="about-section-label-yellow">
                 <x-editable-text
                     key="about_glance_label"
-                    :value="$contexts['about_glance_label'] ?? 'DAYONGAN at a Glance'"
+                    :value="$contexts['about_glance_label'] ?? 'TRIFECTA at a Glance'"
                     tag="span"
                     class="inline-block"
                 />
@@ -631,7 +636,7 @@
                 tag="span"
                 class="inline-block"
             />
-            <span class="text-[#FFD54A]">
+            <span class="text-white">
                 <x-editable-text
                     key="about_cta_title_highlight"
                     :value="$contexts['about_cta_title_highlight'] ?? 'Safer and Stronger Future'"
@@ -644,7 +649,7 @@
         <p class="about-cta-description">
             <x-editable-text
                 key="about_cta_description"
-                :value="$contexts['about_cta_description'] ?? 'Become part of the DAYONGAN family and experience community-based protection, financial literacy, and compassionate assistance that helps every Filipino family move forward with confidence and hope.'"
+                :value="$contexts['about_cta_description'] ?? 'Become part of the TRIFECTA family and experience community-based protection, financial literacy, and compassionate assistance that helps every Filipino family move forward with confidence and hope.'"
                 tag="span"
                 class="block"
             />
@@ -703,7 +708,7 @@
         <blockquote class="about-quote-text">
             <x-editable-text
                 key="about_quote_text"
-                :value="$contexts['about_quote_text'] ?? '&quot;Sa DAYONGAN, naniniwala kami na ang tunay na lakas ng isang komunidad ay nagmumula sa pagtutulungan, pagkakaisa, at malasakit sa bawat pamilyang Pilipino.&quot;'"
+                :value="$contexts['about_quote_text'] ?? '&quot;Sa TRIFECTA, naniniwala kami na ang tunay na lakas ng isang komunidad ay nagmumula sa pagtutulungan, pagkakaisa, at malasakit sa bawat pamilyang Pilipino.&quot;'"
                 tag="span"
                 class="block"
             />

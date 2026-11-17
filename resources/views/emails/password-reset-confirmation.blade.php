@@ -53,7 +53,7 @@
                             </p>
                             <p style="margin: 0 0 24px 0; color: #475569;">
                                 This email confirms that the password for your
-                                <strong style="color: #0B2A5B;">TrueLife member portal</strong> account has been
+                                <strong style="color: #0B2A5B;">TRIFECTA member portal</strong> account has been
                                 changed successfully.
                             </p>
 
@@ -99,12 +99,12 @@
 
                             <p style="margin: 0; color: #475569;">
                                 If you did not request this change, please contact our support team or your nearest
-                                TrueLife branch office immediately.
+                                TRIFECTA branch office immediately.
                             </p>
 
                             <p style="margin: 24px 0 0 0; color: #475569;">
                                 Best regards,<br>
-                                <strong style="color: #0B2A5B;">True Life</strong>
+                                <strong style="color: #0B2A5B;">TRIFECTA</strong>
                             </p>
                         </td>
                     </tr>
@@ -113,9 +113,9 @@
                     <tr>
                         <td align="center"
                             style="background-color: #f8fafc; padding: 24px; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9;">
-                            <p style="margin: 0 0 4px 0;">This is an automated notification message from True Life.
+                            <p style="margin: 0 0 4px 0;">This is an automated notification message from TRIFECTA.
                                 Please do not reply directly to this email.</p>
-                            <p style="margin: 0;">&copy; {{ date('Y') }} True Life. All rights reserved.</p>
+                            <p style="margin: 0;">&copy; {{ date('Y') }} TRIFECTA. All rights reserved.</p>
                         </td>
                     </tr>
 

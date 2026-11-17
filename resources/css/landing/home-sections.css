@@ -1,0 +1,180 @@
+/* =====================================================
+   HOME — ABOUT + WHY CHOOSE
+   Same corporate format as the hero and benefit grid:
+   uppercase tag with a gold rule, navy headings, white
+   cards with a navy number square, and a navy band for
+   figures. No green anywhere.
+===================================================== */
+
+/* -----------------------------------------------------
+   ABOUT
+----------------------------------------------------- */
+
+.home-about {
+    @apply relative overflow-hidden bg-white py-16 sm:py-20 lg:py-24;
+}
+
+.home-about::before {
+    content: "";
+    @apply absolute inset-x-0 top-0 h-1;
+    background: linear-gradient(90deg, var(--color-gold), var(--color-gold-light), var(--color-gold));
+}
+
+.home-about-wrap {
+    @apply relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-12;
+}
+
+.home-about-header {
+    @apply max-w-3xl;
+}
+
+.home-about-title {
+    @apply mt-4 text-2xl font-extrabold leading-[1.14] tracking-tight text-primary sm:text-3xl md:text-4xl;
+}
+
+.home-about-title-accent {
+    @apply text-primary-mid;
+}
+
+.home-about-lead {
+    @apply mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base;
+}
+
+.home-about-grid {
+    @apply mt-10 grid grid-cols-1 gap-5 md:grid-cols-3;
+}
+
+.home-about-card {
+    @apply flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm
+        transition duration-300 hover:-translate-y-1 hover:border-primary-tint-border hover:shadow-lg;
+}
+
+.home-about-card-head {
+    @apply flex items-center gap-3;
+}
+
+.home-about-number {
+    @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-black;
+    background: var(--color-gold);
+    color: var(--color-primary);
+}
+
+.home-about-icon {
+    @apply flex h-11 w-11 items-center justify-center rounded-lg;
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.home-about-card-title {
+    @apply mt-5 text-lg font-bold leading-snug text-primary;
+}
+
+.home-about-card-text {
+    @apply mt-2 text-[13px] leading-relaxed text-slate-600 sm:text-sm;
+}
+
+.home-about-list {
+    @apply mt-3 space-y-2 text-[13px] font-medium text-slate-600 sm:text-sm;
+}
+
+.home-about-list li {
+    @apply flex items-start gap-2;
+}
+
+.home-about-list li::before {
+    content: "";
+    @apply mt-2 h-1.5 w-1.5 shrink-0 rounded-full;
+    background: var(--color-gold);
+}
+
+.home-about-subtitle {
+    @apply text-[11px] font-black uppercase tracking-[0.14em] text-primary-mid;
+}
+
+/* -----------------------------------------------------
+   WHY CHOOSE
+----------------------------------------------------- */
+
+.home-why {
+    @apply relative overflow-hidden py-16 sm:py-20 lg:py-24;
+    background:
+        radial-gradient(circle at 90% 6%, rgb(var(--brand-primary-rgb) / .08), transparent 44%),
+        radial-gradient(circle at 2% 94%, rgb(var(--brand-gold-rgb) / .10), transparent 40%),
+        #F4F7FC;
+}
+
+.home-why-wrap {
+    @apply relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-12;
+}
+
+.home-why-header {
+    @apply max-w-3xl;
+}
+
+.home-why-title {
+    @apply mt-4 text-2xl font-extrabold leading-[1.14] tracking-tight text-primary sm:text-3xl md:text-4xl;
+}
+
+.home-why-title-accent {
+    @apply text-primary-mid;
+}
+
+.home-why-lead {
+    @apply mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base;
+}
+
+.home-why-grid {
+    @apply mt-10 grid grid-cols-1 gap-5 md:grid-cols-3;
+}
+
+.home-why-card {
+    @apply flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm
+        transition duration-300 hover:-translate-y-1 hover:border-primary-tint-border hover:shadow-lg;
+    border-top: 4px solid var(--color-gold);
+}
+
+.home-why-icon {
+    @apply flex h-12 w-12 items-center justify-center rounded-lg;
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.home-why-card-title {
+    @apply mt-5 text-lg font-bold leading-snug text-primary;
+}
+
+.home-why-card-text {
+    @apply mt-2 text-[13px] leading-relaxed text-slate-600 sm:text-sm;
+}
+
+.home-why-card-footer {
+    @apply mt-auto flex items-center gap-2 pt-5 text-[11px] font-bold uppercase tracking-[0.12em] text-primary-mid;
+}
+
+.home-why-card-footer::before {
+    content: "";
+    @apply h-1 w-6 rounded-full;
+    background: var(--color-gold);
+}
+
+/* ---------- figures band ---------- */
+
+.home-why-stats {
+    @apply mt-8 grid grid-cols-2 gap-6 rounded-xl px-6 py-6 text-white lg:grid-cols-4;
+    background: var(--color-primary);
+}
+
+.home-why-stat-value {
+    @apply text-2xl font-black tracking-tight sm:text-3xl;
+    color: var(--color-gold);
+}
+
+.home-why-stat-label {
+    @apply mt-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/70;
+}
+
+@media (max-width: 480px) {
+    .home-why-stat-value {
+        @apply text-xl;
+    }
+}

@@ -14,413 +14,181 @@ class UsersSeeder extends Seeder
      */
     public function run(): void
     {
-        $superAdminRoleId = DB::table('roles')
-            ->where('rolename', 'Super Administrator')
-            ->value('RoleID');
-
-        $administratorRoleId = DB::table('roles')
-            ->where('rolename', 'Administrator')
-            ->value('RoleID');
-
-        $botRoleId = DB::table('roles')
-            ->where('rolename', 'BOT')
-            ->value('RoleID');
-
-        $executiveManagementRoleId = DB::table('roles')
-            ->where('rolename', 'Executive Management')
-            ->value('RoleID');
-
-        $agencyRoleId = DB::table('roles')
-            ->where('rolename', 'Agency')
-            ->value('RoleID');
-
-        $humanResourceRoleId = DB::table('roles')
-            ->where('rolename', 'Human Resource')
-            ->value('RoleID');
-
-        DB::table('users')->insert([
-
-            // Super Administrator
+        $users = [
+            // =====================================
+            // 1. SUPER ADMIN
+            // =====================================
             [
-                'username' => 'sysadmin.ebs',
-                'password' => Hash::make('Admin@c0nf3d3nt!47'),
-
-                'lastname' => 'Administrator',
+                'username' => 'superadmin',
+                'password' => 'SuperAdmin@2026',
+                'lastname' => 'Admin',
                 'firstname' => 'Super',
                 'middlename' => null,
-
-                'birthdate' => '1992-07-01',
-
-                'contactno' => '09978251816',
-                'address' => 'Head Office',
-
-                'email' => 'dtechmsolution@gmail.com',
-                'email_verified_at' => now(),
-
-                'profilepic' => 'images/profiles/default-avatar.png',
-
-                'referralCode' => strtoupper(Str::random(8)),
-                'uplineCode' => null,
-
-                'branchCode' => null,
-
-                'RoleID' => $superAdminRoleId,
-
-                'status' => 'Active',
-
-                'remember_token' => null,
-
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'username' => 'sysadmin.albit',
-                'password' => Hash::make('Admin@110525'),
-
-                'lastname' => 'Albit',
-                'firstname' => 'Anfrid',
-                'middlename' => null,
-
-                'birthdate' => '1990-01-01',
-
-                'contactno' => '09123456789',
-                'address' => 'Head Office',
-
+                'birthdate' => null,
+                'contactno' => null,
+                'address' => null,
                 'email' => 'anfredalbit110525@gmail.com',
-                'email_verified_at' => now(),
-
-                'profilepic' => 'images/profiles/default-avatar.png',
-
-                'referralCode' => strtoupper(Str::random(8)),
-                'uplineCode' => null,
-
-                'branchCode' => null,
-
-                'RoleID' => $superAdminRoleId,
-
+                'RoleID' => 1,
+                'branchCode' => 1,
                 'status' => 'Active',
 
-                'remember_token' => null,
-
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
 
-            // CEO
+            // =====================================
+            // 2. CEO
+            // =====================================
             [
-                'username' => 'renante.robles',
-                'password' => Hash::make('Admin@2026'),
-
-                'lastname' => 'Robles, MPA, LFA',
-                'firstname' => 'Renante',
-                'middlename' => 'Suaybaguio',
-
-                'birthdate' => '1975-05-11',
-
-                'contactno' => '09665622912',
-                'address' => null,
-
-                'email' => 'selboretnan@gmail.com',
-                'email_verified_at' => now(),
-
-                'profilepic' => 'images/profiles/default-avatar.png',
-
-                'referralCode' => strtoupper(Str::random(8)),
-                'uplineCode' => null,
-
-                'branchCode' => null,
-
-                'RoleID' => $administratorRoleId,
-
-                'status' => 'Active',
-
-                'remember_token' => null,
-
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-
-            // COO
-            [
-                'username' => 'bobby.dagala',
-                'password' => Hash::make('Admin@2026'),
-
-                'lastname' => 'Dagala',
-                'firstname' => 'Bobby',
-                'middlename' => 'Paulo',
-
-                'birthdate' => '1983-12-17',
-
-                'contactno' => '09278381647',
-
-                'address' => null,
-
-                'email' => 'theroyalicon2026@gmail.com',
-                'email_verified_at' => now(),
-
-                'profilepic' => 'images/profiles/default-avatar.png',
-
-                'referralCode' => strtoupper(Str::random(8)),
-                'uplineCode' => null,
-
-                'branchCode' => null,
-
-                'RoleID' => $administratorRoleId,
-
-                'status' => 'Active',
-
-                'remember_token' => null,
-
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-
-
-            // Management Team
-            [
-                'username' => 'exemanagement.team',
-                'password' => Hash::make('Management@2026'),
-
-                'lastname' => 'Management',
-                'firstname' => 'Executive',
+                'username' => 'ceo',
+                'password' => 'CEO@2026',
+                'lastname' => 'Executive',
+                'firstname' => 'Chief',
                 'middlename' => null,
-
-                // Source only provides "09/19/19", which is ambiguous.
                 'birthdate' => null,
-
                 'contactno' => null,
-
                 'address' => null,
-
-                'email' => null,
-                'email_verified_at' => now(),
-
-                'profilepic' => 'images/profiles/default-avatar.png',
-
-                'referralCode' => strtoupper(Str::random(8)),
-                'uplineCode' => null,
-
-                'branchCode' => null,
-
-                'RoleID' => $executiveManagementRoleId,
-
+                'email' => 'ceo@gmail.com',
+                'RoleID' => 2,
+                'branchCode' => 1,
                 'status' => 'Active',
-
-                'remember_token' => null,
-
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
-            [
-                'username' => 'agency.team',
-                'password' => Hash::make('Agency@2026'),
 
-                'lastname' => 'Personnel',
-                'firstname' => 'Agency',
+            // =====================================
+            // 3. AGENCY
+            // =====================================
+            [
+                'username' => 'agency',
+                'password' => 'Agency@2026',
+                'lastname' => 'Agency',
+                'firstname' => 'Default',
                 'middlename' => null,
-
-                // Source only provides "09/19/19", which is ambiguous.
                 'birthdate' => null,
-
                 'contactno' => null,
-
                 'address' => null,
-
-                'email' => null,
-                'email_verified_at' => now(),
-
-                'profilepic' => 'images/profiles/default-avatar.png',
-
-                'referralCode' => strtoupper(Str::random(8)),
-                'uplineCode' => null,
-
-                'branchCode' => null,
-
-                'RoleID' => $executiveManagementRoleId,
-
+                'email' => 'agency@gmail.com',
+                'RoleID' => 3,
+                'branchCode' => 1,
                 'status' => 'Active',
-
-                'remember_token' => null,
-
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
+
+            // =====================================
+            // 4. ADMIN
+            // =====================================
             [
-                'username' => 'truelifedayongan',
-                'password' => Hash::make('HR@2026'),
-                'lastname' => 'Resources',
-                'firstname' => 'Human',
+                'username' => 'admin',
+                'password' => 'Admin@2026',
+                'lastname' => 'Administrator',
+                'firstname' => 'System',
                 'middlename' => null,
-
-                // Source only provides "09/19/19", which is ambiguous.
                 'birthdate' => null,
-
                 'contactno' => null,
-
                 'address' => null,
-
-                'email' => null,
-                'email_verified_at' => now(),
-
-                'profilepic' => 'images/profiles/default-avatar.png',
-
-                'referralCode' => strtoupper(Str::random(8)),
-                'uplineCode' => null,
-
-                'branchCode' => null,
-
-                'RoleID' => $executiveManagementRoleId,
-
+                'email' => 'admin@gmail.com',
+                'RoleID' => 4,
+                'branchCode' => 1,
                 'status' => 'Active',
-
-                'remember_token' => null,
-
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
 
-            // Secretary
+            // =====================================
+            // 5. BRANCH MANAGER
+            // =====================================
             [
-                'username' => 'princes.manliguez',
-                'password' => Hash::make('Admin@2026'),
-
-                'lastname' => 'Manliguez',
-                'firstname' => 'Princes',
-                'middlename' => 'Pugasan',
-
-                'birthdate' => '2003-05-04',
-
-                'contactno' => '09266958032',
-
-                'address' => null,
-
-                'email' => 'manliguezprinces00@gmail.com',
-                'email_verified_at' => now(),
-
-                'profilepic' => 'images/profiles/default-avatar.png',
-
-                'referralCode' => strtoupper(Str::random(8)),
-                'uplineCode' => null,
-
-                'branchCode' => null,
-
-                'RoleID' => $botRoleId,
-
-                'status' => 'Active',
-
-                'remember_token' => null,
-
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-
-            // Treasurer
-            [
-                'username' => 'cherry.dagala',
-                'password' => Hash::make('Admin@2026'),
-
-                'lastname' => 'Dagala',
-                'firstname' => 'Cherry Lynn',
-                'middlename' => 'Nierras',
-
-                'birthdate' => '1977-03-26',
-
-                'contactno' => '09055596558',
-
-                'address' => null,
-
-                'email' => 'ccnierras1977@gmail.com',
-                'email_verified_at' => now(),
-
-                'profilepic' => 'images/profiles/default-avatar.png',
-
-                'referralCode' => strtoupper(Str::random(8)),
-                'uplineCode' => null,
-
-                'branchCode' => null,
-
-                'RoleID' => $botRoleId,
-
-                'status' => 'Active',
-
-                'remember_token' => null,
-
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-
-            // Auditor
-            [
-                'username' => 'maria.robles',
-                'password' => Hash::make('Admin@2026'),
-
-                'lastname' => 'Robles',
-                'firstname' => 'Dr. Maria Carmelita',
-                'middlename' => 'Dalisay',
-
+                'username' => 'sanfranzbranchmanager',
+                'password' => 'SanFranzBranch@2026',
+                'lastname' => 'Manager',
+                'firstname' => 'Branch',
+                'middlename' => null,
                 'birthdate' => null,
-
-                'contactno' => '09565003849',
-
+                'contactno' => null,
                 'address' => null,
-
-                'email' => 'mariacdrobles@gmail.com',
-                'email_verified_at' => now(),
-
-                'profilepic' => 'images/profiles/default-avatar.png',
-
-                'referralCode' => strtoupper(Str::random(8)),
-                'uplineCode' => null,
-
-                'branchCode' => null,
-
-                'RoleID' => $botRoleId,
-
+                'email' => 'sanfranzbranchmanager@gmail.com',
+                'RoleID' => 5,
+                'branchCode' => 1,
                 'status' => 'Active',
-
-                'remember_token' => null,
-
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
 
-            // Board of Directors
             [
-                'username' => 'alfe.duron',
-                'password' => Hash::make('Admin@2026'),
-
-                'lastname' => 'Duron',
-                'firstname' => 'Alfe',
-                'middlename' => 'Sinoy',
-
-                // Source only provides "09/19/19", which is ambiguous.
+                'username' => 'digosbranchmanager',
+                'password' => 'DigosBranch@2026',
+                'lastname' => 'Manager',
+                'firstname' => 'Branch',
+                'middlename' => null,
                 'birthdate' => null,
-
-                'contactno' => '09933668594',
-
+                'contactno' => null,
                 'address' => null,
-
-                'email' => 'alfeduron09@gmail.com',
-                'email_verified_at' => now(),
-
-                'profilepic' => 'images/profiles/default-avatar.png',
-
-                'referralCode' => strtoupper(Str::random(8)),
-                'uplineCode' => null,
-
-                'branchCode' => null,
-
-                'RoleID' => $botRoleId,
-
-                'status' => 'Active',
-
-                'remember_token' => null,
-
-                'created_at' => now(),
-                'updated_at' => now(),
+                'email' => 'digosbranchmanager@gmail.com',
+                'RoleID' => 6,
             ],
 
+            [
+                'username' => 'matibranchmanager',
+                'password' => 'MatiBranch@2026',
+                'lastname' => 'Manager',
+                'firstname' => 'Branch',
+                'middlename' => null,
+                'birthdate' => null,
+                'contactno' => null,
+                'address' => null,
+                'email' => 'matibranchmanager@gmail.com',
+                'RoleID' => 7,
+            ],
 
-        ]);
+            // =====================================
+            // 6. TRIFECTA MEMBER
+            // =====================================
+            [
+                'username' => 'member',
+                'password' => 'Member@2026',
+                'lastname' => 'Member',
+                'firstname' => 'Default',
+                'middlename' => null,
+                'birthdate' => null,
+                'contactno' => null,
+                'address' => null,
+                'email' => 'member@trifecta.test',
+                'RoleID' => 8,
+            ],
+        ];
+
+        foreach ($users as $user) {
+
+            DB::table('users')->insert([
+
+                // Account Information
+                'username' => $user['username'],
+                'password' => Hash::make($user['password']),
+
+                // Personal Information
+                'lastname' => $user['lastname'],
+                'firstname' => $user['firstname'],
+                'middlename' => $user['middlename'],
+
+                'birthdate' => $user['birthdate'],
+                'contactno' => $user['contactno'],
+                'address' => $user['address'],
+
+                // Email Information
+                'email' => $user['email'],
+                'email_verified_at' => null,
+
+                // Profile Information
+                'profilepic' => 'images/profiles/default-avatar.png',
+
+                // Referral Information
+                'referralCode' => strtoupper(Str::random(8)),
+                'uplineCode' => null,
+                'branchCode' => null,
+
+                // Role Assignment
+                'RoleID' => $user['RoleID'],
+
+                // Account Status
+                'status' => 'Active',
+                'remember_token' => null,
+
+                // Timestamps
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 }

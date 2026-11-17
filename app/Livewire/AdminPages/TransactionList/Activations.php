@@ -11,11 +11,13 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class Activations extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
     use WithPagination;
 
@@ -251,7 +253,7 @@ class Activations extends Component
     | ROW ACTIONS — review / approve / reject via the shared review modals
     |--------------------------------------------------------------------------
     | Every action opens the full review modal first (details before
-    | decision). TrueLife members get the regular modal, satellite members
+    | decision). TRIFECTA members get the regular modal, satellite members
     | the satellite one. Quick approve still uses the typed SwalFlow dialog
     | from the page shell; reject always goes through the modal so the
     | reviewer sees the request details before writing remarks.
@@ -281,7 +283,7 @@ class Activations extends Component
         }
 
         // Satellite member (RoleID 8) → satellite review modal;
-        // everyone else → the regular TrueLife review modal.
+        // everyone else → the regular TRIFECTA review modal.
         // The exact activation row clicked is passed so the modal reviews
         // that request (important when a member has several requests).
         if ((int) ($activation->user?->RoleID ?? 0) === 8) {
@@ -299,7 +301,7 @@ class Activations extends Component
 
     /*
     | RESUBMIT a REJECTED activation — opens the activation FORM modal
-    | (ActivationModal for TrueLife members, the satellite reapply wizard for
+    | (ActivationModal for TRIFECTA members, the satellite reapply wizard for
     | satellite members) pre-filled from the rejected request. The typed
     | confirmation happens on submit inside that modal; no separate
     | confirmation dialog is shown on click.
@@ -453,6 +455,7 @@ class Activations extends Component
                 ]);
             });
     }
+
 
     public function render()
     {

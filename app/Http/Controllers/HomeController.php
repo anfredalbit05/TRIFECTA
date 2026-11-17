@@ -19,7 +19,7 @@ class HomeController extends Controller
         }
 
         // Load all editable content once
-        $contexts = Context::pluck('details', 'context_key')->toArray();
+        $contexts = Context::merged();
 
         return view('pages.home', compact('contexts'));
     }

@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 
 /**
@@ -17,6 +18,8 @@ use Livewire\Component;
  */
 class Overview extends Component
 {
+    use HasTabSkeleton;
+
     public string $memberSearch = '';
 
     /** "Y-m-d to Y-m-d" (activation date range) */

@@ -1,0 +1,2086 @@
+/* =========================================================
+   SATELLITE MEMBERSHIP MODAL
+   LEFT STEPPER + RIGHT SCROLLABLE CONTENT
+========================================================= */
+
+:root {
+    /* Aliased to the global palette in app.css */
+    --sat-navy: var(--color-primary);
+    --sat-navy-hover: var(--color-primary-mid);
+    --sat-gold: var(--color-accent);
+    --sat-gold-dark: var(--color-accent-dark);
+    --sat-border: #e2e8f0;
+    --sat-bg-light: #f8fafc;
+    --sat-text-main: #1e293b;
+    --sat-text-muted: #64748b;
+    --sat-text-sub: #94a3b8;
+    --sat-error: #f43f5e;
+    --sat-blue-bg: var(--color-primary-tint);
+    --sat-blue-border: var(--color-primary-tint-border);
+}
+
+/* =========================================================
+   RESET / SHARED
+========================================================= */
+
+[x-cloak] {
+    display: none !important;
+}
+
+.satellite-modal,
+.satellite-modal__header-icon,
+.satellite-modal__close,
+.satellite-stepper__number,
+.satellite-plan__check,
+.satellite-plan__icon,
+.payment-method__icon,
+.payment-instruction__icon,
+.wizard-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.payment-method__image {
+    width: 180px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.payment-method__image img {
+    width: 120px;
+    height: 90px;
+    object-fit: contain;
+    display: block;
+}
+
+.account-card,
+.payment-card,
+.summary-card {
+    padding: 1.25rem;
+    border: 1px solid var(--sat-border);
+    border-radius: 1.25rem;
+    background: #fff;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
+}
+
+.satellite-plan__input,
+.payment-method__input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.satellite-modal__close svg,
+.satellite-modal__header-icon svg,
+.wizard-button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+
+/* =========================================================
+   MODAL OVERLAY
+========================================================= */
+
+.satellite-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 1rem;
+
+    overflow-y: auto;
+
+    background: rgb(2 6 23 / 80%);
+    backdrop-filter: blur(12px);
+}
+
+
+/* =========================================================
+   MODAL CONTAINER
+========================================================= */
+
+.satellite-modal__container {
+    width: 100%;
+    max-width: 96rem;
+    height: 92vh;
+    max-height: 92vh;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    border: 1px solid rgb(255 255 255 / 10%);
+    border-radius: 1.5rem;
+
+    background: #fff;
+
+    box-shadow:
+        0 25px 50px -12px rgb(0 0 0 / 25%),
+        0 0 0 1px rgb(15 23 42 / 4%);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.satellite-modal__header {
+    position: relative;
+    flex-shrink: 0;
+
+    overflow: hidden;
+
+    padding: 1.25rem 1.5rem;
+
+    background: var(--sat-navy);
+}
+
+.satellite-modal__glow {
+    position: absolute;
+
+    width: 12rem;
+    height: 12rem;
+
+    border-radius: 9999px;
+
+    filter: blur(48px);
+
+    pointer-events: none;
+}
+
+.satellite-modal__glow--right {
+    top: -5rem;
+    right: -5rem;
+
+    background: rgb(var(--brand-accent-rgb) / 10%);
+}
+
+.satellite-modal__glow--left {
+    bottom: -6rem;
+    left: -5rem;
+
+    background: rgb(var(--brand-primary-light-rgb) / 10%);
+}
+
+.satellite-modal__header-content {
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 1rem;
+}
+
+.satellite-modal__eyebrow {
+    display: flex;
+    align-items: center;
+
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    color: var(--sat-gold);
+
+    font-size: 0.625rem;
+    font-weight: 700;
+
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.satellite-modal__header-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+
+    flex-shrink: 0;
+
+    border-radius: 0.75rem;
+
+    background: var(--sat-gold);
+    color: var(--sat-navy);
+}
+
+.satellite-modal__title {
+    margin: 0;
+
+    color: #fff;
+
+    font-size: 1.35rem;
+    font-weight: 800;
+
+    letter-spacing: -0.025em;
+}
+
+.satellite-modal__subtitle {
+    margin: 0.25rem 0 0;
+
+    color: #cbd5e1;
+
+    font-size: 0.75rem;
+}
+
+/* REAPPLY MODE BANNER (header of the wizard modal) */
+.satellite-reapply-banner {
+    margin-top: 0.75rem;
+
+    padding: 0.55rem 0.9rem;
+
+    border: 1px solid rgb(var(--brand-accent-rgb) / 45%);
+    border-radius: 0.6rem;
+
+    background: rgb(var(--brand-accent-rgb) / 12%);
+    color: var(--color-accent-tint-border);
+
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+.satellite-reapply-banner strong {
+    color: var(--color-accent-tint);
+}
+
+.satellite-modal__close {
+    width: 2.5rem;
+    height: 2.5rem;
+
+    flex-shrink: 0;
+
+    border: 1px solid rgb(255 255 255 / 10%);
+    border-radius: 0.75rem;
+
+    background: rgb(255 255 255 / 10%);
+    color: #cbd5e1;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.satellite-modal__close:hover {
+    background: var(--sat-error);
+    color: #fff;
+    transform: scale(1.03);
+}
+
+
+/* =========================================================
+   MAIN WIZARD AREA
+   LEFT SIDEBAR + RIGHT CONTENT
+========================================================= */
+
+.satellite-modal__wizard {
+    min-width: 0;
+    min-height: 0;
+
+    flex: 1;
+
+    display: grid;
+
+    grid-template-columns: 250px minmax(0, 1fr);
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   LEFT SIDEBAR
+========================================================= */
+
+.satellite-modal__sidebar {
+    position: relative;
+
+    min-width: 0;
+    min-height: 0;
+
+    overflow: hidden;
+
+    border-right: 1px solid var(--sat-border);
+
+    background:
+        linear-gradient(
+            180deg,
+            #f8fafc 0%,
+            #ffffff 100%
+        );
+}
+
+
+/* =========================================================
+   VERTICAL STEPPER
+========================================================= */
+
+.satellite-stepper {
+    position: relative;
+
+    height: 100%;
+
+    padding: 2rem 1.25rem;
+}
+
+.satellite-stepper__items {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
+}
+
+.satellite-stepper__item {
+    position: relative;
+
+    flex: 1;
+
+    display: flex;
+    align-items: flex-start;
+
+    gap: 1rem;
+
+    padding: 0.5rem 0;
+
+    min-height: 100px;
+}
+
+.satellite-stepper__item:last-child {
+    flex: 0;
+}
+
+
+/* =========================================================
+   STEPPER LINE — DESKTOP / VERTICAL
+========================================================= */
+
+.satellite-stepper__line,
+.satellite-stepper__progress {
+    position: absolute;
+    left: 2.5rem;
+    width: 2px;
+    transform: translateX(-50%);
+    border-radius: 9999px;
+    z-index: 1;
+}
+
+.satellite-stepper__line {
+    top: 3.75rem;
+    height: calc((100% - 1rem) * 0.666667);
+    background: #e2e8f0;
+}
+
+.satellite-stepper__progress {
+    top: 3.75rem;
+    height: var(--step-progress, 0%);
+    max-height: calc((100% - 4rem) * 0.666667);
+    background: var(--sat-gold);
+    transition: height 0.5s ease;
+}
+
+
+/* =========================================================
+   STEPPER NUMBER
+========================================================= */
+
+.satellite-stepper__number {
+    position: relative;
+    z-index: 3;
+
+    width: 2.5rem;
+    height: 2.5rem;
+
+    flex-shrink: 0;
+
+    border: 2px solid #cbd5e1;
+    border-radius: 9999px;
+
+    background: #fff;
+
+    color: var(--sat-text-sub);
+
+    font-size: 0.75rem;
+    font-weight: 800;
+
+    transition:
+        background 0.3s ease,
+        color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.satellite-stepper__number--active {
+    border-color: var(--sat-gold);
+
+    background: var(--sat-gold);
+
+    color: var(--sat-navy);
+
+    box-shadow:
+        0 0 0 4px rgb(var(--brand-accent-rgb) / 12%);
+}
+
+
+/* =========================================================
+   STEPPER TEXT
+========================================================= */
+
+.satellite-stepper__details {
+    display: flex;
+    flex-direction: column;
+
+    padding-top: 0.25rem;
+}
+
+.satellite-stepper__label {
+    color: var(--sat-text-muted);
+
+    font-size: 0.75rem;
+    font-weight: 800;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+
+    transition: color 0.3s ease;
+}
+
+.satellite-stepper__label--active {
+    color: var(--sat-navy);
+}
+
+.satellite-stepper__details small {
+    display: block;
+
+    margin-top: 0.3rem;
+
+    color: var(--sat-text-sub);
+
+    font-size: 0.65rem;
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   RIGHT CONTENT
+   ONLY THIS AREA SCROLLS
+========================================================= */
+
+.satellite-modal__body {
+    min-width: 0;
+    min-height: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    padding: 2rem 2.5rem;
+
+    background: var(--sat-bg-light);
+
+    scroll-behavior: smooth;
+
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.satellite-modal__body::-webkit-scrollbar {
+    width: 7px;
+}
+
+.satellite-modal__body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.satellite-modal__body::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: #cbd5e1;
+}
+
+.satellite-modal__body::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+
+/* =========================================================
+   STEP
+========================================================= */
+
+.satellite-step {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.satellite-step__content {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.satellite-step__content--wide,
+.satellite-step__content--payment {
+    max-width: 78rem;
+}
+
+.satellite-step__content--account {
+    max-width: 62rem;
+}
+
+
+/* =========================================================
+   STEP HEADINGS
+========================================================= */
+
+.satellite-step__heading {
+    margin-bottom: 1.5rem;
+}
+
+.satellite-step__number-label {
+    display: block;
+
+    margin-bottom: 0.4rem;
+
+    color: var(--sat-gold-dark);
+
+    font-size: 0.7rem;
+    font-weight: 800;
+
+    letter-spacing: 0.18em;
+
+    text-transform: uppercase;
+}
+
+.satellite-step__heading h3 {
+    margin: 0;
+
+    color: var(--sat-navy);
+
+    font-size: 1.8rem;
+    line-height: 1.2;
+    font-weight: 800;
+
+    letter-spacing: -0.025em;
+}
+
+.satellite-step__heading p {
+    max-width: 48rem;
+
+    margin: 0.6rem 0 0;
+
+    color: var(--sat-text-muted);
+
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   STEP 1 — PLANS
+========================================================= */
+
+.satellite-plans {
+    display: grid;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 1rem;
+}
+
+.satellite-plan {
+    position: relative;
+
+    display: block;
+
+    cursor: pointer;
+}
+
+.satellite-plan__card {
+    position: relative;
+
+    height: 100%;
+    min-height: 330px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    padding: 1.4rem;
+
+    border: 2px solid var(--sat-border);
+    border-radius: 1.15rem;
+
+    background: #fff;
+
+    box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.satellite-plan:hover .satellite-plan__card {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 15px 25px -8px rgb(0 0 0 / 10%);
+}
+
+.satellite-plan__input:checked + .satellite-plan__card {
+    border-color: var(--plan-color, var(--sat-navy));
+
+    box-shadow:
+        0 0 0 4px rgb(var(--brand-accent-rgb) / 12%);
+}
+
+.satellite-plan__check {
+    position: absolute;
+
+    top: 0.85rem;
+    right: 0.85rem;
+
+    width: 1.7rem;
+    height: 1.7rem;
+
+    display: none;
+
+    border-radius: 9999px;
+
+    background: var(--plan-color, var(--sat-navy));
+
+    color: #fff;
+
+    font-size: 0.7rem;
+}
+
+.satellite-plan__input:checked
++ .satellite-plan__card
+.satellite-plan__check {
+    display: flex;
+}
+
+.satellite-plan__icon {
+    width: 3.5rem;
+    height: 3.5rem;
+
+    margin-bottom: 1rem;
+
+    border-radius: 0.9rem;
+
+    font-size: 1.5rem;
+}
+
+.satellite-plan__label {
+    font-size: 0.6rem;
+    font-weight: 800;
+
+    letter-spacing: 0.13em;
+
+    text-transform: uppercase;
+}
+
+.satellite-plan__card h4 {
+    margin: 0.35rem 0 0;
+
+    color: var(--sat-text-main);
+
+    font-size: 1.3rem;
+    line-height: 1.25;
+    font-weight: 800;
+}
+
+.satellite-plan__card p {
+    margin: 0.6rem 0 0;
+
+    color: var(--sat-text-muted);
+
+    font-size: 0.8rem;
+    line-height: 1.55;
+}
+
+.satellite-plan__divider {
+    height: 1px;
+
+    margin: 1rem 0;
+
+    background: #f1f5f9;
+}
+
+.satellite-plan__card ul {
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.6rem;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+
+    color: #475569;
+
+    font-size: 0.7rem;
+}
+
+.satellite-plan__footer {
+    margin-top: auto;
+
+    padding-top: 1.25rem;
+}
+
+.satellite-plan__select {
+    display: block;
+
+    padding: 0.5rem 0.7rem;
+
+    border-radius: 0.7rem;
+
+    text-align: center;
+
+    font-size: 0.6rem;
+    font-weight: 800;
+
+    letter-spacing: 0.05em;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   SELECTION SUMMARY
+========================================================= */
+
+.satellite-selection-info {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 0.85rem;
+
+    margin-top: 1rem;
+}
+
+.selection-card {
+    padding: 0.9rem 1rem;
+
+    border-radius: 0.9rem;
+}
+
+.selection-card p {
+    margin: 0;
+
+    font-size: 0.6rem;
+    font-weight: 800;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+}
+
+.selection-card span {
+    display: block;
+
+    margin-top: 0.2rem;
+
+    color: var(--sat-navy);
+
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.selection-card small {
+    display: block;
+
+    margin-top: 0.2rem;
+
+    font-size: 0.6rem;
+}
+
+.selection-card--gold {
+    border: 1px solid rgb(var(--brand-accent-rgb) / 30%);
+    background: rgb(var(--brand-accent-rgb) / 10%);
+}
+
+.selection-card--gold p {
+    color: var(--color-accent-darker);
+}
+
+.selection-card--blue {
+    border: 1px solid var(--sat-blue-border);
+    background: var(--sat-blue-bg);
+}
+
+.selection-card--blue p,
+.selection-card--blue small {
+    color: var(--color-primary-light);
+}
+
+
+/* =========================================================
+   SATELLITE DETAILS
+========================================================= */
+
+.satellite-details-card {
+    margin-top: 0.85rem;
+
+    padding: 1rem;
+
+    border: 1px solid var(--sat-border);
+    border-radius: 0.9rem;
+
+    background: #fff;
+}
+
+.satellite-details-card__title {
+    margin: 0 0 0.8rem;
+
+    color: var(--sat-navy);
+
+    font-size: 0.75rem;
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+.satellite-details-card__grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 1rem;
+}
+
+.satellite-address-row {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 0.5rem;
+}
+
+.satellite-address-row input {
+    min-width: 0;
+    flex: 1;
+}
+
+.satellite-map-toggle {
+    flex-shrink: 0;
+
+    padding: 0.7rem 0.85rem;
+
+    border: 0;
+    border-radius: 0.7rem;
+
+    background: var(--sat-navy);
+    color: #fff;
+
+    font-size: 0.65rem;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.satellite-map-toggle:hover {
+    background: var(--sat-navy-hover);
+}
+
+
+/* =========================================================
+   MAP
+========================================================= */
+
+.satellite-map-panel {
+    margin-top: 0.7rem;
+
+    padding: 0.7rem;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 0.75rem;
+
+    background: #fff;
+}
+
+.satellite-map-panel__search {
+    display: flex;
+
+    gap: 0.5rem;
+
+    margin-bottom: 0.7rem;
+}
+
+.satellite-map-panel__search input {
+    min-width: 0;
+    flex: 1;
+
+    padding: 0.6rem 0.75rem;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 0.7rem;
+
+    font-size: 0.8rem;
+}
+
+.satellite-map-panel__search button {
+    flex-shrink: 0;
+
+    padding: 0.6rem 0.9rem;
+
+    border: 0;
+    border-radius: 0.7rem;
+
+    background: var(--sat-navy);
+    color: #fff;
+
+    font-size: 0.65rem;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.satellite-map-panel__search button:hover {
+    background: var(--sat-navy-hover);
+}
+
+.satellite-map-panel__map {
+    height: 260px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--sat-border);
+    border-radius: 0.5rem;
+}
+
+#satellite-map {
+    width: 100%;
+    height: 100%;
+}
+
+
+/* =========================================================
+   FORMS
+========================================================= */
+
+.form-group label,
+.reference-card label {
+    display: block;
+
+    margin-bottom: 0.45rem;
+
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.form-group label {
+    color: #334155;
+}
+
+.reference-card label {
+    color: var(--color-primary-dark);
+}
+
+.form-group label span,
+.reference-card label span {
+    color: var(--sat-error);
+}
+
+.form-group input,
+.reference-card input {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 0.7rem 0.85rem;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 0.7rem;
+
+    background: #fff;
+    color: var(--sat-text-main);
+
+    font-size: 0.8rem;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.reference-card input:focus {
+    border-color: var(--sat-navy);
+
+    box-shadow:
+        0 0 0 2px rgb(var(--brand-primary-rgb) / 10%);
+}
+
+.form-error {
+    margin: 0.35rem 0 0;
+
+    color: var(--sat-error);
+
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.form-error--box {
+    margin-top: 0.8rem;
+
+    padding: 0.7rem;
+
+    border: 1px solid #fecdd3;
+    border-radius: 0.7rem;
+
+    background: #fff1f2;
+}
+
+
+/* =========================================================
+   STEP 2 — ACCOUNT
+========================================================= */
+
+.account-card {
+    max-width: 100%;
+
+    padding: 1.25rem;
+}
+
+.account-membership {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 1rem;
+
+    margin-bottom: 1.25rem;
+
+    padding: 0.9rem 1rem;
+
+    border-radius: 0.9rem;
+
+    background: var(--sat-navy);
+}
+
+.account-membership p {
+    margin: 0;
+
+    color: #cbd5e1;
+
+    font-size: 0.55rem;
+    font-weight: 700;
+
+    letter-spacing: 0.1em;
+
+    text-transform: uppercase;
+}
+
+.account-membership strong {
+    display: block;
+
+    margin-top: 0.2rem;
+
+    color: #fff;
+
+    font-size: 1rem;
+}
+
+.account-membership span {
+    display: block;
+
+    margin-top: 0.2rem;
+
+    color: #cbd5e1;
+
+    font-size: 0.7rem;
+}
+
+.account-membership button {
+    flex-shrink: 0;
+
+    padding: 0.45rem 0.7rem;
+
+    border: 0;
+    border-radius: 0.5rem;
+
+    background: rgb(255 255 255 / 10%);
+
+    color: var(--sat-gold);
+
+    font-size: 0.6rem;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.account-membership button:hover {
+    background: rgb(255 255 255 / 20%);
+}
+
+.account-form {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 1rem;
+}
+
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    padding-right: 4rem;
+}
+
+.password-field button {
+    position: absolute;
+
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    padding: 0 0.85rem;
+
+    border: 0;
+
+    background: transparent;
+
+    color: var(--sat-text-sub);
+
+    font-size: 0.6rem;
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    cursor: pointer;
+}
+
+.satellite-modal .member-info {
+    margin-top: 1.25rem;
+
+    padding: 0.9rem;
+
+    border: 1px solid var(--sat-border);
+    border-radius: 0.9rem;
+
+    background: var(--sat-bg-light);
+}
+
+.satellite-modal .member-info p {
+    margin: 0;
+
+    color: var(--sat-text-sub);
+
+    font-size: 0.55rem;
+    font-weight: 700;
+
+    letter-spacing: 0.1em;
+
+    text-transform: uppercase;
+}
+
+.satellite-modal .member-info strong {
+    display: block;
+
+    margin-top: 0.2rem;
+
+    color: var(--sat-navy);
+
+    font-size: 0.8rem;
+}
+
+.satellite-modal .member-info span {
+    display: block;
+
+    margin-top: 0.2rem;
+
+    color: var(--sat-text-muted);
+
+    font-size: 0.7rem;
+}
+
+.info-message {
+    margin-top: 1.25rem;
+
+    padding: 0.7rem 0.9rem;
+
+    border: 1px solid var(--sat-blue-border);
+    border-radius: 0.7rem;
+
+    background: var(--sat-blue-bg);
+
+    color: var(--color-primary-mid);
+
+    font-size: 0.7rem;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   STEP 3 — PAYMENT
+========================================================= */
+
+.payment-layout {
+    display: grid;
+
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+
+    gap: 1rem;
+
+    align-items: start;
+}
+
+.payment-card h4,
+.summary-card h4 {
+    margin: 0 0 0.9rem;
+
+    color: var(--sat-navy);
+
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.payment-methods {
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.65rem;
+}
+
+.payment-method {
+    display: block;
+
+    cursor: pointer;
+}
+
+.payment-method__content {
+    display: flex;
+    align-items: center;
+
+    gap: 0.85rem;
+
+    padding: 0.85rem;
+
+    border: 2px solid var(--sat-border);
+    border-radius: 0.85rem;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.payment-method__input:checked
++ .payment-method__content {
+    border-color: var(--sat-navy);
+
+    background: var(--sat-blue-bg);
+}
+
+.payment-method__input:checked
++ .payment-method__content--cash {
+    background: #fffbeb;
+}
+
+.payment-method__icon {
+    width: 2.75rem;
+    height: 2.75rem;
+
+    flex-shrink: 0;
+
+    border-radius: 0.7rem;
+
+    background: var(--color-primary-tint);
+    color: var(--color-primary-light);
+
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.payment-method__content--cash
+.payment-method__icon,
+.payment-method__icon--bank {
+    background: var(--color-accent-tint);
+    color: var(--color-accent-dark);
+}
+
+.payment-method__icon--maya {
+    background: var(--color-gold-tint);
+    color: var(--color-gold-dark);
+}
+
+.payment-method__content p {
+    margin: 0;
+
+    color: var(--sat-text-main);
+
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.payment-method__content span {
+    display: block;
+
+    margin-top: 0.1rem;
+
+    color: var(--sat-text-muted);
+
+    font-size: 0.65rem;
+}
+
+.reference-card {
+    margin-top: 1rem;
+
+    padding: 0.9rem;
+
+    border: 1px solid var(--color-primary-tint-border);
+    border-radius: 0.9rem;
+
+    background: var(--sat-blue-bg);
+}
+
+.reference-card small {
+    display: block;
+
+    margin-top: 0.45rem;
+
+    color: var(--color-primary-light);
+
+    font-size: 0.6rem;
+    line-height: 1.5;
+}
+
+.cash-message {
+    margin-top: 1rem;
+
+    padding: 0.9rem;
+
+    border: 1px solid var(--color-accent-tint-border);
+    border-radius: 0.9rem;
+
+    background: var(--color-accent-tint);
+}
+
+.cash-message strong {
+    color: var(--color-accent-darker);
+
+    font-size: 0.8rem;
+}
+
+.cash-message p {
+    margin: 0.25rem 0 0;
+
+    color: var(--sat-text-muted);
+
+    font-size: 0.7rem;
+    line-height: 1.55;
+}
+
+.cash-message small {
+    display: block;
+
+    margin-top: 0.45rem;
+
+    color: var(--sat-text-sub);
+
+    font-size: 0.6rem;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.summary-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.7rem;
+}
+
+.summary-item {
+    padding: 0.8rem;
+
+    border-radius: 0.8rem;
+
+    background: var(--sat-bg-light);
+}
+
+.summary-item p,
+.summary-payment p {
+    margin: 0;
+
+    color: var(--sat-text-sub);
+
+    font-size: 0.55rem;
+    font-weight: 700;
+
+    letter-spacing: 0.1em;
+
+    text-transform: uppercase;
+}
+
+.summary-item > div {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 0.5rem;
+
+    margin-top: 0.2rem;
+}
+
+.summary-item strong,
+.summary-payment > strong {
+    color: var(--sat-navy);
+
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.summary-item small,
+.summary-payment small {
+    display: block;
+
+    margin-top: 0.2rem;
+
+    color: var(--sat-text-muted);
+
+    font-size: 0.6rem;
+}
+
+.summary-email {
+    display: block;
+
+    margin-top: 0.2rem;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #475569 !important;
+}
+
+.summary-payment {
+    padding: 0.8rem;
+
+    border: 1px solid rgb(var(--brand-accent-rgb) / 30%);
+    border-radius: 0.8rem;
+
+    background: rgb(var(--brand-accent-rgb) / 10%);
+}
+
+.summary-payment__cash {
+    color: var(--color-accent-dark) !important;
+    font-weight: 600;
+}
+
+.summary-payment__online {
+    color: var(--color-primary-mid) !important;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   TERMS
+========================================================= */
+
+.terms {
+    margin-top: 1rem;
+
+    padding-top: 1rem;
+
+    border-top: 1px solid #f1f5f9;
+}
+
+.terms label {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 0.65rem;
+
+    cursor: pointer;
+}
+
+.terms input {
+    width: 1rem;
+    height: 1rem;
+
+    flex-shrink: 0;
+
+    margin-top: 0.1rem;
+
+    accent-color: var(--sat-navy);
+}
+
+.terms span {
+    color: #475569;
+
+    font-size: 0.65rem;
+    line-height: 1.55;
+}
+
+
+/* =========================================================
+   PAYMENT INSTRUCTION
+========================================================= */
+
+.payment-instruction {
+    display: flex;
+
+    gap: 0.7rem;
+
+    margin-top: 1rem;
+
+    padding: 0.85rem;
+
+    border: 1px solid var(--sat-blue-border);
+    border-radius: 0.85rem;
+
+    background: var(--sat-blue-bg);
+}
+
+.payment-instruction__icon {
+    width: 2rem;
+    height: 2rem;
+
+    flex-shrink: 0;
+
+    border-radius: 0.65rem;
+
+    background: var(--color-primary-tint);
+    color: var(--color-primary-light);
+
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.payment-instruction strong {
+    color: var(--color-primary-mid);
+
+    font-size: 0.7rem;
+}
+
+.payment-instruction p {
+    margin: 0.2rem 0 0;
+
+    color: var(--color-primary-mid);
+
+    font-size: 0.65rem;
+    line-height: 1.55;
+}
+
+
+/* =========================================================
+   FOOTER
+   FIXED — NEVER SCROLLS
+========================================================= */
+
+.satellite-modal__footer {
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 1rem;
+
+    padding: 0.8rem 1.5rem;
+
+    border-top: 1px solid var(--sat-border);
+
+    background: #fff;
+}
+
+.satellite-modal__footer-left,
+.satellite-modal__footer-right {
+    display: flex;
+    align-items: center;
+
+    gap: 0.6rem;
+}
+
+.satellite-modal__footer-right {
+    margin-left: auto;
+}
+
+.wizard-button {
+    gap: 0.4rem;
+
+    padding: 0.65rem 1rem;
+
+    border-radius: 0.7rem;
+
+    font-size: 0.7rem;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.wizard-button--back {
+    border: 1px solid #cbd5e1;
+
+    background: #fff;
+
+    color: #475569;
+}
+
+.wizard-button--back:hover {
+    background: var(--sat-bg-light);
+}
+
+.wizard-button--cancel {
+    border: 0;
+
+    background: transparent;
+
+    color: var(--sat-text-sub);
+}
+
+.wizard-button--cancel:hover {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.wizard-button--next {
+    min-width: 120px;
+
+    border: 0;
+
+    background: var(--sat-navy);
+    color: #fff;
+
+    box-shadow:
+        0 8px 15px -5px rgb(var(--brand-primary-rgb) / 20%);
+}
+
+.wizard-button--next:hover {
+    background: var(--sat-navy-hover);
+}
+
+.wizard-button--submit {
+    min-width: 160px;
+
+    border: 0;
+
+    background: var(--sat-gold-dark);
+    color: var(--sat-navy);
+
+    font-weight: 800;
+
+    box-shadow:
+        0 8px 15px -5px rgb(var(--brand-accent-rgb) / 20%);
+}
+
+.wizard-button--submit:hover {
+    background: var(--sat-gold);
+}
+
+.wizard-button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.5;
+}
+
+.submit-loading {
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.5rem;
+}
+
+.submit-loading__icon {
+    width: 1rem;
+    height: 1rem;
+
+    animation: satellite-spin 1s linear infinite;
+}
+
+.submit-loading__circle {
+    opacity: 0.25;
+}
+
+.submit-loading__path {
+    opacity: 0.75;
+}
+
+@keyframes satellite-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1280px) {
+
+    .satellite-modal__wizard {
+        grid-template-columns: 270px minmax(0, 1fr);
+    }
+
+    .satellite-modal__body {
+        padding: 2.25rem 3rem;
+    }
+
+    .satellite-modal__header {
+        padding: 1.35rem 1.75rem;
+    }
+
+    .satellite-modal__footer {
+        padding: 0.85rem 1.75rem;
+    }
+
+    .satellite-step__heading h3 {
+        font-size: 2rem;
+    }
+
+    .satellite-plan__card {
+        min-height: 350px;
+    }
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1024px) {
+
+    .satellite-modal__wizard {
+        grid-template-columns: 210px minmax(0, 1fr);
+    }
+
+    .satellite-modal__body {
+        padding: 1.5rem;
+    }
+
+    .satellite-stepper {
+        padding: 1.5rem 1rem;
+    }
+
+    .satellite-stepper__item {
+        gap: 0.7rem;
+    }
+
+    .satellite-stepper__label {
+        font-size: 0.65rem;
+    }
+
+    .satellite-stepper__details small {
+        font-size: 0.58rem;
+    }
+
+    .satellite-plans {
+        grid-template-columns: 1fr;
+    }
+
+    .satellite-plan__card {
+        min-height: auto;
+    }
+
+    .payment-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* =========================================================
+   MOBILE / STACKED WIZARD
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .satellite-modal {
+        align-items: flex-start;
+
+        padding: 0;
+    }
+
+    .satellite-modal__container {
+        width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+
+        border-radius: 0;
+    }
+
+    .satellite-modal__header {
+        padding: 1rem;
+    }
+
+    .satellite-modal__title {
+        font-size: 1.15rem;
+    }
+
+    .satellite-modal__wizard {
+        grid-template-columns: 1fr;
+
+        overflow: hidden;
+    }
+
+    .satellite-modal__sidebar {
+        min-height: auto;
+
+        border-right: 0;
+        border-bottom: 1px solid var(--sat-border);
+    }
+
+    .satellite-stepper {
+        height: auto;
+
+        padding: 0.8rem 1rem;
+    }
+
+    .satellite-stepper__items {
+        display: grid;
+
+        grid-template-columns: repeat(3, 1fr);
+
+        height: auto;
+    }
+
+    .satellite-stepper__item {
+        min-height: auto;
+
+        flex: none;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        gap: 0.35rem;
+
+        padding: 0.2rem;
+    }
+
+    .satellite-stepper__item:last-child {
+        flex: none;
+    }
+
+    .satellite-stepper__line,
+    .satellite-stepper__progress {
+        top: 1.65rem;
+        bottom: auto;
+
+        left: 16.66%;
+
+        width: 66.68%;
+        height: 2px;
+
+        transform: none;
+    }
+
+    .satellite-stepper__progress {
+        width: var(--step-progress, 0%);
+    }
+
+    .satellite-stepper__details {
+        align-items: center;
+
+        padding-top: 0;
+    }
+
+    .satellite-stepper__label {
+        font-size: 0.55rem;
+
+        text-align: center;
+    }
+
+    .satellite-stepper__details small {
+        display: none;
+    }
+
+    .satellite-stepper__number {
+        width: 2rem;
+        height: 2rem;
+
+        font-size: 0.65rem;
+    }
+
+    .satellite-modal__body {
+        padding: 1.25rem;
+
+        overflow-y: auto;
+    }
+
+    .satellite-step__heading {
+        margin-bottom: 1.1rem;
+    }
+
+    .satellite-step__heading h3 {
+        font-size: 1.45rem;
+    }
+
+    .satellite-step__heading p {
+        font-size: 0.8rem;
+    }
+
+    .satellite-selection-info {
+        grid-template-columns: 1fr;
+    }
+
+    .satellite-details-card__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .account-form {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .satellite-modal__footer {
+        padding: 0.75rem 1rem;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .satellite-modal__header-content {
+        gap: 0.5rem;
+    }
+
+    .satellite-modal__eyebrow {
+        font-size: 0.55rem;
+    }
+
+    .satellite-modal__header-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .satellite-modal__title {
+        font-size: 1rem;
+    }
+
+    .satellite-modal__subtitle {
+        font-size: 0.65rem;
+    }
+
+    .satellite-modal__close {
+        width: 2.2rem;
+        height: 2.2rem;
+    }
+
+    .satellite-modal__body {
+        padding: 1rem;
+    }
+
+    .satellite-plan__card {
+        padding: 1.1rem;
+    }
+
+    .satellite-plan__icon {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    .account-card,
+    .payment-card,
+    .summary-card {
+        padding: 1rem;
+    }
+
+    .account-membership {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .account-membership button {
+        align-self: flex-start;
+    }
+
+    .satellite-address-row {
+        flex-direction: column;
+    }
+
+    .satellite-map-toggle {
+        width: 100%;
+    }
+
+    .satellite-map-panel__search {
+        flex-direction: column;
+    }
+
+    .satellite-map-panel__search button {
+        width: 100%;
+    }
+
+    .satellite-modal__footer {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 0.5rem;
+    }
+
+    .satellite-modal__footer-left,
+    .satellite-modal__footer-right {
+        width: 100%;
+
+        justify-content: space-between;
+    }
+
+    .satellite-modal__footer-right {
+        margin-left: 0;
+    }
+
+    .wizard-button--next,
+    .wizard-button--submit {
+        flex: 1;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL DEVICES
+========================================================= */
+
+@media (max-width: 360px) {
+
+    .satellite-stepper__label {
+        font-size: 0.5rem;
+    }
+
+    .satellite-stepper__number {
+        width: 1.8rem;
+        height: 1.8rem;
+    }
+
+    .satellite-modal__body {
+        padding: 0.75rem;
+    }
+
+    .satellite-modal__footer {
+        padding: 0.6rem 0.75rem;
+    }
+}

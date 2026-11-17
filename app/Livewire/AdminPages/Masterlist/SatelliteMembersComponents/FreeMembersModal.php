@@ -202,15 +202,15 @@ class FreeMembersModal extends Component
                 .'border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;">'
                 .'<table style="width:100%;font-size:13px;border-collapse:collapse;">'
                 .'<tr><td style="padding:8px 12px;color:#64748B;">Username</td>'
-                .'<td style="padding:8px 12px;text-align:right;font-weight:700;color:#0B2A5B;">'
+                .'<td style="padding:8px 12px;text-align:right;font-weight:700;color:var(--color-primary);">'
                 .e($row['username']).'</td></tr>'
                 .'<tr style="background:#F8FAFC;"><td style="padding:8px 12px;color:#64748B;">Name</td>'
-                .'<td style="padding:8px 12px;text-align:right;font-weight:700;color:#0B2A5B;">'
+                .'<td style="padding:8px 12px;text-align:right;font-weight:700;color:var(--color-primary);">'
                 .e($row['name'] ?: '—').'</td></tr>'
                 .'<tr><td style="padding:8px 12px;color:#64748B;">Type</td>'
-                .'<td style="padding:8px 12px;text-align:right;font-weight:700;color:#0B2A5B;">Free Member</td></tr>'
+                .'<td style="padding:8px 12px;text-align:right;font-weight:700;color:var(--color-primary);">Free Member</td></tr>'
                 .'<tr style="background:#F8FAFC;"><td style="padding:8px 12px;color:#64748B;">Ledger Amount</td>'
-                .'<td style="padding:8px 12px;text-align:right;font-weight:700;color:#0B2A5B;">₱'
+                .'<td style="padding:8px 12px;text-align:right;font-weight:700;color:var(--color-primary);">₱'
                 .number_format($row['amount'], 2).'</td></tr>'
                 .'</table></div>'
                 .'<p style="font-size:13px;color:#64748B;">Their membership-fee ledger is completed and the '
@@ -364,7 +364,7 @@ class FreeMembersModal extends Component
 
         $previewList = $freeUsernames
             ->take(10)
-            ->map(fn ($username) => '<li style="font-weight:700;color:#0B2A5B;">'.e($username).'</li>')
+            ->map(fn ($username) => '<li style="font-weight:700;color:var(--color-primary);">'.e($username).'</li>')
             ->implode('');
 
         $overflow = $freeUsernames->count() > 10
@@ -373,9 +373,9 @@ class FreeMembersModal extends Component
 
         $this->dispatch('swal:confirm', [
             'title' => 'Activate All Free Members?',
-            'html' => 'You are about to activate <strong style="color:#0B2A5B;">'
+            'html' => 'You are about to activate <strong style="color:var(--color-primary);">'
                 .$this->pendingFreeCount.'</strong> pending free member(s) under '
-                .'<strong style="color:#0B2A5B;">'.e($this->satellite?->satellite_name ?: 'this satellite').'</strong>.'
+                .'<strong style="color:var(--color-primary);">'.e($this->satellite?->satellite_name ?: 'this satellite').'</strong>.'
                 .'<div style="margin:14px auto;max-width:420px;text-align:left;'
                 .'border:1px solid #E2E8F0;border-radius:12px;max-height:220px;'
                 .'overflow:auto;padding:10px 14px;">'

@@ -5,7 +5,7 @@
     </div>
 
     @if (session()->has('message'))
-        <div class="mb-4 rounded-xl border border-[#0C2C6B]/30 bg-[#0C2C6B]/10 p-4 text-sm text-[#0C2C6B]">
+        <div class="mb-4 rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/10 p-4 text-sm text-[var(--color-primary)]">
             {{ session('message') }}
         </div>
     @endif
@@ -17,14 +17,14 @@
         wire:model.live.debounce.300ms="search"
         type="search"
         placeholder="Search name or referral code..."
-        class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm shadow-sm focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] lg:max-w-sm"
+        class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm shadow-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] lg:max-w-sm"
     >
 
     <div class="flex flex-wrap items-center gap-3">
 
         {{-- DATE RANGE PICKER --}}
         <div wire:ignore class="relative w-60">
-            <span class="pointer-events-none absolute inset-y-0 left-3 z-10 flex items-center text-slate-400">
+            <span class="pointer-events-none absolute inset-y-0 left-3 z-10 flex items-center text-slate-500">
                 📅
             </span>
 
@@ -32,7 +32,7 @@
                 type="text"
                 id="userDateRange"
                 readonly
-                class="date-range-input w-full cursor-pointer rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-center text-sm font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                class="date-range-input w-full cursor-pointer rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-center text-sm font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 placeholder="Select date range"
             >
         </div>
@@ -57,7 +57,7 @@
                 wire:loading.attr="disabled"
                 wire:target="preparePrint"
                 title="Print Report"
-                class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-[#0C2C6B]"
+                class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-[var(--color-primary)]"
             >
                 <span>🖨️</span>
                 <span class="hidden sm:inline">Print</span>
@@ -110,7 +110,7 @@
     {{-- Screen table --}}
     <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm print:hidden">
         <table class="w-full border-collapse text-left text-sm">
-            <thead class="bg-[#0C2C6B] text-xs uppercase tracking-wide text-white">
+            <thead class="bg-[var(--color-primary)] text-xs uppercase tracking-wide text-white">
                 <tr>
                     <th class="px-4 py-3">Date</th>
                     <th class="px-4 py-3">Code</th>
@@ -169,7 +169,7 @@
                             @foreach (['DR', 'PF', 'CS', 'SDR', 'OV', 'TX', 'WD', 'TOTAL', 'RUNNING_BALANCE'] as $field)
                                 <td
                                     class="whitespace-nowrap px-4 py-3 text-right font-medium
-                                {{ in_array($field, ['TOTAL', 'RUNNING_BALANCE']) ? 'font-bold text-[#0C2C6B]' : '' }}">
+                                {{ in_array($field, ['TOTAL', 'RUNNING_BALANCE']) ? 'font-bold text-[var(--color-primary)]' : '' }}">
                                     ₱{{ number_format((float) $row->{$field}, 2) }}
                                 </td>
                             @endforeach
@@ -180,7 +180,7 @@
                                 wire:click="viewLedger({{ $row->UserID }})"
                                 type="button"
                                 title="View Financial Details"
-                                class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
+                                class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)] transition cursor-pointer text-xs font-semibold shadow">
                                  👁️
                             </button>
                             </td>
@@ -202,25 +202,25 @@
             <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
                 <span class="font-bold text-slate-700">Legend:</span>
                 <span class="inline-flex items-center gap-1">
-                    <strong class="font-semibold text-[#0C2C6B]">DR:</strong> Direct Referral
+                    <strong class="font-semibold text-[var(--color-primary)]">DR:</strong> Direct Referral
                 </span>
                 <span class="inline-flex items-center gap-1">
-                    <strong class="font-semibold text-[#0C2C6B]">PF:</strong> Provident Fund
+                    <strong class="font-semibold text-[var(--color-primary)]">PF:</strong> Provident Fund
                 </span>
                 <span class="inline-flex items-center gap-1">
-                    <strong class="font-semibold text-[#0C2C6B]">CS:</strong> Commission Satellite
+                    <strong class="font-semibold text-[var(--color-primary)]">CS:</strong> Commission Satellite
                 </span>
                 <span class="inline-flex items-center gap-1">
-                    <strong class="font-semibold text-[#0C2C6B]">SDR:</strong> Satellite Direct Referral
+                    <strong class="font-semibold text-[var(--color-primary)]">SDR:</strong> Satellite Direct Referral
                 </span>
                 <span class="inline-flex items-center gap-1">
-                    <strong class="font-semibold text-[#0C2C6B]">OV:</strong> Overrides
+                    <strong class="font-semibold text-[var(--color-primary)]">OV:</strong> Overrides
                 </span>
                 <span class="inline-flex items-center gap-1">
-                    <strong class="font-semibold text-[#0C2C6B]">TX:</strong> Tax 10%
+                    <strong class="font-semibold text-[var(--color-primary)]">TX:</strong> Tax 10%
                 </span>
                 <span class="inline-flex items-center gap-1">
-                    <strong class="font-semibold text-[#0C2C6B]">WD:</strong> Withdrawal
+                    <strong class="font-semibold text-[var(--color-primary)]">WD:</strong> Withdrawal
                 </span>
             </div>
         </div>
@@ -261,9 +261,9 @@
 
     {{-- Printable report --}}
     <div id="printable-users" class="hidden print:block">
-        <header class="mb-5 border-b-2 border-[#0C2C6B] pb-3 text-center">
-            <h1 class="text-2xl font-bold text-[#0C2C6B]">TRUE LIFE</h1>
-            <p class="text-xs font-bold uppercase tracking-widest text-[#D79B10]">Solidaritas</p>
+        <header class="mb-5 border-b-2 border-[var(--color-primary)] pb-3 text-center">
+            <h1 class="text-2xl font-bold text-[var(--color-primary)]">TRIFECTA</h1>
+            <p class="text-xs font-bold uppercase tracking-widest text-[var(--color-accent)]">Health · Wellness · Protection</p>
             <h2 class="mt-2 text-sm font-bold">SALES CONSULTANTS DAILY WALLET REPORT</h2>
             <p class="text-xs text-slate-600">Period: {{ $dateRangeLabel }} @if ($statusFilter)
                     | Status: {{ $statusFilter }}
@@ -272,7 +272,7 @@
         </header>
         <table class="w-full border-collapse text-[10px]">
             <thead>
-                <tr class="bg-[#0C2C6B] text-white">
+                <tr class="bg-[var(--color-primary)] text-white">
                     @foreach (['Date', 'Code', 'Sales Consultant', 'Role', 'DR', 'PF', 'CS', 'SDR', 'OV', 'TX', 'WD', 'Total', 'Running Balance'] as $heading)
                         <th class="border border-black p-1">{{ $heading }}</th>
                     @endforeach
@@ -317,7 +317,7 @@
             <div class="flex min-h-full items-center justify-center">
                 <section
                     class="flex max-h-[calc(100vh-2rem)] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
-                    <header class="flex items-center justify-between gap-4 bg-[#0C2C6B] px-6 py-4 text-white">
+                    <header class="flex items-center justify-between gap-4 bg-[var(--color-primary)] px-6 py-4 text-white">
                         <div>
                             <h3 class="font-bold">Financial Details —
                                 {{ trim(($selectedUser->firstname ?? '') . ' ' . ($selectedUser->lastname ?? '')) }}</h3>
@@ -331,15 +331,15 @@
                     <div class="space-y-6 overflow-y-auto p-5">
                         <div class="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
                             <div>
-                                <p class="text-xs uppercase text-slate-400">Email</p>
+                                <p class="text-xs uppercase text-slate-500">Email</p>
                                 <p class="break-all text-sm font-medium">{{ $selectedUser->email ?? '—' }}</p>
                             </div>
                             <div>
-                                <p class="text-xs uppercase text-slate-400">Referral Code</p>
+                                <p class="text-xs uppercase text-slate-500">Referral Code</p>
                                 <p class="text-sm font-medium">{{ $selectedUser->referralCode ?? '—' }}</p>
                             </div>
                             <div>
-                                <p class="text-xs uppercase text-slate-400">Role</p>
+                                <p class="text-xs uppercase text-slate-500">Role</p>
                                 <p class="text-sm font-medium">{{ $selectedUser->role->rolename ?? 'Member' }}</p>
                             </div>
                         </div>
@@ -372,7 +372,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="6" class="p-4 text-center text-slate-400">No wallet
+                                                <td colspan="6" class="p-4 text-center text-slate-500">No wallet
                                                     entries found.</td>
                                             </tr>
                                         @endforelse
@@ -406,7 +406,7 @@
                                                     @if ($ledger->Source === 'PK')
                                                         {{ $ledger->draw?->prize_name ?? 'Pangkabuhayan Prize' }}
                                                         @if ($ledger->draw)
-                                                            <span class="block text-slate-400">Draw:
+                                                            <span class="block text-slate-500">Draw:
                                                                 {{ $ledger->draw->draw_date?->format('M j, Y') }}</span>
                                                         @endif
                                                     @else
@@ -421,7 +421,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="p-4 text-center text-slate-400">No ledger
+                                                <td colspan="7" class="p-4 text-center text-slate-500">No ledger
                                                     entries found.</td>
                                             </tr>
                                         @endforelse
@@ -440,53 +440,26 @@
         </div>
     @endif
 
-    <style>
-        @media print {
-            @page {
-                size: landscape;
-                margin: 8mm;
-            }
-
-            body * {
-                visibility: hidden !important;
-            }
-
-            #printable-users,
-            #printable-users * {
-                visibility: visible !important;
-            }
-
-            #printable-users {
-                display: block !important;
-                position: absolute !important;
-                inset: 0 auto auto 0;
-                width: 100%;
-            }
-
-            table {
-                border-collapse: collapse !important;
-                width: 100% !important;
-            }
-
-            th,
-            td {
-                border: 1px solid #000 !important;
-                padding: 4px !important;
-            }
-
-            th {
-                background: #0C2C6B !important;
-                color: #fff !important;
-                print-color-adjust: exact !important;
-            }
-        }
-    </style>
 
     @script
     <script>
-        const dateInput = $wire.$el.querySelector('#userDateRange');
+        const initSalesConsultantDateRange = () => {
+            // Lazy components run this block before Livewire morphs the
+            // real markup in, so the input is not in the DOM on the first run.
+            const dateInput = document.getElementById('userDateRange');
 
-        if (dateInput && typeof flatpickr !== 'undefined') {
+            if (!dateInput) {
+                return false;
+            }
+
+            if (dateInput._flatpickr) {
+                return true;
+            }
+
+            if (typeof flatpickr === 'undefined') {
+                return false;
+            }
+
             const picker = flatpickr(dateInput, {
                 mode: 'range',
                 dateFormat: 'Y-m-d',
@@ -538,7 +511,22 @@
             $wire.on('ranges-reset', () => {
                 picker.clear();
             });
-        }
+
+            return true;
+        };
+
+        initSalesConsultantDateRange();
+
+        // Finish the job once Livewire has morphed the lazy component in.
+        const stopWaitingForSalesConsultantDateRange = Livewire.hook('morphed', ({ component }) => {
+            if (component.id !== $wire.$id) {
+                return;
+            }
+
+            if (initSalesConsultantDateRange()) {
+                stopWaitingForSalesConsultantDateRange();
+            }
+        });
 
         // Print the report after Livewire renders the printable table.
         $wire.on('print-sales-consultant-report', () => {

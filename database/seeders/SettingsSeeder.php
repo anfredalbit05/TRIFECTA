@@ -19,19 +19,19 @@ class SettingsSeeder extends Seeder
             // ===========================
             [
                 'name' => 'company_name',
-                'value' => 'TrueLife Dayongan Solidaritas Social Welfare Services, Inc.',
+                'value' => 'TRIFECTA Health, Wellness & Protection Services, Inc.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'name' => 'company_short_name',
-                'value' => 'DAYONGAN',
+                'value' => 'TRIFECTA',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'name' => 'company_email',
-                'value' => 'dayongansolidaritas26@gmail.com',
+                'value' => 'care@trifecta.ph',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -123,7 +123,7 @@ class SettingsSeeder extends Seeder
             // ===========================
             [
                 'name' => 'system_name',
-                'value' => 'Dayongan Membership Management System',
+                'value' => 'TRIFECTA Membership Management System',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

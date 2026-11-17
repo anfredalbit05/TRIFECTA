@@ -10,11 +10,13 @@ use App\Support\Modules;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class BranchVariantGrants extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
     use WithPagination;
 
@@ -247,6 +249,7 @@ class BranchVariantGrants extends Component
         $this->reset('search');
         $this->resetPage();
     }
+
 
     public function render()
     {

@@ -6,8 +6,8 @@
                 {{-- HEADER --}}
                 <div class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4 shadow-sm">
                     <div>
-                        <h2 class="text-lg font-extrabold text-[#0B2A5B] sm:text-xl">Edit Satellite Member</h2>
-                        <p class="text-xs text-slate-500">True Life Solidaritas &bull; Vitae Auxilium</p>
+                        <h2 class="text-lg font-extrabold text-[var(--color-primary)] sm:text-xl">Edit Satellite Member</h2>
+                        <p class="text-xs text-slate-500">Health &middot; Wellness &middot; Protection</p>
                     </div>
 
                     <button wire:click="close" type="button"
@@ -22,8 +22,8 @@
 
                     {{-- PERSONAL INFORMATION --}}
                     <div class="space-y-4">
-                        <div class="rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
+                        <div class="rounded-xl bg-[var(--color-primary)] px-4 py-2.5 shadow-sm">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-white sm:text-sm">
                                 Member Personal Information
                             </h3>
                             <p class="mt-0.5 text-[10px] text-slate-200">
@@ -37,30 +37,30 @@
                             <div>
                                 <label class="mb-1 block text-xs font-bold text-slate-700">Surname *</label>
                                 <input wire:model.live="surname" type="text" placeholder="Dela Cruz"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                             </div>
 
                             {{-- FIRST NAME --}}
                             <div>
                                 <label class="mb-1 block text-xs font-bold text-slate-700">First Name *</label>
                                 <input wire:model.live="first_name" type="text" placeholder="Juan"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                             </div>
 
                             {{-- MIDDLE NAME --}}
                             <div>
                                 <label class="mb-1 block text-xs font-bold text-slate-700">
-                                    Middle Name <span class="font-normal text-slate-400">(Optional)</span>
+                                    Middle Name <span class="font-normal text-slate-500">(Optional)</span>
                                 </label>
                                 <input wire:model.live="middle_name" type="text" placeholder="Santos"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                             </div>
 
                             {{-- GENDER --}}
                             <div>
                                 <label class="mb-1 block text-xs font-bold text-slate-700">Gender *</label>
                                 <select wire:model="gender"
-                                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                                     <option value="">Select Gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
@@ -72,7 +72,7 @@
                             <div>
                                 <label class="mb-1 block text-xs font-bold text-slate-700">Civil Status *</label>
                                 <select wire:model="civil_status"
-                                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                                     <option value="">Select Status</option>
                                     <option value="Single">Single</option>
                                     <option value="Married">Married</option>
@@ -168,11 +168,11 @@
                                 <label class="mb-1 block text-xs font-bold text-slate-700">Birthdate *</label>
 
                                 <button type="button" @click="openPicker = true"
-                                    class="flex w-full items-center justify-between rounded-xl border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-700 transition hover:border-[#0B2A5B] focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                    class="flex w-full items-center justify-between rounded-xl border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-700 transition hover:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                                     <span x-text="$wire.birthdate || 'Select Date of Birth'"
-                                        :class="!$wire.birthdate ? 'text-slate-400' : 'text-slate-700'"></span>
+                                        :class="!$wire.birthdate ? 'text-slate-500' : 'text-slate-700'"></span>
 
-                                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor"
+                                    <svg class="h-4 w-4 text-slate-500" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2v12a2 2 0 002 2z" />
@@ -184,7 +184,7 @@
 
                                     <div @click.stop class="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
 
-                                        <div class="bg-[#E8B923] p-5 text-[#0B2A5B]">
+                                        <div class="bg-[var(--color-accent)] p-5 text-white">
                                             <span class="text-[10px] font-bold uppercase tracking-widest opacity-80">
                                                 Select Date of Birth
                                             </span>
@@ -215,7 +215,7 @@
                                                 <div class="mb-3 flex items-center justify-between border-b pb-2 text-xs font-bold uppercase text-slate-500">
                                                     <span>Select Year</span>
                                                     <button type="button" @click="step = 'month'"
-                                                        class="text-[#0B2A5B] hover:underline">
+                                                        class="text-[var(--color-primary)] hover:underline">
                                                         Next: Month &rarr;
                                                     </button>
                                                 </div>
@@ -224,7 +224,7 @@
                                                     <template x-for="yr in years" :key="yr">
                                                         <button type="button" @click="selectYear(yr)"
                                                             :class="String(selectedYear) === String(yr)
-                                                                ? 'bg-[#0B2A5B] text-white font-bold'
+                                                                ? 'bg-[var(--color-primary)] text-white font-bold'
                                                                 : 'bg-slate-50 text-slate-700 hover:bg-slate-100'"
                                                             class="rounded-lg py-2.5 text-sm transition"
                                                             x-text="yr">
@@ -243,7 +243,7 @@
                                                     <span>Select Month</span>
 
                                                     <button type="button" @click="step = 'day'"
-                                                        class="text-[#0B2A5B] hover:underline">
+                                                        class="text-[var(--color-primary)] hover:underline">
                                                         Next: Day &rarr;
                                                     </button>
                                                 </div>
@@ -252,7 +252,7 @@
                                                     <template x-for="month in months" :key="month.val">
                                                         <button type="button" @click="selectMonth(month.val)"
                                                             :class="selectedMonth === month.val
-                                                                ? 'bg-[#0B2A5B] text-white font-bold'
+                                                                ? 'bg-[var(--color-primary)] text-white font-bold'
                                                                 : 'bg-slate-50 text-slate-700 hover:bg-slate-100'"
                                                             class="rounded-lg py-3 text-sm transition"
                                                             x-text="month.name">
@@ -276,7 +276,7 @@
                                                     <template x-for="day in daysInMonth" :key="day">
                                                         <button type="button" @click="selectDay(day)"
                                                             :class="selectedDay === day
-                                                                ? 'bg-[#0B2A5B] text-white font-bold'
+                                                                ? 'bg-[var(--color-primary)] text-white font-bold'
                                                                 : 'bg-slate-50 text-slate-700 hover:bg-slate-100'"
                                                             class="rounded-lg py-2.5 text-sm transition"
                                                             x-text="day">
@@ -295,7 +295,7 @@
                                             </button>
 
                                             <button type="button" @click="confirmDate()"
-                                                class="rounded-lg bg-[#0B2A5B] px-6 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123b7a]">
+                                                class="rounded-lg bg-[var(--color-primary)] px-6 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[var(--color-primary-mid)]">
                                                 OK
                                             </button>
                                         </div>
@@ -308,15 +308,15 @@
                                 <label class="mb-1 block text-xs font-bold text-slate-700">Occupation</label>
                                 <input wire:model.live="occupation" type="text"
                                     placeholder="e.g. Teacher, Driver, Engineer"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                             </div>
                         </div>
                     </div>
 
                     {{-- ADDRESS & LOCATION --}}
                     <div class="space-y-4">
-                        <div class="rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
+                        <div class="rounded-xl bg-[var(--color-primary)] px-4 py-2.5 shadow-sm">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-white sm:text-sm">
                                 Address & Location
                             </h3>
                             <p class="mt-0.5 text-[10px] text-slate-200">
@@ -332,10 +332,10 @@
                             <div class="flex gap-2">
                                 <input wire:model.live="address" type="text"
                                     placeholder="House No., Street, Barangay, City/Municipality, Province"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
 
                                 <button type="button" wire:click="toggleMap"
-                                    class="shrink-0 rounded-xl bg-[#0B2A5B] px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123b7a]">
+                                    class="shrink-0 rounded-xl bg-[var(--color-primary)] px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[var(--color-primary-mid)]">
                                     {{ $showMapModal ? 'Close Map' : 'Pin Map' }}
                                 </button>
                             </div>
@@ -344,17 +344,17 @@
                                 class="mt-3 space-y-3 overflow-hidden rounded-xl border border-slate-300 bg-white p-3 shadow-sm">
 
                                 <div class="flex items-center justify-between">
-                                    <h4 class="text-sm font-bold text-[#0B2A5B]">Select Location</h4>
-                                    <span class="text-[10px] text-slate-400">Search or click on map</span>
+                                    <h4 class="text-sm font-bold text-[var(--color-primary)]">Select Location</h4>
+                                    <span class="text-[10px] text-slate-500">Search or click on map</span>
                                 </div>
 
                                 <div class="flex gap-2">
                                     <input id="leaflet-search-input" type="text"
                                         placeholder="Search location..."
-                                        class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                        class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
 
                                     <button id="leaflet-search-btn" type="button"
-                                        class="shrink-0 rounded-xl bg-[#0B2A5B] px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#123b7a]">
+                                        class="shrink-0 rounded-xl bg-[var(--color-primary)] px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[var(--color-primary-mid)]">
                                         Search
                                     </button>
                                 </div>
@@ -368,8 +368,8 @@
 
                     {{-- ACCOUNT INFORMATION --}}
                     <div class="space-y-4">
-                        <div class="rounded-xl bg-[#0B2A5B] px-4 py-2.5 shadow-sm">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-[#E8B923] sm:text-sm">
+                        <div class="rounded-xl bg-[var(--color-primary)] px-4 py-2.5 shadow-sm">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-white sm:text-sm">
                                 Account Information
                             </h3>
                             <p class="mt-0.5 text-[10px] text-slate-200">
@@ -385,23 +385,23 @@
                                     Mobile Number *
                                 </label>
                                 <input wire:model.live="mobile" type="tel" placeholder="0917XXXXXXX"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                             </div>
 
                             {{-- EMAIL --}}
                             <div>
                                 <label class="mb-1 block text-xs font-bold text-slate-700">
-                                    Email Address <span class="font-normal text-slate-400">(Optional)</span>
+                                    Email Address <span class="font-normal text-slate-500">(Optional)</span>
                                 </label>
                                 <input wire:model="email" type="email" placeholder="juan@example.com"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                             </div>
 
                             {{-- USERNAME --}}
                             <div>
                                 <label class="mb-1 block text-xs font-bold text-slate-700">Username *</label>
                                 <input wire:model="username" type="text" placeholder="Juan123"
-                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]">
+                                    class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                             </div>
                         </div>
                     </div>
@@ -422,7 +422,7 @@
                         <button wire:click="confirmUpdate"
                             wire:loading.attr="disabled"
                             type="button"
-                            class="flex w-1/2 items-center justify-center rounded-xl bg-[#D4A017] px-6 py-2.5 text-xs font-bold text-[#0B2A5B] shadow-md transition hover:bg-[#E8B923] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
+                            class="flex w-1/2 items-center justify-center rounded-xl bg-[var(--color-accent)] px-6 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
 
                             <span wire:loading.remove wire:target="confirmUpdate">
                                 Update Member
@@ -430,7 +430,7 @@
 
                             <div wire:loading.flex wire:target="confirmUpdate"
                                 class="items-center justify-center gap-2">
-                                <svg class="h-4 w-4 shrink-0 animate-spin text-[#0B2A5B]"
+                                <svg class="h-4 w-4 shrink-0 animate-spin text-[var(--color-primary)]"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10"
                                         stroke="currentColor" stroke-width="4"></circle>
@@ -453,229 +453,5 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-    <script>
-        {{-- Scoped in an IIFE: top-level `let map` here clashes with the same
-             declarations in application-modal.blade.php when both components are
-             mounted on one page (e.g. Masterlist). A classic-script redeclaration
-             throws a SyntaxError that kills this whole block, silently disabling
-             every Livewire.on listener below. --}}
-        (() => {
-            let map = null;
-            let marker = null;
-
-            document.addEventListener('livewire:initialized', () => {
-
-            Livewire.on('destroy-map', () => {
-                if (map) {
-                    map.remove();
-                    map = null;
-                    marker = null;
-                }
-            });
-
-            Livewire.on('map-opened', (data) => {
-                setTimeout(() => {
-                    const defaultLat = 7.442294461028405;
-                    const defaultLng = 125.81370503321095;
-
-                    const lat = data.latitude ?? defaultLat;
-                    const lng = data.longitude ?? defaultLng;
-
-                    if (map) {
-                        map.remove();
-                        map = null;
-                        marker = null;
-                    }
-
-                    map = L.map('map').setView([lat, lng], 15);
-
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap'
-                    }).addTo(map);
-
-                    if (data.latitude !== null && data.longitude !== null) {
-                        marker = L.marker([lat, lng]).addTo(map);
-                        map.setView([lat, lng], 16);
-                    }
-
-                    const searchInput = document.getElementById('leaflet-search-input');
-                    const searchBtn = document.getElementById('leaflet-search-btn');
-
-                    const performSearch = () => {
-                        if (!searchInput) return;
-
-                        const query = searchInput.value.trim();
-                        if (!query) return;
-
-                        fetch(
-                            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`
-                        )
-                            .then(response => response.json())
-                            .then(results => {
-                                if (!results?.length) {
-                                    Swal.fire({
-                                        icon: 'warning',
-                                        title: 'Location Not Found',
-                                        text: 'Please try another location.',
-                                        confirmButtonColor: '#0B2A5B'
-                                    });
-                                    return;
-                                }
-
-                                const result = results[0];
-                                const center = [
-                                    parseFloat(result.lat),
-                                    parseFloat(result.lon)
-                                ];
-
-                                map.setView(center, 16);
-
-                                if (marker) {
-                                    marker.setLatLng(center);
-                                } else {
-                                    marker = L.marker(center).addTo(map);
-                                }
-
-                                Livewire.dispatch('set-coordinates', {
-                                    lat: result.lat,
-                                    lng: result.lon
-                                });
-                            })
-                            .catch(error => {
-                                console.error('Geocoding error:', error);
-
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Search Error',
-                                    text: 'Unable to search for this location. Please try again.',
-                                    confirmButtonColor: '#0B2A5B'
-                                });
-                            });
-                    };
-
-                    searchInput?.addEventListener('keypress', e => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            performSearch();
-                        }
-                    });
-
-                    searchBtn?.addEventListener('click', e => {
-                        e.preventDefault();
-                        performSearch();
-                    });
-
-                    map.on('click', e => {
-                        if (marker) {
-                            marker.setLatLng(e.latlng);
-                        } else {
-                            marker = L.marker(e.latlng).addTo(map);
-                        }
-
-                        Livewire.dispatch('set-coordinates', {
-                            lat: e.latlng.lat,
-                            lng: e.latlng.lng
-                        });
-                    });
-
-                    setTimeout(() => map.invalidateSize(), 100);
-                }, 300);
-            });
-
-            {{-- VALIDATION ERROR --}}
-            Livewire.on('validation-error', data => {
-                Swal.fire({
-                    icon: 'error',
-                    title: data.title || 'Error',
-                    html: data.html || data.text || 'Please check the required fields.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0B2A5B',
-                    allowOutsideClick: false
-                });
-            });
-
-            {{-- CONFIRM UPDATE --}}
-            Livewire.on('swal-confirm-update', data => {
-                const changes = data?.changes || [];
-
-                let rowsHtml = '';
-
-                if (changes.length) {
-                    changes.forEach(change => {
-                        rowsHtml += `
-                            <tr>
-                                <td style="padding:6px 10px;font-weight:600;color:#0B2A5B;border-bottom:1px solid #e2e8f0;">
-                                    ${change.field}
-                                </td>
-                                <td style="padding:6px 10px;color:#dc2626;text-decoration:line-through;border-bottom:1px solid #e2e8f0;">
-                                    ${change.old}
-                                </td>
-                                <td style="padding:6px 10px;color:#16a34a;font-weight:600;border-bottom:1px solid #e2e8f0;">
-                                    ${change.new}
-                                </td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    rowsHtml = `
-                        <tr>
-                            <td colspan="3" style="padding:12px;text-align:center;color:#94a3b8;">
-                                No changes detected.
-                            </td>
-                        </tr>
-                    `;
-                }
-
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Confirm Update',
-                    width: 560,
-                    html: `
-                        <div style="text-align:left;">
-                            <p style="margin-bottom:10px;color:#475569;font-size:13px;">
-                                Please review the changes below before saving:
-                            </p>
-
-                            <div style="max-height:280px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:8px;">
-                                <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                                    <thead>
-                                        <tr style="background:#f1f5f9;">
-                                            <th style="padding:6px 10px;text-align:left;">Field</th>
-                                            <th style="padding:6px 10px;text-align:left;">Before</th>
-                                            <th style="padding:6px 10px;text-align:left;">After</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>${rowsHtml}</tbody>
-                                </table>
-                            </div>
-                        </div>
-                    `,
-                    showCancelButton: true,
-                    confirmButtonText: 'Save Changes',
-                    cancelButtonText: 'Cancel',
-                    confirmButtonColor: '#0B2A5B',
-                    cancelButtonColor: '#D79B10',
-                    reverseButtons: true
-                }).then(result => {
-                    if (result.isConfirmed) {
-                        Livewire.dispatch('confirmed-update-member');
-                    }
-                });
-            });
-
-            {{-- GENERIC TOAST --}}
-            Livewire.on('show-toast', data => {
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: data.icon || 'success',
-                    title: data.title || 'Success',
-                    showConfirmButton: false,
-                    timer: 2500,
-                    timerProgressBar: true
-                });
-            });
-            });
-        })();
-    </script>
+    @vite('resources/js/livewire/admin-pages/masterlist/satellite-members-components/satellite-members-edit.js')
 </div>

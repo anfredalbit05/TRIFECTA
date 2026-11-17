@@ -5,11 +5,13 @@ namespace App\Livewire\AdminPages\Masterlist;
 use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Faq;
 use App\Support\Modules;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class FaqList extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
     use WithPagination;
 
@@ -169,6 +171,7 @@ class FaqList extends Component
         $this->resetPage();
     }
 
+
     public function render()
     {
         $faqs = Faq::when(filled($this->search), function ($query) {
@@ -181,7 +184,7 @@ class FaqList extends Component
             ->latest('FaqID')
             ->paginate(10);
 
-        return view('components.admin-pages.masterlist.faqs', [
+        return view('livewire.admin-pages.masterlist.faqs', [
             'faqs' => $faqs,
         ]);
     }

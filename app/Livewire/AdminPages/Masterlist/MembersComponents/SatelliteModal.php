@@ -67,9 +67,9 @@ class SatelliteModal extends Component
     ];
 
     private const PLAN_META = [
-        'Bronze' => ['label' => 'Basic', 'color' => '#CD7F32', 'icon' => '♢'],
-        'Silver' => ['label' => 'Popular', 'color' => '#64748B', 'icon' => '◇'],
-        'Gold' => ['label' => 'Premium', 'color' => '#D4A017', 'icon' => '✦'],
+        'Bronze' => ['label' => 'Basic', 'color' => 'var(--color-primary-light)', 'icon' => '♢'],
+        'Silver' => ['label' => 'Popular', 'color' => 'var(--color-primary)', 'icon' => '◇'],
+        'Gold' => ['label' => 'Premium', 'color' => 'var(--color-accent)', 'icon' => '✦'],
     ];
 
     private const PAYMENT_METHODS = [
@@ -1006,7 +1006,7 @@ class SatelliteModal extends Component
     public function render(): View
     {
         return view(
-            'components.admin-pages.masterlist.members-modals.satelite-modal'
+            'livewire.admin-pages.masterlist.members-modals.satelite-modal'
         );
     }
 }

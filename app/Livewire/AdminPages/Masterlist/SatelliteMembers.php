@@ -18,11 +18,13 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\On;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class SatelliteMembers extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
     use WithPagination;
 
@@ -119,6 +121,7 @@ class SatelliteMembers extends Component
     // =====================================================
     // RENDER SATELLITE MEMBERS
     // =====================================================
+
 
     public function render()
     {

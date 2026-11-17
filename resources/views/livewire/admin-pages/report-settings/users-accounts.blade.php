@@ -14,7 +14,7 @@
 
     <!-- Success Message Notification -->
     @if (session()->has('message'))
-        <div class="p-4 mb-4 text-[#0C2C6B] bg-[#0C2C6B]/10 border border-[#0C2C6B]/30 rounded-xl text-sm font-medium">
+        <div class="p-4 mb-4 text-[var(--color-primary)] bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 rounded-xl text-sm font-medium">
             {{ session('message') }}
         </div>
     @endif
@@ -23,7 +23,7 @@
     <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
         <!-- SEARCH INPUT -->
         <div class="relative max-w-sm w-full">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
@@ -32,8 +32,8 @@
 
             <input type="text" wire:model.live.debounce.300ms="search" placeholder="Name, email, or referral code..."
                 class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl
-                focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
-                focus:border-[#0C2C6B]
+                focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]
+                focus:border-[var(--color-primary)]
                 bg-white shadow-sm transition">
         </div>
 
@@ -42,17 +42,17 @@
 
             <!-- DATE RANGE FILTER -->
             <div wire:ignore class="relative w-72">
-                <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none z-10">
+                <span class="absolute inset-y-0 left-3 flex items-center text-slate-500 pointer-events-none z-10">
                     📅
                 </span>
                 <input type="text" id="userDateRange" readonly
-                    class="date-range-input pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white text-slate-700 shadow-sm cursor-pointer w-full text-center font-medium"
+                    class="date-range-input pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-white text-slate-700 shadow-sm cursor-pointer w-full text-center font-medium"
                     placeholder="Select date range">
             </div>
 
             <!-- Status Filter -->
             <select wire:model.live="statusFilter"
-                class="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] cursor-pointer shadow-sm">
+                class="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] cursor-pointer shadow-sm">
                 <option value="">All Statuses</option>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
@@ -61,7 +61,7 @@
 
             @if ($dateRange)
                 <button type="button" wire:click="clearDateFilter" title="Clear date filter"
-                    class="inline-flex items-center px-3 py-2 text-sm text-slate-500 hover:text-[#D79B10] hover:border-[#D79B10]/30 hover:bg-[#D79B10]/10 rounded-xl border border-slate-200 bg-white shadow-sm cursor-pointer transition">
+                    class="inline-flex items-center px-3 py-2 text-sm text-slate-500 hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/10 rounded-xl border border-slate-200 bg-white shadow-sm cursor-pointer transition">
                     ✕
                 </button>
             @endif
@@ -71,7 +71,7 @@
 
             <!-- PRINT BUTTON (prints the full filtered table) -->
             <button type="button" onclick="window.print()" title="Print Report"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-[#0C2C6B] text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-[var(--color-primary)] text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
                 <span>🖨️</span>
                 <span class="hidden sm:inline">Print</span>
             </button>
@@ -105,10 +105,20 @@
 
     <!-- USERS TABLE (screen only) -->
     <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm print:hidden">
+        @if($users->isEmpty())
+
+            <x-report-empty-state
+                title="No Users Found"
+                message="There are currently no user accounts available."
+                icon="👥"
+            />
+
+        @else
+
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr
-                    class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
+                    class="border-b border-slate-200 bg-[var(--color-primary)] text-xs font-semibold uppercase tracking-wider text-white">
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">User Profile</th>
                     <th class="py-3 px-4">Role</th>
@@ -151,31 +161,31 @@
                             </span>
                         </td>
 
-                        <td class="py-4 px-4 font-bold text-[#0C2C6B]">
+                        <td class="py-4 px-4 font-bold text-[var(--color-primary)]">
                             ₱{{ number_format($walletDR, 2) }}
                         </td>
 
-                        <td class="py-4 px-4 font-bold text-[#0C2C6B]">
+                        <td class="py-4 px-4 font-bold text-[var(--color-primary)]">
                             ₱{{ number_format($providentFund, 2) }}
                         </td>
 
-                        <td class="py-4 px-4 font-bold text-[#0C2C6B]">
+                        <td class="py-4 px-4 font-bold text-[var(--color-primary)]">
                             ₱{{ number_format($walletOV, 2) }}
                         </td>
 
-                        <td class="py-4 px-4 font-bold text-[#D79B10]">
+                        <td class="py-4 px-4 font-bold text-[var(--color-accent)]">
                             ₱{{ number_format($walletWD, 2) }}
                         </td>
 
-                        <td class="py-4 px-4 font-bold text-[#0B2A5B]">
+                        <td class="py-4 px-4 font-bold text-[var(--color-primary)]">
                             ₱{{ number_format($total - (-$walletWD), 2) }}
                         </td>
 
                         <td class="py-4 px-4">
                             @php
                                 $statusClasses = match ($user->status) {
-                                    'Active' => 'bg-[#0C2C6B]/10 text-[#0C2C6B] border-[#0C2C6B]/30',
-                                    'Pending' => 'bg-[#D79B10]/10 text-[#D79B10] border-[#D79B10]/30',
+                                    'Active' => 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] border-[var(--color-primary)]/30',
+                                    'Pending' => 'bg-[var(--color-accent)]/10 text-[var(--color-accent)] border-[var(--color-accent)]/30',
                                     default => 'bg-slate-100 text-slate-600 border-slate-300',
                                 };
                             @endphp
@@ -188,10 +198,9 @@
                           @if($this->canRead)
                         <td class="py-4 px-4 text-right">
                                @if($this->canRead)
-                            <button wire:click="viewLedger({{ $user->UserID }})" title="View Financials"
-                                class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow">
-                                👁️
-                            </button>
+                            <x-action-btn icon="ledger" tone="ledger"
+                                wire:click="viewLedger({{ $user->UserID }})"
+                                title="View Financials" />
                             @endif
                         </td>
                         @endif
@@ -205,19 +214,19 @@
                 @endforelse
             </tbody>
         </table>
+        @endif
 
         <!-- PAGINATION -->
         @if ($users->hasPages())
             <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
                 @if ($users->onFirstPage())
-                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                    <span class="px-4 py-2 bg-gray-200 text-gray-600 rounded cursor-not-allowed">
                         Previous
                     </span>
                 @else
                     <button wire:click="previousPage" wire:loading.attr="disabled"
-                        class="px-4 py-2 text-white rounded transition cursor-pointer"
-                        style="background-color: #D79B10;" onmouseover="this.style.backgroundColor='#c58d0f'"
-                        onmouseout="this.style.backgroundColor='#D79B10'">
+                        class="px-4 py-2 text-white rounded transition cursor-pointer bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)]"
+                        onmouseout="this.style.backgroundColor='var(--color-accent)'">
                         Previous
                     </button>
                 @endif
@@ -228,13 +237,12 @@
 
                 @if ($users->hasMorePages())
                     <button wire:click="nextPage" wire:loading.attr="disabled"
-                        class="px-4 py-2 text-white rounded transition cursor-pointer"
-                        style="background-color: #0C2C6B;" onmouseover="this.style.backgroundColor='#0a2559'"
-                        onmouseout="this.style.backgroundColor='#0C2C6B'">
+                        class="px-4 py-2 text-white rounded transition cursor-pointer bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)]"
+                        onmouseout="this.style.backgroundColor='var(--color-primary)'">
                         Next
                     </button>
                 @else
-                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                    <span class="px-4 py-2 bg-gray-200 text-gray-600 rounded cursor-not-allowed">
                         Next
                     </span>
                 @endif
@@ -244,9 +252,9 @@
 
     <!-- PRINTABLE FULL-TABLE REPORT (hidden on screen, shown only when printing) -->
     <div id="printable-users" class="hidden print:block font-sans">
-        <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#0C2C6B]">
-            <h1 class="m-0 text-2xl font-bold text-[#0C2C6B] font-serif">TRUE LIFE</h1>
-            <p class="my-1 text-[11px] font-bold text-[#D79B10] uppercase tracking-wider">
+        <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[var(--color-primary)]">
+            <h1 class="m-0 text-2xl font-bold text-[var(--color-primary)] font-serif">TRIFECTA</h1>
+            <p class="my-1 text-[11px] font-bold text-[var(--color-accent)] uppercase tracking-wider">
                 &mdash; S O L I D A R I T A S &mdash;
             </p>
             <h2 class="mt-2.5 mb-1 text-sm uppercase text-slate-800 font-bold">USER ACCOUNTS & FINANCIAL OVERVIEW</h2>
@@ -263,7 +271,7 @@
 
         <table class="w-full border-collapse font-sans text-[10px]">
             <thead>
-                <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[22px]">
+                <tr class="bg-[var(--color-primary)] text-white font-bold text-center h-[22px]">
                     <th class="border border-slate-900 p-1">#</th>
                     <th class="border border-slate-900 p-1">Name</th>
                     <th class="border border-slate-900 p-1">Role</th>
@@ -329,13 +337,13 @@
                     class="w-full max-w-3xl max-h-[calc(100vh-2rem)] overflow-hidden rounded-2xl bg-white shadow-2xl flex flex-col">
 
                     <!-- MODAL HEADER -->
-                    <div class="bg-[#0C2C6B] px-6 py-4 text-white flex items-center justify-between">
+                    <div class="bg-[var(--color-primary)] px-6 py-4 text-white flex items-center justify-between">
                         <div>
                             <h3 class="text-lg font-bold">
                                 User Financial Overview:
                                 {{ trim(($selectedUser->firstname ?? '') . ' ' . ($selectedUser->lastname ?? '')) }}
                             </h3>
-                            <p class="text-xs text-white/70">Reviewing wallets, provident funds, and individual ledger
+                            <p class="text-xs text-white">Reviewing wallets, provident funds, and individual ledger
                                 records.</p>
                         </div>
 
@@ -358,16 +366,16 @@
                         <div
                             class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
                             <div>
-                                <span class="block text-xs font-semibold text-slate-400 uppercase">Email</span>
+                                <span class="block text-xs font-semibold text-slate-500 uppercase">Email</span>
                                 <span class="text-sm font-medium text-slate-800">{{ $selectedUser->email }}</span>
                             </div>
                             <div>
-                                <span class="block text-xs font-semibold text-slate-400 uppercase">Referral Code</span>
+                                <span class="block text-xs font-semibold text-slate-500 uppercase">Referral Code</span>
                                 <span
                                     class="text-sm font-medium text-slate-800">{{ $selectedUser->referralCode ?? 'N/A' }}</span>
                             </div>
                             <div>
-                                <span class="block text-xs font-semibold text-slate-400 uppercase">Status</span>
+                                <span class="block text-xs font-semibold text-slate-500 uppercase">Status</span>
                                 <span class="text-sm font-medium text-slate-800">{{ $selectedUser->status }}</span>
                             </div>
                         </div>
@@ -395,25 +403,25 @@
 
                                                     @if ($wallet->source == 'DR')
                                                         <span
-                                                            class="text-[#0C2C6B] bg-[#0C2C6B]/10 px-2 py-0.5 rounded">
+                                                            class="text-[var(--color-primary)] bg-[var(--color-primary)]/10 px-2 py-0.5 rounded">
                                                             Direct Referral ({{ $wallet->source }})
                                                         </span>
                                                     @endif
                                                     @if ($wallet->source == 'PF')
                                                         <span
-                                                            class="text-[#0C2C6B] bg-[#0C2C6B]/10 px-2 py-0.5 rounded">
+                                                            class="text-[var(--color-primary)] bg-[var(--color-primary)]/10 px-2 py-0.5 rounded">
                                                             Provident Fund (PF)
                                                         </span>
                                                     @endif
                                                     @if ($wallet->source == 'OV')
                                                         <span
-                                                            class="text-[#0C2C6B] bg-[#0C2C6B]/10 px-2 py-0.5 rounded">
+                                                            class="text-[var(--color-primary)] bg-[var(--color-primary)]/10 px-2 py-0.5 rounded">
                                                             Overrides ({{ $wallet->source }})
                                                         </span>
                                                     @endif
                                                     @if ($wallet->source == 'WD')
                                                         <span
-                                                            class="text-[#0C2C6B] bg-[#0C2C6B]/10 px-2 py-0.5 rounded">
+                                                            class="text-[var(--color-primary)] bg-[var(--color-primary)]/10 px-2 py-0.5 rounded">
                                                             Withdrawal (WD)
                                                         </span>
                                                     @endif
@@ -430,7 +438,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="4" class="py-3 px-3 text-center text-slate-400">No
+                                                <td colspan="4" class="py-3 px-3 text-center text-slate-500">No
                                                     records
                                                     found.</td>
                                             </tr>
@@ -464,35 +472,35 @@
                                                 <td class="py-2 px-3">
                                                     <span
                                                         class="font-semibold text-slate-800">{{ $ledger->RefID }}</span>
-                                                    <span class="text-slate-400 text-[10px] block">Source:
+                                                    <span class="text-slate-500 text-[10px] block">Source:
                                                         {{ $ledger->Source }}</span>
                                                 </td>
                                                 <td class="py-2 px-3 text-[10px]">
                                                     @if ($ledger->Source === 'PK')
                                                         <span
-                                                            class="font-semibold text-[#D79B10]">🎡 Pangkabuhayan Prize</span>
-                                                        <span class="text-slate-400 block">
+                                                            class="font-semibold text-[var(--color-accent)]">🎡 Pangkabuhayan Prize</span>
+                                                        <span class="text-slate-500 block">
                                                             {{ $ledger->draw?->prize_name }}
                                                             {{ $ledger->draw ? '· draw of '.$ledger->draw->draw_date->format('M j, Y') : '' }}
                                                         </span>
                                                     @else
-                                                        <span class="text-slate-400">—</span>
+                                                        <span class="text-slate-500">—</span>
                                                     @endif
                                                 </td>
-                                                <td class="py-2 px-3 font-semibold text-[#0B2A5B]">
+                                                <td class="py-2 px-3 font-semibold text-[var(--color-primary)]">
                                                     ₱{{ number_format($ledger->amount ?? 0, 2) }}</td>
                                                 <td class="py-2 px-3">
                                                     <span
-                                                        class="px-2 py-0.5 text-[10px] font-semibold bg-[#0C2C6B]/10 text-[#0C2C6B] rounded-full">
+                                                        class="px-2 py-0.5 text-[10px] font-semibold bg-[var(--color-primary)]/10 text-[var(--color-primary)] rounded-full">
                                                         {{ $ledger->status }}
                                                     </span>
                                                 </td>
-                                                <td class="py-2 px-3 text-slate-400">
+                                                <td class="py-2 px-3 text-slate-500">
                                                     {{ $ledger->created_at?->format('Y-m-d H:i') }}</td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="6" class="py-3 px-3 text-center text-slate-400">No
+                                                <td colspan="6" class="py-3 px-3 text-center text-slate-500">No
                                                     ledger
                                                     entries found.</td>
                                             </tr>
@@ -516,12 +524,12 @@
 
             <!-- PRINTABLE SINGLE-USER FINANCIAL REPORT -->
             <div id="printable-user-financials" class="hidden font-sans">
-                <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#0C2C6B]">
-                    <h1 class="m-0 text-2xl font-bold text-[#0C2C6B] font-serif">
-                        TRUE LIFE
+                <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[var(--color-primary)]">
+                    <h1 class="m-0 text-2xl font-bold text-[var(--color-primary)] font-serif">
+                        TRIFECTA
                     </h1>
 
-                    <p class="my-1 text-[11px] font-bold text-[#D79B10] uppercase tracking-wider">
+                    <p class="my-1 text-[11px] font-bold text-[var(--color-accent)] uppercase tracking-wider">
                         &mdash; S O L I D A R I T A S &mdash;
                     </p>
 
@@ -535,7 +543,7 @@
                 <h3 class="text-xs font-bold uppercase text-slate-700 mb-1">Wallets & Provident Funds</h3>
                 <table class="w-full border-collapse font-sans text-[10px] mb-4">
                     <thead>
-                        <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[22px]">
+                        <tr class="bg-[var(--color-primary)] text-white font-bold text-center h-[22px]">
                             <th class="border border-slate-900 p-1">Wallet ID</th>
                             <th class="border border-slate-900 p-1">Source Type</th>
                             <th class="border border-slate-900 p-1">Amount</th>
@@ -564,7 +572,7 @@
                 <h3 class="text-xs font-bold uppercase text-slate-700 mb-1">Ledger Entries</h3>
                 <table class="w-full border-collapse font-sans text-[10px]">
                     <thead>
-                        <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[22px]">
+                        <tr class="bg-[var(--color-primary)] text-white font-bold text-center h-[22px]">
                             <th class="border border-slate-900 p-1">ID</th>
                             <th class="border border-slate-900 p-1">Ref ID</th>
                             <th class="border border-slate-900 p-1">Source</th>
@@ -604,110 +612,68 @@
             </div>
     @endif
 
-    <style>
-        @media print {
-            @page {
-                size: landscape;
-                margin: 8mm;
-            }
 
-            /* Default state (no button clicked): hide everything except the full table */
-            body:not([data-print-target]) * {
-                visibility: hidden !important;
-            }
-
-            body:not([data-print-target]) #printable-users,
-            body:not([data-print-target]) #printable-users * {
-                visibility: visible !important;
-            }
-
-            body:not([data-print-target]) #printable-users {
-                display: block !important;
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-            }
-
-            /* Single-user print target: hide everything except that user's report */
-            body[data-print-target="user-financials"] * {
-                visibility: hidden !important;
-            }
-
-            body[data-print-target="user-financials"] #printable-user-financials,
-            body[data-print-target="user-financials"] #printable-user-financials * {
-                visibility: visible !important;
-            }
-
-            body[data-print-target="user-financials"] #printable-user-financials {
-                display: block !important;
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-            }
-
-            table {
-                border-collapse: collapse !important;
-                width: 100% !important;
-            }
-
-            th,
-            td {
-                border: 1px solid #000 !important;
-                padding: 4px !important;
-            }
-
-            th {
-                background-color: #0C2C6B !important;
-                color: white !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-        }
-    </style>
-
-    <script>
-        function printUserFinancials() {
-            document.body.setAttribute('data-print-target', 'user-financials');
-            window.print();
-        }
-        window.addEventListener('afterprint', () => {
-            document.body.removeAttribute('data-print-target');
-        });
-    </script>
+    @vite('resources/js/livewire/admin-pages/report-settings/users-accounts.js')
 
     @script
         <script>
-            const dateInput = $wire.$el.querySelector('#userDateRange');
+            const initUserDateRange = () => {
+                // Lazy components run this block before Livewire morphs the
+                // real markup in, so the input is not in the DOM on the first
+                // run (looking it up on $wire.$el would hit the placeholder).
+                const dateInput = document.getElementById('userDateRange');
 
-            const picker = flatpickr(dateInput, {
-                mode: 'range',
-                dateFormat: 'Y-m-d',
-                altInput: true,
-                altFormat: 'M d, Y',
-                maxDate: 'today',
-                defaultDate: @js($dateRange ? explode(' to ', $dateRange) : []),
-                onChange: (selectedDates, dateStr, instance) => {
-                    if (selectedDates.length === 2) {
-                        const start = instance.formatDate(selectedDates[0], 'Y-m-d');
-                        const end = instance.formatDate(selectedDates[1], 'Y-m-d');
-                        $wire.set('dateRange', `${start} to ${end}`);
-                    } else if (selectedDates.length === 0) {
-                        $wire.set('dateRange', '');
-                    }
-                },
-                onClose: (selectedDates, dateStr, instance) => {
-                    if (selectedDates.length === 1) {
-                        const day = instance.formatDate(selectedDates[0], 'Y-m-d');
-                        instance.setDate([selectedDates[0], selectedDates[0]], false);
-                        $wire.set('dateRange', `${day} to ${day}`);
-                    }
+                if (!dateInput) {
+                    return false;
                 }
-            });
 
-            $wire.on('ranges-reset', () => {
-                picker.clear();
+                if (dateInput._flatpickr) {
+                    return true;
+                }
+
+                const picker = flatpickr(dateInput, {
+                    mode: 'range',
+                    dateFormat: 'Y-m-d',
+                    altInput: true,
+                    altFormat: 'M d, Y',
+                    maxDate: 'today',
+                    defaultDate: @js($dateRange ? explode(' to ', $dateRange) : []),
+                    onChange: (selectedDates, dateStr, instance) => {
+                        if (selectedDates.length === 2) {
+                            const start = instance.formatDate(selectedDates[0], 'Y-m-d');
+                            const end = instance.formatDate(selectedDates[1], 'Y-m-d');
+                            $wire.set('dateRange', `${start} to ${end}`);
+                        } else if (selectedDates.length === 0) {
+                            $wire.set('dateRange', '');
+                        }
+                    },
+                    onClose: (selectedDates, dateStr, instance) => {
+                        if (selectedDates.length === 1) {
+                            const day = instance.formatDate(selectedDates[0], 'Y-m-d');
+                            instance.setDate([selectedDates[0], selectedDates[0]], false);
+                            $wire.set('dateRange', `${day} to ${day}`);
+                        }
+                    }
+                });
+
+                $wire.on('ranges-reset', () => {
+                    picker.clear();
+                });
+
+                return true;
+            };
+
+            initUserDateRange();
+
+            // Finish the job once Livewire has morphed the lazy component in.
+            const stopWaitingForUserDateRange = Livewire.hook('morphed', ({ component }) => {
+                if (component.id !== $wire.$id) {
+                    return;
+                }
+
+                if (initUserDateRange()) {
+                    stopWaitingForUserDateRange();
+                }
             });
         </script>
     @endscript

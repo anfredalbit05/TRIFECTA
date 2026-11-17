@@ -13,13 +13,13 @@
                     <!-- Badge -->
 
                     <div
-                        class="inline-flex w-fit items-center bg-[#0A2146] text-white text-xs font-bold uppercase tracking-[0.2em] px-5 py-2 rounded-md">
+                        class="inline-flex w-fit items-center bg-[var(--color-primary-darker)] text-white text-xs font-bold uppercase tracking-[0.2em] px-5 py-2 rounded-md">
                         The Leadership Team
                     </div>
 
                     <!-- Heading -->
 
-                    <h1 class="mt-8 text-5xl lg:text-6xl font-black leading-tight text-[#0A2146] uppercase">
+                    <h1 class="mt-8 text-5xl lg:text-6xl font-black leading-tight text-[var(--color-primary-darker)] uppercase">
 
                         Strong Leadership.
 
@@ -29,7 +29,7 @@
 
                     </h1>
 
-                    <div class="w-28 h-[3px] bg-[#D4A017] mt-6"></div>
+                    <div class="w-28 h-[3px] bg-[var(--color-accent)] mt-6"></div>
 
                     <!-- Description -->
 
@@ -46,13 +46,13 @@
                     <div class="mt-10">
 
                         <span
-                            class="inline-flex bg-[#0A2146] text-white text-xs font-bold uppercase px-4 py-2 rounded">
+                            class="inline-flex bg-[var(--color-primary-darker)] text-white text-xs font-bold uppercase px-4 py-2 rounded">
 
                             The CEO
 
                         </span>
 
-                        <h2 class="mt-4 text-4xl font-black text-[#0A2146] uppercase">
+                        <h2 class="mt-4 text-4xl font-black text-[var(--color-primary-darker)] uppercase">
 
                             Renante
 
@@ -68,7 +68,7 @@
 
                         </p>
 
-                        <p class="mt-5 text-2xl font-extrabold uppercase text-[#D4A017]">
+                        <p class="mt-5 text-2xl font-extrabold uppercase text-[var(--color-accent)]">
 
                             A Leader.
 
@@ -91,7 +91,7 @@
                         <div class="flex items-center gap-4">
 
                             <div
-                                class="w-14 h-14 rounded-full bg-[#0A2146] text-white flex items-center justify-center text-2xl">
+                                class="w-14 h-14 rounded-full bg-[var(--color-primary-darker)] text-white flex items-center justify-center text-2xl">
 
                                 🏛️
 
@@ -99,7 +99,7 @@
 
                             <div>
 
-                                <h3 class="font-black uppercase text-[#0A2146] text-xl">
+                                <h3 class="font-black uppercase text-[var(--color-primary-darker)] text-xl">
 
                                     Public Service
 
@@ -138,7 +138,7 @@
                         <div class="flex items-center gap-4">
 
                             <div
-                                class="w-14 h-14 rounded-full bg-[#D4A017] text-white flex items-center justify-center text-2xl">
+                                class="w-14 h-14 rounded-full bg-[var(--color-accent)] text-white flex items-center justify-center text-2xl">
 
                                 💼
 
@@ -146,7 +146,7 @@
 
                             <div>
 
-                                <h3 class="font-black uppercase text-[#0A2146] text-xl">
+                                <h3 class="font-black uppercase text-[var(--color-primary-darker)] text-xl">
 
                                     Professional
 
@@ -183,7 +183,7 @@
                         <div class="flex items-center gap-4">
 
                             <div
-                                class="w-14 h-14 rounded-full bg-[#0A2146] text-white flex items-center justify-center text-2xl">
+                                class="w-14 h-14 rounded-full bg-[var(--color-primary-darker)] text-white flex items-center justify-center text-2xl">
 
                                 🎓
 
@@ -191,7 +191,7 @@
 
                             <div>
 
-                                <h3 class="font-black uppercase text-[#0A2146] text-xl">
+                                <h3 class="font-black uppercase text-[var(--color-primary-darker)] text-xl">
 
                                     Academic
 
@@ -225,12 +225,12 @@
 
                 <!-- RIGHT SIDE IMAGE -->
 
-                <div class="relative bg-[#081a36] min-h-[1000px]">
+                <div class="relative bg-[var(--color-primary-darker)] min-h-[1000px]">
 
-                    <!-- gold decoration -->
+                    <!-- accent decoration -->
 
                     <div
-                        class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#D4A017] to-yellow-300">
+                        class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-light)]">
                     </div>
 
                     <!-- image -->
@@ -247,7 +247,7 @@
                     <!-- background glow -->
 
                     <div
-                        class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-[#D4A017]/20 blur-[120px] rounded-full">
+                        class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-[var(--color-accent)]/20 blur-[120px] rounded-full">
                     </div>
 
                 </div>

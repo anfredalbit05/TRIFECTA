@@ -1,4 +1,3 @@
-
 @php
     $joinAllow = \Illuminate\Support\Facades\DB::table('settings')
         ->where('BranchID', 0)
@@ -6,178 +5,229 @@
         ->value('value');
 
     $joinAllow = filter_var($joinAllow, FILTER_VALIDATE_BOOLEAN);
+
+    /* Annual figure advertised on the card. Falls back to the seeded value. */
+    $priceRows = [
+        [
+            'label_key' => 'hero_card_row1_label',
+            'label' => $contexts['hero_card_row1_label'] ?? 'Hospital confinement support',
+            'value_key' => 'hero_card_row1_value',
+            'value' => $contexts['hero_card_row1_value'] ?? '₱15,000',
+        ],
+        [
+            'label_key' => 'hero_card_row2_label',
+            'label' => $contexts['hero_card_row2_label'] ?? 'Natural death assistance',
+            'value_key' => 'hero_card_row2_value',
+            'value' => $contexts['hero_card_row2_value'] ?? '₱20,000',
+        ],
+        [
+            'label_key' => 'hero_card_row3_label',
+            'label' => $contexts['hero_card_row3_label'] ?? 'Accident and disability cover',
+            'value_key' => 'hero_card_row3_value',
+            'value' => $contexts['hero_card_row3_value'] ?? '₱65,000',
+        ],
+        [
+            'label_key' => 'hero_card_row4_label',
+            'label' => $contexts['hero_card_row4_label'] ?? 'Emergency care per incident',
+            'value_key' => 'hero_card_row4_value',
+            'value' => $contexts['hero_card_row4_value'] ?? '₱13,000',
+        ],
+    ];
+
+    $heroChecks = [
+        ['key' => 'hero_check_1', 'text' => $contexts['hero_check_1'] ?? 'You plus three beneficiaries'],
+        ['key' => 'hero_check_2', 'text' => $contexts['hero_check_2'] ?? 'Beneficiaries from 0 to 100 years old'],
+        ['key' => 'hero_check_3', 'text' => $contexts['hero_check_3'] ?? 'Renewable every year'],
+    ];
 @endphp
 
-<section class="hero-section">
+<section class="tf-hero">
 
-    {{-- =========================
-        BACKGROUND
-    ========================= --}}
-    <div class="hero-bg-container">
-        <img
-            src="{{ asset('images/hero-bg.jpg') }}"
-            alt="Dayongan Community"
-            class="hero-image"
-        >
-        <div class="hero-overlay"></div>
-        <div class="hero-glow-gold"></div>
-        <div class="hero-glow-blue"></div>
-    </div>
+    <span class="tf-hero-blob b1" aria-hidden="true"></span>
+    <span class="tf-hero-blob b2" aria-hidden="true"></span>
 
-    {{-- =========================
-        CONTENT
-    ========================= --}}
-    <div class="hero-content-wrapper">
-        <div class="hero-container">
-            <div class="hero-grid">
+    <div class="tf-hero-inner">
+        <div class="tf-hero-grid">
 
-                {{-- LEFT COLUMN --}}
-                <div class="hero-left-col pt-10">
+            {{-- =====================================================
+                 COPY
+            ====================================================== --}}
+            <div class="tf-hero-copy">
 
-                    {{-- Badge --}}
-                    <div class="hero-badge">
-                        <span class="hero-badge-dot"></span>
-                        <x-editable-text
-                            key="hero_badge"
-                            :value="$contexts['hero_badge'] ?? ''"
-                            tag="span"
-                            class="hero-badge-text"
-                        />
-                    </div>
-
-                    {{-- Heading --}}
-                    <h1 class="hero-title">
-                        <span class="block">
-                            <x-editable-text
-                                key="hero_title_line1"
-                                :value="$contexts['hero_title_line1'] ?? ''"
-                                tag="span"
-                            />
-                            <span class="hero-title-highlight">
-                                <x-editable-text
-                                    key="hero_title_highlight1"
-                                    :value="$contexts['hero_title_highlight1'] ?? ''"
-                                    tag="span"
-                                />
-                            </span>
-                        </span>
-
-                        <span class="block">
-                            <x-editable-text
-                                key="hero_title_line2"
-                                :value="$contexts['hero_title_line2'] ?? ''"
-                                tag="span"
-                            />
-                            <span class="hero-title-highlight">
-                                <x-editable-text
-                                    key="hero_title_highlight2"
-                                    :value="$contexts['hero_title_highlight2'] ?? ''"
-                                    tag="span"
-                                />
-                            </span>
-                        </span>
-
-                        <span class="block mt-1">
-                            <x-editable-text
-                                key="hero_title_line3"
-                                :value="$contexts['hero_title_line3'] ?? ''"
-                                tag="span"
-                            />
-                            <span class="hero-title-highlight">
-                                <x-editable-text
-                                    key="hero_title_highlight3"
-                                    :value="$contexts['hero_title_highlight3'] ?? ''"
-                                    tag="span"
-                                />
-                            </span>
-                        </span>
-                    </h1>
-
-                    <div class="hero-accent-line"></div>
-
-                    {{-- Description --}}
+                <span class="tf-eyebrow">
                     <x-editable-text
-                        key="hero_description"
-                        :value="$contexts['hero_description'] ?? ''"
-                        tag="p"
-                        class="hero-description"
+                        key="hero_badge"
+                        :value="$contexts['hero_badge'] ?? 'Three pillars · one membership'"
+                        tag="span"
+                        class="inline-block"
                     />
+                </span>
 
-                    {{-- Buttons --}}
-                    <div class="hero-btn-group">
+                <x-editable-text
+                    key="hero_scriptline"
+                    :value="$contexts['hero_scriptline'] ?? 'Health. Wellness. Protection. One promise for your family.'"
+                    tag="p"
+                    class="tf-hero-script"
+                />
 
-                        @if($joinAllow)
-                            <a
-                                onclick="Livewire.dispatch('open-application-modal')"
-                                class="hero-btn-primary cursor-pointer">
-                                Join Now
-                            </a>
-                        @else
-                            <a
-                                class="hero-btn-primary cursor-not-allowed opacity-60"
-                                aria-disabled="true">
-                                Join Unavailable
-                            </a>
-                        @endif
+                <h1 class="tf-hero-title">
+                    <span class="block">
+                        <x-editable-text key="hero_title_line1" :value="$contexts['hero_title_line1'] ?? 'A stronger'" tag="span" />
+                        <span class="tf-hero-accent">
+                            <x-editable-text key="hero_title_highlight1" :value="$contexts['hero_title_highlight1'] ?? 'safety net'" tag="span" />
+                        </span>
+                    </span>
 
-                        <a
-                            href="{{ route('how-it-works') }}"
-                            class="hero-btn-secondary">
-                            Learn More
+                    <span class="block">
+                        <x-editable-text key="hero_title_line2" :value="$contexts['hero_title_line2'] ?? 'for the people'" tag="span" />
+                        <span class="tf-hero-accent">
+                            <x-editable-text key="hero_title_highlight2" :value="$contexts['hero_title_highlight2'] ?? 'you love'" tag="span" />
+                        </span>
+                    </span>
+
+                    <span class="block">
+                        <x-editable-text key="hero_title_line3" :value="$contexts['hero_title_line3'] ?? 'every single day.'" tag="span" />
+                        <span class="tf-hero-accent">
+                            <x-editable-text key="hero_title_highlight3" :value="$contexts['hero_title_highlight3'] ?? ''" tag="span" />
+                        </span>
+                    </span>
+                </h1>
+
+                <x-editable-text
+                    key="hero_description"
+                    :value="$contexts['hero_description'] ?? 'TRIFECTA brings health support, everyday wellness perks and personal accident protection together in one annual membership.'"
+                    tag="p"
+                    class="tf-hero-desc"
+                />
+
+                <div class="tf-hero-actions">
+
+                    @if ($joinAllow)
+                        <a onclick="Livewire.dispatch('open-application-modal')" class="tf-btn-gold cursor-pointer">
+                            Apply for Membership
                         </a>
+                    @else
+                        <a class="tf-btn-gold cursor-not-allowed opacity-60" aria-disabled="true">
+                            Applications Paused
+                        </a>
+                    @endif
 
-                    </div>
+                    <a href="{{ route('how-it-works') }}" class="tf-btn-ghost">
+                        See how it works
+                    </a>
 
                 </div>
 
-                {{-- RIGHT COLUMN --}}
-                <div class="hero-right-col">
-                    <div class="relative">
-
-                        <div class="hero-logo-box">
-                            <img
-                                src="{{ asset('images/truelife-logo.png') }}"
-                                alt="Dayongan Logo"
-                                class="hero-logo-img"
-                            >
-                        </div>
-
-                        {{-- Members Card --}}
-                        <div class="hero-card-members">
-                            <p class="hero-card-title">
-                                {{ number_format($totalMembers) }}
-                            </p>
-                            <x-editable-text
-                                key="hero_members_label"
-                                :value="$contexts['hero_members_label'] ?? 'Active Members'"
-                                tag="p"
-                                class="hero-card-subtext"
-                            />
-                        </div>
-
-                        {{-- Support Card --}}
-                        <div class="hero-card-support">
-                            <x-editable-text
-                                key="hero_support_count"
-                                :value="$contexts['hero_support_count'] ?? ''"
-                                tag="p"
-                                class="hero-card-title"
-                            />
-                            <x-editable-text
-                                key="hero_support_label"
-                                :value="$contexts['hero_support_label'] ?? ''"
-                                tag="p"
-                                class="hero-card-subtext"
-                            />
-                        </div>
-
-                    </div>
-                </div>
+                <ul class="tf-hero-checks">
+                    @foreach ($heroChecks as $check)
+                        <li>
+                            <x-editable-text :key="$check['key']" :value="$check['text']" tag="span" />
+                        </li>
+                    @endforeach
+                </ul>
 
             </div>
+
+
+            {{-- =====================================================
+                 FLOATING PLAN CARD
+            ====================================================== --}}
+            <div class="tf-hero-stage">
+
+                <div class="tf-hero-chip c1">
+                    <span class="tf-hero-chip-dot">✦</span>
+                    <span>
+                        <strong>
+                            <x-editable-text key="hero_members_count" :value="$contexts['hero_members_count'] ?? '2,300+'" tag="span" />
+                        </strong>
+                        <small>
+                            <x-editable-text key="hero_members_label" :value="$contexts['hero_members_label'] ?? 'Protected Members'" tag="span" />
+                        </small>
+                    </span>
+                </div>
+
+                <div class="tf-hero-chip c2">
+                    <span class="tf-hero-chip-dot">◷</span>
+                    <span>
+                        <strong>
+                            <x-editable-text key="hero_support_count" :value="$contexts['hero_support_count'] ?? '24/7'" tag="span" />
+                        </strong>
+                        <small>
+                            <x-editable-text key="hero_support_label" :value="$contexts['hero_support_label'] ?? 'Member Care'" tag="span" />
+                        </small>
+                    </span>
+                </div>
+
+                <aside class="tf-plan">
+
+                    <div class="tf-plan-top">
+                        <x-editable-text
+                            key="hero_card_label"
+                            :value="$contexts['hero_card_label'] ?? 'Annual membership'"
+                            tag="span"
+                            class="tf-plan-label"
+                        />
+                        <span class="tf-hero-chip-dot">◆</span>
+                    </div>
+
+                    <x-editable-text
+                        key="hero_card_amount"
+                        :value="$contexts['hero_card_amount'] ?? '₱1,999'"
+                        tag="p"
+                        class="tf-plan-amount"
+                    />
+
+                    <x-editable-text
+                        key="hero_card_meta"
+                        :value="$contexts['hero_card_meta'] ?? 'one payment · 12 months of cover · renewable'"
+                        tag="p"
+                        class="tf-plan-meta"
+                    />
+
+                    <x-editable-text
+                        key="hero_card_highlight"
+                        :value="$contexts['hero_card_highlight'] ?? 'More than ₱200,000 in combined benefits'"
+                        tag="p"
+                        class="tf-plan-highlight"
+                    />
+
+                    <div class="tf-plan-rows">
+                        @foreach ($priceRows as $row)
+                            <div class="tf-plan-row">
+                                <x-editable-text
+                                    :key="$row['label_key']"
+                                    :value="$row['label']"
+                                    tag="span"
+                                />
+                                <x-editable-text
+                                    :key="$row['value_key']"
+                                    :value="$row['value']"
+                                    tag="span"
+                                />
+                            </div>
+                        @endforeach
+                    </div>
+
+                    @if ($joinAllow)
+                        <a onclick="Livewire.dispatch('open-application-modal')" class="tf-plan-cta cursor-pointer">
+                            Join now
+                        </a>
+                    @else
+                        <span class="tf-plan-cta cursor-not-allowed opacity-60">Join unavailable</span>
+                    @endif
+
+                    <x-editable-text
+                        key="hero_card_note"
+                        :value="$contexts['hero_card_note'] ?? 'Health benefits begin after the 6-month waiting period from approval.'"
+                        tag="p"
+                        class="tf-plan-note"
+                    />
+
+                </aside>
+
+            </div>
+
         </div>
     </div>
-
-    <div class="hero-bottom-bar"></div>
 
 </section>

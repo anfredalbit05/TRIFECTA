@@ -287,7 +287,7 @@ class ActivationReviewModal extends Component
 
     /*
     |--------------------------------------------------------------------------
-    | Member Type — TrueLife member vs Satellite member
+    | Member Type — TRIFECTA member vs Satellite member
     |--------------------------------------------------------------------------
     | Satellite members (RoleID 8) review through the satellite modal, but a
     | mixed statusFilter like the transaction list can route a RoleID 8 user

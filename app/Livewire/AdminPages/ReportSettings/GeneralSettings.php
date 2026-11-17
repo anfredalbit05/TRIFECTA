@@ -7,12 +7,14 @@ use App\Models\Setting;
 use App\Models\Branch;
 use App\Support\Modules;
 use Illuminate\Support\Facades\Storage;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 class GeneralSettings extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
     use WithFileUploads;
     use WithPagination;

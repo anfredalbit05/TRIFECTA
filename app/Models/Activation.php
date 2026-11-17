@@ -173,7 +173,7 @@ class Activation extends Model
             ->max('receipt_number');
 
         $next = ($highest === null)
-            ? 550
+            ? 001
             : ((int) $highest + 1);
 
         return str_pad((string) $next, 6, '0', STR_PAD_LEFT);
@@ -193,7 +193,7 @@ class Activation extends Model
     */
 
     /** First policy sequence used when no TRI- number has been issued yet. */
-    public const FIRST_POLICY_SEQUENCE = 550;
+    public const FIRST_POLICY_SEQUENCE = 001;
 
     /**
      * The highest policy sequence issued for the current year, across the

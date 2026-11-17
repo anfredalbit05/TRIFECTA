@@ -1,0 +1,416 @@
+/* =====================================================
+   LANDING — SHARED RHYTHM & NAVY BANDS
+   Loaded last so it pins the same spacing scale, hero
+   band, eyebrow, headline and surface colours on every
+   public page:
+
+       home · about · team · how-it-works ·
+       testimonials · news · contact
+
+   Section scale : 4rem / 5rem / 6rem (mobile / sm / lg)
+   Hero scale    : 4rem 0 3.5rem  →  5rem 0 4.5rem  →  6rem 0 5rem
+   Navy bands    : one gradient, white text, gold accents
+   Light surface : #F4F7FC
+===================================================== */
+
+:root {
+    --landing-surface: #F4F7FC;
+    --landing-section-pad: 4rem;
+    --landing-hero-pad-top: 4rem;
+    --landing-hero-pad-bottom: 3.5rem;
+    --landing-navy: linear-gradient(135deg, var(--color-primary-darker) 0%, var(--color-primary) 46%, var(--color-primary-mid) 100%);
+}
+
+@media (min-width: 640px) {
+    :root {
+        --landing-section-pad: 5rem;
+        --landing-hero-pad-top: 5rem;
+        --landing-hero-pad-bottom: 4.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --landing-section-pad: 6rem;
+        --landing-hero-pad-top: 6rem;
+        --landing-hero-pad-bottom: 5rem;
+    }
+}
+
+/* -----------------------------------------------------
+   1. SECTION RHYTHM
+----------------------------------------------------- */
+
+.benefit-section,
+.home-about,
+.home-why,
+.about-band,
+.about-objectives-section,
+.about-highlights-section,
+.about-cta-section,
+.about-quote-section,
+.tmt-exec,
+.tmt-roster,
+.hiw-process,
+.hiw-claims-section,
+.hiw-faq-section,
+.hiw-cta,
+.tm-stories,
+.tm-values,
+.tm-cta,
+.newsroom-section,
+.news-closing,
+.contact-details-section,
+.contact-map-section,
+.contact-form-section {
+    padding-top: var(--landing-section-pad);
+    padding-bottom: var(--landing-section-pad);
+}
+
+/* -----------------------------------------------------
+   2. HERO BAND — one navy gradient, one gold rule
+----------------------------------------------------- */
+
+.hero-section,
+.about-hero,
+.tmt-hero,
+.hiw-hero,
+.tm-hero,
+.news-masthead,
+.contact-hero {
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+    /* Faint blueprint grid painted into the band itself, so it can never
+       sit on top of the copy the way a pseudo-element overlay would. */
+    background-color: var(--color-primary-darker);
+    background-image:
+        linear-gradient(to right, rgb(255 255 255 / .05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgb(255 255 255 / .05) 1px, transparent 1px),
+        var(--landing-navy);
+    background-size: 56px 56px, 56px 56px, cover;
+    padding-top: var(--landing-hero-pad-top);
+    padding-bottom: var(--landing-hero-pad-bottom);
+}
+
+/* Band padding lives here, so the inner wrappers only handle gutters. */
+.hero-inner,
+.hiw-hero-layout {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+/* Gold rule across the top of every hero band. */
+.hero-section::before,
+.about-hero::before,
+.tmt-hero::before,
+.hiw-hero::before,
+.tm-hero::before,
+.news-masthead::before,
+.contact-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 2;
+    height: 4px;
+    pointer-events: none;
+    background: linear-gradient(90deg, var(--color-gold), var(--color-gold-light), var(--color-gold));
+}
+
+/* The per-page grid overlays are superseded by the band background. */
+.hero-section::after,
+.about-hero::after,
+.tmt-hero::after,
+.hiw-hero::after,
+.tm-hero::after,
+.news-masthead::after,
+.contact-hero::after {
+    content: none;
+}
+
+/* -----------------------------------------------------
+   3. HERO EYEBROW — gold rule + gold uppercase label
+----------------------------------------------------- */
+
+.hero-badge,
+.about-hero-badge,
+.tmt-kicker-light,
+.hiw-hero-eyebrow,
+.tm-eyebrow,
+.news-eyebrow,
+.contact-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--color-gold);
+    backdrop-filter: none;
+}
+
+.hero-badge::before,
+.about-hero-badge::before,
+.tmt-kicker-light::before,
+.hiw-hero-eyebrow::before,
+.tm-eyebrow::before,
+.news-eyebrow::before,
+.contact-hero-badge::before {
+    content: "";
+    display: block;
+    width: 28px;
+    height: 4px;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    background: var(--color-gold);
+}
+
+/* Per-page eyebrow decorations are superseded by the shared rule. */
+.hero-badge-dot,
+.hiw-eyebrow-dot,
+.tm-eyebrow-line,
+.news-eyebrow-line {
+    display: none !important;
+}
+
+/* -----------------------------------------------------
+   4. HERO HEADLINE + LEAD
+----------------------------------------------------- */
+
+.hero-title,
+.about-hero-title,
+.tmt-hero-title,
+.hiw-hero-title,
+.tm-hero-title,
+.news-intro-title,
+.contact-hero-title {
+    margin-top: 1.25rem;
+    font-size: 1.9rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #fff;
+}
+
+@media (min-width: 640px) {
+    .hero-title,
+    .about-hero-title,
+    .tmt-hero-title,
+    .hiw-hero-title,
+    .tm-hero-title,
+    .news-intro-title,
+    .contact-hero-title {
+        font-size: 2.35rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-title,
+    .about-hero-title,
+    .tmt-hero-title,
+    .hiw-hero-title,
+    .tm-hero-title,
+    .news-intro-title,
+    .contact-hero-title {
+        font-size: 3rem;
+        line-height: 1.08;
+    }
+}
+
+/* The highlighted half of the headline is always gold. */
+.hero-title-highlight,
+.about-hero-title-highlight,
+.tmt-hero-title-accent,
+.hiw-hero-highlight,
+.news-intro-highlight,
+.contact-hero-title-highlight {
+    display: block;
+    color: var(--color-gold);
+}
+
+/* Testimonials: two editable lines, white lead-in then gold accent. */
+.tm-hero-title > span {
+    display: block;
+}
+
+.tm-hero-title > span:first-child {
+    color: #fff;
+}
+
+.tm-hero-title > span:not(:first-child) {
+    color: var(--color-gold);
+}
+
+.hero-description,
+.about-hero-description,
+.tmt-hero-lead,
+.hiw-hero-description,
+.tm-hero-description,
+.news-intro-description,
+.contact-hero-description {
+    margin-top: 1.25rem;
+    max-width: 42rem;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: rgb(255 255 255 / .85);
+}
+
+@media (min-width: 640px) {
+    .hero-description,
+    .about-hero-description,
+    .tmt-hero-lead,
+    .hiw-hero-description,
+    .tm-hero-description,
+    .news-intro-description,
+    .contact-hero-description {
+        font-size: 1rem;
+    }
+}
+
+/* -----------------------------------------------------
+   5. NAVY BANDS INSIDE PAGES
+----------------------------------------------------- */
+
+.hiw-cta,
+.news-closing,
+.about-objectives-section,
+.about-highlights-section,
+.about-cta-section {
+    color: #fff;
+    background: var(--landing-navy);
+}
+
+.hiw-cta::before,
+.news-closing::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    pointer-events: none;
+    background: linear-gradient(90deg, var(--color-gold), var(--color-gold-light), var(--color-gold));
+}
+
+/* Body copy on navy is never slate — it is white at 85 %. */
+.hiw-cta p,
+.news-closing p,
+.about-cta-description,
+.about-objectives-section .about-objective-item,
+.about-highlights-section .about-highlight-text {
+    color: rgb(255 255 255 / .85);
+}
+
+/* -----------------------------------------------------
+   6. ACTIONS ON NAVY — gold, navy label
+----------------------------------------------------- */
+
+.hiw-btn-primary,
+.tm-hero-button {
+    color: var(--color-primary) !important;
+    background: var(--color-gold) !important;
+    box-shadow: 0 10px 25px rgb(0 0 0 / .18);
+}
+
+.hiw-btn-primary:hover,
+.tm-hero-button:hover {
+    background: var(--color-gold-light) !important;
+}
+
+/* Arrow glyphs inside a gold button take the button's navy label. */
+.tm-hero-button span {
+    color: inherit;
+}
+
+/* -----------------------------------------------------
+   7. LIGHT SURFACE — one tint everywhere
+----------------------------------------------------- */
+
+.benefit-section,
+.hiw-process,
+.hiw-faq-section,
+.tm-stories,
+.tm-cta,
+.newsroom-section,
+.contact-details-section,
+.contact-form-section,
+.home-why {
+    background-color: var(--landing-surface);
+    background-image: none;
+}
+
+/* -----------------------------------------------------
+   8. TESTIMONIALS HERO — glass panel on navy
+----------------------------------------------------- */
+
+.tm-hero-visual {
+    color: #fff;
+}
+
+.tm-visual-main {
+    background: rgb(255 255 255 / .07);
+    border: 1px solid rgb(255 255 255 / .16);
+    box-shadow: 0 25px 60px rgb(4 26 64 / .35);
+    backdrop-filter: blur(2px);
+}
+
+.tm-visual-top,
+.tm-visual-main > p,
+.tm-visual-bottom {
+    color: rgb(255 255 255 / .78);
+}
+
+.tm-visual-navy {
+    background: #fff;
+    color: var(--color-primary);
+}
+
+.tm-hero-brand > span {
+    color: #fff;
+}
+
+.tm-hero-brand i {
+    background: rgb(255 255 255 / .3);
+}
+
+.tm-hero-brand small,
+.tm-visual-caption {
+    color: rgb(255 255 255 / .6);
+}
+
+/* -----------------------------------------------------
+   9. NEWS MASTHEAD — copy on navy
+----------------------------------------------------- */
+
+.news-brand-mark {
+    color: #fff;
+}
+
+.news-brand-divider {
+    background: rgb(255 255 255 / .3);
+}
+
+.news-intro-bottom {
+    color: rgb(255 255 255 / .6);
+}
+
+.news-lead-placeholder {
+    background: rgb(255 255 255 / .07);
+    border: 1px solid rgb(255 255 255 / .16);
+    color: #fff;
+}
+
+.news-lead-placeholder h2 {
+    color: #fff;
+}
+
+.news-lead-placeholder p {
+    color: rgb(255 255 255 / .8);
+}
+
+.news-placeholder-icon {
+    color: var(--color-gold);
+}

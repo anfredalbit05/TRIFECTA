@@ -8,11 +8,13 @@ use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class BranchesList extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules, WithPagination;
 
     protected $paginationTheme = 'tailwind';
@@ -197,6 +199,7 @@ class BranchesList extends Component
         $this->dispatch('ranges-reset');
     }
 
+
     public function render()
     {
         [$dateFrom, $dateTo] = $this->parsedDateRange();
@@ -217,7 +220,7 @@ class BranchesList extends Component
             ->latest('BranchID')
             ->paginate(10);
 
-        return view('components.admin-pages.masterlist.branches', [
+        return view('livewire.admin-pages.masterlist.branches', [
             'branches' => $branches,
         ]);
     }

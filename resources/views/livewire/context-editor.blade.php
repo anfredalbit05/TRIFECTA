@@ -35,7 +35,7 @@
 
             <button
                 wire:click="save"
-                class="px-5 py-2 rounded bg-blue-700 text-white">
+                class="px-5 py-2 rounded bg-[var(--color-primary)] text-white">
 
                 Save
 

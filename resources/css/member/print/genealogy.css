@@ -1,0 +1,32 @@
+/* =========================================================
+   PRINT - MEMBER / GENEALOGY
+   Extracted from the per-component <style> blocks so the
+   markup only carries classes. Loaded only on this page via @vite.
+========================================================= */
+
+/* --- livewire\member-pages\genealogy\overview.blade.php --- */
+
+@media print {
+    @page { margin: 10mm; }
+
+    .genealogy-overview .genealogy-print-hide { display: none !important; }
+
+    .genealogy-overview .ov-wrap {
+        overflow: visible !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    .genealogy-overview .ov-table { min-width: 0 !important; font-size: 11px; }
+    .genealogy-overview .ov-table th,
+    .genealogy-overview .ov-table td { padding: 3px 8px !important; }
+    .genealogy-overview .ov-table thead { display: table-header-group; }
+    .genealogy-overview .ov-table tr { break-inside: avoid; page-break-inside: avoid; }
+    .genealogy-overview .ov-table span { padding-top: 0 !important; padding-bottom: 0 !important; }
+
+    /* keep colors (header bar, badges) in the printout */
+    .genealogy-overview * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}

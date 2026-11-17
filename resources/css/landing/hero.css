@@ -1,0 +1,181 @@
+/* =====================================
+   HERO — solid navy band with a white
+   protection card on the right.
+===================================== */
+
+.hero-section {
+    @apply relative w-full overflow-hidden;
+    background:
+        radial-gradient(circle at 84% 0%, rgb(var(--brand-primary-mid-rgb) / .55), transparent 55%),
+        radial-gradient(circle at 4% 100%, rgb(var(--brand-primary-darker-rgb) / .9), transparent 62%),
+        var(--color-primary);
+}
+
+/* Gold rule across the top of the band */
+.hero-section::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 5px;
+    background: linear-gradient(90deg, var(--color-gold), var(--color-gold-light), var(--color-gold));
+}
+
+.hero-inner {
+    @apply relative mx-auto max-w-7xl px-6 py-14 sm:px-8 sm:py-18 lg:px-12 lg:py-24;
+}
+
+.hero-grid {
+    @apply grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-16;
+}
+
+/* =====================================
+   LEFT COLUMN
+===================================== */
+
+.hero-badge {
+    @apply inline-flex items-center gap-2.5 rounded-full border border-gold/50 px-4 py-1.5;
+}
+
+.hero-badge-dot {
+    @apply h-1.5 w-1.5 rounded-full bg-gold;
+}
+
+.hero-badge-text {
+    @apply text-[10px] font-black uppercase tracking-[0.16em] text-gold sm:text-[11px];
+}
+
+.hero-script {
+    @apply mt-6 text-base italic text-[#D3E3F7] sm:text-lg;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.hero-title {
+    @apply mt-2 text-3xl font-black uppercase leading-[1.04] tracking-tight text-white sm:text-4xl lg:text-[44px];
+}
+
+.hero-title-highlight {
+    @apply text-white;
+}
+
+.hero-accent-line {
+    @apply mt-6 h-1 w-16 rounded-full bg-gold;
+}
+
+.hero-description {
+    @apply mt-5 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base;
+}
+
+/* =====================================
+   BUTTONS
+===================================== */
+
+.hero-btn-group {
+    @apply mt-7 flex flex-col gap-3 sm:flex-row;
+}
+
+.hero-btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg bg-gold px-7 py-3.5 text-center text-sm font-extrabold text-primary
+        shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-gold-light;
+}
+
+.hero-btn-secondary {
+    @apply inline-flex items-center justify-center rounded-lg border-2 border-white/40 px-7 py-3.5 text-center text-sm font-extrabold text-white
+        transition duration-200 hover:border-white hover:bg-white/10;
+}
+
+/* ---------- trust checks ---------- */
+
+.hero-checks {
+    @apply mt-8 flex flex-col gap-2.5 border-t border-white/15 pt-6 sm:flex-row sm:flex-wrap sm:gap-x-6;
+}
+
+.hero-check {
+    @apply flex items-center gap-2 text-xs font-semibold text-white/85 sm:text-[13px];
+}
+
+.hero-check::before {
+    content: "✓";
+    @apply flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-[10px] font-black text-primary;
+    background: var(--color-gold);
+}
+
+/* =====================================
+   PRICE CARD (right column)
+===================================== */
+
+.hero-right-col {
+    @apply w-full;
+}
+
+.hero-price-card {
+    @apply relative w-full rounded-2xl bg-white p-6 shadow-2xl sm:p-7;
+}
+
+.hero-price-label {
+    @apply text-[10px] font-black uppercase tracking-[0.22em] text-slate-400;
+}
+
+.hero-price-amount {
+    @apply mt-1 text-4xl font-black leading-none tracking-tight text-primary sm:text-5xl;
+}
+
+.hero-price-meta {
+    @apply mt-2 text-[11px] font-semibold text-slate-500 sm:text-xs;
+}
+
+.hero-price-highlight {
+    @apply mt-4 flex items-center rounded-lg bg-gold-tint px-3 py-2.5 text-xs font-black text-primary sm:text-[13px];
+}
+
+.hero-price-rows {
+    @apply mt-4 divide-y divide-slate-100 border-t border-slate-100;
+}
+
+.hero-price-row {
+    @apply flex items-start justify-between gap-3 py-2.5;
+}
+
+.hero-price-row-label {
+    @apply text-[11px] leading-snug text-slate-600 sm:text-xs;
+}
+
+.hero-price-row-value {
+    @apply shrink-0 text-[11px] font-extrabold text-primary sm:text-xs;
+}
+
+.hero-price-cta {
+    @apply mt-5 flex w-full items-center justify-center rounded-lg bg-primary px-4 py-3
+        text-sm font-extrabold text-white transition hover:bg-primary-hover;
+}
+
+.hero-price-note {
+    @apply mt-3 text-center text-[10px] leading-relaxed text-slate-400;
+}
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 1023px) {
+    .hero-inner {
+        @apply py-12;
+    }
+
+    .hero-title {
+        @apply text-[26px] leading-[1.08];
+    }
+
+    .hero-price-card {
+        @apply mx-auto max-w-md;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        @apply text-[22px];
+    }
+
+    .hero-price-amount {
+        @apply text-4xl;
+    }
+}

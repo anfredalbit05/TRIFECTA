@@ -63,7 +63,7 @@
         </form>
     </div>
 
-    @if(auth()->user()->RoleID != 9)
+    @if(auth()->user()->RoleID != 8 && $this->hasApprovedActivationHistory)
     {{-- ================= 3. READ-ONLY ACCOUNT DETAILS ================= --}}
     <div class="card">
         <div class="card-header">
@@ -94,18 +94,18 @@
             </div>
         </div>
 
-    {{-- Referral Code --}}
-    <div class="account-detail-cell">
-        <p class="account-detail-label">Referral Code</p>
-        <p class="account-detail-value">{{ auth()->user()->referralCode ?? 'Not available' }}</p>
-    </div>
+        {{-- Referral Code --}}
+        <div class="account-detail-cell">
+            <p class="account-detail-label">Referral Code</p>
+            <p class="account-detail-value">{{ auth()->user()->referralCode ?? 'Not available' }}</p>
+        </div>
 
-    {{-- Policy Number --}}
-    <div class="account-detail-cell">
-        <p class="account-detail-label">Policy Number</p>
-        <p class="account-detail-value">{{ auth()->user()->policy_number ?? 'Not available' }}</p>
+        {{-- Policy Number --}}
+        <div class="account-detail-cell">
+            <p class="account-detail-label">Policy Number</p>
+            <p class="account-detail-value">{{ auth()->user()->policy_number ?? 'Not available' }}</p>
+        </div>
     </div>
-</div>
 
         {{-- ==================== 4. REFERRAL QR & LINK ==================== --}}
         <div class="referral-section">
@@ -146,7 +146,7 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100 translate-y-0"
         x-transition:leave-end="opacity-0 -translate-y-4"
-        style="display: none;"
+        x-cloak
         class="toast">
         <svg xmlns="http://www.w3.org/2000/svg" class="alert-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -155,58 +155,3 @@
     </div>
 
 </div>
-
-{{-- ============================= 6. SCRIPTS ============================= --}}
-<script>
-    function accountForm() {
-        return {
-            copied: false,
-            async confirmSave() {
-                @this.call('save');
-            }
-        }
-    }
-
-    document.addEventListener('livewire:initialized', () => {
-        // Receives the 'changes' array from backend and displays them in SweetAlert
-        Livewire.on('prompt-save-confirmation', (event) => {
-            // Livewire 3 passes parameters inside an array, handle both v2/v3 safely
-            const changes = Array.isArray(event) ? event[0] : event.changes;
-
-            const changesHtml = changes ? changes.join('<br>') : '';
-
-            Swal.fire({
-                title: 'Confirm Account Update',
-                html: `Are you sure you want to update these details?<br><br><div style="text-align: left; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px;">${changesHtml}</div>`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#0C2C6B',
-                cancelButtonColor: '#D79B10',
-                confirmButtonText: 'Yes, Save Changes',
-                cancelButtonText: 'Cancel',
-                allowOutsideClick: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    @this.call('executeSave');
-                }
-            });
-        });
-
-        // Triggered when save is completed successfully
-        Livewire.on('account-updated', () => {
-            Swal.fire({
-                title: 'Account Updated!',
-                text: 'Your account information has been updated successfully.',
-                icon: 'success',
-                confirmButtonColor: '#0C2C6B',
-                confirmButtonText: 'OK',
-                allowOutsideClick: false,
-                allowEscapeKey: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.reload();
-                }
-            });
-        });
-    });
-</script>

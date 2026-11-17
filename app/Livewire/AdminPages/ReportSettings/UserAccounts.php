@@ -7,11 +7,13 @@ use App\Models\Ledger;
 use App\Models\User;
 use App\Support\Modules;
 use Carbon\Carbon;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class UserAccounts extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
     use WithPagination;
 
@@ -137,6 +139,7 @@ class UserAccounts extends Component
             });
     }
 
+
     public function render()
     {
         [$dateFrom, $dateTo] = $this->parsedDateRange();
@@ -145,8 +148,17 @@ class UserAccounts extends Component
             ->latest('UserID')
             ->paginate(10);
 
-        // Unpaginated set for the printable report, same filters as the table
+        // Unpaginated set for the printable report, same filters as the table.
+        // The print table only needs the user's identity, role and wallet
+        // totals, so skip the (huge) ledgers relation and the unused user
+        // columns — eager-loading every ledger for every member exhausts PHP's
+        // memory limit on this page.
         $printUsers = (clone $this->baseQuery())
+            ->without('ledgers')
+            ->with(['wallets' => function ($query) {
+                $query->select('UserID', 'source', 'status', 'amount');
+            }])
+            ->select(['UserID', 'firstname', 'lastname', 'status', 'RoleID'])
             ->latest('UserID')
             ->get();
 

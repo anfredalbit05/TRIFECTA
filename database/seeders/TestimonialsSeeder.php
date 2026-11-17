@@ -17,7 +17,7 @@ class TestimonialsSeeder extends Seeder
             [
                 'fullname' => 'Maria Santos',
                 'designation' => 'Member',
-                'testimony' => 'Joining DAYONGAN gave me peace of mind knowing my family has financial protection during unexpected situations. The staff were very accommodating.',
+                'testimony' => 'Joining TRIFECTA gave me peace of mind knowing my family has financial protection during unexpected situations. The staff were very accommodating.',
                 'rate' => 5,
                 'status' => 'Published',
                 'UserID' => null,
@@ -39,7 +39,7 @@ class TestimonialsSeeder extends Seeder
             [
                 'fullname' => 'Ana Rodriguez',
                 'designation' => 'Beneficiary',
-                'testimony' => 'Our family received assistance during a difficult time. DAYONGAN truly lives by its mission of helping families.',
+                'testimony' => 'Our family received assistance during a difficult time. TRIFECTA truly lives by its mission of helping families.',
                 'rate' => 5,
                 'status' => 'Published',
                 'UserID' => null,
@@ -50,7 +50,7 @@ class TestimonialsSeeder extends Seeder
             [
                 'fullname' => 'Pedro Ramirez',
                 'designation' => 'Member',
-                'testimony' => 'The benefits are affordable yet comprehensive. I highly recommend DAYONGAN to anyone looking for family protection.',
+                'testimony' => 'The benefits are affordable yet comprehensive. I highly recommend TRIFECTA to anyone looking for family protection.',
                 'rate' => 5,
                 'status' => 'Published',
                 'UserID' => null,
@@ -72,7 +72,7 @@ class TestimonialsSeeder extends Seeder
             [
                 'fullname' => 'Michael Reyes',
                 'designation' => 'Business Owner',
-                'testimony' => 'DAYONGAN has become an important part of our family planning. The membership provides confidence and security.',
+                'testimony' => 'TRIFECTA has become an important part of our family planning. The membership provides confidence and security.',
                 'rate' => 5,
                 'status' => 'Published',
                 'UserID' => null,
@@ -116,7 +116,7 @@ class TestimonialsSeeder extends Seeder
             [
                 'fullname' => 'Richard Gomez',
                 'designation' => 'Government Employee',
-                'testimony' => 'I admire DAYONGAN for promoting financial literacy while providing valuable community support.',
+                'testimony' => 'I admire TRIFECTA for promoting financial literacy while providing valuable community support.',
                 'rate' => 5,
                 'status' => 'Published',
                 'UserID' => null,
@@ -127,7 +127,7 @@ class TestimonialsSeeder extends Seeder
             [
                 'fullname' => 'Christine Ramos',
                 'designation' => 'Member',
-                'testimony' => 'My family feels more secure because of DAYONGAN. Thank you for your dedication and service.',
+                'testimony' => 'My family feels more secure because of TRIFECTA. Thank you for your dedication and service.',
                 'rate' => 5,
                 'status' => 'Published',
                 'UserID' => null,
@@ -138,7 +138,7 @@ class TestimonialsSeeder extends Seeder
             [
                 'fullname' => 'Edgar Morales',
                 'designation' => 'Farmer',
-                'testimony' => 'Even in rural communities, DAYONGAN reaches out and provides genuine assistance to members.',
+                'testimony' => 'Even in rural communities, TRIFECTA reaches out and provides genuine assistance to members.',
                 'rate' => 5,
                 'status' => 'Published',
                 'UserID' => null,
@@ -160,7 +160,7 @@ class TestimonialsSeeder extends Seeder
             [
                 'fullname' => 'Dennis Flores',
                 'designation' => 'Member',
-                'testimony' => 'DAYONGAN has become a trusted partner in protecting our family. I encourage others to join.',
+                'testimony' => 'TRIFECTA has become a trusted partner in protecting our family. I encourage others to join.',
                 'rate' => 5,
                 'status' => 'Published',
                 'UserID' => null,
@@ -215,7 +215,7 @@ class TestimonialsSeeder extends Seeder
             [
                 'fullname' => 'Catherine Lim',
                 'designation' => 'Accountant',
-                'testimony' => 'The financial literacy seminars and community programs make DAYONGAN stand out from other organizations.',
+                'testimony' => 'The financial literacy seminars and community programs make TRIFECTA stand out from other organizations.',
                 'rate' => 5,
                 'status' => 'Published',
                 'UserID' => null,

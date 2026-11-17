@@ -42,7 +42,7 @@
                 justify-center
                 rounded-lg
                 border-2
-                border-blue-300
+                border-[var(--color-primary-light)]
                 bg-white
                 px-3
                 py-2
@@ -51,20 +51,20 @@
                 transition-all
                 duration-200
                 hover:-translate-y-0.5
-                hover:border-[#0C2C6B]
+                hover:border-[var(--color-primary)]
                 hover:shadow-md
             ',
 
             '
-                border-blue-600
+                border-[var(--color-primary)]
                 ring-2
-                ring-blue-100
+                ring-[var(--color-primary-tint)]
             ' => ($node['status'] ?? '') === 'Active',
 
             '
-                !border-[#D4A017]
+                !border-[var(--color-accent)]
                 !ring-2
-                !ring-[#D4A017]/40
+                !ring-[var(--color-accent)]/40
             ' => $highlighted,
         ])
     >
@@ -80,10 +80,10 @@
                 items-center
                 justify-center
                 rounded-full
-                bg-blue-50
+                bg-[var(--color-primary-tint)]
                 text-[9px]
                 font-bold
-                text-blue-600
+                text-[var(--color-primary)]
             "
         >
             {{ strtoupper(substr($node['name'] ?? 'U', 0, 1)) }}

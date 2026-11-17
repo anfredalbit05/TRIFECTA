@@ -1,0 +1,59 @@
+/* =========================================================
+   PRINT - ADMIN / MASTERLIST
+   Extracted from the per-component <style> blocks so the
+   markup only carries classes. Loaded only on this page via @vite.
+========================================================= */
+
+/* --- livewire\admin-pages\masterlist\dashboard.blade.php --- */
+
+@media print {
+    @page {
+        size: landscape;
+        margin: 8mm;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    #printable-report,
+    #printable-report *,
+    .member-table,
+    .member-table * {
+        visibility: visible !important;
+    }
+
+    #printable-report {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+    }
+
+    .member-table {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 110px !important;
+        width: 100% !important;
+    }
+
+    table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+    }
+
+    th,
+    td {
+        border: 1px solid #000 !important;
+        padding: 4px !important;
+    }
+
+    th {
+        background-color: var(--color-primary) !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}

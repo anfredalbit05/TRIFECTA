@@ -2,17 +2,6 @@
     Logout
 </button>
 
-<style>
-    .swal2-container {
-        z-index: 99999 !important;
-    }
-
-    /* WARNING ICON */
-    .swal2-icon.swal2-warning {
-        border-color: #0B2A5B !important;
-        color: #0B2A5B !important;
-    }
-</style>
 
 @script
 <script>
@@ -22,8 +11,8 @@
             text: 'You will be logged out from your account.',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#0B2A5B',
-            cancelButtonColor: '#D79B10',
+            confirmButtonColor: 'var(--color-primary)',
+            cancelButtonColor: 'var(--color-accent)',
             confirmButtonText: 'Yes, logout',
             cancelButtonText: 'Cancel'
         }).then(result => {

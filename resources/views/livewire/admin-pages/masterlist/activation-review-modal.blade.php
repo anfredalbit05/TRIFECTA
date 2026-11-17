@@ -9,16 +9,16 @@
                 <div class="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
                     <div>
                         <div class="flex items-center gap-2">
-                            <h2 class="text-xl font-extrabold text-[#0B2A5B]">
+                            <h2 class="text-xl font-extrabold text-[var(--color-primary)]">
                                 Activation Review
                             </h2>
                             @if ($this->memberType === 'satellite')
-                                <span class="inline-flex items-center rounded-full bg-[#D79B10] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                                <span class="inline-flex items-center rounded-full bg-[var(--color-accent)] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
                                     Satellite Member
                                 </span>
                             @else
-                                <span class="inline-flex items-center rounded-full bg-[#0B2A5B] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
-                                    TrueLife Member
+                                <span class="inline-flex items-center rounded-full bg-[var(--color-primary)] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                                    TRIFECTA Member
                                 </span>
                             @endif
                         </div>
@@ -43,8 +43,8 @@
                     {{-- MEMBER INFORMATION --}}
                     {{-- ================================================= --}}
                     <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <div class="bg-[#0B2A5B] px-5 py-3">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                        <div class="bg-[var(--color-primary)] px-5 py-3">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">
                                 Member Information
                             </h3>
                         </div>
@@ -52,7 +52,7 @@
                         <div class="grid grid-cols-1 gap-5 p-5 sm:grid-cols-2 lg:grid-cols-3">
                             {{-- FULL NAME --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Full Name
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -63,7 +63,7 @@
 
                             {{-- USERNAME --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Username
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -73,7 +73,7 @@
 
                             {{-- CONTACT NUMBER --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Contact Number
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -83,7 +83,7 @@
 
                             {{-- GENDER --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Gender
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -93,7 +93,7 @@
 
                             {{-- BIRTHDATE --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Birthdate
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -103,13 +103,13 @@
 
                             {{-- MEMBER STATUS --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Current Status
                                 </p>
                                 <div class="mt-2">
                                     <span @class([
                                         'inline-flex rounded-full px-3 py-1 text-xs font-bold',
-                                        'bg-emerald-100 text-emerald-700' => $member?->status === 'Active',
+                                        'bg-[var(--color-primary-tint)] text-[var(--color-primary)]' => $member?->status === 'Active',
                                         'bg-red-100 text-red-700' => $member?->status !== 'Active',
                                     ])>
                                         {{ $member?->status ?? 'Unknown' }}
@@ -125,8 +125,8 @@
 <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
     {{-- HEADER --}}
-    <div class="bg-[#0B2A5B] px-5 py-3">
-        <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+    <div class="bg-[var(--color-primary)] px-5 py-3">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-white">
             Activation Information
         </h3>
     </div>
@@ -139,7 +139,7 @@
 
             {{-- ACTIVATION ID --}}
             <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                     Activation ID
                 </p>
 
@@ -151,11 +151,11 @@
 
             {{-- AMOUNT --}}
             <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                     Amount
                 </p>
 
-                <p class="mt-1 text-lg font-extrabold text-emerald-600">
+                <p class="mt-1 text-lg font-extrabold text-[var(--color-primary)]">
                     ₱{{ number_format($activation?->amount ?? 0, 2) }}
                 </p>
             </div>
@@ -163,7 +163,7 @@
 
             {{-- PAYMENT METHOD --}}
             <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                     Payment Method
                 </p>
 
@@ -175,7 +175,7 @@
 
             {{-- ACTIVATION TYPE --}}
             <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                     Activation Type
                 </p>
 
@@ -189,7 +189,7 @@
 
             {{-- PAYMENT REFERENCE --}}
             <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                     Payment Reference
                 </p>
 
@@ -201,7 +201,7 @@
 
             {{-- REQUEST STATUS --}}
             <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                     Request Status
                 </p>
 
@@ -210,7 +210,7 @@
                         $status = $activation?->status ?? 'Pending';
 
                         $statusClass = match (strtolower($status)) {
-                            'approved' => 'bg-emerald-100 text-emerald-700',
+                            'approved' => 'bg-[var(--color-primary-tint)] text-[var(--color-primary)]',
                             'rejected' => 'bg-red-100 text-red-700',
                             'cancelled' => 'bg-slate-200 text-slate-700',
                             default => 'bg-amber-100 text-amber-700',
@@ -245,7 +245,7 @@
                     <button
                         type="button"
                         wire:click="generatePolicyNumber"
-                        class="rounded-lg bg-[#0B2A5B] px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-blue-800"
+                        class="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-[var(--color-primary-dark)]"
                     >
                         Generate
                     </button>
@@ -257,8 +257,8 @@
                     wire:model.live="policy_number"
                     type="text"
                     maxlength="100"
-                    placeholder="TRI-00550-TS2026-550"
-                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm uppercase focus:border-[#0B2A5B] focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+                    placeholder="TRI-00001-TS2026-1"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm uppercase focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 >
 
                 @error('policy_number')
@@ -273,7 +273,7 @@
                     </p>
                 @endif
 
-                <p class="mt-1 text-[10px] text-slate-400">
+                <p class="mt-1 text-[10px] text-slate-500">
                     Next:
                     <span
                         id="next-policy-number"
@@ -299,7 +299,7 @@
                     <button
                         type="button"
                         wire:click="generateReceiptNumber"
-                        class="rounded-lg bg-[#0B2A5B] px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-blue-800"
+                        class="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-[var(--color-primary-dark)]"
                     >
                         Generate
                     </button>
@@ -313,7 +313,7 @@
                     inputmode="numeric"
                     maxlength="6"
                     placeholder="{{ $this->nextReceiptNumber }}"
-                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:border-[#0B2A5B] focus:outline-none focus:ring-2 focus:ring-[#0B2A5B]"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 >
 
                 @error('receipt_number')
@@ -328,7 +328,7 @@
                     </p>
                 @endif
 
-                <p class="mt-1 text-[10px] text-slate-400">
+                <p class="mt-1 text-[10px] text-slate-500">
                     Next:
                     <span
                         id="next-receipt-number"
@@ -344,7 +344,7 @@
         </div>
         @else
             <div class="mt-5 border-t border-slate-100 pt-5">
-                <p class="rounded-xl bg-emerald-50 px-4 py-3 text-xs font-semibold text-emerald-700">
+                <p class="rounded-xl bg-[var(--color-primary-tint)] px-4 py-3 text-xs font-semibold text-[var(--color-primary)]">
                     Free member — provisioned by their satellite. No payment was
                     collected, so no policy or receipt number is issued: approving
                     only completes their membership-fee ledger and credits the
@@ -362,8 +362,8 @@
                     {{-- ================================================= --}}
                     @if ($activation)
                         <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                            <div class="bg-[#0B2A5B] px-5 py-3">
-                                <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                            <div class="bg-[var(--color-primary)] px-5 py-3">
+                                <h3 class="text-sm font-bold uppercase tracking-wider text-white">
                                     Payment Breakdown
                                 </h3>
                             </div>
@@ -376,7 +376,7 @@
                                         <p class="text-sm font-semibold text-slate-700">
                                             Membership Fee
                                         </p>
-                                        <p class="text-xs text-slate-400">
+                                        <p class="text-xs text-slate-500">
                                             Base activation fee
                                         </p>
                                     </div>
@@ -393,7 +393,7 @@
                                             <p class="text-sm font-semibold text-slate-700">
                                                 GCash Convenience Fee
                                             </p>
-                                            <p class="text-xs text-slate-400">
+                                            <p class="text-xs text-slate-500">
                                                 1% convenience fee
                                             </p>
                                         </div>
@@ -409,7 +409,7 @@
                                             <p class="text-sm font-semibold text-slate-700">
                                                 Paymaya Convenience Fee
                                             </p>
-                                            <p class="text-xs text-slate-400">
+                                            <p class="text-xs text-slate-500">
                                                 1% convenience fee
                                             </p>
                                         </div>
@@ -424,7 +424,7 @@
                                 <div
                                     class="mt-3 flex items-center justify-between gap-4 rounded-xl bg-slate-50 px-4 py-3">
                                     <div>
-                                        <p class="text-sm font-extrabold text-[#0B2A5B]">
+                                        <p class="text-sm font-extrabold text-[var(--color-primary)]">
                                             Total Amount to Pay
                                         </p>
 
@@ -437,7 +437,7 @@
                                         @endif
                                     </div>
 
-                                    <span class="text-xl font-extrabold text-emerald-600">
+                                    <span class="text-xl font-extrabold text-[var(--color-primary)]">
                                         ₱{{ number_format(
                                             $totalMembershipFeesCost +
                                                 ((strtolower(trim($activation->payment_method ?? '')) === 'gcash' && $gcashConvenienceFeeEnabled) ||
@@ -451,12 +451,12 @@
 
                                 {{-- ADMIN CHECK NOTE --}}
                                 @if (strtolower(trim($activation->payment_method ?? '')) === 'gcash')
-                                    <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
-                                        <p class="text-xs font-semibold text-blue-800">
+                                    <div class="mt-4 rounded-lg border border-[var(--color-primary-tint-border)] bg-[var(--color-primary-tint)] px-4 py-3">
+                                        <p class="text-xs font-semibold text-[var(--color-primary-dark)]">
                                             Payment Verification
                                         </p>
 
-                                        <p class="mt-1 text-[11px] leading-relaxed text-blue-700">
+                                        <p class="mt-1 text-[11px] leading-relaxed text-[var(--color-primary)]">
                                             Verify that the amount sent through GCash matches the
                                             total amount above. You may use the payment reference
                                             shown in the activation request to verify the transaction
@@ -473,8 +473,8 @@
                     {{-- REFERRAL INFORMATION --}}
                     {{-- ================================================= --}}
                     <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <div class="bg-[#0B2A5B] px-5 py-3">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                        <div class="bg-[var(--color-primary)] px-5 py-3">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">
                                 Referral Information
                             </h3>
                         </div>
@@ -482,7 +482,7 @@
                         <div class="grid grid-cols-1 gap-5 p-5 sm:grid-cols-2">
                             {{-- REFERRAL CODE --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Upline Code
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -492,7 +492,7 @@
 
                             {{-- REFERRAL MEMBER --}}
                             <div>
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                                     Referral Member
                                 </p>
                                 <p class="mt-1 font-bold text-slate-800">
@@ -507,8 +507,8 @@
                     {{-- BENEFICIARIES --}}
                     {{-- ================================================= --}}
                     <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <div class="flex items-center justify-between bg-[#0B2A5B] px-5 py-3">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-[#E8B923]">
+                        <div class="flex items-center justify-between bg-[var(--color-primary)] px-5 py-3">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">
                                 Beneficiaries
                             </h3>
 
@@ -592,7 +592,7 @@
                              happens on submit inside that modal. --}}
                         @if (($this->canChangeStatus || $this->canDelete) && $activation?->status === 'Rejected')
                             <button type="button" wire:click="openResubmitForm"
-                                class="rounded-xl border border-[#0B2A5B] bg-white px-6 py-2.5 text-xs font-bold text-[#0B2A5B] transition hover:bg-[#0B2A5B] hover:text-white">
+                                class="rounded-xl border border-[var(--color-primary)] bg-white px-6 py-2.5 text-xs font-bold text-[var(--color-primary)] transition hover:bg-[var(--color-primary)] hover:text-white">
                                 ↺ Resubmit
                             </button>
                         @endif
@@ -601,14 +601,14 @@
                              on Transaction List - Activations --}}
                         @if (($this->canChangeStatus || $this->canDelete) && $activation?->status === 'Pending')
                         <button type="button" wire:click="confirmReject"
-                            class="rounded-xl bg-[#D79B10] hover:bg-[#B8830D] px-6 py-2.5 text-xs font-bold text-white transition cursor-pointer">
+                            class="rounded-xl bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] px-6 py-2.5 text-xs font-bold text-white transition cursor-pointer">
                             Reject
                         </button>
 
                         {{-- APPROVE — needs can_change_status (or can_delete)
                              on Transaction List - Activations --}}
                         <button type="button" wire:click="confirmApprove"
-                            class="rounded-xl bg-[#0B2A5B] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800 cursor-pointer">
+                            class="rounded-xl bg-[var(--color-primary)] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-[var(--color-primary-dark)] cursor-pointer">
                             Approve Activation
                         </button>
                         @endif

@@ -1,0 +1,29 @@
+/* ==========================================================================
+   3) TREE NODE (recursive partial)
+   ========================================================================== */
+.node-wrap,.node-child{position:relative;display:flex;flex-direction:column;align-items:flex-start}
+
+/* Connector pieces */
+.node-top-line,.node-child-line,.node-children-stem{width:.125rem;height:1.5rem;flex-shrink:0;background:#cbd5e1}
+.node-top-line,.node-child-line,.node-horizontal-bar{display:none}
+.node-child-line{margin-top:-1.5rem}
+.node-children-stem{align-self:center}
+.node-horizontal-bar{position:absolute;top:-1.5rem;left:80px;right:80px;height:.125rem;background:#cbd5e1;pointer-events:none}
+.node-mobile-stub{position:absolute;left:-1rem;top:50%;display:block;width:1rem;height:.125rem;background:#cbd5e1;transform:translateY(-50%)}
+
+/* Card */
+.node-card{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:160px;padding:1rem;background:#fff;border:2px solid #e2e8f0;border-radius:.75rem;box-shadow:0 1px 2px 0 rgb(0 0 0 / .05);cursor:pointer;transition:all .2s ease}
+.node-card--active{border-color:var(--color-primary-mid);box-shadow:0 0 0 2px rgb(var(--brand-primary-mid-rgb) / .1)}
+.node-avatar{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:2.75rem;height:2.75rem;margin-bottom:.5rem;font-size:1rem;font-weight:700;color:var(--color-primary-light);background:var(--color-primary-tint);border:1px solid var(--color-primary-tint);border-radius:9999px;box-shadow:inset 0 2px 4px 0 rgb(0 0 0 / .05)}
+.node-name{width:100%;margin-bottom:.25rem;font-size:.75rem;font-weight:600;text-align:center;color:#1e293b}
+.node-ref{max-width:100%;padding:.125rem .5rem;font-size:11px;font-weight:500;color:#64748b;background:#f1f5f9;border:1px solid rgb(226 232 240 / .6);border-radius:.375rem}
+
+/* Children / downlines */
+.node-children-row{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1.5rem;width:100%;margin-left:.5rem;padding-left:1rem;border-left:2px solid #cbd5e1}
+
+@media (min-width:640px){
+    .node-wrap,.node-child{align-items:center}
+    .node-top-line,.node-child-line,.node-horizontal-bar{display:block}
+    .node-mobile-stub{display:none}
+    .node-children-row{flex-direction:row;align-items:center;gap:2.5rem;width:auto;margin-left:0;padding-left:0;border-left:0}
+}

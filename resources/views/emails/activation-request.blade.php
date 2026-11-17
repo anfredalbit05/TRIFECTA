@@ -152,7 +152,7 @@
 
                             <p style="margin: 0; color: #475569;">
                                 Best regards,<br>
-                                <strong style="color: #0B2A5B;">True Life</strong>
+                                <strong style="color: #0B2A5B;">TRIFECTA</strong>
                             </p>
                         </td>
                     </tr>
@@ -160,7 +160,7 @@
                     <!-- Footer Section -->
                     <tr>
                         <td align="center" style="background-color: #f8fafc; padding: 24px; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9;">
-                            <p style="margin: 0;">&copy; {{ date('Y') }} True Life. All rights reserved.</p>
+                            <p style="margin: 0;">&copy; {{ date('Y') }} TRIFECTA. All rights reserved.</p>
                         </td>
                     </tr>
 

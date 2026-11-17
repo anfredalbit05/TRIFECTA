@@ -21,11 +21,13 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\On;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class AdminUsers extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
     use WithPagination;
 
@@ -164,14 +166,7 @@ class AdminUsers extends Component
         $branchCode = Auth::user()?->branchCode;
 
         return User::query()
-            ->where('RoleID', '!=', 4)
-            ->when(! $this->isMainBranchUser(), function ($query) use ($branchCode) {
-                if (blank($branchCode)) {
-                    $query->whereRaw('1 = 0');   // no branch = see nothing
-                } else {
-                    $query->where('branchCode', $branchCode);
-                }
-            });
+            ->where('RoleID', '!=', 8);
     }
 
     /**
@@ -1443,6 +1438,7 @@ class AdminUsers extends Component
 
         return $position !== '' ? $position : null;
     }
+
 
     public function render()
     {

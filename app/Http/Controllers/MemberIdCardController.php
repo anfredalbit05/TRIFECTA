@@ -248,7 +248,7 @@ $validUntil = $approvedActivation?->policy_expiration_date
         */
 
         return $pdf->download(
-            'True-Life-Dayongan-ID-'.
+            'TRIFECTA-ID-'.
             str_pad((string) $user->UserID, 5, '0', STR_PAD_LEFT).
             '.pdf'
         );

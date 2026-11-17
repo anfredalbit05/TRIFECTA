@@ -1,0 +1,259 @@
+
+/* =====================================================
+   TRIFECTA CONTACT PAGE - BRAND COLORS
+===================================================== */
+:root {
+    --contact-navy: #092F78;
+    --contact-blue: #1260B0;
+    --contact-gold: #F5C400;
+    --contact-royal: #1260B0;
+    --contact-dark: #14243D;
+    --contact-muted: #64748b;
+    --contact-light: #F4F7FC;
+}
+
+/* =====================================================
+   HERO
+===================================================== */
+.contact-hero {
+    @apply relative overflow-hidden py-24 sm:py-28 text-white;
+    background: linear-gradient(120deg, #092F78 0%, #104B96 65%, #1260B0 100%);
+}
+.contact-hero::before {
+    content: "";
+    @apply absolute top-0 left-0 w-full h-1;
+    background: linear-gradient(90deg, var(--contact-gold) 0 34%, var(--contact-blue) 34% 67%, #fff 67%);
+}
+.contact-hero-glow-left {
+    @apply absolute -top-24 -left-24 w-80 h-80 rounded-full blur-3xl pointer-events-none;
+    background: #F5C40020;
+}
+.contact-hero-glow-right {
+    @apply absolute -bottom-32 -right-20 w-96 h-96 rounded-full blur-3xl pointer-events-none;
+    background: #F5C40018;
+}
+.contact-hero-badge {
+    @apply inline-flex items-center gap-2 uppercase tracking-[0.22em] text-xs sm:text-sm font-bold text-[var(--color-gold)];
+}
+.contact-hero-badge::before {
+    content: "";
+    @apply w-8 h-1 rounded-full;
+    background: var(--contact-gold);
+}
+.contact-hero-title {
+    @apply mt-5 text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight;
+}
+.contact-hero-title-highlight { color: var(--contact-gold); }
+.contact-hero-description {
+    @apply mt-5 text-blue-100 leading-relaxed max-w-2xl mx-auto text-base sm:text-lg;
+}
+
+/* =====================================================
+   SHARED HEADERS
+===================================================== */
+.contact-section-header,
+.contact-details-header,
+.contact-map-header {
+    @apply text-center max-w-3xl mx-auto mb-12;
+}
+.contact-section-label,
+.contact-details-subtitle,
+.contact-map-subtitle {
+    @apply inline-flex items-center gap-2.5 uppercase tracking-[0.2em] font-bold text-xs sm:text-sm;
+    color: var(--contact-blue);
+}
+.contact-section-label::before,
+.contact-details-subtitle::before,
+.contact-map-subtitle::before {
+    content: "";
+    display: block;
+    width: 28px;
+    height: 4px;
+    border-radius: 9999px;
+    background: var(--contact-gold);
+}
+.contact-section-title,
+.contact-details-title,
+.contact-map-title {
+    @apply mt-3 text-3xl sm:text-4xl font-black tracking-tight;
+    color: var(--contact-navy);
+}
+.contact-section-description,
+.contact-details-description,
+.contact-map-location {
+    @apply mt-4 text-slate-600 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed;
+}
+
+/* =====================================================
+   CONTACT DETAILS
+===================================================== */
+.contact-details-section {
+    @apply relative py-20 sm:py-24;
+    background: var(--contact-light);
+}
+.contact-details-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6;
+}
+.contact-detail-card {
+    @apply relative bg-white rounded-2xl p-7 sm:p-8 text-center flex flex-col items-center border border-slate-200 transition-all duration-300;
+    box-shadow: 0 5px 20px #092F7808;
+}
+.contact-detail-card::before {
+    content: "";
+    @apply absolute top-0 left-8 right-8 h-1 rounded-b-full;
+    background: var(--contact-gold);
+}
+.contact-detail-card:hover {
+    @apply -translate-y-2 border-blue-200;
+    box-shadow: 0 15px 35px #092F7818;
+}
+.contact-card-icon {
+    @apply w-16 h-16 rounded-2xl flex items-center justify-center mb-5;
+    color: var(--contact-blue);
+    background: #EAF2FF;
+}
+.contact-card-icon svg {
+    @apply w-8 h-8;
+}
+.contact-detail-title {
+    @apply text-lg font-extrabold;
+    color: var(--contact-navy);
+}
+.contact-card-text {
+    @apply mt-4 text-sm leading-relaxed text-slate-600 whitespace-pre-line;
+}
+.contact-card-text-bold {
+    @apply mt-3 text-sm font-bold text-slate-700;
+}
+
+/* =====================================================
+   FACEBOOK BANNER
+===================================================== */
+.contact-facebook-banner {
+    @apply relative overflow-hidden mt-12 rounded-3xl p-8 sm:p-12 text-center text-white;
+    background: linear-gradient(115deg, #092F78, #1260B0);
+    box-shadow: 0 15px 35px #092F7820;
+}
+.contact-facebook-banner::after {
+    content: "";
+    @apply absolute -right-16 -top-24 w-64 h-64 rounded-full border-[35px] pointer-events-none;
+    border-color: #FFFFFF12;
+}
+.contact-facebook-icon {
+    @apply relative z-10 w-16 h-16 mx-auto mb-5 flex items-center justify-center rounded-2xl;
+    color: var(--contact-gold);
+    background: #FFFFFF15;
+}
+.contact-facebook-icon svg { @apply w-9 h-9; }
+.contact-facebook-title {
+    @apply relative z-10 text-2xl sm:text-3xl font-black;
+}
+.contact-facebook-text {
+    @apply relative z-10 mt-4 text-blue-100 text-sm sm:text-base leading-relaxed max-w-xl mx-auto;
+}
+.contact-facebook-btn {
+    @apply relative z-10 inline-flex items-center justify-center gap-2 mt-7 px-7 py-3.5 rounded-xl font-bold text-sm transition-all duration-200;
+    color: var(--contact-navy);
+    background: var(--contact-gold);
+}
+.contact-facebook-btn:hover {
+    @apply -translate-y-1 shadow-lg;
+    background: #FFDA35;
+}
+
+/* =====================================================
+   MAP
+===================================================== */
+.contact-map-section {
+    @apply py-20 sm:py-24 bg-white;
+}
+.contact-map-container {
+    @apply mt-10 w-full h-80 sm:h-[430px] overflow-hidden rounded-3xl border border-slate-200;
+    box-shadow: 0 15px 40px #092F7810;
+}
+.contact-map-iframe {
+    @apply w-full h-full border-0;
+}
+
+/* =====================================================
+   INQUIRY FORM
+===================================================== */
+.contact-form-section {
+    @apply py-20 sm:py-24;
+    background: var(--contact-light);
+}
+.contact-form-card {
+    @apply bg-white rounded-3xl p-6 sm:p-10 lg:p-12 border border-slate-200;
+    box-shadow: 0 15px 45px #092F7810;
+}
+.contact-form-header {
+    @apply text-center mb-9;
+}
+.contact-form-label {
+    @apply inline-flex items-center gap-2.5 uppercase tracking-[0.2em] text-xs sm:text-sm font-bold;
+    color: var(--contact-blue);
+}
+.contact-form-label::before {
+    content: "";
+    display: block;
+    width: 28px;
+    height: 4px;
+    border-radius: 9999px;
+    background: var(--contact-gold);
+}
+.contact-form-title {
+    @apply mt-3 text-2xl sm:text-3xl font-black;
+    color: var(--contact-navy);
+}
+.contact-form-desc {
+    @apply mt-3 text-sm sm:text-base text-slate-500;
+}
+.contact-form-alert {
+    @apply mb-6 p-4 rounded-xl text-center text-sm font-semibold border;
+    color: var(--contact-navy);
+    background: #EDF3FB;
+    border-color: #D3E2F4;
+}
+.contact-form-label-text {
+    @apply block text-sm font-bold text-slate-700 mb-2;
+}
+.contact-form-input,
+.contact-form-select,
+.contact-form-textarea {
+    @apply w-full px-4 py-3 rounded-xl border border-slate-200 text-sm sm:text-base text-slate-700 bg-white outline-none transition-all duration-200;
+}
+.contact-form-input:focus,
+.contact-form-select:focus,
+.contact-form-textarea:focus {
+    border-color: var(--contact-blue);
+    box-shadow: 0 0 0 3px #1260B01A;
+}
+.contact-form-input::placeholder,
+.contact-form-textarea::placeholder {
+    @apply text-slate-400;
+}
+.contact-form-textarea { @apply resize-y min-h-32; }
+.contact-form-error { @apply block mt-1.5 text-xs font-medium text-red-500; }
+.contact-form-submit-btn {
+    @apply w-full py-3.5 px-6 rounded-xl text-white font-bold text-sm sm:text-base transition-all duration-200 cursor-pointer;
+    background: var(--contact-navy);
+}
+.contact-form-submit-btn:hover {
+    background: var(--contact-blue);
+    box-shadow: 0 8px 20px #092F7825;
+}
+.contact-form-submit-btn:disabled {
+    @apply opacity-60 cursor-not-allowed;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+@media (max-width: 640px) {
+    .contact-hero { @apply py-20; }
+    .contact-details-section,
+    .contact-map-section,
+    .contact-form-section { @apply py-14; }
+    .contact-details-grid { @apply gap-5; }
+    .contact-facebook-banner { @apply p-7; }
+}

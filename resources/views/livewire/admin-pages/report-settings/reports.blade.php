@@ -15,7 +15,7 @@
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <!-- SEARCH INPUT -->
     <div class="relative max-w-sm w-full sm:w-auto flex-1">
-        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
             <svg
                 class="h-4 w-4"
                 fill="none"
@@ -36,8 +36,8 @@
             wire:model.live="search"
             placeholder="Search ledgers..."
             class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl
-                focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
-                focus:border-[#0C2C6B]
+                focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]
+                focus:border-[var(--color-primary)]
                 bg-white shadow-sm transition"
         >
     </div>
@@ -47,17 +47,17 @@
 
             <!-- DATE RANGE FILTER -->
             <div wire:ignore class="relative w-72">
-                <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none z-10">
+                <span class="absolute inset-y-0 left-3 flex items-center text-slate-500 pointer-events-none z-10">
                     📅
                 </span>
                 <input type="text" id="ledgerDateRange" readonly
-                    class="date-range-input pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white text-slate-700 shadow-sm cursor-pointer w-full text-center font-medium"
+                    class="date-range-input pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-white text-slate-700 shadow-sm cursor-pointer w-full text-center font-medium"
                     placeholder="Select date range">
             </div>
 
             @if ($dateRange)
                 <button type="button" wire:click="clearDateFilter" title="Clear date filter"
-                    class="inline-flex items-center px-3 py-2 text-sm text-slate-500 hover:text-[#D79B10] hover:border-[#D79B10]/30 hover:bg-[#D79B10]/10 rounded-xl border border-slate-200 bg-white shadow-sm cursor-pointer transition">
+                    class="inline-flex items-center px-3 py-2 text-sm text-slate-500 hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/10 rounded-xl border border-slate-200 bg-white shadow-sm cursor-pointer transition">
                     ✕
                 </button>
             @endif
@@ -66,7 +66,7 @@
 
             <!-- PRINT BUTTON — builds the printable report, prints, then tears it down -->
             <button type="button" wire:click="preparePrint" title="Print Report"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-[#0C2C6B] text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-[var(--color-primary)] text-sm font-semibold rounded-xl shadow-sm transition cursor-pointer">
                 <span>🖨️</span>
                 <span class="hidden sm:inline">Print</span>
             </button>
@@ -138,10 +138,19 @@
 
     <!-- LEDGERS TABLE (screen only) -->
     <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm print:hidden">
+        @if($ledgers->isEmpty())
+
+            <x-report-empty-state
+                title="No Ledger Records"
+                message="No transactions have been recorded yet."
+                icon="📊"
+            />
+
+        @else
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr
-                    class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
+                    class="border-b border-slate-200 bg-[var(--color-primary)] text-xs font-semibold uppercase tracking-wider text-white">
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">Source</th>
                     <th class="py-3 px-4">Name</th>
@@ -171,7 +180,7 @@
 
                         <td class="py-4 px-4 font-semibold text-slate-900">
                             <span
-                                class="px-2.5 py-1 text-xs font-semibold rounded-full bg-[#0C2C6B]/10 text-[#0C2C6B] border border-[#0C2C6B]/30">
+                                class="px-2.5 py-1 text-xs font-semibold rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-primary)]/30">
                                 {{ $this->sourceLabel($ledger->Source) }}
                             </span>
                         </td>
@@ -189,14 +198,14 @@
                         </td>
 
                         <td
-                            class="py-4 px-4 font-semibold {{ $ledger->amount < 0 ? 'text-[#D79B10]' : 'text-[#0C2C6B]' }}">
+                            class="py-4 px-4 font-semibold {{ $ledger->amount < 0 ? 'text-[var(--color-accent)]' : 'text-[var(--color-primary)]' }}">
                             {{ number_format($ledger->amount, 2) }}
                         </td>
 
                         <td class="py-4 px-4">
                             <span
                                 class="px-2.5 py-1 text-xs font-semibold rounded-full
-                                {{ $ledger->status === 'Completed' ? 'bg-[#0C2C6B]/10 text-[#0C2C6B] border border-[#0C2C6B]/30' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                                {{ $ledger->status === 'Completed' ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-primary)]/30' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
                                 {{ $ledger->status }}
                             </span>
                         </td>
@@ -213,20 +222,20 @@
                     </tr>
                 @endforelse
             </tbody>
-        </table>
+            </table>
+            @endif
 
         <!-- PAGINATION -->
         @if ($ledgers->hasPages())
             <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex justify-center items-center space-x-4">
                 {{-- Previous Page Link --}}
                 @if ($ledgers->onFirstPage())
-                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed text-sm">
+                    <span class="px-4 py-2 bg-gray-200 text-gray-600 rounded cursor-not-allowed text-sm">
                         Previous
                     </span>
                 @else
                     <button wire:click="previousPage" wire:loading.attr="disabled"
-                        class="px-4 py-2 text-white rounded transition cursor-pointer text-sm"
-                        style="background-color: #D79B10;">
+                        class="px-4 py-2 text-white rounded transition cursor-pointer text-sm bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)]">
                         Previous
                     </button>
                 @endif
@@ -238,12 +247,11 @@
                 {{-- Next Page Link --}}
                 @if ($ledgers->hasMorePages())
                     <button wire:click="nextPage" wire:loading.attr="disabled"
-                        class="px-4 py-2 text-white rounded transition cursor-pointer text-sm"
-                        style="background-color: #0C2C6B;">
+                        class="px-4 py-2 text-white rounded transition cursor-pointer text-sm bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)]">
                         Next
                     </button>
                 @else
-                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed text-sm">
+                    <span class="px-4 py-2 bg-gray-200 text-gray-600 rounded cursor-not-allowed text-sm">
                         Next
                     </span>
                 @endif
@@ -256,12 +264,12 @@
          every ledger row made the page multi-megabyte and laggy. -->
     @if ($printing)
     <div id="printable-ledgers" class="hidden print:block font-sans">
-        <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[#0C2C6B]">
-            <h1 class="m-0 text-2xl font-bold text-[#0C2C6B] font-serif">
-                TRUE LIFE DAYONGAN
+        <div class="text-center font-sans mb-5 pb-3 border-b-2 border-[var(--color-primary)]">
+            <h1 class="m-0 text-2xl font-bold text-[var(--color-primary)] font-serif">
+                TRIFECTA
             </h1>
 
-            <p class="my-1 text-[11px] font-bold text-[#D79B10] uppercase tracking-wider">
+            <p class="my-1 text-[11px] font-bold text-[var(--color-accent)] uppercase tracking-wider">
                 &mdash; S O L I D A R I T A S &mdash;
             </p>
 
@@ -279,7 +287,7 @@
 
         <table class="w-full border-collapse font-sans text-[10px]">
             <thead>
-                <tr class="bg-[#0C2C6B] text-white font-bold text-center h-[22px]">
+                <tr class="bg-[var(--color-primary)] text-white font-bold text-center h-[22px]">
                     <th class="border border-slate-900 p-1">#</th>
                     <th class="border border-slate-900 p-1">Source</th>
                     <th class="border border-slate-900 p-1">Name</th>
@@ -320,81 +328,66 @@
     </div>
     @endif
 
-    <style>
-        @media print {
-            @page {
-                size: landscape;
-                margin: 8mm;
-            }
-
-            body * {
-                visibility: hidden !important;
-            }
-
-            #printable-ledgers,
-            #printable-ledgers * {
-                visibility: visible !important;
-            }
-
-            #printable-ledgers {
-                display: block !important;
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-            }
-
-            table {
-                border-collapse: collapse !important;
-                width: 100% !important;
-            }
-
-            th,
-            td {
-                border: 1px solid #000 !important;
-                padding: 4px !important;
-            }
-
-            th {
-                background-color: #0C2C6B !important;
-                color: white !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-        }
-    </style>
 
     @script
         <script>
-            const dateInput = $wire.$el.querySelector('#ledgerDateRange');
+            const initLedgerDateRange = () => {
+                // Lazy components run this block before Livewire morphs the
+                // real markup in, so the input is not in the DOM on the first
+                // run (looking it up on $wire.$el would hit the placeholder).
+                const dateInput = document.getElementById('ledgerDateRange');
 
-            const picker = flatpickr(dateInput, {
-                mode: 'range',
-                dateFormat: 'Y-m-d',
-                altInput: true,
-                altFormat: 'M d, Y',
-                maxDate: 'today',
-                defaultDate: @js($dateRange ? explode(' to ', $dateRange) : []),
-                onChange: (selectedDates, dateStr, instance) => {
-                    if (selectedDates.length === 2) {
-                        const start = instance.formatDate(selectedDates[0], 'Y-m-d');
-                        const end = instance.formatDate(selectedDates[1], 'Y-m-d');
-                        $wire.set('dateRange', `${start} to ${end}`);
-                    } else if (selectedDates.length === 0) {
-                        $wire.set('dateRange', '');
-                    }
-                },
-                onClose: (selectedDates, dateStr, instance) => {
-                    if (selectedDates.length === 1) {
-                        const day = instance.formatDate(selectedDates[0], 'Y-m-d');
-                        instance.setDate([selectedDates[0], selectedDates[0]], false);
-                        $wire.set('dateRange', `${day} to ${day}`);
-                    }
+                if (!dateInput) {
+                    return false;
                 }
-            });
 
-            $wire.on('ranges-reset', () => {
-                picker.clear();
+                if (dateInput._flatpickr) {
+                    return true;
+                }
+
+                const picker = flatpickr(dateInput, {
+                    mode: 'range',
+                    dateFormat: 'Y-m-d',
+                    altInput: true,
+                    altFormat: 'M d, Y',
+                    maxDate: 'today',
+                    defaultDate: @js($dateRange ? explode(' to ', $dateRange) : []),
+                    onChange: (selectedDates, dateStr, instance) => {
+                        if (selectedDates.length === 2) {
+                            const start = instance.formatDate(selectedDates[0], 'Y-m-d');
+                            const end = instance.formatDate(selectedDates[1], 'Y-m-d');
+                            $wire.set('dateRange', `${start} to ${end}`);
+                        } else if (selectedDates.length === 0) {
+                            $wire.set('dateRange', '');
+                        }
+                    },
+                    onClose: (selectedDates, dateStr, instance) => {
+                        if (selectedDates.length === 1) {
+                            const day = instance.formatDate(selectedDates[0], 'Y-m-d');
+                            instance.setDate([selectedDates[0], selectedDates[0]], false);
+                            $wire.set('dateRange', `${day} to ${day}`);
+                        }
+                    }
+                });
+
+                $wire.on('ranges-reset', () => {
+                    picker.clear();
+                });
+
+                return true;
+            };
+
+            initLedgerDateRange();
+
+            // Finish the job once Livewire has morphed the lazy component in.
+            const stopWaitingForLedgerDateRange = Livewire.hook('morphed', ({ component }) => {
+                if (component.id !== $wire.$id) {
+                    return;
+                }
+
+                if (initLedgerDateRange()) {
+                    stopWaitingForLedgerDateRange();
+                }
             });
         </script>
     @endscript

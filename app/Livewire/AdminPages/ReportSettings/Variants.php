@@ -6,11 +6,13 @@ use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Variant;
 use App\Support\Modules;
 use Illuminate\Database\QueryException;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class Variants extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
     use WithPagination;
 
@@ -174,6 +176,7 @@ class Variants extends Component
     $this->reset('search');
     $this->resetPage();
 }
+
 
     public function render()
     {

@@ -1,0 +1,93 @@
+/* =========================================================
+   PRINT - ADMIN / TRANSACTION LIST
+   Extracted from the per-component <style> blocks so the
+   markup only carries classes. Loaded only on this page via @vite.
+========================================================= */
+
+/* --- livewire\admin-pages\transaction-list\activations.blade.php --- */
+
+@media print {
+    @page {
+        size: landscape;
+        margin: 8mm;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    #printable-activations,
+    #printable-activations * {
+        visibility: visible !important;
+    }
+
+    #printable-activations {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+    }
+
+    table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+    }
+
+    th,
+    td {
+        border: 1px solid #000 !important;
+        padding: 4px !important;
+    }
+
+    th {
+        background-color: var(--color-primary) !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
+
+/* --- livewire\admin-pages\transaction-list\withdrawals.blade.php --- */
+
+@media print {
+    @page {
+        size: landscape;
+        margin: 8mm;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    #printable-withdrawals,
+    #printable-withdrawals * {
+        visibility: visible !important;
+    }
+
+    #printable-withdrawals {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+    }
+
+    table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+    }
+
+    th,
+    td {
+        border: 1px solid #000 !important;
+        padding: 4px !important;
+    }
+
+    th {
+        background-color: var(--color-primary) !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}

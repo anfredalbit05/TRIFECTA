@@ -3,12 +3,15 @@
 namespace App\Livewire\MemberPages\MyProfile;
 
 use App\Models\User;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class Security extends Component
 {
+    use HasTabSkeleton;
+
     public string $currentPassword = '';
 
     public string $newPassword = '';

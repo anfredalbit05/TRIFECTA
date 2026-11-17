@@ -1,0 +1,85 @@
+/* ===============================================================
+   MEMBER SATELLITE PAGE (reuses admin SatelliteMembers stack)
+   Palette: primary var(--color-primary), accent var(--color-accent), slate neutrals.
+   Scoped under .sat-* so nothing clashes with other pages.
+   =============================================================== */
+
+@layer components {
+  /* -- TABS -------------------------------------------------------
+     Underline tab bar shared with my-profile / masterlist /
+     report-settings: text only, gold rule under the active tab. */
+  .sat-tabs {
+    @apply flex w-full items-end flex-wrap gap-1 border-b border-slate-200 bg-white px-3;
+  }
+
+  .sat-tab {
+    @apply relative flex shrink-0 cursor-pointer items-center justify-center gap-1.5 border-b-[3px] border-transparent px-3.5 py-3 text-[13px] font-bold leading-none text-slate-500 transition duration-200;
+  }
+
+  .sat-tab:hover {
+    @apply bg-transparent text-[var(--color-primary)];
+  }
+
+  .sat-tab--active {
+    @apply border-b-[var(--color-gold)] bg-transparent text-[var(--color-primary)];
+  }
+
+  .sat-tab-count {
+    @apply rounded-full bg-[var(--color-accent)] px-1.5 py-0.5 text-[0.6rem] font-bold text-white;
+  }
+
+  .sat-table-wrap {
+    @apply overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm;
+  }
+
+  .sat-table {
+    @apply w-full border-collapse text-sm;
+  }
+
+  .sat-table thead tr {
+    @apply bg-[var(--color-primary)] text-left text-white;
+  }
+
+  .sat-table th {
+    @apply whitespace-nowrap px-4 py-3 text-[0.7rem] font-bold uppercase tracking-wider;
+  }
+
+  .sat-table td {
+    @apply border-t border-slate-100 px-4 py-3 align-middle text-slate-700;
+  }
+
+  .sat-table tbody tr:hover {
+    @apply bg-slate-50;
+  }
+
+  .sat-empty {
+    @apply px-4 py-10 text-center text-sm text-slate-500;
+  }
+
+  .sat-pill {
+    @apply inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-[0.68rem] font-bold uppercase tracking-wide text-white;
+  }
+
+  .sat-pill-approved {
+    @apply bg-[var(--color-primary)];
+  }
+
+  .sat-pill-pending {
+    @apply bg-[var(--color-accent)];
+  }
+
+  .sat-pill-rejected {
+    @apply bg-[#b91c1c];
+  }
+
+  .sat-action {
+    @apply flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-600 transition hover:bg-[var(--color-primary)] hover:text-white;
+  }
+
+  /* -- APPLY SATELLITE BUTTON --------------------------------------
+     Sits right of the tab bar; primary fill + accent hover, matching the
+     shared SatelliteModal wizard palette. */
+  .sat-apply-btn {
+    @apply flex shrink-0 cursor-pointer items-center gap-1 rounded-xl bg-[var(--color-primary)] px-4 py-2.5 text-[13px] font-bold text-white shadow-[0_4px_12px_rgba(0,0,0,0.12)] transition duration-200 hover:bg-[var(--color-accent)];
+  }
+}

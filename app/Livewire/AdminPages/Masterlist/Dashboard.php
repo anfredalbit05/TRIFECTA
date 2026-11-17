@@ -6,11 +6,13 @@ use App\Models\User;
 use App\Models\Branch;
 use App\Models\Benefit;
 use App\Models\Inquiry;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class Dashboard extends Component
 {
+    use HasTabSkeleton;
     public string $summaryFilter = 'all';
 
     // Excel Export Filters
@@ -25,6 +27,7 @@ class Dashboard extends Component
         // Simply triggers a component re-render with fresh database queries
         session()->flash('message', 'Dashboard data refreshed successfully.');
     }
+
 
     public function render()
     {
@@ -55,7 +58,7 @@ class Dashboard extends Component
         // Inside render() method:
         $printMembers = $query->with('beneficiaries')->latest()->get();
 
-        return view('components.admin-pages.masterlist.dashboard', [
+        return view('livewire.admin-pages.masterlist.dashboard', [
             'totalMembers' => User::where('RoleID', 4)->count(),
             'activeBranches' => Branch::where('status', true)->count(),
             'totalBenefits' => Benefit::where('status', true)->count(),
@@ -157,15 +160,16 @@ class Dashboard extends Component
             echo '<body>';
 
             // HEADER
-            echo '<div style="text-align: center; font-family: Arial, sans-serif; margin-bottom: 25px; border-bottom: 2px solid #1b365d; padding-bottom: 15px;">';
-            echo '<h1 style="margin: 0; font-size: 28px; font-weight: bold; color: #1b365d; letter-spacing: 3px; font-family: Georgia, serif;">TRUE LIFE DAYONGAN</h1>';
-            echo '<p style="margin: 4px 0; font-size: 12px; font-weight: bold; color: #c5a059; letter-spacing: 4px; text-transform: uppercase;">&mdash; S O L I D A R I T A S &mdash;</p>';
+            // (Excel export can't read CSS vars — palette hexes are inlined.)
+            echo '<div style="text-align: center; font-family: Arial, sans-serif; margin-bottom: 25px; border-bottom: 2px solid #073F80; padding-bottom: 15px;">';
+            echo '<h1 style="margin: 0; font-size: 28px; font-weight: bold; color: #073F80; letter-spacing: 3px; font-family: Georgia, serif;">TRIFECTA</h1>';
+            echo '<p style="margin: 4px 0; font-size: 12px; font-weight: bold; color: #309425; letter-spacing: 4px; text-transform: uppercase;">&mdash; S O L I D A R I T A S &mdash;</p>';
             echo '<h2 style="margin: 15px 0 5px 0; font-size: 16px; font-weight: bold; text-transform: uppercase; color: #333;">LIST OF MEMBERS & BENEFICIARIES</h2>';
             echo '</div>';
 
             // DATA TABLE
             echo '<table border="1" style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11px; width: 100%;">';
-            echo '<tr style="background-color: #0C2C6B; color: #FFFFFF; font-weight: bold; text-align: center; height: 25px;">';
+            echo '<tr style="background-color: #0B5FC0; color: #FFFFFF; font-weight: bold; text-align: center; height: 25px;">';
             echo '<th style="padding: 5px;">#</th>';
             echo '<th style="padding: 5px;">Full Name</th>';
             echo '<th style="padding: 5px;">Birthdate</th>';

@@ -1,0 +1,38 @@
+/* Extracted from resources/views/layouts\app.blade.php */
+
+.swal2-container {
+    z-index: 99999 !important;
+}
+
+/*
+ * Mobile bottom navigation spacing.
+ * The navbar is fixed at the bottom, so we reserve space
+ * for it to prevent content from being hidden underneath.
+ */
+@media (max-width: 1023px) {
+    main {
+        padding-bottom: calc(100px + env(safe-area-inset-bottom));
+    }
+
+    footer {
+        padding-bottom: calc(100px + env(safe-area-inset-bottom));
+    }
+}
+
+/* Extracted from resources/views/layouts\member.blade.php */
+
+.swal2-container {
+    z-index: 99999 !important;
+}
+
+/* Extracted from resources/views/livewire\logout-button.blade.php */
+
+.swal2-container {
+    z-index: 99999 !important;
+}
+
+/* WARNING ICON */
+.swal2-icon.swal2-warning {
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
+}

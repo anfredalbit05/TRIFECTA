@@ -1,32 +1,6 @@
 <div class="genealogy-overview">
 
     {{-- PRINT STYLES (scoped; !important beats Tailwind utilities like "flex") --}}
-    <style>
-        @media print {
-            @page { margin: 10mm; }
-
-            .genealogy-overview .genealogy-print-hide { display: none !important; }
-
-            .genealogy-overview .ov-wrap {
-                overflow: visible !important;
-                border: 0 !important;
-                border-radius: 0 !important;
-            }
-
-            .genealogy-overview .ov-table { min-width: 0 !important; font-size: 11px; }
-            .genealogy-overview .ov-table th,
-            .genealogy-overview .ov-table td { padding: 3px 8px !important; }
-            .genealogy-overview .ov-table thead { display: table-header-group; }
-            .genealogy-overview .ov-table tr { break-inside: avoid; page-break-inside: avoid; }
-            .genealogy-overview .ov-table span { padding-top: 0 !important; padding-bottom: 0 !important; }
-
-            /* keep colors (header bar, badges) in the printout */
-            .genealogy-overview * {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-        }
-    </style>
 
     {{-- TOOLBAR --}}
     <div class="genealogy-explorer-header genealogy-print-hide">
@@ -51,7 +25,7 @@
                 type="text"
                 wire:model.live.debounce.400ms="memberSearch"
                 placeholder="Search member (name or referral code)..."
-                class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-9 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]/20"
+                class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-9 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
             >
 
             @if (filled($memberSearch))
@@ -72,7 +46,7 @@
                             wire:key="candidate{{ $candidate->UserID }}"
                             class="flex w-full items-center gap-3 border-b border-slate-100 px-4 py-2.5 text-left transition last:border-b-0 hover:bg-slate-50"
                         >
-                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-blue-600">
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-tint)] text-xs font-bold text-[var(--color-primary)]">
                                 {{ strtoupper(substr($candidate->firstname, 0, 1)) }}
                             </span>
 
@@ -101,7 +75,7 @@
                 type="button"
                 x-data
                 @click="window.print()"
-                class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-[#0C2C6B] px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#123c88] hover:shadow-md"
+                class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[var(--color-primary-mid)] hover:shadow-md"
                 title="Print direct downlines"
             >
                 <span class="text-base">&#128424;</span>
@@ -200,7 +174,7 @@
                             x-model="q"
                             @keydown.escape="q = ''"
                             placeholder="Filter name or referral code..."
-                            class="w-full rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-9 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[#0C2C6B] focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]/20"
+                            class="w-full rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-9 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
                         >
 
                         <button
@@ -257,7 +231,7 @@
                             type="text"
                             readonly
                             placeholder="Filter by activation date"
-                            class="date-range-input w-full cursor-pointer rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-center text-sm font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                            class="date-range-input w-full cursor-pointer rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-center text-sm font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                         >
                     </div>
 
@@ -285,7 +259,7 @@
                     <div class="ov-wrap overflow-x-auto rounded-xl border border-slate-200 bg-white">
                         <table class="ov-table w-full min-w-[1050px] border-collapse text-sm">
 
-                            <thead class="bg-[#0C2C6B] text-white">
+                            <thead class="bg-[var(--color-primary)] text-white">
                                 <tr>
                                     <th class="px-4 py-3 text-left">#</th>
                                     <th class="px-4 py-3 text-left">Member Name</th>
@@ -316,8 +290,8 @@
                                         <td class="px-4 py-3">
                                             <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold
                                                 {{ $node['payment_method'] === 'Cash'
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : 'bg-blue-100 text-blue-700' }}">
+                                                    ? 'bg-[var(--color-primary-tint)] text-[var(--color-primary)]'
+                                                    : 'bg-[var(--color-primary-tint)] text-[var(--color-primary)]' }}">
                                                 {{ $node['payment_method'] ?: '—' }}
                                             </span>
                                         </td>
@@ -329,7 +303,7 @@
 
                                         <td class="px-4 py-3">
                                             <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold
-                                                {{ strtolower($node['status']) === 'active' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600' }}">
+                                                {{ strtolower($node['status']) === 'active' ? 'bg-[var(--color-primary-tint)] text-[var(--color-primary)]' : 'bg-slate-100 text-slate-600' }}">
                                                 {{ $node['status'] }}
                                             </span>
                                         </td>

@@ -23,7 +23,7 @@
                             <table role="presentation" cellspacing="0" cellpadding="0">
                                 <tr>
                                     <td align="center" style="background-color: rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 12px; backdrop-filter: blur(8px);">
-                                        <img src="{{ asset('images/truelife-logo.png') }}" alt="True Life Logo" width="64" height="64" style="display: block; width: 64px; height: 64px; object-fit: contain;">
+                                        <img src="{{ asset('images/truelife-logo.png') }}" alt="TRIFECTA Logo" width="64" height="64" style="display: block; width: 64px; height: 64px; object-fit: contain;">
                                     </td>
                                 </tr>
                             </table>
@@ -113,7 +113,7 @@
 
                             <p style="margin: 0;">
                                 Best regards,<br>
-                                <strong style="color: #0B2A5B;">True Life Dayongan</strong>
+                                <strong style="color: #0B2A5B;">TRIFECTA</strong>
                             </p>
                         </td>
                     </tr>
@@ -121,7 +121,7 @@
                     <!-- Footer Section -->
                     <tr>
                         <td align="center" style="background-color: #f8fafc; padding: 24px; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9;">
-                            <p style="margin: 0;">&copy; {{ date('Y') }} True Life Dayongan. All rights reserved.</p>
+                            <p style="margin: 0;">&copy; {{ date('Y') }} TRIFECTA. All rights reserved.</p>
                         </td>
                     </tr>
 

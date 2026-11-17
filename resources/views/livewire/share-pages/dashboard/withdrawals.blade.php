@@ -139,12 +139,7 @@
             <div class="card-body">
 
                 <div
-                    class="withdrawal-history-list"
-                    style="
-                        max-height: 430px;
-                        overflow-y: auto;
-                        padding-right: 6px;
-                    "
+                    class="withdrawal-history-list max-h-[430px] overflow-y-auto pr-1.5"
                 >
 
                     @forelse ($withdrawals as $withdrawal)
@@ -189,7 +184,7 @@
                                         class="inline-flex items-center
                                             px-3 py-1.5 rounded-full
                                             text-xs font-semibold
-                                            bg-[#E8F0FF] text-[#0C2C6B]"
+                                            bg-[var(--color-primary-tint)] text-[var(--color-primary)]"
                                     >
                                         Approved
                                     </span>
@@ -200,7 +195,7 @@
                                         class="inline-flex items-center
                                             px-3 py-1.5 rounded-full
                                             text-xs font-semibold
-                                            bg-yellow-100 text-yellow-700"
+                                            bg-amber-100 text-amber-700"
                                     >
                                         Pending
                                     </span>
@@ -222,7 +217,7 @@
                                         class="inline-flex items-center
                                             px-3 py-1.5 rounded-full
                                             text-xs font-semibold
-                                            bg-blue-100 text-blue-700"
+                                            bg-[var(--color-primary-tint)] text-[var(--color-primary)]"
                                     >
                                         Completed
                                     </span>

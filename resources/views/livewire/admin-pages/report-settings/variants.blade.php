@@ -15,7 +15,7 @@
             <button
                 type="button"
                 wire:click="openCreateModal"
-                class="masterlist-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer shadow bg-[#0C2C6B] text-white hover:bg-[#09204f] w-full sm:w-auto"
+                class="masterlist-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer shadow bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)] w-full sm:w-auto"
             >
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -27,7 +27,7 @@
 
     {{-- SUCCESS MESSAGE --}}
     @if (session()->has('success'))
-        <div class="p-4 mb-4 text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl text-sm font-medium">
+        <div class="p-4 mb-4 text-[var(--color-primary)] bg-[var(--color-primary-tint)] border border-[var(--color-primary-tint-border)] rounded-xl text-sm font-medium">
             {{ session('success') }}
         </div>
     @endif
@@ -55,7 +55,7 @@
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
 
         <div class="relative w-full lg:max-w-3xl">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/>
@@ -67,8 +67,8 @@
                 wire:model.live.debounce.300ms="search"
                 placeholder="Search variants..."
                 class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl
-                    focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]
-                    focus:border-[#0C2C6B] bg-white shadow-sm transition"
+                    focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]
+                    focus:border-[var(--color-primary)] bg-white shadow-sm transition"
             >
         </div>
 
@@ -109,7 +109,7 @@
         <table class="w-full min-w-[700px] text-left border-collapse">
 
             <thead>
-                <tr class="border-b border-slate-200 bg-[#0C2C6B] text-xs font-semibold uppercase tracking-wider text-white">
+                <tr class="border-b border-slate-200 bg-[var(--color-primary)] text-xs font-semibold uppercase tracking-wider text-white">
                     <th class="py-3 px-4">#</th>
                     <th class="py-3 px-4">Variant Name</th>
                     <th class="py-3 px-4">Description</th>
@@ -151,7 +151,7 @@
 
                             <span @class([
                                 'inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold',
-                                'bg-emerald-50 text-emerald-700' => $isActive,
+                                'bg-[var(--color-primary-tint)] text-[var(--color-primary)]' => $isActive,
                                 'bg-slate-100 text-slate-600' => ! $isActive,
                             ])>
                                 {{ $variant->status ?: 'Unknown' }}
@@ -164,14 +164,9 @@
                                 <div class="flex gap-2 justify-center">
 
                                     @if ($this->canUpdate)
-                                        <button
-                                            type="button"
+                                        <x-action-btn icon="edit" tone="edit"
                                             wire:click="editVariant({{ $variant->VID }})"
-                                            title="Update Variant"
-                                            class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#0C2C6B] text-white hover:bg-[#09204f] transition cursor-pointer text-xs font-semibold shadow"
-                                        >
-                                            ✏️ Edit
-                                        </button>
+                                            title="Update Variant" />
                                     @endif
 
                                     {{-- @if ($this->canDelete)
@@ -179,7 +174,7 @@
                                             type="button"
                                             wire:click="confirmDelete({{ $variant->VID }})"
                                             title="Delete Variant"
-                                            class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer text-xs font-semibold shadow"
+                                            class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition cursor-pointer text-xs font-semibold shadow"
                                         >
                                             🗑️
                                         </button>
@@ -211,7 +206,7 @@
             <div class="px-4 py-4 border-t border-slate-200 bg-slate-50 flex flex-wrap justify-center items-center gap-4">
 
                 @if ($variants->onFirstPage())
-                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                    <span class="px-4 py-2 bg-gray-200 text-gray-600 rounded cursor-not-allowed">
                         Previous
                     </span>
                 @else
@@ -219,8 +214,7 @@
                         type="button"
                         wire:click="previousPage"
                         wire:loading.attr="disabled"
-                        class="px-4 py-2 text-white rounded transition cursor-pointer disabled:opacity-50"
-                        style="background-color: #D79B10;"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer disabled:opacity-50 bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)]"
                     >
                         Previous
                     </button>
@@ -235,13 +229,12 @@
                         type="button"
                         wire:click="nextPage"
                         wire:loading.attr="disabled"
-                        class="px-4 py-2 text-white rounded transition cursor-pointer disabled:opacity-50"
-                        style="background-color: #0C2C6B;"
+                        class="px-4 py-2 text-white rounded transition cursor-pointer disabled:opacity-50 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)]"
                     >
                         Next
                     </button>
                 @else
-                    <span class="px-4 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+                    <span class="px-4 py-2 bg-gray-200 text-gray-600 rounded cursor-not-allowed">
                         Next
                     </span>
                 @endif
@@ -259,12 +252,12 @@
             <div class="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl my-8">
 
                 {{-- MODAL HEADER --}}
-                <div class="bg-[#0C2C6B] px-6 py-4 text-white flex items-center justify-between">
+                <div class="bg-[var(--color-primary)] px-6 py-4 text-white flex items-center justify-between">
                     <div>
                         <h3 class="text-lg font-bold">
                             {{ $variant_id ? 'Edit Variant' : 'Add New Variant' }}
                         </h3>
-                        <p class="text-xs text-blue-100">
+                        <p class="text-xs text-[var(--color-primary-tint)]">
                             Fill in the variant details below.
                         </p>
                     </div>
@@ -286,7 +279,7 @@
 
                         {{-- NAME --}}
                         <div>
-                            <label for="variant-name" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                            <label for="variant-name" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
                                 Variant Name <span class="text-red-500">*</span>
                             </label>
 
@@ -296,7 +289,7 @@
                                 wire:model="name"
                                 maxlength="100"
                                 placeholder="Enter variant name"
-                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                             >
 
                             @error('name')
@@ -306,7 +299,7 @@
 
                         {{-- DESCRIPTION --}}
                         <div>
-                            <label for="variant-description" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                            <label for="variant-description" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
                                 Description
                             </label>
 
@@ -316,7 +309,7 @@
                                 rows="3"
                                 maxlength="1000"
                                 placeholder="Enter variant description"
-                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B]"
+                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                             ></textarea>
 
                             @error('description')
@@ -326,14 +319,14 @@
 
                         {{-- STATUS --}}
                         <div>
-                            <label for="variant-status" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                            <label for="variant-status" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
                                 Status
                             </label>
 
                             <select
                                 id="variant-status"
                                 wire:model="status"
-                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0C2C6B] bg-white"
+                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-white"
                             >
                                 <option value="active">Active</option>
                                 <option value="inactive">Inactive</option>
@@ -360,7 +353,7 @@
                             type="submit"
                             wire:loading.attr="disabled"
                             wire:target="saveVariant"
-                            class="px-4 py-2 text-xs font-semibold text-white bg-[#0C2C6B] rounded-lg hover:bg-[#09204f] transition cursor-pointer shadow disabled:opacity-50"
+                            class="px-4 py-2 text-xs font-semibold text-white bg-[var(--color-primary)] rounded-lg hover:bg-[var(--color-primary-dark)] transition cursor-pointer shadow disabled:opacity-50"
                         >
                             <span wire:loading.remove wire:target="saveVariant">
                                 {{ $variant_id ? 'Save Changes' : 'Create Variant' }}
@@ -381,15 +374,15 @@
         <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm">
             <div class="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
 
-                <div class="bg-[#0C2C6B] px-6 py-4 text-white">
+                <div class="bg-[var(--color-primary)] px-6 py-4 text-white">
                     <h3 class="text-lg font-bold">Delete Variant</h3>
-                    <p class="mt-1 text-xs text-blue-100">
+                    <p class="mt-1 text-xs text-[var(--color-primary-tint)]">
                         Confirm before proceeding.
                     </p>
                 </div>
 
                 <div class="p-6">
-                    <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-xl text-amber-600">
+                    <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-xl text-red-600">
                         !
                     </div>
 
@@ -411,7 +404,7 @@
                             wire:click="deleteVariant"
                             wire:loading.attr="disabled"
                             wire:target="deleteVariant"
-                            class="px-4 py-2 text-xs font-semibold text-white bg-amber-500 rounded-lg hover:bg-amber-600 transition cursor-pointer shadow disabled:opacity-50"
+                            class="px-4 py-2 text-xs font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 transition cursor-pointer shadow disabled:opacity-50"
                         >
                             <span wire:loading.remove wire:target="deleteVariant">
                                 Delete Variant

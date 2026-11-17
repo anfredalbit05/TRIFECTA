@@ -1,0 +1,96 @@
+/* =========================
+   NEWS & UPDATE
+========================= */
+
+
+.news-updates-container {
+    @apply space-y-5;
+}
+
+
+
+
+
+/* HEADER */
+
+.news-header {
+
+    @apply flex items-center justify-between;
+
+}
+
+
+
+.news-header h2 {
+
+    @apply text-xl font-bold text-[var(--color-primary)];
+
+}
+
+
+
+
+
+/* LIST */
+
+.news-list {
+
+    @apply space-y-4;
+
+}
+
+
+
+
+
+/* CARD */
+
+.post-card {
+
+    @apply rounded-xl border border-gray-200 bg-white p-5 shadow-sm;
+
+}
+
+
+
+.post-card h3 {
+
+    @apply text-lg font-bold text-[var(--color-primary)];
+
+}
+
+
+
+.post-card p {
+
+    @apply mt-2 text-sm text-gray-500;
+
+}
+
+
+
+.news-date {
+
+    @apply mt-3 block text-xs text-gray-400;
+
+}
+
+
+
+
+
+/* BUTTON */
+
+.post-btn {
+
+    @apply rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white transition;
+
+}
+
+
+
+.post-btn:hover {
+
+    @apply opacity-90;
+
+}

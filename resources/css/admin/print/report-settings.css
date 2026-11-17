@@ -1,0 +1,258 @@
+/* =========================================================
+   PRINT - ADMIN / REPORT SETTINGS
+   Extracted from the per-component <style> blocks so the
+   markup only carries classes. Loaded only on this page via @vite.
+========================================================= */
+
+/* --- livewire\admin-pages\report-settings\users-accounts.blade.php --- */
+
+@media print {
+    @page {
+        size: landscape;
+        margin: 8mm;
+    }
+
+    /* Default state (no button clicked): hide everything except the full table */
+    body:not([data-print-target]) * {
+        visibility: hidden !important;
+    }
+
+    body:not([data-print-target]) #printable-users,
+    body:not([data-print-target]) #printable-users * {
+        visibility: visible !important;
+    }
+
+    body:not([data-print-target]) #printable-users {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Single-user print target: hide everything except that user's report */
+    body[data-print-target="user-financials"] * {
+        visibility: hidden !important;
+    }
+
+    body[data-print-target="user-financials"] #printable-user-financials,
+    body[data-print-target="user-financials"] #printable-user-financials * {
+        visibility: visible !important;
+    }
+
+    body[data-print-target="user-financials"] #printable-user-financials {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+    }
+
+    table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+    }
+
+    th,
+    td {
+        border: 1px solid #000 !important;
+        padding: 4px !important;
+    }
+
+    th {
+        background-color: var(--color-primary) !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
+
+/* --- livewire\admin-pages\report-settings\reports.blade.php --- */
+
+@media print {
+    @page {
+        size: landscape;
+        margin: 8mm;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    #printable-ledgers,
+    #printable-ledgers * {
+        visibility: visible !important;
+    }
+
+    #printable-ledgers {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+    }
+
+    table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+    }
+
+    th,
+    td {
+        border: 1px solid #000 !important;
+        padding: 4px !important;
+    }
+
+    th {
+        background-color: var(--color-primary) !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
+
+/* --- livewire\admin-pages\report-settings\sales-consultant-report.blade.php --- */
+
+@media print {
+    @page {
+        size: landscape;
+        margin: 8mm;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    #printable-users,
+    #printable-users * {
+        visibility: visible !important;
+    }
+
+    #printable-users {
+        display: block !important;
+        position: absolute !important;
+        inset: 0 auto auto 0;
+        width: 100%;
+    }
+
+    table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+    }
+
+    th,
+    td {
+        border: 1px solid #000 !important;
+        padding: 4px !important;
+    }
+
+    th {
+        background: var(--color-primary) !important;
+        color: #fff !important;
+        print-color-adjust: exact !important;
+    }
+}
+
+/* --- livewire\components\spin-fund-report.blade.php --- */
+
+/* ==========================================================
+     PRINT RULES — two modes, each scoped to its own
+     data-print-target so the other Livewire components on
+     this page (reports, users-accounts) keep their own
+     print behaviour untouched.
+     1. Whole fund report → body[data-print-target="spin-fund-report"]
+     2. Winners of a draw → body[data-print-target="draw-winners"]
+=========================================================== */
+@media print {
+    @page {
+        size: portrait;
+        margin: 8mm;
+    }
+
+    /* ===== 1 · WHOLE FUND REPORT ===== */
+
+    body[data-print-target="spin-fund-report"] * {
+        visibility: hidden !important;
+    }
+
+    body[data-print-target="spin-fund-report"] #printable-spin-fund-report,
+    body[data-print-target="spin-fund-report"] #printable-spin-fund-report * {
+        visibility: visible !important;
+    }
+
+    body[data-print-target="spin-fund-report"] #printable-spin-fund-report {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+    }
+
+    /* The other tabs' printable blocks must never leak into this
+       printout (their own stylesheets reveal them when no target
+       attribute is set on <body>). */
+    body[data-print-target="spin-fund-report"] #printable-users,
+    body[data-print-target="spin-fund-report"] #printable-user-financials,
+    body[data-print-target="spin-fund-report"] #printable-ledgers,
+    body[data-print-target="spin-fund-report"] #printable-draw-winners {
+        display: none !important;
+    }
+
+    /* Let the per-cycle table use the full paper width. */
+    body[data-print-target="spin-fund-report"] #printable-spin-fund-report .overflow-x-auto {
+        overflow: visible !important;
+    }
+
+    /* Primary totals card: keep its background when printing. */
+    body[data-print-target="spin-fund-report"] #printable-spin-fund-report .bg-\[var\(--color-primary\)\] {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* ===== 2 · WINNERS OF ONE DRAW ===== */
+
+    body[data-print-target="draw-winners"] * {
+        visibility: hidden !important;
+    }
+
+    body[data-print-target="draw-winners"] #printable-draw-winners,
+    body[data-print-target="draw-winners"] #printable-draw-winners * {
+        visibility: visible !important;
+    }
+
+    body[data-print-target="draw-winners"] #printable-draw-winners {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Keep every other printable region out of this printout. */
+    body[data-print-target="draw-winners"] #printable-spin-fund-report,
+    body[data-print-target="draw-winners"] #printable-users,
+    body[data-print-target="draw-winners"] #printable-user-financials,
+    body[data-print-target="draw-winners"] #printable-ledgers {
+        display: none !important;
+    }
+
+    /* ===== Shared table polish ===== */
+
+    table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+    }
+
+    th,
+    td {
+        border: 1px solid #000 !important;
+        padding: 4px !important;
+    }
+
+    th {
+        background-color: var(--color-primary) !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}

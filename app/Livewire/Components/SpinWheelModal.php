@@ -4,6 +4,7 @@ namespace App\Livewire\Components;
 
 use App\Models\SpinDraw;
 use App\Models\SpinWinner;
+use App\Models\User;
 use App\Services\SpinWheelAnnouncer;
 use App\Services\SpinWheelService;
 use Carbon\Carbon;
@@ -205,6 +206,7 @@ class SpinWheelModal extends Component
         $this->spinIndex = $result['index'];
         $this->spinTotal = $result['total'];
         $this->lastWin = array_merge($result['winner'], [
+            'address' => (string) (User::find($result['winner']['UserID'] ?? null)?->address ?? ''),
             'emailed' => $notification['emailed'],
             'email' => $notification['email'],
             'notice' => $notification['message'],
@@ -275,14 +277,21 @@ class SpinWheelModal extends Component
             return;
         }
 
+        $text = $this->lastWin['prize_name']
+            .' worth ₱'.number_format((float) $this->lastWin['prize_amount'], 2)
+            .' · spin #'.$this->lastWin['spin_order']
+            .' · '.$this->lastWin['invites']
+            .' qualifying activation'.((int) $this->lastWin['invites'] === 1 ? '' : 's');
+
+        $address = trim((string) ($this->lastWin['address'] ?? ''));
+
+        if ($address !== '') {
+            $text .= '\n📍 '.$address;
+        }
+
         $this->dispatch('swal:success', [
             'title' => '🎉 '.$this->lastWin['name'].' wins!',
-            'text' => $this->lastWin['prize_name']
-                .' worth ₱'.number_format((float) $this->lastWin['prize_amount'], 2)
-                .' · spin #'.$this->lastWin['spin_order']
-                .' · '.$this->lastWin['invites']
-                .' qualifying activation'.((int) $this->lastWin['invites'] === 1 ? '' : 's')
-                .'\n'.$this->lastWin['notice'],
+            'text' => $text.'\n'.$this->lastWin['notice'],
         ]);
     }
 
@@ -688,23 +697,46 @@ class SpinWheelModal extends Component
             ->values()
             ->all();
 
-        $this->winners = $service->winnersOf($draw)
-            ->map(fn (SpinWinner $winner) => [
-                'WinnerID' => $winner->WinnerID,
-                'name' => $service->displayName($winner->user),
-                'address' => $winner->user?->address,
-                'code' => (string) ($winner->user->referralCode ?? ''),
-                'invites' => (int) $winner->qualified_invites,
-                'prize_name' => (string) $winner->prize_name,
-                'prize_amount' => (float) $winner->prize_amount,
-                'spin_order' => (int) $winner->spin_order,
-                'drawn_at' => optional($winner->created_at)->format('M j, Y g:i A'),
-                'ledger_id' => $winner->ledger?->TransactionID,
-                'claim_status' => (string) ($winner->ledger->status ?? 'Pending'),
-                'claimed_at' => $winner->ledger?->status === 'Completed'
-                    ? optional($winner->ledger->updated_at)->format('M j, Y g:i A')
-                    : null,
-            ])
+        $winners = $service->winnersOf($draw)->sortByDesc('spin_order');
+
+        // Resolve each winner's upline (users.uplineCode -> users.referralCode)
+        // in a single query so the winners card can show who recruited them.
+        $uplineCodes = $winners
+            ->map(fn (SpinWinner $winner) => trim((string) ($winner->user?->uplineCode ?? '')))
+            ->filter()
+            ->unique()
+            ->values();
+
+        $uplines = $uplineCodes->isEmpty()
+            ? collect()
+            : User::whereIn('referralCode', $uplineCodes)
+                ->get(['UserID', 'firstname', 'lastname', 'username', 'referralCode'])
+                ->keyBy('referralCode');
+
+        $this->winners = $winners
+            ->map(function (SpinWinner $winner) use ($service, $uplines) {
+                $uplineCode = trim((string) ($winner->user?->uplineCode ?? ''));
+                $upline = $uplineCode !== '' ? $uplines->get($uplineCode) : null;
+
+                return [
+                    'WinnerID' => $winner->WinnerID,
+                    'name' => $service->displayName($winner->user),
+                    'address' => $winner->user?->address,
+                    'code' => (string) ($winner->user->referralCode ?? ''),
+                    'upline_name' => $upline ? $service->displayName($upline) : '',
+                    'upline_code' => $uplineCode,
+                    'invites' => (int) $winner->qualified_invites,
+                    'prize_name' => (string) $winner->prize_name,
+                    'prize_amount' => (float) $winner->prize_amount,
+                    'spin_order' => (int) $winner->spin_order,
+                    'drawn_at' => optional($winner->created_at)->format('M j, Y g:i A'),
+                    'ledger_id' => $winner->ledger?->TransactionID,
+                    'claim_status' => (string) ($winner->ledger->status ?? 'Pending'),
+                    'claimed_at' => $winner->ledger?->status === 'Completed'
+                        ? optional($winner->ledger->updated_at)->format('M j, Y g:i A')
+                        : null,
+                ];
+            })
             ->values()
             ->all();
 

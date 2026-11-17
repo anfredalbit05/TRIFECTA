@@ -1,252 +1,173 @@
-<section class="overview-section bg-gradient-to-b from-slate-50 to-white py-20 sm:py-24 lg:py-32">
+@php
+    /* Six-point health benefit grid. Each card keeps its number, headline,
+       value and short explanation editable from the context editor. */
+    $points = [
+        [
+            'n' => '1',
+            'title_key' => 'benefit_1_title',
+            'title' => $contexts['benefit_1_title'] ?? 'Preventive Healthcare',
+            'amount_key' => 'benefit_1_amount',
+            'amount' => $contexts['benefit_1_amount'] ?? 'Reimbursement of ₱500',
+            'text_key' => 'benefit_1_text',
+            'text' => $contexts['benefit_1_text'] ?? 'CBC, urinalysis, fecalysis and chest x-ray.',
+            'badge_key' => null,
+            'badge' => null,
+        ],
+        [
+            'n' => '2',
+            'title_key' => 'benefit_2_title',
+            'title' => $contexts['benefit_2_title'] ?? 'In-Patient Care',
+            'amount_key' => 'benefit_2_amount',
+            'amount' => $contexts['benefit_2_amount'] ?? '₱15,000 consumable',
+            'text_key' => 'benefit_2_text',
+            'text' => $contexts['benefit_2_text'] ?? 'Stay in a private or semi-private room, plus doctors\' fees.',
+            'badge_key' => null,
+            'badge' => null,
+        ],
+        [
+            'n' => '3',
+            'title_key' => 'benefit_3_title',
+            'title' => $contexts['benefit_3_title'] ?? 'Out-Patient Care',
+            'amount_key' => 'benefit_3_amount',
+            'amount' => $contexts['benefit_3_amount'] ?? '₱5,000 consumable',
+            'text_key' => 'benefit_3_text',
+            'text' => $contexts['benefit_3_text'] ?? 'Check-ups and medicine allowance.',
+            'badge_key' => null,
+            'badge' => null,
+        ],
+        [
+            'n' => '4',
+            'title_key' => 'benefit_4_title',
+            'title' => $contexts['benefit_4_title'] ?? 'Emergency Care',
+            'amount_key' => 'benefit_4_amount',
+            'amount' => $contexts['benefit_4_amount'] ?? '₱13,000 per incident, through accident',
+            'text_key' => 'benefit_4_text',
+            'text' => $contexts['benefit_4_text'] ?? 'Ambulance (actual cost), physician services, minor surgery and admission.',
+            'badge_key' => 'benefit_4_badge',
+            'badge' => $contexts['benefit_4_badge'] ?? 'Usable within 72 hours of policy approval',
+        ],
+        [
+            'n' => '5',
+            'title_key' => 'benefit_5_title',
+            'title' => $contexts['benefit_5_title'] ?? 'Dental Care',
+            'amount_key' => 'benefit_5_amount',
+            'amount' => $contexts['benefit_5_amount'] ?? 'Reimbursement of ₱1,000',
+            'text_key' => 'benefit_5_text',
+            'text' => $contexts['benefit_5_text'] ?? 'Consultation and examination, and single tooth extraction.',
+            'badge_key' => null,
+            'badge' => null,
+        ],
+        [
+            'n' => '6',
+            'title_key' => 'benefit_6_title',
+            'title' => $contexts['benefit_6_title'] ?? 'Maternity & Ultrasound',
+            'amount_key' => 'benefit_6_amount',
+            'amount' => $contexts['benefit_6_amount'] ?? 'Reimbursement up to ₱2,000',
+            'text_key' => 'benefit_6_text',
+            'text' => $contexts['benefit_6_text'] ?? 'Physician\'s fee per visit, tetanus injection, ultrasound, routine laboratory and urinalysis, and vitamins and medicines.',
+            'badge_key' => null,
+            'badge' => null,
+        ],
+    ];
+@endphp
 
-    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+<section class="benefit-section" id="benefits">
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+    <div class="benefit-wrap">
 
+        {{-- =========================
+            SECTION HEADER
+        ========================== --}}
+        <div class="benefit-header">
 
-            {{-- =========================
-                CONTENT SIDE
-            ========================== --}}
+            <x-editable-text
+                key="overview_badge"
+                :value="$contexts['overview_badge'] ?? ''"
+                tag="span"
+                class="section-tag"
+            />
 
-            <div class="lg:col-span-7 space-y-6">
+            <h2 class="benefit-title">
+                <x-editable-text key="overview_title" :value="$contexts['overview_title'] ?? ''" tag="span" />
+                <span class="benefit-title-highlight">
+                    <x-editable-text key="overview_title_highlight" :value="$contexts['overview_title_highlight'] ?? ''" tag="span" />
+                </span>
+            </h2>
 
-                <div class="max-w-3xl text-left">
+            <x-editable-text
+                key="overview_description"
+                :value="$contexts['overview_description'] ?? ''"
+                tag="div"
+                class="benefit-lead"
+            />
 
+        </div>
 
-                    {{-- Badge --}}
+        {{-- =========================
+            SIX-POINT GRID
+        ========================== --}}
+        <div class="benefit-grid">
 
-                    <x-editable-text
-                        key="overview_badge"
-                        :value="$contexts['overview_badge'] ?? ''"
-                        tag="span"
-                        class="inline-block px-4 py-1.5 rounded-full bg-amber-100/80 text-amber-700 font-bold tracking-widest uppercase text-xs sm:text-sm border border-amber-200"
-                    />
+            @foreach ($points as $point)
+                <article class="benefit-card">
 
+                    <div class="benefit-card-head">
+                        <span class="benefit-number">{{ $point['n'] }}</span>
 
-                    {{-- Title --}}
-
-                    <h2 class="mt-4 text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0C2C6B] leading-tight">
-
-                        <x-editable-text
-                            key="overview_title"
-                            :value="$contexts['overview_title'] ?? ''"
-                            tag="span"
-                        />
-
-                        <br>
-
-                        <span class="text-amber-500">
-
-                            <x-editable-text
-                                key="overview_title_highlight"
-                                :value="$contexts['overview_title_highlight'] ?? ''"
-                                tag="span"
-                            />
-
-                        </span>
-
-                    </h2>
-
-
-                    {{-- Description --}}
-
-                    <x-editable-text
-                        key="overview_description"
-                        :value="$contexts['overview_description'] ?? ''"
-                        tag="div"
-                        class="mt-4 text-slate-600 text-base sm:text-lg leading-relaxed"
-                    />
-
-
-                </div>
-
-
-
-                {{-- =========================
-                    COVERAGE PLANS
-                ========================== --}}
-
-                <div class="bg-slate-100/70 rounded-2xl p-3 border border-slate-200 grid grid-cols-3 gap-3 text-center">
-
-
-                    {{-- Bronze --}}
-
-                    <div class="bg-white p-3 rounded-xl shadow-sm border border-amber-200">
-
-                        <x-editable-text
-                            key="bronze_title"
-                            :value="$contexts['bronze_title'] ?? ''"
-                            tag="div"
-                            class="text-xs font-bold text-amber-800 uppercase"
-                        />
-
-                        <x-editable-text
-                            key="bronze_amount"
-                            :value="$contexts['bronze_amount'] ?? ''"
-                            tag="div"
-                            class="text-sm sm:text-base font-extrabold text-[#0C2C6B]"
-                        />
-
-                    </div>
-
-
-
-                    {{-- Silver --}}
-
-                    <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-300">
-
-                        <x-editable-text
-                            key="silver_title"
-                            :value="$contexts['silver_title'] ?? ''"
-                            tag="div"
-                            class="text-xs font-bold text-slate-700 uppercase"
-                        />
-
-                        <x-editable-text
-                            key="silver_amount"
-                            :value="$contexts['silver_amount'] ?? ''"
-                            tag="div"
-                            class="text-sm sm:text-base font-extrabold text-[#0C2C6B]"
-                        />
-
-                    </div>
-
-
-
-                    {{-- Gold --}}
-
-                    <div class="bg-white p-3 rounded-xl shadow-sm border border-amber-400">
-
-                        <x-editable-text
-                            key="gold_title"
-                            :value="$contexts['gold_title'] ?? ''"
-                            tag="div"
-                            class="text-xs font-bold text-amber-600 uppercase"
-                        />
-
-                        <x-editable-text
-                            key="gold_amount"
-                            :value="$contexts['gold_amount'] ?? ''"
-                            tag="div"
-                            class="text-sm sm:text-base font-extrabold text-[#0C2C6B]"
-                        />
-
-                    </div>
-
-
-                </div>
-
-
-
-                {{-- =========================
-                    FEATURES
-                ========================== --}}
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-
-
-                    {{-- Feature 1 --}}
-
-                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-
-                        <h3 class="text-sm font-bold text-[#0C2C6B]">
+                        <div class="benefit-heading">
+                            <h3 class="benefit-card-title">
+                                <x-editable-text :key="$point['title_key']" :value="$point['title']" tag="span" />
+                            </h3>
 
                             <x-editable-text
-                                key="feature_1_title"
-                                :value="$contexts['feature_1_title'] ?? ''"
-                                tag="span"
+                                :key="$point['amount_key']"
+                                :value="$point['amount']"
+                                tag="p"
+                                class="benefit-amount"
                             />
-
-                        </h3>
-
-
-                        <x-editable-text
-                            key="feature_1_text"
-                            :value="$contexts['feature_1_text'] ?? ''"
-                            tag="p"
-                            class="text-xs text-slate-500 mt-1"
-                        />
-
+                        </div>
                     </div>
 
+                    <x-editable-text
+                        :key="$point['text_key']"
+                        :value="$point['text']"
+                        tag="p"
+                        class="benefit-text"
+                    />
 
-
-                    {{-- Feature 2 --}}
-
-                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-
-                        <h3 class="text-sm font-bold text-[#0C2C6B]">
-
+                    @if ($point['badge_key'])
+                        <div class="benefit-badge-wrap">
                             <x-editable-text
-                                key="feature_2_title"
-                                :value="$contexts['feature_2_title'] ?? ''"
+                                :key="$point['badge_key']"
+                                :value="$point['badge']"
                                 tag="span"
+                                class="benefit-badge"
                             />
+                        </div>
+                    @endif
 
-                        </h3>
+                </article>
+            @endforeach
 
+        </div>
 
-                        <x-editable-text
-                            key="feature_2_text"
-                            :value="$contexts['feature_2_text'] ?? ''"
-                            tag="p"
-                            class="text-xs text-slate-500 mt-1"
-                        />
+        {{-- =========================
+            TOTAL BAND
+        ========================== --}}
+        <div class="benefit-total">
+            <x-editable-text
+                key="benefit_total_label"
+                :value="$contexts['benefit_total_label'] ?? 'Total amount of services'"
+                tag="p"
+                class="benefit-total-label"
+            />
 
-                    </div>
-
-
-                </div>
-
-
-            </div>
-
-
-
-
-            {{-- =========================
-                IMAGE SIDE
-            ========================== --}}
-
-            <div class="lg:col-span-5 relative">
-
-
-                <img
-                    src="{{ asset('images/hero-bg.jpg') }}"
-                    alt="DAYONGAN Community Support"
-                    class="w-full h-[480px] object-cover rounded-3xl shadow-2xl border-4 border-white"
-                >
-
-
-
-                {{-- Pricing Badge --}}
-
-                <div class="absolute bottom-6 left-6 right-6 bg-white/95 rounded-2xl p-4 shadow-lg">
-
-
-                    <x-editable-text
-                        key="pricing_title"
-                        :value="$contexts['pricing_title'] ?? ''"
-                        tag="span"
-                        class="text-xs uppercase font-bold text-slate-500"
-                    />
-
-
-                    <x-editable-text
-                        key="pricing_amount"
-                        :value="$contexts['pricing_amount'] ?? ''"
-                        tag="div"
-                        class="text-2xl font-black text-[#E5B83B]"
-                    />
-
-
-                </div>
-
-
-            </div>
-
-
+            <x-editable-text
+                key="benefit_total_amount"
+                :value="$contexts['benefit_total_amount'] ?? '₱200,000+ worth of protection!'"
+                tag="p"
+                class="benefit-total-amount"
+            />
         </div>
 
     </div>

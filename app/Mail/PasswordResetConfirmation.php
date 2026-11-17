@@ -34,7 +34,7 @@ class PasswordResetConfirmation extends Mailable
                 env('MAIL_FROM_ADDRESS'),
                 env('MAIL_FROM_NAME')
             )
-            ->subject('Your Password Has Been Reset - DAYONGAN')
+            ->subject('Your Password Has Been Reset - TRIFECTA')
             ->view('emails.password-reset-confirmation');
     }
 }

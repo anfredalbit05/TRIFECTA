@@ -32,7 +32,7 @@ class NewsUpdates extends Component
 
     public function loadContexts(): void
     {
-        $this->contexts = Context::pluck('details', 'context_key')->toArray();
+        $this->contexts = Context::merged();
     }
 
     #[On('context-updated')]

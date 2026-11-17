@@ -12,10 +12,12 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 
 class Disbursements extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
 
     /** Module this component manages (Transaction List - Disbursement). */
@@ -956,6 +958,7 @@ class Disbursements extends Component
         ]);
         $this->showModal = false;
     }
+
 
     public function render()
     {

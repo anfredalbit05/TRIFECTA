@@ -12,20 +12,20 @@
         {{-- Withdrawal cards --}}
         <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Withdrawals</p>
-            <p class="mt-2 text-3xl font-bold text-[#0C2C6B]">{{ number_format($withdrawalCount) }}</p>
+            <p class="mt-2 text-3xl font-bold text-[var(--color-primary)]">{{ number_format($withdrawalCount) }}</p>
             <p class="mt-1 text-xs text-slate-500">{{ number_format($withdrawalApproved) }} approved</p>
         </div>
 
         <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Withdrawn Total</p>
-            <p class="mt-2 text-3xl font-bold text-[#0C2C6B]">₱{{ number_format($withdrawalTotal, 2) }}</p>
+            <p class="mt-2 text-3xl font-bold text-[var(--color-primary)]">₱{{ number_format($withdrawalTotal, 2) }}</p>
             <p class="mt-1 text-xs text-slate-500">net of tax, approved only</p>
         </div>
 
         {{-- Activation cards --}}
         <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Activations</p>
-            <p class="mt-2 text-3xl font-bold text-[#0C2C6B]">{{ number_format($activationCount) }}</p>
+            <p class="mt-2 text-3xl font-bold text-[var(--color-primary)]">{{ number_format($activationCount) }}</p>
             <p class="mt-1 text-xs text-slate-500">
                 {{ number_format($activationApproved) }} approved · {{ number_format($activationPending) }} pending · {{ number_format($activationRejected) }} rejected
             </p>
@@ -33,7 +33,7 @@
 
         <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Activation Total</p>
-            <p class="mt-2 text-3xl font-bold text-[#0C2C6B]">₱{{ number_format($activationTotal, 2) }}</p>
+            <p class="mt-2 text-3xl font-bold text-[var(--color-primary)]">₱{{ number_format($activationTotal, 2) }}</p>
             <p class="mt-1 text-xs text-slate-500">approved memberships</p>
         </div>
 
@@ -43,7 +43,7 @@
         <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="bg-[#0C2C6B] text-left text-xs uppercase tracking-wider text-white">
+                    <tr class="bg-[var(--color-primary)] text-left text-xs uppercase tracking-wider text-white">
                         <th class="px-4 py-3">Month</th>
                         <th class="px-4 py-3">Approved Activations</th>
                         <th class="px-4 py-3">Amount</th>

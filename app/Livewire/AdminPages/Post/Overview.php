@@ -6,10 +6,12 @@ use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\NewsUpdate;
 use App\Models\Testimonial;
 use App\Support\Modules;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 
 class Overview extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
 
     /*
@@ -29,7 +31,7 @@ class Overview extends Component
 
     public function render()
     {
-        return view('components.admin-pages.post.overview', [
+        return view('livewire.admin-pages.post.overview', [
             'canCreate' => $this->canCreate,
             'canRead' => $this->canRead,
             'canUpdate' => $this->canUpdate,

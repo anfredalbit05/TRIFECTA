@@ -232,14 +232,14 @@
                             <div class="user-name-row">
 
                                 <span class="user-name">
-                                    {{ $news->user ? $news->user->firstname . ' ' . $news->user->lastname : 'TRUELIFE' }}
+                                    {{ $news->user ? $news->user->firstname . ' ' . $news->user->lastname : 'TRIFECTA' }}
                                 </span>
 
 
                                 <!-- VERIFIED ICON -->
                                 <span class="verified-icon">
 
-                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="#1877F2">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="var(--color-primary-light)">
                                         <path
                                             d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.9 14.7L6 12.6l1.5-1.5 2.6 2.6 6.3-6.3 1.5 1.5-7.8 7.8z" />
                                     </svg>
@@ -356,50 +356,6 @@
     ========================== -->
     <livewire:components.spin-wheel-modal />
 
-    <script>
-    window.addEventListener('insufficient-withdrawal-balance', event => {
-        const data = event.detail;
-
-        Swal.fire({
-            icon: 'warning',
-            title: 'Insufficient Balance',
-            html: `
-                <div class="text-center">
-                    <p class="text-sm text-gray-600 mb-4">
-                        Your Cash Wallet balance is not enough to make a withdrawal.
-                    </p>
-
-                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-left">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-gray-500">
-                                Cash Wallet
-                            </span>
-
-                            <strong class="text-[#0C2C6B]">
-                                ₱${data.balance}
-                            </strong>
-                        </div>
-
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-500">
-                                Minimum Withdrawal
-                            </span>
-
-                            <strong class="text-red-600">
-                                ₱${data.minimum}
-                            </strong>
-                        </div>
-                    </div>
-
-                    <p class="text-xs text-gray-500 mt-4">
-                        You need at least ₱${data.minimum} in your Cash Wallet to withdraw.
-                    </p>
-                </div>
-            `,
-            confirmButtonText: 'Okay',
-            confirmButtonColor: '#0C2C6B'
-        });
-    });
-</script>
+    @vite('resources/js/livewire/share-pages/dashboard/overview.js')
 
 </div>

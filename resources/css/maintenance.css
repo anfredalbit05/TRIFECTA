@@ -8,7 +8,7 @@
     @apply bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200
     text-slate-800
     antialiased
-    selection:bg-[#D79B10] selection:text-white
+    selection:bg-[var(--color-accent)] selection:text-white
     min-h-screen
     flex items-center justify-center
     p-4 sm:p-6 lg:p-8;
@@ -44,7 +44,7 @@
 .maintenance-glow-top {
     @apply absolute -top-24 -right-24
     w-48 h-48
-    bg-[#0C2C6B]/10
+    bg-[var(--color-primary)]/10
     rounded-full
     blur-3xl
     pointer-events-none;
@@ -53,7 +53,7 @@
 .maintenance-glow-bottom {
     @apply absolute -bottom-24 -left-24
     w-48 h-48
-    bg-[#D79B10]/10
+    bg-[var(--color-accent)]/10
     rounded-full
     blur-3xl
     pointer-events-none;
@@ -78,12 +78,12 @@
 .maintenance-icon-pulse {
     @apply absolute inset-0
     rounded-3xl
-    bg-[#D79B10]/5;
+    bg-[var(--color-accent)]/5;
 }
 
 .maintenance-icon-svg {
     @apply h-12 w-12 sm:h-14 sm:w-14
-    text-[#D79B10]
+    text-[var(--color-accent)]
     relative z-10;
 }
 
@@ -100,16 +100,16 @@
     @apply inline-block
     px-3.5 py-1
     text-xs font-bold uppercase tracking-widest
-    text-[#0C2C6B]
-    bg-blue-50
-    border border-blue-100
+    text-[var(--color-primary)]
+    bg-[var(--color-primary-tint)]
+    border border-[var(--color-primary-tint)]
     rounded-full;
 }
 
 .maintenance-title {
     @apply text-3xl sm:text-4xl
     font-extrabold
-    text-[#0C2C6B]
+    text-[var(--color-primary)]
     tracking-tight;
 }
 

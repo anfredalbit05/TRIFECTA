@@ -1,146 +1,168 @@
 @extends('layouts.member')
 
-@section('title', 'Report & Settings')
+@section('title', 'Operations Desk')
+
+@push('styles')
+    @vite('resources/css/admin/print/report-settings.css')
+@endpush
 
 @section('content')
 
-<div class="report-settings-container"
-     x-data="{ tab: $persist('overview').as('report-settings-tab') }">
+<div class="ws-page"
+     x-data="{
+        tab: $persist('overview').as('report-settings-tab'),
 
-    <nav class="report-settings-header">
-        <div class="report-settings-header-title">
-            <h1>Report & Settings</h1>
+        switchTab(name) {
+            this.tab = name;
+
+            this.$nextTick(() => {
+                if (window.Livewire && typeof Livewire.rescan === 'function') {
+                    Livewire.rescan();
+                }
+            });
+        }
+     }">
+
+    <header class="ws-head">
+        <div>
+            <span class="ws-head-kicker">Reports · Settings</span>
+            <h1>Operations Desk</h1>
+            <p>Read the numbers, tune the rules of the programme, and keep every configuration decision in one place.</p>
         </div>
-    </nav>
 
-    <div class="report-settings-layout">
+        <div class="ws-head-side">
+            <span class="ws-head-pill">Financial year · <strong>{{ date('Y') }}</strong></span>
+        </div>
+    </header>
 
-        <div class="report-settings-desktop-nav">
+    <div class="ws-grid">
 
-            <a href="#"
-               @click.prevent="tab='overview'"
-               :class="{ active: tab==='overview' }">
-                <span class="report-settings-tab-icon">⌂</span>
-                <span>Overview</span>
-            </a>
+        <aside class="ws-rail">
+
+            <div class="ws-rail-group">
+                <div class="ws-rail-label">Insights</div>
+
+                <a href="#" class="ws-rail-link" :class="tab === 'overview' ? 'is-active' : ''"
+                   @click.prevent="switchTab('overview')">
+                    <span class="ws-rail-icon">⌂</span>
+                    <span>Overview</span>
+                </a>
+
+                <a href="#" class="ws-rail-link" :class="tab === 'users' ? 'is-active' : ''"
+                   @click.prevent="switchTab('users')">
+                    <span class="ws-rail-icon">♟</span>
+                    <span>Users Reports</span>
+                </a>
+
+                <a href="#" class="ws-rail-link" :class="tab === 'reports' ? 'is-active' : ''"
+                   @click.prevent="switchTab('reports')">
+                    <span class="ws-rail-icon">▤</span>
+                    <span>Ledgers</span>
+                </a>
+            </div>
 
             @if(auth()->user()->RoleID == 1)
-                <a href="#"
-                   @click.prevent="tab='general'"
-                   :class="{ active: tab==='general' }">
-                    <span class="report-settings-tab-icon">⚙</span>
-                    <span>General</span>
-                </a>
+                <div class="ws-rail-group">
+                    <div class="ws-rail-label">Configuration</div>
 
-                <a href="#"
-                   @click.prevent="tab='variants'"
-                   :class="{ active: tab==='variants' }">
-                    <span class="report-settings-tab-icon">▦</span>
-                    <span>Variants</span>
-                </a>
+                    <a href="#" class="ws-rail-link" :class="tab === 'general' ? 'is-active' : ''"
+                       @click.prevent="switchTab('general')">
+                        <span class="ws-rail-icon">⚙</span>
+                        <span>General</span>
+                    </a>
 
-                <a href="#"
-                   @click.prevent="tab='branch-variant-grants'"
-                   :class="{ active: tab==='branch-variant-grants' }">
-                    <span class="report-settings-tab-icon">▦</span>
-                    <span>Branch Variant Grants</span>
-                </a>
-            @endif
+                    <a href="#" class="ws-rail-link" :class="tab === 'variants' ? 'is-active' : ''"
+                       @click.prevent="switchTab('variants')">
+                        <span class="ws-rail-icon">▦</span>
+                        <span>Variants</span>
+                    </a>
 
-            <a href="#"
-               @click.prevent="tab='users'"
-               :class="{ active: tab==='users' }">
-                <span class="report-settings-tab-icon">♟</span>
-                <span>Users Reports</span>
-            </a>
-
-            <a href="#"
-               @click.prevent="tab='reports'"
-               :class="{ active: tab==='reports' }">
-                <span class="report-settings-tab-icon">▤</span>
-                <span>Ledgers</span>
-            </a>
-
-            @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
-                <a href="#"
-                   @click.prevent="tab='pangkabuhayan'"
-                   :class="{ active: tab==='pangkabuhayan' }">
-                    <span class="report-settings-tab-icon">🎡</span>
-                    <span>Pangkabuhayan</span>
-                </a>
+                    <a href="#" class="ws-rail-link" :class="tab === 'branch-variant-grants' ? 'is-active' : ''"
+                       @click.prevent="switchTab('branch-variant-grants')">
+                        <span class="ws-rail-icon">◫</span>
+                        <span>Branch Variant Grants</span>
+                    </a>
+                </div>
             @endif
 
             @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
-                <a href="#"
-                   @click.prevent="tab='sales'"
-                   :class="{ active: tab==='sales' }">
-                    <span class="report-settings-tab-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        width="20" height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="10" cy="7" r="4"/>
-                        <path d="M20 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                    </svg>
-                </span>
-                    <span>Sales Consultant Report</span>
-                </a>
+                <div class="ws-rail-group">
+                    <div class="ws-rail-label">Growth</div>
+
+                    <a href="#" class="ws-rail-link" :class="tab === 'pangkabuhayan' ? 'is-active' : ''"
+                       @click.prevent="switchTab('pangkabuhayan')">
+                        <span class="ws-rail-icon">◎</span>
+                        <span>Pangkabuhayan</span>
+                    </a>
+
+                    <a href="#" class="ws-rail-link" :class="tab === 'sales' ? 'is-active' : ''"
+                       @click.prevent="switchTab('sales')">
+                        <span class="ws-rail-icon">◔</span>
+                        <span>Sales Consultant Report</span>
+                    </a>
+                </div>
             @endif
 
-        </div>
+        </aside>
 
-        <div x-show="tab==='overview'" x-cloak class="report-settings-main-card">
-            <livewire:admin-pages.report-settings.overview />
-        </div>
+        <section class="ws-panel">
 
+            {{-- OVERVIEW --}}
+            <template x-if="tab === 'overview'">
+                <div class="report-settings-main-card">
+                    <livewire:admin-pages.report-settings.overview lazy />
+                </div>
+            </template>
 
-        <div x-show="tab==='users'" x-cloak class="report-settings-main-card">
-            <livewire:admin-pages.report-settings.user-accounts />
-        </div>
+            {{-- USERS REPORTS --}}
+            <template x-if="tab === 'users'">
+                <div class="report-settings-main-card">
+                    <livewire:admin-pages.report-settings.user-accounts lazy />
+                </div>
+            </template>
 
-        <div x-show="tab==='reports'" x-cloak class="report-settings-main-card">
-            <livewire:admin-pages.report-settings.reports />
-        </div>
+            {{-- LEDGERS --}}
+            <template x-if="tab === 'reports'">
+                <div class="report-settings-main-card">
+                    <livewire:admin-pages.report-settings.reports lazy />
+                </div>
+            </template>
 
+            <template x-if="tab === 'sales'">
+                <div class="report-settings-main-card">
+                    <livewire:admin-pages.report-settings.sales-consultant-report lazy />
+                </div>
+            </template>
 
-        <div x-show="tab==='sales'" x-cloak class="report-settings-main-card">
-            <livewire:admin-pages.report-settings.sales-consultant-report />
-        </div>
+            @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
+                <template x-if="tab === 'pangkabuhayan'">
+                    <div class="report-settings-main-card">
+                        <livewire:components.spin-fund-report lazy />
+                    </div>
+                </template>
+            @endif
 
+            @if(auth()->user()->RoleID == 1)
+                <template x-if="tab === 'variants'">
+                    <div class="report-settings-main-card">
+                        <livewire:admin-pages.report-settings.variants lazy />
+                    </div>
+                </template>
 
-        @if(in_array(auth()->user()->RoleID, [1,2,5,6,7]))
-            <div x-show="tab==='pangkabuhayan'" x-cloak class="report-settings-main-card">
-                <livewire:components.spin-fund-report />
-            </div>
-        @endif
+                <template x-if="tab === 'branch-variant-grants'">
+                    <div class="report-settings-main-card">
+                        <livewire:admin-pages.report-settings.branch-variant-grants lazy />
+                    </div>
+                </template>
 
-        @if(auth()->user()->RoleID == 1)
-            <div x-show="tab==='variants'" x-cloak class="report-settings-main-card">
-                <livewire:admin-pages.report-settings.variants />
-            </div>
-        @endif
+                <template x-if="tab === 'general'">
+                    <div class="report-settings-main-card">
+                        <livewire:admin-pages.report-settings.general-settings lazy />
+                    </div>
+                </template>
+            @endif
 
-        @if(auth()->user()->RoleID == 1)
-            <div x-show="tab==='branch-variant-grants'" x-cloak class="report-settings-main-card">
-                <livewire:admin-pages.report-settings.branch-variant-grants />
-            </div>
-        @endif
-
-        @if(auth()->user()->RoleID == 1)
-            <div x-show="tab==='general'" x-cloak class="report-settings-main-card">
-                <livewire:admin-pages.report-settings.general-settings />
-            </div>
-        @endif
-
-
-
-
+        </section>
 
     </div>
 
@@ -150,46 +172,14 @@
      type — loaded once here on the static page (NOT inside the Livewire
      component, where modal re-renders would re-process it and cause lag). --}}
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-    <script>
-        function signaturePad() {
-            return {
-                pad: null,
 
-                initPad() {
-                    this.$nextTick(() => {
-                        const canvas = this.$refs.pad;
-
-                        canvas.width = canvas.offsetWidth || 520;
-                        canvas.height = 140;
-
-                        this.pad = new SignaturePad(canvas, {
-                            backgroundColor: 'rgb(255, 255, 255)', // needed so the export isn't transparent
-                            penColor: 'rgb(15, 23, 42)',
-                        });
-                    });
-                },
-
-                clear() {
-                    this.pad?.clear();
-                },
-
-                save($wire) {
-                    if (!this.pad || this.pad.isEmpty()) {
-                        Swal.fire({
-                            title: 'No Signature',
-                            text: 'Please draw a signature first.',
-                            icon: 'warning',
-                            confirmButtonColor: '#0B2A5B',
-                        });
-
-                        return;
-                    }
-
-                    // raw base64 payload (same shape the file upload sends)
-                    $wire.call('saveSignatureSetting', this.pad.toDataURL('image/png').split(',')[1]);
-                },
-            };
-        }
-    </script>
+{{-- The overview tab is a lazy Livewire component, so its Alpine factory
+     must be registered before Alpine starts. Load the module here on the
+     static page instead of inside the lazy component. --}}
+@vite([
+    'resources/js/pages/admin-pages/report-settings.js',
+    'resources/js/livewire/admin-pages/report-settings/overview.js',
+    'resources/js/livewire/components/spin-fund-report.js',
+])
 
 @endsection

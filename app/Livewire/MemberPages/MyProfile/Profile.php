@@ -11,11 +11,13 @@ use BaconQrCode\Writer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
 class Profile extends Component
 {
+    use HasTabSkeleton;
     use WithFileUploads;
 
     public $profilepic = null;

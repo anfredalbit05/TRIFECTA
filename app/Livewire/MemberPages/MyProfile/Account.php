@@ -3,6 +3,7 @@
 namespace App\Livewire\MemberPages\MyProfile;
 
 use App\Models\User;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -12,10 +13,15 @@ use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 
+use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
+
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class Account extends Component
 {
+    use HasTabSkeleton;
+
     public string $username = '';
     public string $email = '';
     public string $qrCode = '';
@@ -88,7 +94,7 @@ class Account extends Component
 
     // If no changes exist, show info alert
     if (empty($changes)) {
-        $this->js("Swal.fire({ title: 'No Changes Detected', text: 'You haven’t modified any account details.', icon: 'info', confirmButtonColor: '#0C2C6B' })");
+        $this->js("Swal.fire({ title: 'No Changes Detected', text: 'You haven’t modified any account details.', icon: 'info', confirmButtonColor: 'var(--color-primary)' })");
         return;
     }
 
@@ -140,6 +146,29 @@ public function executeSave(): void
         ]);
 
         return $pdf->download('unitylife-id-card.pdf');
+    }
+
+    /**
+     * Check whether the user has at least one activation
+     * whose latest activation history is Approved.
+     */
+    #[Computed]
+    public function hasApprovedActivationHistory(): bool
+    {
+        $userId = Auth::id();
+
+        return DB::table('activation_histories as ah')
+            ->join('activations as a', 'a.ActivationID', '=', 'ah.ActivationID')
+            ->where('a.UserID', $userId)
+            ->where('ah.status', 'Approved')
+            ->whereRaw('ah.HistoryID = (
+                SELECT latest.HistoryID
+                FROM activation_histories AS latest
+                WHERE latest.ActivationID = ah.ActivationID
+                ORDER BY latest.created_at DESC, latest.HistoryID DESC
+                LIMIT 1
+            )')
+            ->exists();
     }
 
     public function render()

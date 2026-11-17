@@ -20,11 +20,13 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\On;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class Members extends Component
 {
+    use HasTabSkeleton;
     use AuthorizesModules;
     use WithPagination;
 
@@ -110,17 +112,8 @@ class Members extends Component
      */
     private function scopedMembers()
     {
-        $branchCode = Auth::user()?->branchCode;
-
         return User::query()
-            ->where('RoleID', 4)
-            ->when(! $this->isMainBranchUser(), function ($query) use ($branchCode) {
-                if (blank($branchCode)) {
-                    $query->whereRaw('1 = 0');   // no branch = see nothing
-                } else {
-                    $query->where('branchCode', $branchCode);
-                }
-            });
+            ->where('RoleID', 8);
     }
 
     /**
@@ -199,6 +192,7 @@ class Members extends Component
     | Render Members
     |--------------------------------------------------------------------------
     */
+
 
     public function render()
     {
@@ -285,7 +279,7 @@ class Members extends Component
             FILTER_VALIDATE_BOOLEAN
         );
 
-        return view('components.admin-pages.masterlist.members', [
+        return view('livewire.admin-pages.masterlist.members', [
             'members' => $members,
             'isWithdrawalActive' => $this->isWithdrawalActive(),
             'isSatelliteApplicationActive' => $isSatelliteApplicationActive,

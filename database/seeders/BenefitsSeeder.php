@@ -16,19 +16,19 @@ class BenefitsSeeder extends Seeder
         $benefits = [
             // Primary Owner Benefits (18-65 yrs old)
             [
-                'name' => 'Dayongan Unnatural Fatality (Disablement) Cash Assistance',
+                'name' => 'TRIFECTA Unnatural Fatality (Disablement) Cash Assistance',
                 'details' => null,
                 'amount' => 65000.00,
                 'holdertype' => 'Primary Owner',
             ],
             [
-                'name' => 'Dayongan Health "Support Accident" Reimbursement',
+                'name' => 'TRIFECTA Health "Support Accident" Reimbursement',
                 'details' => 'Per occurrence',
                 'amount' => 13000.00,
                 'holdertype' => 'Primary Owner',
             ],
             [
-                'name' => 'Dayongan Financial Support sa Di Tinuyong Pagkamatay',
+                'name' => 'TRIFECTA Financial Support sa Di Tinuyong Pagkamatay',
                 'details' => null,
                 'amount' => 30000.00,
                 'holdertype' => 'Primary Owner',
@@ -40,19 +40,19 @@ class BenefitsSeeder extends Seeder
                 'holdertype' => 'Primary Owner',
             ],
             [
-                'name' => 'Dayongan Admission Support Pag Maaksidente',
+                'name' => 'TRIFECTA Admission Support Pag Maaksidente',
                 'details' => 'Good for 15 days, ₱500.00 per day',
                 'amount' => 500.00,
                 'holdertype' => 'Primary Owner',
             ],
             [
-                'name' => 'Dayongan Fire Cash Assistance',
+                'name' => 'TRIFECTA Fire Cash Assistance',
                 'details' => null,
                 'amount' => 5000.00,
                 'holdertype' => 'Primary Owner',
             ],
             [
-                'name' => 'Dayongan Accidental Burial Assistance',
+                'name' => 'TRIFECTA Accidental Burial Assistance',
                 'details' => null,
                 'amount' => 10000.00,
                 'holdertype' => 'Primary Owner',
@@ -82,7 +82,7 @@ class BenefitsSeeder extends Seeder
                 'holdertype' => 'Primary Owner',
             ],
             [
-                'name' => 'Dayongan Hospitalization Assistance',
+                'name' => 'TRIFECTA Hospitalization Assistance',
                 'details' => '₱15,000 consumable, upon renew next year no contestability',
                 'amount' => 15000.00,
                 'holdertype' => 'Primary Owner',
@@ -96,13 +96,13 @@ class BenefitsSeeder extends Seeder
 
             // 3 Beneficiaries Benefits (0-100 yrs old)
             [
-                'name' => 'Dayongan Natural Death Claim Financial Assistance',
+                'name' => 'TRIFECTA Natural Death Claim Financial Assistance',
                 'details' => '3 mos contestability',
                 'amount' => 10000.00,
                 'holdertype' => 'Beneficiaries',
             ],
             [
-                'name' => 'Dayongan Hospitalization Assistance',
+                'name' => 'TRIFECTA Hospitalization Assistance',
                 'details' => '6 mos contestability, upon renewal there will be no contestability, consumable',
                 'amount' => 15000.00,
                 'holdertype' => 'Beneficiaries',

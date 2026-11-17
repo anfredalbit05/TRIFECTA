@@ -254,7 +254,7 @@ class SpinWheelService
         $value = fn (string $key) => (string) (Setting::where('name', $key)->value('value') ?? '');
 
         return [
-            'name' => $value('company_name') ?: 'True Life Dayongan',
+            'name' => $value('company_name') ?: 'TRIFECTA',
             'contact' => $value('company_contact'),
             'email' => $value('company_email'),
         ];

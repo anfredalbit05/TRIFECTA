@@ -8,9 +8,6 @@ use Carbon\Carbon;
 
 class MembershipFeeSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $now = Carbon::now();
@@ -19,55 +16,55 @@ class MembershipFeeSeeder extends Seeder
             [
                 'FeeID' => 'FEE001',
                 'FeeName' => 'Insurance',
-                'Cost' => 450.00,
+                'Cost' => 360.00,
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
             [
                 'FeeID' => 'FEE002',
-                'FeeName' => 'Direct Referral',
+                'FeeName' => 'Commission',
                 'Cost' => 400.00,
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
             [
                 'FeeID' => 'FEE003',
+                'FeeName' => 'Overrides',
+                'Cost' => 135.00,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'FeeID' => 'FEE004',
+                'FeeName' => 'Direct and Override Commission Tax',
+                'Cost' => 55.00,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'FeeID' => 'FEE005',
+                'FeeName' => 'Pangkabuhayan',
+                'Cost' => 49.00,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'FeeID' => 'FEE006',
                 'FeeName' => 'Provident Fund',
                 'Cost' => 50.00,
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
             [
-                'FeeID' => 'FEE004',
-                'FeeName' => 'Pangkabuhayan',
-                'Cost' => 50.00,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'FeeID' => 'FEE005',
-                'FeeName' => 'Dayong Share',
-                'Cost' => 50.00,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'FeeID' => 'FEE006',
-                'FeeName' => 'Overrides',
-                'Cost' => 150.00,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
                 'FeeID' => 'FEE007',
-                'FeeName' => 'IT System',
-                'Cost' => 50.00,
+                'FeeName' => 'Leadership Program / Office Staff',
+                'Cost' => 120.00,
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
             [
                 'FeeID' => 'FEE008',
-                'FeeName' => 'Satellite Office',
+                'FeeName' => 'Travel / Car Incentive',
                 'Cost' => 100.00,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -75,42 +72,28 @@ class MembershipFeeSeeder extends Seeder
             [
                 'FeeID' => 'FEE009',
                 'FeeName' => 'Hospitalization',
-                'Cost' => 100.00,
+                'Cost' => 300.00,
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
             [
                 'FeeID' => 'FEE010',
-                'FeeName' => 'Outreach Program',
-                'Cost' => 49.00,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'FeeID' => 'FEE011',
-                'FeeName' => 'Leadership Incentive',
-                'Cost' => 150.00,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'FeeID' => 'FEE012',
-                'FeeName' => 'Business Partners Wallet',
+                'FeeName' => 'Dayong',
                 'Cost' => 100.00,
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
             [
-                'FeeID' => 'FEE013',
-                'FeeName' => 'Admin',
-                'Cost' => 250.00,
+                'FeeID' => 'FEE011',
+                'FeeName' => 'IT',
+                'Cost' => 30.00,
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
             [
-                'FeeID' => 'FEE014',
-                'FeeName' => 'Car Incentives',
-                'Cost' => 50.00,
+                'FeeID' => 'FEE012',
+                'FeeName' => 'Admin',
+                'Cost' => 300.00,
                 'created_at' => $now,
                 'updated_at' => $now,
             ],

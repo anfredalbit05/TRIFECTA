@@ -4,10 +4,13 @@ namespace App\Livewire\MemberPages\MyProfile;
 
 use App\Models\Activation;
 use Illuminate\Support\Facades\Auth;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 
 class Certificate extends Component
 {
+    use HasTabSkeleton;
+
     public function render()
     {
         $user = Auth::user();

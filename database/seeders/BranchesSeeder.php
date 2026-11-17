@@ -13,12 +13,12 @@ class BranchesSeeder extends Seeder
     public function run(): void
     {
         $createdBy = DB::table('users')
-            ->where('email', 'selboretnan@gmail.com')
+            ->where('email', 'anfredalbit110525@gmail.com')
             ->value('UserID');
 
         DB::table('branches')->insert([
             [
-                'branchname' => 'Main Branch',
+                'branchname' => 'San Franch Main Branch',
                 'address' => 'Tagum City, Davao del Norte',
                 'status' => true,
                 'UserID' => $createdBy,
@@ -26,8 +26,16 @@ class BranchesSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'branchname' => 'Kapalong Branch',
-                'address' => 'Kapalong, Davao del Norte',
+                'branchname' => 'Digos Branch',
+                'address' => 'Digos City, Davao del Sur',
+                'status' => true,
+                'UserID' => $createdBy,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'branchname' => 'Mati Branch',
+                'address' => 'Mati City, Davao del Sur',
                 'status' => true,
                 'UserID' => $createdBy,
                 'created_at' => now(),

@@ -5,11 +5,13 @@ namespace App\Livewire\AdminPages\Masterlist;
 use App\Models\Role;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class Roles extends Component
 {
+    use HasTabSkeleton;
     use WithPagination;
 
     protected $paginationTheme = 'tailwind';
@@ -225,6 +227,7 @@ class Roles extends Component
     /**
      * Render roles table.
      */
+
     public function render()
     {
         [$dateFrom, $dateTo] = $this->parsedDateRange();

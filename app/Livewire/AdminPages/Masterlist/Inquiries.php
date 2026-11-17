@@ -8,11 +8,13 @@ use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail; // 1. Import the pagination trait
+use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class Inquiries extends Component
 {
+    use HasTabSkeleton;
     // 2. Use the pagination trait here
     use AuthorizesModules;
     use WithPagination;
@@ -46,6 +48,9 @@ class Inquiries extends Component
         // Mark as read automatically if it hasn't been read yet
         if (is_null($inquiry->date_read)) {
             $inquiry->markAsRead();
+
+            // Keep the unread badge on the Inquiries tab in sync.
+            $this->dispatch('inquiries-updated', count: Inquiry::whereNull('date_read')->count());
         }
 
         $this->selectedInquiry = $inquiry;
@@ -138,6 +143,7 @@ class Inquiries extends Component
         $this->dispatch('ranges-reset');
     }
 
+
     public function render()
     {
         [$dateFrom, $dateTo] = $this->parsedDateRange();
@@ -160,7 +166,7 @@ class Inquiries extends Component
             ->latest()
             ->paginate(10);
 
-        return view('components.admin-pages.masterlist.inquiries', [
+        return view('livewire.admin-pages.masterlist.inquiries', [
             'inquiries' => $inquiries,
         ]);
     }

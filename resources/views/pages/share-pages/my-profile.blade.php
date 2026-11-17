@@ -1,87 +1,111 @@
 @extends('layouts.member')
 
-@section('title', 'My Profile')
+@section('title', 'Account Settings')
 
 @section('content')
 
 <div
-    class="my-profile-container"
+    class="ws-page"
     x-data="{ tab: $persist('profile').as('my-profile-tab') }"
     @account-activated.window="$wire.$refresh()"
 >
-    <nav class="my-profile-header">
-        <div class="my-profile-header-title">
-            <h1>My Profile</h1>
+
+    <header class="ws-head">
+        <div>
+            <span class="ws-head-kicker">Personal · Account</span>
+            <h1>Account Settings</h1>
+            <p>Keep your identity, contact details and sign-in security current so your cover never lapses.</p>
         </div>
-    </nav>
 
-    <main class="my-profile-layout">
-
-        <div class="my-profile-nav-menu">
-            <div class="my-profile-tabs-links">
-
-                <a href="#" @click.prevent="tab='profile'" :class="{active:tab==='profile'}">
-                    <span class="my-profile-tab-icon">♙</span>
-                    <span>Profile</span>
-                </a>
-
-                <a href="#" @click.prevent="tab='account'" :class="{active:tab==='account'}">
-                    <span class="my-profile-tab-icon">◉</span>
-                    <span>Account</span>
-                </a>
-
-                <a href="#" @click.prevent="tab='security'" :class="{active:tab==='security'}">
-                    <span class="my-profile-tab-icon">🛡</span>
-                    <span>Security</span>
-                </a>
-
-                {{-- <a href="#" @click.prevent="tab='activity'" :class="{active:tab==='activity'}">
-                    <span class="my-profile-tab-icon">◷</span>
-                    <span>Activity</span>
-                </a> --}}
-
-                 @if(auth()->user()->RoleID == 1 || auth()->user()->RoleID == 4)
-                <a href="#" @click.prevent="tab='certificate'" :class="{active:tab==='certificate'}">
-                    <span class="my-profile-tab-icon">▣</span>
-                    <span>Certificate</span>
-                </a>
-                @endif
-
-
-            </div>
-
+        <div class="ws-head-side">
             <div class="my-profile-tabs-activation">
                 <livewire:member-pages.my-profile.activation-button />
             </div>
         </div>
+    </header>
 
-        <div x-show="tab==='profile'" x-cloak class="my-profile-main-card">
-            <livewire:member-pages.my-profile.profile />
-        </div>
+    <div class="ws-grid">
 
-        <div x-show="tab==='account'" x-cloak class="my-profile-main-card">
-            <livewire:member-pages.my-profile.account />
-        </div>
+        <aside class="ws-rail">
 
-        <div x-show="tab==='security'" x-cloak class="my-profile-main-card">
-            <livewire:member-pages.my-profile.security />
-        </div>
+            <div class="ws-rail-group">
+                <div class="ws-rail-label">Identity</div>
 
-        <div x-show="tab==='activity'" x-cloak class="my-profile-main-card">
-            <livewire:member-pages.my-profile.activity />
-        </div>
+                <a href="#" class="ws-rail-link" :class="tab === 'profile' ? 'is-active' : ''"
+                   @click.prevent="tab = 'profile'">
+                    <span class="ws-rail-icon">♙</span>
+                    <span>Profile</span>
+                </a>
 
-        @if(auth()->user()->RoleID == 1 || auth()->user()->RoleID == 4)
-        <div x-show="tab==='certificate'" x-cloak class="my-profile-main-card">
-            <livewire:member-pages.my-profile.certificate />
-        </div>
-        @endif
+                <a href="#" class="ws-rail-link" :class="tab === 'account' ? 'is-active' : ''"
+                   @click.prevent="tab = 'account'">
+                    <span class="ws-rail-icon">◉</span>
+                    <span>Account</span>
+                </a>
+            </div>
 
-    </main>
+            <div class="ws-rail-group">
+                <div class="ws-rail-label">Access</div>
 
+                <a href="#" class="ws-rail-link" :class="tab === 'security' ? 'is-active' : ''"
+                   @click.prevent="tab = 'security'">
+                    <span class="ws-rail-icon">🛡</span>
+                    <span>Security</span>
+                </a>
+
+                @if(auth()->user()->RoleID == 1 || auth()->user()->RoleID == 4)
+                    <a href="#" class="ws-rail-link" :class="tab === 'certificate' ? 'is-active' : ''"
+                       @click.prevent="tab = 'certificate'">
+                        <span class="ws-rail-icon">▣</span>
+                        <span>Certificate</span>
+                    </a>
+                @endif
+            </div>
+
+        </aside>
+
+        <section class="ws-panel">
+
+            <div x-show="tab === 'profile'" x-cloak class="my-profile-main-card">
+                <livewire:member-pages.my-profile.profile lazy />
+            </div>
+
+            <div x-show="tab === 'account'" x-cloak class="my-profile-main-card">
+                <livewire:member-pages.my-profile.account lazy />
+            </div>
+
+            <div x-show="tab === 'security'" x-cloak class="my-profile-main-card">
+                <livewire:member-pages.my-profile.security lazy />
+            </div>
+
+            <div x-show="tab === 'activity'" x-cloak class="my-profile-main-card">
+                <livewire:member-pages.my-profile.activity lazy />
+            </div>
+
+            @if(auth()->user()->RoleID == 1 || auth()->user()->RoleID == 4)
+                <div x-show="tab === 'certificate'" x-cloak class="my-profile-main-card">
+                    <livewire:member-pages.my-profile.certificate lazy />
+                </div>
+            @endif
+
+        </section>
+
+    </div>
 
     <livewire:member-pages.my-profile.activation-modal />
 
 </div>
+
+{{-- Signature pad library for the profile tab's signature pad. --}}
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+
+{{-- The profile tabs are lazy Livewire components, so their Alpine factories
+     must be registered before each lazy component mounts. Load the modules
+     here on the static page instead of inside the lazy components. --}}
+@vite([
+    'resources/js/livewire/member-pages/my-profile/profile.js',
+    'resources/js/livewire/member-pages/my-profile/account.js',
+    'resources/js/livewire/member-pages/my-profile/security.js',
+])
 
 @endsection

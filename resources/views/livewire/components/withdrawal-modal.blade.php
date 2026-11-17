@@ -67,7 +67,7 @@
             <div class="flex items-center justify-between border-b border-slate-100 px-6 py-5">
                 <div>
                     <div class="flex items-center gap-2">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-lg">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-primary-tint)] text-lg">
                             💳
                         </div>
 
@@ -85,7 +85,7 @@
                                     Admin Mode
                                 </span>
                             @else
-                                <span class="text-xs text-slate-400">
+                                <span class="text-xs text-slate-500">
                                     Request a withdrawal from your wallet
                                 </span>
                             @endif
@@ -96,7 +96,7 @@
                 <button
                     type="button"
                     @click="showWithdrawModal = false"
-                    class="flex h-8 w-8 items-center justify-center rounded-lg text-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                    class="flex h-8 w-8 items-center justify-center rounded-lg text-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
                 >
                     &times;
                 </button>
@@ -106,33 +106,33 @@
 
                 <div class="mb-5 grid grid-cols-2 gap-3">
                     <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
                             Available Balance
                         </span>
 
-                        <span class="mt-1 block text-xl font-bold text-[#0C2C6B]">
+                        <span class="mt-1 block text-xl font-bold text-[var(--color-primary)]">
                             ₱{{ number_format($totalAmount, 2) }}
                         </span>
                     </div>
 
-                    <div class="rounded-xl border border-blue-100 bg-blue-50 p-4">
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-blue-500">
+                    <div class="rounded-xl border border-[var(--color-primary-tint)] bg-[var(--color-primary-tint)] p-4">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-[var(--color-primary)]">
                             Remaining
                         </span>
 
                         <span
-                            class="mt-1 block text-xl font-bold text-[#0C2C6B]"
+                            class="mt-1 block text-xl font-bold text-[var(--color-primary)]"
                             x-text="'₱' + formatMoney(remainingBalance)"
                         ></span>
                     </div>
                 </div>
 
-                <div class="mb-5 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
-                    <div class="mb-1 flex items-center gap-2 text-sm font-bold text-blue-950">
+                <div class="mb-5 rounded-xl border border-[var(--color-primary-tint)] bg-[var(--color-primary-tint)] px-4 py-3">
+                    <div class="mb-1 flex items-center gap-2 text-sm font-bold text-[var(--color-primary-darker)]">
                         Payout Schedule
                     </div>
 
-                    <p class="text-xs leading-5 text-blue-900">
+                    <p class="text-xs leading-5 text-[var(--color-primary-dark)]">
                         Friday 6:01 PM to Friday 6:00 PM requests are processed
                         and released on the upcoming Monday.
                     </p>
@@ -146,7 +146,7 @@
                         </label>
 
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 font-bold text-slate-400">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 font-bold text-slate-500">
                                 ₱
                             </span>
 
@@ -165,7 +165,7 @@
                                 :class="{
                                     'border-red-400 focus:border-red-500 focus:ring-red-100':
                                         isBelowMinimum || exceedsBalance,
-                                    'border-slate-200 focus:border-[#0C2C6B] focus:ring-blue-50':
+                                    'border-slate-200 focus:border-[var(--color-primary)] focus:ring-[var(--color-primary-tint)]':
                                         !isBelowMinimum && !exceedsBalance
                                 }"
                                 class="w-full rounded-xl border py-3 pl-8 pr-4 text-sm font-semibold outline-none focus:ring-2"
@@ -197,7 +197,7 @@
 
                         <p
                             x-show="!isBelowMinimum && !exceedsBalance"
-                            class="mt-1.5 text-[11px] text-slate-400"
+                            class="mt-1.5 text-[11px] text-slate-500"
                         >
                             Minimum withdrawal:
                             <strong class="text-slate-600">
@@ -213,7 +213,7 @@
 
                         <select
                             wire:model.live="withdrawalMethod"
-                            class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-[#0C2C6B] focus:ring-2 focus:ring-blue-50"
+                            class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary-tint)]"
                         >
                             <option value="">Select withdrawal method</option>
                             <option value="Cash">Cash</option>
@@ -267,7 +267,7 @@
 
                                 <select
                                     wire:model="bankName"
-                                    class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-[#0C2C6B] focus:ring-2 focus:ring-blue-50"
+                                    class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary-tint)]"
                                 >
                                     <option value="">Select destination bank</option>
 
@@ -293,7 +293,7 @@
                                 type="text"
                                 wire:model="accountName"
                                 placeholder="Enter account holder name"
-                                class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#0C2C6B] focus:ring-2 focus:ring-blue-50"
+                                class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary-tint)]"
                             >
 
                             @error('accountName')
@@ -312,7 +312,7 @@
                                 type="text"
                                 wire:model="accountNumber"
                                 placeholder="Enter account number"
-                                class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#0C2C6B] focus:ring-2 focus:ring-blue-50"
+                                class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary-tint)]"
                             >
 
                             @error('accountNumber')
@@ -341,7 +341,7 @@
                     @click="confirmWithdrawal()"
                     wire:loading.attr="disabled"
                     wire:target="submitWithdrawal"
-                    class="rounded-xl bg-[#0C2C6B] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#09204f] disabled:opacity-50"
+                    class="rounded-xl bg-[var(--color-primary)] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
                 >
                     <span wire:loading.remove wire:target="submitWithdrawal">
                         Submit Request
@@ -371,7 +371,7 @@
                 icon: 'warning',
                 title: 'Invalid Amount',
                 text: 'Please enter a valid withdrawal amount first.',
-                confirmButtonColor: '#0C2C6B'
+                confirmButtonColor: 'var(--color-primary)'
             });
 
             return;
@@ -399,7 +399,7 @@
                                     Available Balance
                                 </span>
 
-                                <strong class="text-sm text-[#0C2C6B]">
+                                <strong class="text-sm text-[var(--color-primary)]">
                                     ₱${balance.toLocaleString('en-PH', {
                                         minimumFractionDigits: 2,
                                         maximumFractionDigits: 2
@@ -429,7 +429,7 @@
                     </div>
                 `,
                 confirmButtonText: 'Okay',
-                confirmButtonColor: '#0C2C6B'
+                confirmButtonColor: 'var(--color-primary)'
             });
 
             return;
@@ -454,7 +454,7 @@
                             maximumFractionDigits: 2
                         }
                     )}.`,
-                confirmButtonColor: '#0C2C6B'
+                confirmButtonColor: 'var(--color-primary)'
             });
 
             return;
@@ -471,7 +471,7 @@
                 icon: 'warning',
                 title: 'Withdrawal Method Required',
                 text: 'Please select a withdrawal method before submitting.',
-                confirmButtonColor: '#0C2C6B'
+                confirmButtonColor: 'var(--color-primary)'
             });
 
             return;
@@ -489,7 +489,7 @@
                 icon: 'warning',
                 title: 'Bank Required',
                 text: 'Please select a destination bank.',
-                confirmButtonColor: '#0C2C6B'
+                confirmButtonColor: 'var(--color-primary)'
             });
 
             return;
@@ -506,7 +506,7 @@
                     icon: 'warning',
                     title: 'Account Name Required',
                     text: 'Please enter the account name.',
-                    confirmButtonColor: '#0C2C6B'
+                    confirmButtonColor: 'var(--color-primary)'
                 });
 
                 return;
@@ -517,7 +517,7 @@
                     icon: 'warning',
                     title: 'Account Number Required',
                     text: 'Please enter the account number.',
-                    confirmButtonColor: '#0C2C6B'
+                    confirmButtonColor: 'var(--color-primary)'
                 });
 
                 return;
@@ -547,7 +547,7 @@
                             Withdrawal Amount
                         </span>
 
-                        <strong class="text-2xl text-[#0C2C6B]">
+                        <strong class="text-2xl text-[var(--color-primary)]">
                             ₱${formattedAmount}
                         </strong>
 
@@ -583,9 +583,9 @@
 
             cancelButtonText: 'Cancel',
 
-            confirmButtonColor: '#0C2C6B',
+            confirmButtonColor: 'var(--color-primary)',
 
-            cancelButtonColor: '#D79B10',
+            cancelButtonColor: 'var(--color-accent)',
 
             reverseButtons: true,
 
@@ -653,7 +653,7 @@
             title: 'Withdrawal Submitted',
             text:
                 `Your withdrawal request of ₱${event.detail.amount} has been submitted.`,
-            confirmButtonColor: '#0C2C6B'
+            confirmButtonColor: 'var(--color-primary)'
         }).then(() => {
 
             window.dispatchEvent(
@@ -677,7 +677,7 @@
             icon: 'error',
             title: 'Withdrawal Failed',
             text: event.detail.message ?? 'Something went wrong.',
-            confirmButtonColor: '#0C2C6B'
+            confirmButtonColor: 'var(--color-primary)'
         });
     });
 
@@ -704,7 +704,7 @@
                                 Amount
                             </span>
 
-                            <strong class="text-[#0C2C6B]">
+                            <strong class="text-[var(--color-primary)]">
                                 ₱${data.amount}
                             </strong>
                         </div>
@@ -775,7 +775,7 @@
                                 </div>
                             `
                             : `
-                                <div class="rounded-xl border border-blue-100 bg-blue-50 p-3 text-xs text-blue-900">
+                                <div class="rounded-xl border border-[var(--color-primary-tint)] bg-[var(--color-primary-tint)] p-3 text-xs text-[var(--color-primary-dark)]">
                                     This withdrawal will be processed through cash payout.
                                 </div>
                             `
@@ -788,7 +788,7 @@
                                 Status
                             </span>
 
-                            <strong class="text-yellow-600">
+                            <strong class="text-amber-600">
                                 Pending
                             </strong>
                         </div>
@@ -809,7 +809,7 @@
             `,
 
             confirmButtonText: 'Okay',
-            confirmButtonColor: '#0C2C6B',
+            confirmButtonColor: 'var(--color-primary)',
         });
 
     });

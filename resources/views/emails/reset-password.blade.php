@@ -53,7 +53,7 @@
                             </p>
                             <p style="margin: 0 0 28px 0; color: #475569;">
                                 We received a request to reset the password for your
-                                <strong style="color: #0B2A5B;">Truelife member portal</strong> account. Click the
+                                <strong style="color: #0B2A5B;">TRIFECTA member portal</strong> account. Click the
                                 button below to choose a new password.
                             </p>
 
@@ -104,7 +104,7 @@
                                             This reset link will expire in <strong>60 minutes</strong>. If you did not
                                             request a password reset, no further action is needed and your password
                                             will remain unchanged. For assistance, please contact our support team or
-                                            your nearest Truelife branch office.
+                                            your nearest TRIFECTA branch office.
                                         </p>
                                     </td>
                                 </tr>
@@ -112,7 +112,7 @@
 
                             <p style="margin: 0; color: #475569;">
                                 Best regards,<br>
-                                <strong style="color: #0B2A5B;">True Life</strong>
+                                <strong style="color: #0B2A5B;">TRIFECTA</strong>
                             </p>
                         </td>
                     </tr>
@@ -121,9 +121,9 @@
                     <tr>
                         <td align="center"
                             style="background-color: #f8fafc; padding: 24px; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9;">
-                            <p style="margin: 0 0 4px 0;">This is an automated notification message from True Life.
+                            <p style="margin: 0 0 4px 0;">This is an automated notification message from TRIFECTA.
                                 Please do not reply directly to this email.</p>
-                            <p style="margin: 0;">&copy; {{ date('Y') }} True Life. All rights reserved.</p>
+                            <p style="margin: 0;">&copy; {{ date('Y') }} TRIFECTA. All rights reserved.</p>
                         </td>
                     </tr>
 
