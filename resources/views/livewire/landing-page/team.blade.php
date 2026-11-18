@@ -114,12 +114,12 @@
                 </article>
 
                 <article class="tmt-person">
-                    <img src="{{ asset('images/team-princes-manliguez.jpg') }}"
-                         alt="Ms. Princes Manliguez, LFA — Finance Officer"
+                    <img src="{{ asset('images/team-alfe-duron.jpg') }}"
+                         alt="Ms. Alfe S. Duron, LFA — HR Head"
                          class="tmt-person-photo">
-                    <span class="tmt-person-role">Finance</span>
-                    <h3 class="tmt-person-name">Ms. Princes Manliguez, LFA</h3>
-                    <p class="tmt-person-meta">Finance Officer · membership fees, releases &amp; cashiering</p>
+                    <span class="tmt-person-role">People</span>
+                    <h3 class="tmt-person-name">Ms. Alfe S. Duron, LFA</h3>
+                    <p class="tmt-person-meta">HR Head · recruitment, training &amp; staff welfare</p>
                 </article>
 
                 <article class="tmt-person">
@@ -132,12 +132,12 @@
                 </article>
 
                 <article class="tmt-person">
-                    <img src="{{ asset('images/team-alfe-duron.jpg') }}"
-                         alt="Ms. Alfe S. Duron, LFA — HR Head"
+                    <img src="{{ asset('images/team-princes-manliguez.jpg') }}"
+                         alt="Ms. Princes Manliguez, LFA — Finance Officer"
                          class="tmt-person-photo">
-                    <span class="tmt-person-role">People</span>
-                    <h3 class="tmt-person-name">Ms. Alfe S. Duron, LFA</h3>
-                    <p class="tmt-person-meta">HR Head · recruitment, training &amp; staff welfare</p>
+                    <span class="tmt-person-role">Finance</span>
+                    <h3 class="tmt-person-name">Ms. Princes Manliguez, LFA</h3>
+                    <p class="tmt-person-meta">Finance Officer · membership fees, releases &amp; cashiering</p>
                 </article>
 
                 <article class="tmt-person">
@@ -157,24 +157,6 @@
                     <h3 class="tmt-person-name">Ms. Georgelyn Angeles</h3>
                     <p class="tmt-person-meta">SFX Branch Secretary · walk-in inquiries &amp; renewals</p>
                 </article>
-
-                <article class="tmt-person">
-                    <span class="tmt-person-avatar">TA</span>
-                    <span class="tmt-person-role">Agency</span>
-                    <h3 class="tmt-person-name">TRI CARE AGENCY</h3>
-                    <p class="tmt-person-meta">Partner agency · licensing &amp; field coordination</p>
-                </article>
-
-                @foreach ($branches->take(3) as $branch)
-                    <article class="tmt-person" wire:key="branch-{{ $branch->BranchID }}">
-                        <span class="tmt-person-avatar">
-                            {{ Str::upper(Str::substr(preg_replace('/[^A-Za-z ]/', '', $branch->branchname), 0, 2)) }}
-                        </span>
-                        <span class="tmt-person-role">Branch Manager</span>
-                        <h3 class="tmt-person-name">{{ preg_replace('/\s+Branch$/i', '', $branch->branchname) }}</h3>
-                        <p class="tmt-person-meta">{{ $branch->address }}</p>
-                    </article>
-                @endforeach
 
             </div>
 

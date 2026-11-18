@@ -106,7 +106,7 @@
 <!-- =========================
      DTI REGISTRATION CERTIFICATE
 ========================= -->
-<section class="about-band bg-[#F4F7FC]">
+{{-- <section class="about-band bg-[#F4F7FC]">
     <div class="about-container">
 
         <!-- Section Header -->
@@ -209,7 +209,7 @@
         </div>
 
     </div>
-</section>
+</section> --}}
 
 
 <!-- =========================

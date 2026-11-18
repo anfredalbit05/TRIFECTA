@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-
 class Activation extends Model
 {
     /*
@@ -26,98 +25,24 @@ class Activation extends Model
     */
 
     protected $fillable = [
-
-        /*
-        | Member being activated
-        */
-
         'UserID',
-
-        /*
-        | Satellite row this activation belongs to (satellite memberships)
-        */
-
         'satelliteID',
-
-         'VID',
-
-        /*
-        | Activation amount
-        */
-
+        'VID',
         'amount',
-
-        /*
-        | W = Walk-in
-        | O = Online
-        */
-
         'type',
-
-        /*
-        | Cash
-        | GCash
-        | Bank Transfer
-        */
-
         'payment_method',
-
-        /*
-        | Referral code entered
-        | by the activating member
-        */
-
         'upline_code',
-
-        /*
-        | GCash or bank transaction reference
-        |
-        | Null for Cash payments
-        */
-
         'payment_reference',
-
-        /*
-        | UserID of the user whose
-        | uplineCode matches referral_code
-        */
-
         'ProcessedBy',
-
-        /*
-        | Pending
-        | Approved
-        | Rejected
-        */
-
         'status',
-
-        /*
-        | Acknowledgement receipt number
-        | (auto-generated on approval, e.g. 000550)
-        */
-
         'receipt_number',
-
-        /*
-        | Policy details (Cocogen) attached to this activation —
-        | the users table has no such columns.
-        */
-
         'policy_number',
         'cocogen_policy_number',
         'policy_effectivity_date',
         'policy_expiration_date',
-
-        /*
-        | Cashier who signed the acknowledgement receipt
-        | (name + signature image path, snapshot at approval)
-        */
-
         'cashier_name',
         'cashier_signature',
         'isFree',
-
     ];
 
     /*
@@ -129,8 +54,6 @@ class Activation extends Model
     protected function casts(): array
     {
         return [
-            // Free members provisioned when a satellite activation is
-            // approved (everything else is a paid activation).
             'isFree' => 'boolean',
         ];
     }
@@ -141,9 +64,6 @@ class Activation extends Model
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * @return BelongsTo<User, $this>
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(
@@ -157,47 +77,52 @@ class Activation extends Model
     |--------------------------------------------------------------------------
     | Receipt Number Generation
     |
-    | Sequential 6-digit numbers (000550, 000551, ...) based on the HIGHEST
-    | control number in the activations table — regardless of which row or
-    | status holds it — so a number is never reused. When no number has
-    | been issued yet, the sequence starts at 000550.
+    | Format: 00001, 00002, 00003...
+    | Starts at 00001 if no receipt number exists.
     |--------------------------------------------------------------------------
     */
 
+    public const FIRST_RECEIPT_SEQUENCE = 1;
+
     public static function nextReceiptNumber(): string
     {
-        // Zero-padded 6-digit numbers sort identically as strings and ints,
-        // so MAX(receipt_number) is the highest number ever issued.
         $highest = static::query()
             ->whereNotNull('receipt_number')
             ->max('receipt_number');
 
         $next = ($highest === null)
-            ? 001
+            ? static::FIRST_RECEIPT_SEQUENCE
             : ((int) $highest + 1);
 
-        return str_pad((string) $next, 6, '0', STR_PAD_LEFT);
+        return str_pad(
+            (string) $next,
+            5,
+            '0',
+            STR_PAD_LEFT
+        );
     }
 
     /*
     |--------------------------------------------------------------------------
     | Policy Number Generation
     |
-    | Sequential TRI-00550-TS2026-550 style numbers. The sequence STARTS at
-    | 550 when nothing has been issued yet, and continues from the HIGHEST
-    | sequence found in BOTH the activations and users tables (users gets a
-    | copy of the policy number on approval, so scanning only one table
-    | could reuse a number). Backlog numbers below the next number remain
-    | allowed as long as they are unused — same rule as receipt numbers.
+    | Format: TRI-00001-2026-1
+    |
+    | TRI     = Prefix
+    | 00001   = Sequential policy number
+    | 2026    = Current year
+    | 1       = Policy identifier / final segment
+    |
+    | The sequence checks BOTH activations and users tables.
     |--------------------------------------------------------------------------
     */
 
-    /** First policy sequence used when no TRI- number has been issued yet. */
-    public const FIRST_POLICY_SEQUENCE = 001;
+    public const FIRST_POLICY_SEQUENCE = 1;
 
     /**
-     * The highest policy sequence issued for the current year, across the
-     * activations AND users tables. 0 when none has been issued yet.
+     * Get the highest policy sequence issued for the current year.
+     *
+     * Searches both activations and users tables.
      */
     public static function latestPolicySequence(): int
     {
@@ -210,15 +135,22 @@ class Activation extends Model
         ];
 
         foreach ($tables as $table) {
-            foreach ($table
+            $policyNumbers = $table
                 ->whereNotNull('policy_number')
-                ->where('policy_number', 'like', 'TRI-%-TS'.$year.'-%')
-                ->pluck('policy_number') as $policyNumber) {
-                if (preg_match('/^TRI-(\d+)-TS\d{4}-(\d+)$/', (string) $policyNumber, $matches)) {
-                    // The first and final numbers must match anyway; take the
-                    // larger of the two so a malformed legacy row can never
-                    // make the sequence repeat a number.
-                    $sequence = max((int) $matches[1], (int) $matches[2]);
+                ->where('policy_number', 'like', 'TRI-%-' . $year . '-%')
+                ->pluck('policy_number');
+
+            foreach ($policyNumbers as $policyNumber) {
+                if (
+                    preg_match(
+                        '/^TRI-(\d+)-(\d{4})-(\d+)$/',
+                        (string) $policyNumber,
+                        $matches
+                    )
+                ) {
+                    // Only use the sequence segment.
+                    // The final segment is NOT the sequence.
+                    $sequence = (int) $matches[1];
 
                     if ($sequence > $highest) {
                         $highest = $sequence;
@@ -231,15 +163,27 @@ class Activation extends Model
     }
 
     /**
-     * The next policy number to be generated, e.g. TRI-00551-TS2026-551.
-     * Starts at TRI-00550-TS2026-550 when nothing has been issued yet.
+     * Generate the next policy number.
+     *
+     * Example:
+     * TRI-00001-2026-1
+     * TRI-00002-2026-1
+     * TRI-00003-2026-1
      */
     public static function nextPolicyNumber(): string
     {
-        $next = max(static::FIRST_POLICY_SEQUENCE, static::latestPolicySequence() + 1);
+        $next = max(
+            static::FIRST_POLICY_SEQUENCE,
+            static::latestPolicySequence() + 1
+        );
+
         $year = now()->year;
 
-        return sprintf('TRI-%05d-TS%d-%d', $next, $year, $next);
+        return sprintf(
+            'TRI-%05d-%d-1',
+            $next,
+            $year
+        );
     }
 
     /*
@@ -248,9 +192,6 @@ class Activation extends Model
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * @return BelongsTo<User, $this>
-     */
     public function processedBy(): BelongsTo
     {
         return $this->belongsTo(
@@ -260,9 +201,12 @@ class Activation extends Model
         );
     }
 
-    /**
-     * @return HasMany<ActivationHistory, $this>
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Activation Histories
+    |--------------------------------------------------------------------------
+    */
+
     public function histories(): HasMany
     {
         return $this->hasMany(
@@ -272,15 +216,18 @@ class Activation extends Model
         );
     }
 
-    /**
-     * Each activation belongs to one variant.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Variant
+    |--------------------------------------------------------------------------
+    */
+
     public function variant(): BelongsTo
     {
         return $this->belongsTo(
             Variant::class,
-            'VID', // Foreign key in activations table
-            'VID'        // Primary key in variants table
+            'VID',
+            'VID'
         );
     }
 }
