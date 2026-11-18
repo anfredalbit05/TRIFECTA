@@ -112,10 +112,13 @@
     @apply relative mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)] lg:items-center lg:gap-16 lg:px-12;
 }
 
+
 .tmt-exec-photo {
     @apply relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-sm;
     border-top: 4px solid var(--color-gold);
+    width: 100%;
 }
+
 
 /* Small gold tick floating over the portrait. */
 .tmt-exec-photo-rule {
@@ -123,13 +126,18 @@
     background: var(--color-gold);
 }
 
+
 .tmt-exec-img {
-    @apply block h-[300px] w-full object-cover sm:h-[380px] lg:h-[420px];
-    /* Every uploaded banner keeps the portrait on its left side; cropping
-       from the left keeps the face in frame instead of centring on the
-       artwork and slicing it. */
-    object-position: left center;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: auto;
+    object-fit: contain;
+    object-position: center;
+    background: #f8fafc;
 }
+
 
 .tmt-exec-photo-tag {
     @apply absolute bottom-4 left-4 z-10 rounded-md px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em];
@@ -210,19 +218,25 @@
    whole 16:9 sheet was squeezed into a 200px-high strip. Cropping a square
    from the portrait side renders the face at (almost) source scale, so the
    photo stays crisp. */
+
+
 .tmt-person-photo {
     display: block;
     width: calc(100% + 3rem);
     max-width: none;
     height: auto;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 16 / 9;
+
     margin: -1.5rem -1.5rem 1.25rem;
-    object-fit: cover;
-    object-position: left center;
+
+    object-fit: contain;
+    object-position: center;
+
     border-radius: 17px 17px 0 0;
     border-bottom: 3px solid var(--color-gold);
-    background: var(--color-primary-tint);
+    background: #ffffff;
 }
+
 
 .tmt-person-role {
     @apply mt-5 block text-[10px] font-black uppercase tracking-[0.16em] text-primary-mid;
