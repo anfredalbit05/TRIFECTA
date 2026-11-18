@@ -30,7 +30,7 @@ Route::middleware(['maintenance'])->group(function () {
     Route::get('/testimonials', Testimonials::class)->name('testimonials');
     Route::get('/news', NewsUpdates::class)->name('news');
     Route::get('/contact', Contact::class)->name('contact');
-    Route::get('/login', Home::class)->defaults('autoLogin', true)->name('secret.login');
+    Route::get('/login', Home::class)->defaults('autoLogin', true)->name('login');
 
 });
 
