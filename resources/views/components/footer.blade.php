@@ -67,10 +67,10 @@
             <div>
                 <h4>Member Care</h4>
                 <ul>
-                    <li>{{ $ctx['contact_phone_1'] ?? '0917 555 0199' }}</li>
-                    <li>{{ $ctx['contact_email_address'] ?? 'care@trifecta.ph' }}</li>
+                    <li>{{ $ctx['contact_phone_1'] ?? '09158066395' }}</li>
+                    <li>{{ $ctx['contact_email_address'] ?? 'theroyalicon2026@2026' }}</li>
                     <li>Mon – Sat · 8:00am – 5:00pm</li>
-                    <li>Tagum City · Kapalong</li>
+                    <li>Maharlika Highway, San Francisco, Agusan Del Sur, Philippines</li>
                 </ul>
             </div>
 
