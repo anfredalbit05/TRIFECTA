@@ -2,7 +2,7 @@
     use Illuminate\Support\Str;
 
     $user = auth()->user();
-    $isAdmin = $user && !in_array($user->RoleID, [4, 8]);
+    $isAdmin = $user && !in_array($user->RoleID, [1,2,3,4,5,6,7]);
 
     /*
     | Satellite nav visibility:
@@ -11,13 +11,13 @@
     |   their referralCode as the upline code (a live DB check, cached
     |   for the request).
     */
-    $isSatelliteMember = $user?->RoleID == 8
-        || ($user
-            && $user->RoleID != 8
-            && filled($user->referralCode)
-            && \App\Models\Activation::where('upline_code', $user->referralCode)
-                ->whereHas('user', fn ($q) => $q->where('RoleID', 8))
-                ->exists());
+    // $isSatelliteMember = $user?->RoleID == 8
+    //     || ($user
+    //         && $user->RoleID != 8
+    //         && filled($user->referralCode)
+    //         && \App\Models\Activation::where('upline_code', $user->referralCode)
+    //             ->whereHas('user', fn ($q) => $q->where('RoleID', 8))
+    //             ->exists());
 
     $profilePic = $user?->profilepic;
     $defaultAvatar = 'images/profiles/default-avatar.png';
@@ -30,20 +30,20 @@
     | Pending transaction counts (admin sidebar badges). Only queried for
     | admins — members never see these two links.
     */
-    $pendingActivations = $isAdmin ? \App\Models\Activation::where('status', 'Pending')->count() : 0;
-    $pendingWithdrawals = $isAdmin ? \App\Models\Withdrawal::where('status', 'Pending')->count() : 0;
-    $pendingTransactions = $pendingActivations + $pendingWithdrawals;
+    // $pendingActivations = $isAdmin ? \App\Models\Activation::where('status', 'Pending')->count() : 0;
+    // $pendingWithdrawals = $isAdmin ? \App\Models\Withdrawal::where('status', 'Pending')->count() : 0;
+    // $pendingTransactions = $pendingActivations + $pendingWithdrawals;
 
     /* Masterlist badge: satellite members awaiting activation review. */
-    $pendingSatelliteActivations = $isAdmin
-        ? \App\Models\Activation::where('status', 'Pending')
-            ->whereHas('user', fn ($q) => $q->where('RoleID', 8))
-            ->count()
-        : 0;
+    // $pendingSatelliteActivations = $isAdmin
+    //     ? \App\Models\Activation::where('status', 'Pending')
+    //         ->whereHas('user', fn ($q) => $q->where('RoleID', 8))
+    //         ->count()
+    //     : 0;
 
     $roleLine = match (true) {
-        $user?->RoleID == 4 => ($user?->status ?? 'Inactive') . ' Member',
-        $user?->RoleID == 8 => ($user?->status ?? 'Inactive') . ' Satellite Member',
+        $user?->RoleID == 8 => ($user?->status ?? 'Inactive') . ' Member',
+        // $user?->RoleID == 8 => ($user?->status ?? 'Inactive') . ' Satellite Member',
         (bool) $user        => ($user->status ?? 'Inactive') . ' · ' . ($user->position ?? '--'),
         default             => '',
     };
@@ -153,12 +153,12 @@
                             <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
                         </svg>
                         <span>Member Registry</span>
-                        @if ($pendingSatelliteActivations > 0)
+                        {{-- @if ($pendingSatelliteActivations > 0)
                             <span class="tf-side-badge"
                                   title="{{ $pendingSatelliteActivations }} satellite activation(s) pending review">
                                 {{ $pendingSatelliteActivations }}
                             </span>
-                        @endif
+                        @endif --}}
                     </a>
 
                     <a href="{{ route('transaction-list') }}"
@@ -168,12 +168,12 @@
                             <path d="M3 6h18M3 12h18M3 18h18M7 3v2M12 3v2M17 3v2" />
                         </svg>
                         <span>Payment Desk</span>
-                        @if ($pendingTransactions > 0)
+                        {{-- @if ($pendingTransactions > 0)
                             <span class="tf-side-badge"
                                   title="{{ $pendingActivations }} pending activation(s), {{ $pendingWithdrawals }} pending withdrawal(s)">
                                 {{ $pendingTransactions }}
                             </span>
-                        @endif
+                        @endif --}}
                     </a>
 
                     <a href="{{ route('post') }}"
@@ -210,7 +210,7 @@
                     <span>Account Settings</span>
                 </a>
 
-                @if ($isSatelliteMember)
+                {{-- @if ($isSatelliteMember)
                     <a href="{{ route('satellite.portal') }}"
                        class="tf-side-link {{ request()->routeIs('satellite.portal') ? 'is-active' : '' }}">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
@@ -220,7 +220,7 @@
                         </svg>
                         <span>Satellite Hub</span>
                     </a>
-                @endif
+                @endif --}}
             </div>
 
         </div>
@@ -306,7 +306,7 @@
                 <span>Account</span>
             </a>
 
-            @if ($isSatelliteMember)
+            {{-- @if ($isSatelliteMember)
                 <a href="{{ route('satellite.portal') }}"
                    class="tf-dock-link {{ request()->routeIs('satellite.portal') ? 'is-active' : '' }}">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
@@ -316,7 +316,7 @@
                     </svg>
                     <span>Satellite</span>
                 </a>
-            @endif
+            @endif --}}
 
         </div>
     </nav>

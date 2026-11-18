@@ -59,11 +59,11 @@
                     <span>Members</span>
                 </a>
 
-                <a href="#" class="ws-rail-link" :class="tab === 'satellite-members' ? 'is-active' : ''"
+                {{-- <a href="#" class="ws-rail-link" :class="tab === 'satellite-members' ? 'is-active' : ''"
                    @click.prevent="tab = 'satellite-members'">
                     <span class="ws-rail-icon">◉</span>
                     <span>Satellite Members</span>
-                </a>
+                </a> --}}
 
                 <a href="#" class="ws-rail-link" :class="tab === 'admin-users' ? 'is-active' : ''"
                    @click.prevent="tab = 'admin-users'">
@@ -138,11 +138,11 @@
                 </div>
             </template>
 
-            <template x-if="tab === 'satellite-members'">
+            {{-- <template x-if="tab === 'satellite-members'">
                 <div class="masterlist-main-card">
                     <livewire:admin-pages.masterlist.satellite-members lazy />
                 </div>
-            </template>
+            </template> --}}
 
             <template x-if="tab === 'branches'">
                 <div class="masterlist-main-card">

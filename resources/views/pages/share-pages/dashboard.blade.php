@@ -13,7 +13,7 @@
 
     <header class="ws-head">
         <div>
-            <span class="ws-head-kicker">{{ $user->RoleID == 4 ? 'Member Portal' : 'Member Workspace' }}</span>
+            <span class="ws-head-kicker">{{ $user->RoleID == 8 ? 'Member Portal' : 'Member Workspace' }}</span>
             <h1>Command Center</h1>
             <p>
                 Welcome back, {{ $user->firstname ?? 'Member' }}. Your cover, your community and your money —
@@ -40,7 +40,7 @@
                     <span>My Overview</span>
                 </a>
 
-                @if($user->RoleID != 4)
+                @if($user->RoleID != 8)
                     <a href="#" class="ws-rail-link" :class="tab === 'analytics' ? 'is-active' : ''"
                        @click.prevent="tab = 'analytics'">
                         <span class="ws-rail-icon">▤</span>
