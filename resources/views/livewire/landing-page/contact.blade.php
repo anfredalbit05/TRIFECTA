@@ -51,7 +51,7 @@
                 </div>
 
                 {{-- SUB OFFICE --}}
-                <div class="contact-detail-card">
+                {{-- <div class="contact-detail-card">
                     <div class="contact-card-icon">
                         <flux:icon.building-office-2/>
                     </div>
@@ -61,7 +61,7 @@
                     <p class="contact-card-text">
                         <x-editable-text key="contact_sub_office_address" :value="$contexts['contact_sub_office_address'] ?? ''" tag="span" class="inline-block"/>
                     </p>
-                </div>
+                </div> --}}
 
                 {{-- PHONE --}}
                 <div class="contact-detail-card">

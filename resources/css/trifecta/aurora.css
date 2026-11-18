@@ -2010,7 +2010,14 @@ body.tf-app {
 }
 
 @media (max-width: 639px) {
-    .tf-nav-login { display: none; }
+       .tf-nav-login {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        padding: 9px 13px;
+        font-size: 10px;
+        white-space: nowrap;
+    }
     .tf-footer-grid { grid-template-columns: 1fr; }
     .tf-footer-bottom { justify-content: center; text-align: center; }
     .tf-hero-title { font-size: 30px; }
