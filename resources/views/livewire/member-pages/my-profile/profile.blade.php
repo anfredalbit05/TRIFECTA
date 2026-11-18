@@ -353,20 +353,20 @@
             </div>
 
 
-            @if (auth()->user()->RoleID != 8)
-                {{-- --------------- 7. LIVE ID PREVIEW --------------- --}}
+            {{-- @if (auth()->user()->RoleID != 8)
+                --------------- 7. LIVE ID PREVIEW ---------------
                 <div class="id-preview-card">
                     <h4 class="id-preview-title">👁️ Live ID Preview</h4>
 
                     <div class="id-card-viewport">
 
-                        {{-- FRONT SIDE --}}
+                        FRONT SIDE
                         <div id="id-card-front" class="id-card-front-new">
-                            {{-- Template artwork --}}
+                            Template artwork
                             <img src="{{ asset('images/certificate/id-front.png') }}" class="id-template-img"
                                 alt="ID Front">
 
-                            {{-- Photo overlay (fills the framed portrait area) --}}
+                            Photo overlay (fills the framed portrait area)
                             <div class="idn-photo">
                                 @if ($profilepic && is_object($profilepic))
                                     <img src="{{ $profilepic->temporaryUrl() }}">
@@ -375,7 +375,7 @@
                                 @endif
                             </div>
 
-                            {{-- Data overlays --}}
+                            Data overlays
                             <div class="idn-field idn-name">
                                 {{ strtoupper(trim("$firstname " . ($middlename ? substr(trim($middlename), 0, 1) . '. ' : '') . $lastname) ?: 'NAME HERE') }}
                             </div>
@@ -383,7 +383,7 @@
                             <div class="idn-field idn-issue">{{ $dateOfIssue }}</div>
                             <div class="idn-field idn-valid">{{ $validUntil }}</div>
 
-                            {{-- Member signature on a white card below the QR/barcode area --}}
+                            Member signature on a white card below the QR/barcode area
                             <div class="idn-signature">
                                 @if ($signature)
                                     <img src="{{ asset('storage/' . $signature) }}">
@@ -391,9 +391,9 @@
                             </div>
                         </div>
 
-                        {{-- BACK SIDE --}}
-                        {{-- The back artwork is fully pre-printed (Member Benefits
-                         summary) — no data overlays needed here. --}}
+                        BACK SIDE
+                        The back artwork is fully pre-printed (Member Benefits
+                         summary) — no data overlays needed here.
                         <div id="id-card-back" class="id-card-back-new hidden">
                             <img src="{{ asset('images/certificate/id-back.png') }}" class="id-template-img"
                                 alt="ID Back">
@@ -412,19 +412,19 @@
                             Download ID (PDF)
                         </a>
 
-                        {{-- @if ($hasDownloadableReceipt)
+                        @if ($hasDownloadableReceipt)
                             <a href="{{ route('activation.receipt.download') }}" class="btn-download">
                                 🧾 Download Receipt
                             </a>
-                        @endif --}}
+                        @endif
 
-                        {{-- <button type="button" wire:click="requestPhysicalId" class="btn-primary flex-1">
+                        <button type="button" wire:click="requestPhysicalId" class="btn-primary flex-1">
                             Request Physical ID
-                        </button> --}}
+                        </button>
                     </div>
                 </div>
 
-            @endif
+            @endif --}}
         </div>
     </div>
 

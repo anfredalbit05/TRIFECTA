@@ -29,7 +29,7 @@
             <div class="ws-rail-group">
                 <div class="ws-rail-label">Network</div>
 
-                @if (auth()->check() && (int) auth()->user()->RoleID !== 4)
+                @if (auth()->check() && (int) auth()->user()->RoleID !== 8)
                     {{-- Overview is a leadership tool — not shown to plain Members --}}
                     <a href="#" class="ws-rail-link" :class="tab === 'overview' ? 'is-active' : ''"
                        @click.prevent="tab = 'overview'">
@@ -44,18 +44,18 @@
                     <span>Invitee</span>
                 </a>
 
-                <a href="#" class="ws-rail-link" :class="tab === 'board-member' ? 'is-active' : ''"
+                {{-- <a href="#" class="ws-rail-link" :class="tab === 'board-member' ? 'is-active' : ''"
                    @click.prevent="tab = 'board-member'">
                     <span class="ws-rail-icon">♙</span>
                     <span>Board Member</span>
-                </a>
+                </a> --}}
             </div>
 
         </aside>
 
         <section class="ws-panel">
 
-            @if (auth()->check() && (int) auth()->user()->RoleID !== 4)
+            @if (auth()->check() && (int) auth()->user()->RoleID !== 8)
                 <div x-show="tab === 'overview'"
                      x-cloak
                      x-transition.opacity.duration.200ms
@@ -79,7 +79,7 @@
 
             </div>
 
-            <div x-show="tab === 'board-member'"
+            {{-- <div x-show="tab === 'board-member'"
                  x-cloak
                  x-transition.opacity.duration.200ms
                  class="genealogy-main-card">
@@ -88,7 +88,7 @@
                     @include('livewire.member-pages.genealogy.board-members')
                 </div>
 
-            </div>
+            </div> --}}
 
         </section>
 
