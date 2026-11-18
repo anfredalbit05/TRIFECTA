@@ -25,9 +25,8 @@ return new class extends Migration
             $table->decimal('tax_amount', 12, 2)->default(0);
             $table->decimal('amount', 12, 2);
 
-            $table->enum('type', ['W', 'O'])
-                ->after('amount');
-                
+            $table->enum('type', ['W', 'O']);
+
             $table->enum('withdrawal_method', [
                 'Cash',
                 'GCash',
@@ -36,7 +35,7 @@ return new class extends Migration
             ]);
 
             $table->string('bank_name', 255)->nullable();
-            
+
             $table->string('account_name', 255)
                 ->nullable();
 
