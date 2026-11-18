@@ -31,13 +31,13 @@ class Dashboard extends Component
 
     public function render()
     {
-        $mapUsers = User::where('RoleID', 4)
+        $mapUsers = User::where('RoleID', 8)
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->get(['FirstName', 'LastName', 'address', 'longitude', 'latitude']);
 
         // Build filtered query for the print table matching export filters
-        $query = User::query()->where('RoleID', 4);
+        $query = User::query()->where('RoleID', 8);
 
         if (!empty($this->exportYear)) {
             $query->whereYear('created_at', $this->exportYear);
@@ -59,7 +59,7 @@ class Dashboard extends Component
         $printMembers = $query->with('beneficiaries')->latest()->get();
 
         return view('livewire.admin-pages.masterlist.dashboard', [
-            'totalMembers' => User::where('RoleID', 4)->count(),
+            'totalMembers' => User::where('RoleID', 8)->count(),
             'activeBranches' => Branch::where('status', true)->count(),
             'totalBenefits' => Benefit::where('status', true)->count(),
             'totalInquiries' => Inquiry::count(),
@@ -79,7 +79,7 @@ class Dashboard extends Component
 
     public function getSummaryStatsProperty(): array
     {
-        $query = User::query()->where('RoleID', 4);
+        $query = User::query()->where('RoleID', 8);
 
         // 1. Apply Report Filters (Year & Month) if selected
         if (!empty($this->exportYear)) {
