@@ -202,7 +202,7 @@
 }
 
 .tmt-person {
-    @apply flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm
+    @apply flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm
         transition duration-300 hover:-translate-y-1 hover:border-primary-tint-border hover:shadow-lg;
     border-top: 3px solid var(--color-gold);
 }
@@ -213,26 +213,24 @@
     color: #fff;
 }
 
-/* Board card: the uploaded photo banner sits above the role + name.
-   The banners carry a lot of small artwork, which turned soft when the
-   whole 16:9 sheet was squeezed into a 200px-high strip. Cropping a square
-   from the portrait side renders the face at (almost) source scale, so the
-   photo stays crisp. */
-
+/* Board card: every banner is shown in the SAME 3:2 box, edge to edge.
+   object-fit: cover fills the full card width (no white side bars), so
+   all photos have identical width and height. Keep the faces visible by
+   anchoring the crop at the top. For zero cropping, export every banner
+   at 3:2 (e.g. 1536x1024). */
 
 .tmt-person-photo {
     display: block;
     width: calc(100% + 3rem);
     max-width: none;
     height: auto;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 3 / 2;
 
     margin: -1.5rem -1.5rem 1.25rem;
 
-    object-fit: contain;
-    object-position: center;
+    object-fit: cover;
+    object-position: center top;
 
-    border-radius: 17px 17px 0 0;
     border-bottom: 3px solid var(--color-gold);
     background: #ffffff;
 }

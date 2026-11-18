@@ -132,6 +132,15 @@
                 </article>
 
                 <article class="tmt-person">
+                    <img src="{{ asset('images/team-george-vargas.jpg') }}"
+                         alt="Mr. George Vargas — Area Manager, San Franz, Agusan"
+                         class="tmt-person-photo">
+                    <span class="tmt-person-role">Branch</span>
+                    <h3 class="tmt-person-name">Mr. George Vargas</h3>
+                    <p class="tmt-person-meta">Area Manager · San Franz, Agusan</p>
+                </article>
+
+                <article class="tmt-person">
                     <img src="{{ asset('images/team-princes-manliguez.jpg') }}"
                          alt="Ms. Princes Manliguez, LFA — Finance Officer"
                          class="tmt-person-photo">

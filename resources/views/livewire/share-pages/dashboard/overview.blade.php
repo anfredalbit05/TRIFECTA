@@ -40,11 +40,10 @@
             </button>
         </div>
 
-        @if (!in_array(auth()->user()->RoleID, [4, 8]))
+        {{-- @if (!in_array(auth()->user()->RoleID, [4, 8]))
 
             @if ($isKabuhayanSpinActive)
 
-                {{-- ACTIVE BUTTON --}}
                 <button type="button"
                     wire:click="$dispatch('open-spin-wheel')"
                     wire:loading.attr="disabled"
@@ -84,7 +83,6 @@
 
             @else
 
-                {{-- DISABLED BUTTON --}}
                 <div
                     class="w-full px-4 py-2.5 rounded-lg
                         bg-gray-100 border border-gray-200
@@ -104,7 +102,7 @@
 
             @endif
 
-        @endif
+        @endif --}}
 
 
         <!-- =========================

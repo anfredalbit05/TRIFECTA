@@ -106,11 +106,12 @@
                                 class="hidden">
 
                             @if (!$profilepic && auth()->user()->profilepic && auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
-                                <button type="button" wire:click="removeProfilePicture"
-                                    wire:confirm="Are you sure you want to remove your profile picture?"
-                                    class="btn-warning">
-                                    Remove Profile Picture
-                                </button>
+                            <button type="button"
+                                wire:click="removeProfilePicture"
+                                wire:confirm="Are you sure you want to remove your profile picture?"
+                                class="btn-danger">
+                                Remove Profile Picture
+                            </button>
                             @endif
                         </div>
 
@@ -353,78 +354,114 @@
             </div>
 
 
-            {{-- @if (auth()->user()->RoleID != 8)
-                --------------- 7. LIVE ID PREVIEW ---------------
-                <div class="id-preview-card">
-                    <h4 class="id-preview-title">👁️ Live ID Preview</h4>
+            @if (auth()->user()->RoleID != 8)
+                {{-- --------------- 7. LIVE ID PREVIEW --------------- --}}
+            <div class="id-preview-card">
+                <h4 class="id-preview-title">👁️ Live ID Preview</h4>
 
-                    <div class="id-card-viewport">
+                <div class="id-card-viewport">
 
-                        FRONT SIDE
-                        <div id="id-card-front" class="id-card-front-new">
-                            Template artwork
-                            <img src="{{ asset('images/certificate/id-front.png') }}" class="id-template-img"
-                                alt="ID Front">
+                    {{-- FRONT SIDE --}}
+                    <div id="id-card-front" class="id-card-side id-card-front-new">
 
-                            Photo overlay (fills the framed portrait area)
-                            <div class="idn-photo">
-                                @if ($profilepic && is_object($profilepic))
-                                    <img src="{{ $profilepic->temporaryUrl() }}">
-                                @elseif (auth()->user()->profilepic && auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
-                                    <img src="{{ asset('storage/' . auth()->user()->profilepic) }}">
-                                @endif
-                            </div>
+                        <img src="{{ asset('images/certificate/trifecta-id.png') }}"
+                            class="id-template-img"
+                            alt="TRIFECTA Membership ID Front">
 
-                            Data overlays
-                            <div class="idn-field idn-name">
-                                {{ strtoupper(trim("$firstname " . ($middlename ? substr(trim($middlename), 0, 1) . '. ' : '') . $lastname) ?: 'NAME HERE') }}
-                            </div>
-                            <div class="idn-field idn-membership">{{ $membershipNo }}</div>
-                            <div class="idn-field idn-issue">{{ $dateOfIssue }}</div>
-                            <div class="idn-field idn-valid">{{ $validUntil }}</div>
-
-                            Member signature on a white card below the QR/barcode area
-                            <div class="idn-signature">
-                                @if ($signature)
-                                    <img src="{{ asset('storage/' . $signature) }}">
-                                @endif
-                            </div>
+                        {{-- Member Photo --}}
+                        <div class="idn-photo">
+                            @if ($profilepic && is_object($profilepic))
+                                <img src="{{ $profilepic->temporaryUrl() }}" alt="Member Photo">
+                            @elseif (auth()->user()->profilepic &&
+                                auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
+                                <img src="{{ asset('storage/' . auth()->user()->profilepic) }}"
+                                    alt="Member Photo">
+                            @endif
                         </div>
 
-                        BACK SIDE
-                        The back artwork is fully pre-printed (Member Benefits
-                         summary) — no data overlays needed here.
-                        <div id="id-card-back" class="id-card-back-new hidden">
-                            <img src="{{ asset('images/certificate/id-back.png') }}" class="id-template-img"
-                                alt="ID Back">
+                        {{-- Cover Existing Sample Information --}}
+                        <div class="idn-mask idn-name-mask"></div>
+                        <div class="idn-mask idn-membership-mask"></div>
+                        <div class="idn-mask idn-certificate-mask"></div>
+                        <div class="idn-mask idn-issue-mask"></div>
+                        <div class="idn-mask idn-valid-mask"></div>
+
+                        {{-- Dynamic Member Information --}}
+                        <div class="idn-field idn-name">
+                            {{ strtoupper(trim("$firstname " . ($middlename ? substr(trim($middlename), 0, 1) . '. ' : '') . $lastname)) }}
                         </div>
+
+                        <div class="idn-field idn-membership">
+                            {{ $membershipNo }}
+                        </div>
+
+                        <div class="idn-field idn-certificate">
+                            {{ $certificateNo ?? '' }}
+                        </div>
+
+                        <div class="idn-field idn-issue">
+                            {{ $dateOfIssue }}
+                        </div>
+
+                        <div class="idn-field idn-valid">
+                            {{ $validUntil }}
+                        </div>
+
                     </div>
 
-                    <div class="id-tabs">
-                        <button type="button" id="btn-front" onclick="switchIdTab('front')"
-                            class="id-tab id-tab--active">Front</button>
-                        <button type="button" id="btn-back" onclick="switchIdTab('back')"
-                            class="id-tab id-tab--inactive">Back</button>
+                    {{-- BACK SIDE --}}
+                    <div id="id-card-back" class="id-card-side id-card-back-new hidden">
+
+                        <img src="{{ asset('images/certificate/trifecta-id.png') }}"
+                            class="id-template-img"
+                            alt="TRIFECTA Membership ID Back">
+
                     </div>
 
-                    <div class="id-actions flex justify-center items-center gap-4">
-                        <a href="{{ route('member.id-card.pdf') }}" class="btn-download text-center">
-                            Download ID (PDF)
-                        </a>
-
-                        @if ($hasDownloadableReceipt)
-                            <a href="{{ route('activation.receipt.download') }}" class="btn-download">
-                                🧾 Download Receipt
-                            </a>
-                        @endif
-
-                        <button type="button" wire:click="requestPhysicalId" class="btn-primary flex-1">
-                            Request Physical ID
-                        </button>
-                    </div>
                 </div>
 
-            @endif --}}
+                {{-- FRONT / BACK TABS
+                <div class="id-tabs">
+                    <button type="button"
+                            id="btn-front"
+                            onclick="switchIdTab('front')"
+                            class="id-tab id-tab--active">
+                        Front
+                    </button>
+
+                    <button type="button"
+                            id="btn-back"
+                            onclick="switchIdTab('back')"
+                            class="id-tab id-tab--inactive">
+                        Back
+                    </button>
+                </div> --}}
+
+                {{-- ACTIONS --}}
+                <div class="id-actions flex justify-center items-center gap-4 flex-wrap">
+
+                    <a href="{{ route('member.id-card.pdf') }}"
+                    class="btn-submit">
+                        Download ID (PDF)
+                    </a>
+
+                    @if ($hasDownloadableReceipt)
+                        <a href="{{ route('activation.receipt.download') }}"
+                        class="btn-submit">
+                            🧾 Download Receipt
+                        </a>
+                    @endif
+
+                    {{-- <button type="button"
+                            wire:click="requestPhysicalId"
+                            class="btn-download text-center">
+                        Request Physical ID
+                    </button> --}}
+
+                </div>
+            </div>
+
+            @endif
         </div>
     </div>
 
