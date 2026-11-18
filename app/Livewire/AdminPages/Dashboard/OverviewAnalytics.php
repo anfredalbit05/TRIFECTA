@@ -124,9 +124,9 @@ class OverviewAnalytics extends Component
         };
 
         // Member Analytics
-        $this->totalMembers = User::where(fn($q) => $applyFilter($q))->count();
-        $this->activeMembers = User::where(fn($q) => $applyFilter($q))->where('status', 1)->count();
-        $this->inactiveMembers = User::where(fn($q) => $applyFilter($q))->where('status', 0)->count();
+        $this->totalMembers = User::where(fn($q) => $applyFilter($q))->where('RoleID', 8)->count();
+        $this->activeMembers = User::where(fn($q) => $applyFilter($q))->where('status', 1)->where('RoleID', 8)->count();
+        $this->inactiveMembers = User::where(fn($q) => $applyFilter($q))->where('status', 0)->where('RoleID', 8)->count();
 
         // System Counts
         $this->totalBranches = Branch::where(fn($q) => $applyFilter($q))->count();
