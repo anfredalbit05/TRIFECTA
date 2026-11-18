@@ -105,63 +105,77 @@
             <div class="tmt-roster-grid">
 
                 <article class="tmt-person">
-                    <img src="{{ asset('images/team-bobby-dagala.jpg') }}"
-                         alt="Mr. Bobby P. Dagala, LFA — Vice President and Chief Operating Officer"
-                         class="tmt-person-photo">
+                    <div class="tmt-person-media" style="--photo: url('{{ asset('images/team-bobby-dagala.jpg') }}');">
+                        <img src="{{ asset('images/team-bobby-dagala.jpg') }}"
+                             alt="Mr. Bobby P. Dagala, LFA — Vice President and Chief Operating Officer"
+                             class="tmt-person-photo">
+                    </div>
                     <span class="tmt-person-role">Vice President / COO</span>
                     <h3 class="tmt-person-name">Mr. Bobby P. Dagala, LFA</h3>
                     <p class="tmt-person-meta">Management &amp; operations · 20 years in the insurance industry · Founder of Tri Care Community</p>
                 </article>
 
                 <article class="tmt-person">
-                    <img src="{{ asset('images/team-alfe-duron.jpg') }}"
-                         alt="Mr. Alfe S. Duron, LFA — HR Head"
-                         class="tmt-person-photo">
+                    <div class="tmt-person-media" style="--photo: url('{{ asset('images/team-alfe-duron.jpg') }}');">
+                        <img src="{{ asset('images/team-alfe-duron.jpg') }}"
+                             alt="Mr. Alfe S. Duron, LFA — HR Head"
+                             class="tmt-person-photo">
+                    </div>
                     <span class="tmt-person-role">People</span>
                     <h3 class="tmt-person-name">Mr. Alfe S. Duron, LFA</h3>
                     <p class="tmt-person-meta">HR Head · recruitment, training &amp; staff welfare</p>
                 </article>
 
                 <article class="tmt-person">
-                    <img src="{{ asset('images/team-pierre-hordista.jpg') }}"
-                         alt="Mr. Pierre Hordista, LFA — IT In-Charge"
-                         class="tmt-person-photo">
+                    <div class="tmt-person-media" style="--photo: url('{{ asset('images/team-pierre-hordista.jpg') }}');">
+                        <img src="{{ asset('images/team-pierre-hordista.jpg') }}"
+                             alt="Mr. Pierre Hordista, LFA — IT In-Charge"
+                             class="tmt-person-photo">
+                    </div>
                     <span class="tmt-person-role">Technology</span>
                     <h3 class="tmt-person-name">Mr. Pierre Hordista, LFA</h3>
                     <p class="tmt-person-meta">IT In-Charge · systems, records security &amp; member data</p>
                 </article>
 
                 <article class="tmt-person">
-                    <img src="{{ asset('images/team-george-vargas.jpg') }}"
-                         alt="Mr. George Vargas — Area Manager, San Franz, Agusan"
-                         class="tmt-person-photo">
+                    <div class="tmt-person-media" style="--photo: url('{{ asset('images/team-george-vargas.jpg') }}');">
+                        <img src="{{ asset('images/team-george-vargas.jpg') }}"
+                             alt="Mr. George Vargas — Area Manager, San Franz, Agusan"
+                             class="tmt-person-photo">
+                    </div>
                     <span class="tmt-person-role">Branch</span>
                     <h3 class="tmt-person-name">Mr. George Vargas</h3>
                     <p class="tmt-person-meta">Area Manager · San Franz, Agusan</p>
                 </article>
 
                 <article class="tmt-person">
-                    <img src="{{ asset('images/team-princes-manliguez.jpg') }}"
-                         alt="Ms. Princes Manliguez, LFA — Finance Officer"
-                         class="tmt-person-photo">
+                    <div class="tmt-person-media" style="--photo: url('{{ asset('images/team-princes-manliguez.jpg') }}');">
+                        <img src="{{ asset('images/team-princes-manliguez.jpg') }}"
+                             alt="Ms. Princes Manliguez, LFA — Finance Officer"
+                             class="tmt-person-photo">
+                    </div>
                     <span class="tmt-person-role">Finance</span>
                     <h3 class="tmt-person-name">Ms. Princes Manliguez, LFA</h3>
                     <p class="tmt-person-meta">Finance Officer · membership fees, releases &amp; cashiering</p>
                 </article>
 
                 <article class="tmt-person">
-                    <img src="{{ asset('images/team-jeralyn-gonzales.jpg') }}"
-                         alt="Mrs. Jeralyn B. Gonzales — Cashier and Encoder"
-                         class="tmt-person-photo">
+                    <div class="tmt-person-media" style="--photo: url('{{ asset('images/team-jeralyn-gonzales.jpg') }}');">
+                        <img src="{{ asset('images/team-jeralyn-gonzales.jpg') }}"
+                             alt="Mrs. Jeralyn B. Gonzales — Cashier and Encoder"
+                             class="tmt-person-photo">
+                    </div>
                     <span class="tmt-person-role">Administration</span>
                     <h3 class="tmt-person-name">Mrs. Jeralyn B. Gonzales</h3>
                     <p class="tmt-person-meta">Cashier / Encoder · payments, receipts &amp; member records</p>
                 </article>
 
                 <article class="tmt-person">
-                    <img src="{{ asset('images/team-georgelyn-angeles.jpg') }}"
-                         alt="Ms. Georgelyn Angeles — SFX Branch Secretary"
-                         class="tmt-person-photo">
+                    <div class="tmt-person-media" style="--photo: url('{{ asset('images/team-georgelyn-angeles.jpg') }}');">
+                        <img src="{{ asset('images/team-georgelyn-angeles.jpg') }}"
+                             alt="Ms. Georgelyn Angeles — SFX Branch Secretary"
+                             class="tmt-person-photo">
+                    </div>
                     <span class="tmt-person-role">Branch</span>
                     <h3 class="tmt-person-name">Ms. Georgelyn Angeles</h3>
                     <p class="tmt-person-meta">SFX Branch Secretary · walk-in inquiries &amp; renewals</p>
