@@ -2,7 +2,7 @@
     use Illuminate\Support\Str;
 
     $user = auth()->user();
-    $isAdmin = $user && !in_array($user->RoleID, [1,2,3,4,5,6,7]);
+    $isAdmin = $user && !in_array($user->RoleID, [8, 9]); // 8 = Satellite, 9 = Satellite Admin
 
     /*
     | Satellite nav visibility:
@@ -273,9 +273,9 @@
                         <path d="M3 6h18M3 12h18M3 18h18M7 3v2M12 3v2M17 3v2" />
                     </svg>
                     <span>Payments</span>
-                    @if ($pendingTransactions > 0)
+                    {{-- @if ($pendingTransactions > 0)
                         <span class="tf-side-badge">{{ $pendingTransactions }}</span>
-                    @endif
+                    @endif --}}
                 </a>
 
                 <a href="{{ route('post') }}"
