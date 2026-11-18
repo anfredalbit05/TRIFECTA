@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -6,9 +7,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('wallets', function (Blueprint $table) {
@@ -23,17 +21,16 @@ return new class extends Migration
             $table->decimal('amount', 12, 2)->default(0);
 
             $table->enum('source', [
-                'DR', // Direct Referral
-                'OV', // Overrides
-                'PF', // Provident Fund
-                'WD', // Withdrawal
-                'CS', // Company Share (satellite activation split, 10%)
-                'SDR', // Satellite Direct Referral (free member, tier-based)
+                'DR',  // Direct Referral
+                'OV',  // Overrides
+                'PF',  // Provident Fund
+                'WD',  // Withdrawal
+                'CS',  // Company Share
+                'SDR', // Satellite Direct Referral
             ])->nullable();
 
-            $table->boolean('isWithdrawable')
-                ->default(true)
-                ->after('source');
+            // Removed ->after('source') to prevent MySQL CREATE TABLE error
+            $table->boolean('isWithdrawable')->default(true);
 
             $table->foreignId('ActivationID')
                 ->nullable()
@@ -41,7 +38,6 @@ return new class extends Migration
                 ->cascadeOnUpdate()
                 ->nullOnDelete();
 
-            // A wallet ledger row may be linked to the withdrawal it settled.
             $table->unsignedBigInteger('withdrawID')->nullable();
 
             $table->enum('status', [
@@ -50,13 +46,9 @@ return new class extends Migration
             ])->default('Active');
 
             $table->timestamps();
-
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('wallets');

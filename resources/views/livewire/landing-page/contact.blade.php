@@ -134,7 +134,7 @@
 
             <div class="contact-map-container">
                 <iframe
-                    src="https://maps.google.com/maps?q=7.449762432011926,125.80273268264297&z=17&output=embed"
+                    src="https://maps.google.com/maps?q=8.521671349205194,125.96259286780149&z=17&output=embed"
                     class="contact-map-iframe"
                     allowfullscreen
                     loading="lazy"
@@ -143,7 +143,7 @@
             </div>
 
             <div class="mt-7 text-center">
-                <a href="https://www.google.com/maps/search/?api=1&query=7.449762432011926,125.80273268264297"
+                <a href="https://www.google.com/maps/search/?api=1&query=8.521671349205194,125.96259286780149"
                    target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">
                     <flux:icon.map-pin class="w-5 h-5"/>
                     Open Location in Google Maps
