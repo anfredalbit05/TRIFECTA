@@ -170,10 +170,10 @@ return [
     'contact_details_description' => 'Drop by a branch, call our member care line, or send an email. We answer every message as quickly as we can.',
     'contact_main_office_title' => 'Main Office',
     'contact_main_office_address' => 'TRIFECTA House
-National Highway, Tagum City',
-    'contact_sub_office_title' => 'Satellite Desk',
-    'contact_sub_office_address' => 'Member Care Center
-Kapalong, Davao del Norte',
+    National Highway, Tagum City',
+        'contact_sub_office_title' => 'Satellite Desk',
+        'contact_sub_office_address' => 'Member Care Center
+    Kapalong, Davao del Norte',
     'contact_phone_title' => 'Member Care Line',
     'contact_phone_1' => '0917 555 0199',
     'contact_phone_2' => '(084) 555 0199',

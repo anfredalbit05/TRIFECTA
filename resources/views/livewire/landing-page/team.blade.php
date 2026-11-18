@@ -115,10 +115,10 @@
 
                 <article class="tmt-person">
                     <img src="{{ asset('images/team-alfe-duron.jpg') }}"
-                         alt="Ms. Alfe S. Duron, LFA — HR Head"
+                         alt="Mr. Alfe S. Duron, LFA — HR Head"
                          class="tmt-person-photo">
                     <span class="tmt-person-role">People</span>
-                    <h3 class="tmt-person-name">Ms. Alfe S. Duron, LFA</h3>
+                    <h3 class="tmt-person-name">Mr. Alfe S. Duron, LFA</h3>
                     <p class="tmt-person-meta">HR Head · recruitment, training &amp; staff welfare</p>
                 </article>
 
