@@ -1,37 +1,44 @@
 /* =====================================================
-   TEAM PAGE
-   Styles for resources/views/livewire/landing-page/team.blade.php
-   (markup uses the tmt-* classes: hero, executive, roster).
+   NEWS PAGE
+   Styles for the news / announcements landing page
+   (markup uses the news-* and newsroom-* classes).
 
-   Format matches the rest of the landing pages: gold rule on
-   top of every band, gold-rule uppercase eyebrow, navy
-   headings, white cards with a gold cap. No green anywhere.
+   Same format as the other landing pages: navy bands,
+   gold rule accents, white cards with a gold cap.
 ===================================================== */
 
-.tmt-page {
-    @apply bg-white;
+.news-page {
+    background: #ffffff;
 }
 
 /* -----------------------------------------------------
-   HERO
+   MASTHEAD (hero + featured story)
 ----------------------------------------------------- */
 
-.tmt-hero {
-    @apply relative overflow-hidden;
+.news-masthead {
+    position: relative;
+    overflow: hidden;
+    padding: 8rem 0 4rem;
+    border-radius: 0 0 2.5rem 2.5rem;
     background: linear-gradient(135deg, var(--color-primary-darker) 0%, var(--color-primary) 46%, var(--color-primary-mid) 100%);
-    padding: 4rem 0 3.5rem;
 }
 
-/* Gold rule across the top of the band. */
-.tmt-hero::before {
+/* Gold rule across the top. */
+.news-masthead::before {
     content: "";
-    @apply absolute inset-x-0 top-0 z-10 h-1.5;
+    position: absolute;
+    inset: 0 0 auto 0;
+    z-index: 1;
+    height: 6px;
     background: linear-gradient(90deg, var(--color-gold), var(--color-gold-light), var(--color-gold));
 }
 
-/* Faint blueprint grid, faded out towards the bottom. */
-.tmt-hero-grid {
-    @apply pointer-events-none absolute inset-0;
+/* Faint blueprint grid. */
+.news-masthead::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
     background-image:
         linear-gradient(to right, rgb(255 255 255 / .06) 1px, transparent 1px),
         linear-gradient(to bottom, rgb(255 255 255 / .06) 1px, transparent 1px);
@@ -40,242 +47,753 @@
     mask-image: radial-gradient(ellipse at 50% 0%, #000 0%, transparent 78%);
 }
 
-.tmt-hero-inner {
-    @apply relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-12;
+.news-masthead > div {
+    position: relative;
+    z-index: 2;
 }
 
-.tmt-hero-title {
-    @apply mt-5 max-w-4xl text-3xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-4xl lg:text-5xl;
+.news-masthead-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    align-items: center;
 }
 
-.tmt-hero-title-accent {
-    @apply mt-1 block;
+@media (min-width: 1024px) {
+    .news-masthead-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 4rem;
+    }
+}
+
+/* ---- intro ---- */
+
+.news-intro {
+    min-width: 0;
+}
+
+.news-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     color: var(--color-gold);
 }
 
-.tmt-hero-lead {
-    @apply mt-6 max-w-2xl text-sm leading-relaxed text-white/85 sm:text-base;
-}
-
-.tmt-hero-facts {
-    @apply mt-10 grid grid-cols-1 gap-x-8 gap-y-6 border-t border-white/15 pt-8 sm:grid-cols-3;
-}
-
-.tmt-hero-facts > div {
-    @apply relative;
-}
-
-/* Gold tick above each fact. */
-.tmt-hero-facts > div::before {
-    content: "";
-    @apply absolute -top-8 left-0 h-0.5 w-8;
-    background: var(--color-gold);
-}
-
-.tmt-hero-fact-value {
-    @apply block text-xs font-black tracking-[0.22em];
-    color: var(--color-gold);
-}
-
-.tmt-hero-fact-label {
-    @apply mt-1.5 block text-sm font-semibold text-white;
-}
-
-/* -----------------------------------------------------
-   SHARED — gold-rule eyebrow
------------------------------------------------------ */
-
-.tmt-kicker {
-    @apply inline-flex items-center gap-2.5 text-[11px] font-black uppercase tracking-[0.18em] text-primary sm:text-xs;
-}
-
-.tmt-kicker::before {
-    content: "";
-    @apply block h-1 w-7 shrink-0 rounded-full;
-    background: var(--color-gold);
-}
-
-/* On navy backgrounds the label itself is gold. */
-.tmt-kicker-light {
-    color: var(--color-gold);
-}
-
-/* -----------------------------------------------------
-   EXECUTIVE (President & CEO)
------------------------------------------------------ */
-
-.tmt-exec {
-    @apply relative bg-white py-16 sm:py-20 lg:py-24;
-}
-
-.tmt-exec-wrap {
-    @apply relative mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)] lg:items-center lg:gap-16 lg:px-12;
-}
-
-
-.tmt-exec-photo {
-    @apply relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-sm;
-    border-top: 4px solid var(--color-gold);
-    width: 100%;
-}
-
-
-/* Small gold tick floating over the portrait. */
-.tmt-exec-photo-rule {
-    @apply absolute left-4 top-4 z-10 block h-0.5 w-10;
-    background: var(--color-gold);
-}
-
-
-.tmt-exec-img {
+.news-eyebrow-line {
     display: block;
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    aspect-ratio: auto;
-    object-fit: contain;
-    object-position: center;
-    background: #f8fafc;
+    width: 1.75rem;
+    height: 4px;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    background: var(--color-gold);
 }
 
+.news-intro-title {
+    margin-top: 1.25rem;
+    max-width: 36rem;
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+}
 
-.tmt-exec-photo-tag {
-    @apply absolute bottom-4 left-4 z-10 rounded-md px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em];
-    background: var(--color-primary);
+@media (min-width: 640px) {
+    .news-intro-title { font-size: 2.5rem; }
+}
+
+@media (min-width: 1024px) {
+    .news-intro-title { font-size: 3rem; }
+}
+
+.news-intro-highlight {
+    display: block;
+    margin-top: 0.25rem;
     color: var(--color-gold);
 }
 
-.tmt-exec-body {
-    @apply min-w-0;
+.news-intro-description {
+    margin-top: 1.5rem;
+    max-width: 34rem;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: rgb(255 255 255 / .85);
 }
 
-.tmt-exec-name {
-    @apply mt-4 text-xl font-extrabold leading-snug tracking-tight text-primary sm:text-2xl lg:text-[28px];
+.news-intro-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(255 255 255 / .15);
+    font-size: 0.8125rem;
+    color: rgb(255 255 255 / .7);
 }
 
-.tmt-exec-role {
-    @apply mt-2 text-[11px] font-black uppercase tracking-[0.16em] text-primary-mid sm:text-xs;
+.news-brand-mark {
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    color: #ffffff;
 }
 
-.tmt-exec-lead {
-    @apply mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-[15px];
+.news-brand-divider {
+    display: block;
+    width: 2rem;
+    height: 2px;
+    background: var(--color-gold);
 }
 
-.tmt-exec-chips {
-    @apply mt-6 flex flex-wrap gap-2;
+/* ---- featured story ---- */
+
+.news-lead-story {
+    position: relative;
+    min-height: 22rem;
+    overflow: hidden;
+    border-radius: 1rem;
+    border-top: 4px solid var(--color-gold);
+    box-shadow: 0 20px 45px -15px rgb(0 0 0 / .5);
 }
 
-.tmt-exec-chips li {
-    @apply rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-semibold text-primary;
+@media (min-width: 1024px) {
+    .news-lead-story { min-height: 26rem; }
+}
+
+.news-lead-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.news-lead-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(5 20 56 / .95) 0%, rgb(5 20 56 / .55) 55%, rgb(5 20 56 / .15) 100%);
+}
+
+.news-lead-content {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1.75rem;
+}
+
+.news-lead-label {
+    padding: 0.3rem 0.65rem;
+    border-radius: 0.375rem;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    background: var(--color-gold);
+    color: var(--color-primary-darker);
+}
+
+.news-lead-meta {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgb(255 255 255 / .75);
+}
+
+.news-lead-title {
+    font-size: 1.375rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #ffffff;
+}
+
+@media (min-width: 640px) {
+    .news-lead-title { font-size: 1.625rem; }
+}
+
+.news-lead-description {
+    max-width: 32rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: rgb(255 255 255 / .85);
+}
+
+.news-lead-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    color: var(--color-gold);
+    transition: gap 0.2s ease;
+}
+
+.news-lead-link:hover {
+    gap: 0.7rem;
+}
+
+/* ---- placeholder when there is no featured post ---- */
+
+.news-lead-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 18rem;
+    padding: 2rem;
+    text-align: center;
+    border-radius: 1rem;
+    border: 1px solid rgb(255 255 255 / .18);
+    border-top: 4px solid var(--color-gold);
+    background: rgb(255 255 255 / .07);
+    color: #ffffff;
+}
+
+.news-placeholder-icon {
+    color: var(--color-gold);
+}
+
+.news-lead-placeholder h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.news-lead-placeholder p {
+    max-width: 22rem;
+    font-size: 0.875rem;
+    color: rgb(255 255 255 / .8);
 }
 
 /* -----------------------------------------------------
-   LEADERSHIP ROSTER
+   NAVIGATION (categories)
 ----------------------------------------------------- */
 
-.tmt-roster {
-    @apply relative overflow-hidden py-16 sm:py-20 lg:py-24;
+.news-navigation {
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.news-navigation-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem 0;
+}
+
+@media (min-width: 1024px) {
+    .news-navigation-inner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+    }
+}
+
+.news-navigation-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.news-navigation-heading span {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    color: var(--color-primary);
+}
+
+.news-navigation-heading small {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.news-category-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.news-category-link {
+    padding: 0.45rem 0.95rem;
+    border-radius: 9999px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.news-category-link:hover {
+    border-color: var(--color-primary);
+    background: #ffffff;
+}
+
+.news-category-link.active {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: #ffffff;
+}
+
+.news-results-count {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    white-space: nowrap;
+}
+
+.news-results-count span {
+    margin-left: 0.25rem;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    color: var(--color-primary-mid);
+}
+
+/* -----------------------------------------------------
+   NEWSROOM SECTION
+----------------------------------------------------- */
+
+.newsroom-section {
+    position: relative;
+    overflow: hidden;
+    padding: 4rem 0 5rem;
     background:
         radial-gradient(circle at 92% 4%, rgb(var(--brand-primary-rgb) / .07), transparent 46%),
         radial-gradient(circle at 4% 96%, rgb(var(--brand-gold-rgb) / .10), transparent 42%),
         #F4F7FC;
 }
 
-.tmt-roster-wrap {
-    @apply relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-12;
+.newsroom-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
 }
 
-.tmt-roster-head {
-    @apply max-w-3xl;
+@media (min-width: 768px) {
+    .newsroom-heading {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+    }
 }
 
-.tmt-roster-title {
-    @apply mt-4 text-2xl font-extrabold leading-[1.14] tracking-tight text-primary sm:text-3xl md:text-4xl;
+.newsroom-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    color: var(--color-primary);
 }
 
-.tmt-roster-lead {
-    @apply mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base;
-}
-
-.tmt-roster-grid {
-    @apply mt-10 grid grid-cols-1 items-start gap-5 sm:grid-cols-2 lg:grid-cols-3;
-}
-
-.tmt-person {
-    @apply flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm
-        transition duration-300 hover:-translate-y-1 hover:border-primary-tint-border hover:shadow-lg;
-    border-top: 3px solid var(--color-gold);
-}
-
-.tmt-person-avatar {
-    @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-[13px] font-black tracking-wide;
-    background: var(--color-primary);
-    color: #fff;
-}
-
-/* Board card photo.
-   The banner is shown at its OWN shape, full card width, with nothing
-   cropped, so every name, title and "LFA" is always visible.
-   !important is used so no other stylesheet can force a crop.
-   For identical card heights, export every banner at the same ratio
-   (e.g. 1600x900). */
-
-.tmt-person-media {
+.newsroom-kicker::before {
+    content: "";
     display: block;
-    width: calc(100% + 3rem);
-    margin: -1.5rem -1.5rem 1.25rem;
-    overflow: hidden;
-    line-height: 0;
-    background: #ffffff;
-    border-bottom: 3px solid var(--color-gold);
+    width: 1.75rem;
+    height: 4px;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    background: var(--color-gold);
 }
 
-.tmt-person-photo {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    aspect-ratio: auto !important;
-    object-fit: fill !important;
-    margin: 0 !important;
-    border: 0 !important;
+.newsroom-title {
+    margin-top: 0.75rem;
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.14;
+    letter-spacing: -0.02em;
+    color: var(--color-primary);
 }
 
-
-.tmt-person-role {
-    @apply mt-5 block text-[10px] font-black uppercase tracking-[0.16em] text-primary-mid;
+@media (min-width: 768px) {
+    .newsroom-title { font-size: 2.25rem; }
 }
 
-.tmt-person-name {
-    @apply mt-2 text-[15px] font-bold leading-snug text-primary sm:text-base;
+.newsroom-heading-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #475569;
 }
 
-.tmt-person-meta {
-    @apply mt-2 text-[12.5px] leading-relaxed text-slate-600;
+.newsroom-dot {
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--color-gold);
 }
 
 /* -----------------------------------------------------
-   SMALL SCREENS
+   EDITORIAL GRID
 ----------------------------------------------------- */
 
-@media (min-width: 640px) {
-    .tmt-hero {
-        padding: 5rem 0 4.5rem;
+.news-editorial-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .news-editorial-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (min-width: 1024px) {
-    .tmt-hero {
-        padding: 6rem 0 5rem;
+    .news-editorial-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
-@media (max-width: 480px) {
-    .tmt-hero {
-        padding: 3rem 0 2.5rem;
-    }
+/* ---- lead article (full width) ---- */
 
-    .tmt-hero-facts {
-        @apply gap-y-7;
+.news-editorial-lead {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-top: 3px solid var(--color-gold);
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgb(0 0 0 / .05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.news-editorial-lead:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 35px -12px rgb(15 35 90 / .25);
+}
+
+@media (min-width: 768px) {
+    .news-editorial-lead {
+        grid-column: 1 / -1;
+        flex-direction: row;
     }
+}
+
+.news-editorial-lead-image {
+    position: relative;
+    min-height: 15rem;
+    overflow: hidden;
+    background: #e2e8f0;
+}
+
+@media (min-width: 768px) {
+    .news-editorial-lead-image {
+        flex: 0 0 52%;
+        min-height: 22rem;
+    }
+}
+
+.news-editorial-lead-image img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.news-editorial-lead-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.75rem;
+}
+
+@media (min-width: 1024px) {
+    .news-editorial-lead-body { padding: 2.5rem; }
+}
+
+.news-editorial-lead-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--color-primary);
+}
+
+@media (min-width: 1024px) {
+    .news-editorial-lead-title { font-size: 1.875rem; }
+}
+
+/* ---- standard cards ---- */
+
+.news-editorial-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-top: 3px solid var(--color-gold);
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgb(0 0 0 / .05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.news-editorial-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 35px -12px rgb(15 35 90 / .25);
+}
+
+.news-editorial-card-image {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #e2e8f0;
+}
+
+.news-editorial-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.news-editorial-card:hover .news-editorial-card-image img {
+    transform: scale(1.05);
+}
+
+.news-editorial-card-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.25rem;
+}
+
+.news-editorial-card-title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--color-primary);
+}
+
+/* ---- shared article bits ---- */
+
+.news-image-category {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    z-index: 2;
+    padding: 0.3rem 0.65rem;
+    border-radius: 0.375rem;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: var(--color-primary);
+    color: var(--color-gold);
+}
+
+.news-article-date {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary-mid);
+}
+
+.news-editorial-excerpt {
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: #475569;
+}
+
+.news-article-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: auto;
+    padding-top: 0.9rem;
+    border-top: 1px solid #e2e8f0;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.news-article-bottom a {
+    font-weight: 800;
+    color: var(--color-primary);
+    transition: color 0.2s ease;
+}
+
+.news-article-bottom a:hover {
+    color: var(--color-primary-mid);
+}
+
+/* ---- empty state ---- */
+
+.news-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 4rem 1.5rem;
+    text-align: center;
+    border-radius: 0.75rem;
+    border: 1px dashed #cbd5e1;
+    background: #ffffff;
+    color: var(--color-primary);
+}
+
+.news-empty h3 {
+    font-size: 1.125rem;
+    font-weight: 800;
+}
+
+.news-empty p {
+    max-width: 24rem;
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+/* -----------------------------------------------------
+   PAGINATION
+----------------------------------------------------- */
+
+.news-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 3rem;
+}
+
+.news-page-button,
+.news-page-disabled {
+    padding: 0.55rem 1.1rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+}
+
+.news-page-button {
+    border: 1px solid var(--color-primary);
+    background: var(--color-primary);
+    color: #ffffff;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.news-page-button:hover {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+    color: var(--color-primary-darker);
+}
+
+.news-page-disabled {
+    border: 1px solid #e2e8f0;
+    background: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.news-page-number {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    color: #475569;
+}
+
+.news-page-number strong {
+    color: var(--color-primary);
+}
+
+/* -----------------------------------------------------
+   BRAND CLOSING
+----------------------------------------------------- */
+
+.news-closing {
+    position: relative;
+    overflow: hidden;
+    padding: 4rem 0;
+    background: linear-gradient(135deg, var(--color-primary-darker) 0%, var(--color-primary) 55%, var(--color-primary-mid) 100%);
+}
+
+.news-closing::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--color-gold), var(--color-gold-light), var(--color-gold));
+}
+
+.news-closing-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+@media (min-width: 768px) {
+    .news-closing-inner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 3rem;
+    }
+}
+
+.news-closing-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    color: var(--color-gold);
+}
+
+.news-closing h2 {
+    margin-top: 0.75rem;
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.15;
+    color: #ffffff;
+}
+
+@media (min-width: 768px) {
+    .news-closing h2 { font-size: 2.25rem; }
+}
+
+.news-closing p {
+    margin-top: 0.75rem;
+    max-width: 34rem;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: rgb(255 255 255 / .82);
+}
+
+.news-closing-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    padding: 0.85rem 1.6rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 800;
+    background: var(--color-gold);
+    color: var(--color-primary-darker);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.news-closing-button:hover {
+    transform: translateY(-2px);
+    background: var(--color-gold-light);
 }
