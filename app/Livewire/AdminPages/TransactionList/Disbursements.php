@@ -14,6 +14,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 
 class Disbursements extends Component
 {
@@ -78,17 +79,15 @@ class Disbursements extends Component
     #[Computed]
     public function rows()
     {
-        $query = Disbursement::query()
+        return Disbursement::query()
             ->with(['fee.variant', 'creator'])
             ->when($this->statusFilter !== '', fn ($q) => $q
                 ->where('status', (int) $this->statusFilter))
             ->when($this->creatorFilter !== '', fn ($q) => $q
                 ->where('CreatedBy', (int) $this->creatorFilter))
-            // The variant card only scopes the fund list of a NEW
-            // disbursement — the list itself always shows every row of the
-            // branch scope, so a saved row can never "disappear".
             ->when($this->search !== '', function ($q) {
                 $term = '%'.str_replace(['%', '_'], ['\\%', '\\_'], $this->search).'%';
+
                 $q->where(function ($q) use ($term) {
                     $q->where('remarks', 'like', $term)
                         ->orWhere('DID', 'like', $term)
@@ -99,10 +98,11 @@ class Disbursements extends Component
                             ->orWhere('username', 'like', $term));
                 });
             })
-            ->orderByDesc('DID');
+            ->orderByDesc('DID')
+            ->get();
+    }
 
-        return $this->scopeToBranch($query)->get();
-    }    /**
+     /**
      * Funds for the modal dropdown. A NEW disbursement is narrowed by the
      * selected variant card; an EDIT is never narrowed, so the row's own
      * source fund always restores into the dropdown (and stays available
@@ -113,18 +113,12 @@ class Disbursements extends Component
     {
         $narrow = $this->variantFilter !== null && ! $this->editingDid;
 
-        $query = MembershipFee::query()
+        return MembershipFee::query()
             ->with('variant')
             ->when($narrow, fn ($q) => $q->where('VID', $this->variantFilter))
-            ->orderBy('FeeName');
-
-        // Branch isolation: only the variants granted to the user's branch
-        // may be drawn from (an empty grant list offers no funds at all).
-        if (($vids = $this->grantedVids()) !== null) {
-            $query->whereIn('VID', $vids);
-        }
-
-        return $query->get()->map(fn (MembershipFee $fee) => [
+            ->orderBy('FeeName')
+            ->get()
+            ->map(fn (MembershipFee $fee) => [
                 'FeeID' => $fee->FeeID,
                 'FeeName' => $fee->FeeName,
                 'Variant' => $fee->variant?->name ?? 'No Variant',
@@ -188,27 +182,27 @@ class Disbursements extends Component
      * of the table filters: they describe every disbursement CREATED inside
      * the signed-in user's branch scope, not just the rows on screen.
      */
-    #[Computed]
-    public function statistics(): array
-    {
-        $sums = $this->scopeToBranch(Disbursement::query())
-            ->selectRaw('status, COALESCE(SUM(amount), 0) AS total')
-            ->groupBy('status')
-            ->pluck('total', 'status');
+        #[Computed]
+        public function statistics(): array
+        {
+            $sums = Disbursement::query()
+                ->selectRaw('status, COALESCE(SUM(amount), 0) AS total')
+                ->groupBy('status')
+                ->pluck('total', 'status');
 
-        return [
-            'unposted' => round((float) ($sums[Disbursement::STATUS_UNPOSTED] ?? 0), 2),
-            'posted' => round((float) ($sums[Disbursement::STATUS_POSTED] ?? 0), 2),
-            'void' => round((float) ($sums[Disbursement::STATUS_VOID] ?? 0), 2),
-            'net' => round((float) ($sums[Disbursement::STATUS_POSTED] ?? 0), 2),
-        ];
-    }
+            return [
+                'unposted' => round((float) ($sums[Disbursement::STATUS_UNPOSTED] ?? 0), 2),
+                'posted' => round((float) ($sums[Disbursement::STATUS_POSTED] ?? 0), 2),
+                'void' => round((float) ($sums[Disbursement::STATUS_VOID] ?? 0), 2),
+                'net' => round((float) ($sums[Disbursement::STATUS_POSTED] ?? 0), 2),
+            ];
+        }
 
     /** Users who created disbursements inside the user's branch scope. */
     #[Computed]
     public function creatorOptions()
     {
-        $ids = $this->scopeToBranch(Disbursement::query())
+        $ids = Disbursement::query()
             ->whereNotNull('CreatedBy')
             ->distinct()
             ->pluck('CreatedBy');
@@ -224,29 +218,11 @@ class Disbursements extends Component
             ]);
     }
 
-    /**
-     * Branch isolation. A signed-in user only sees (and only draws from) the
-     * variants granted to their branch in branch_variant_grants, where
-     * users.branchCode carries branches.BranchID. The System Administrator
-     * (RoleID 1) — and contexts with no authenticated user — stay unrestricted.
-     */
-    private function scopeToBranch($query)
-    {
-        $vids = $this->grantedVids();
-
-        if ($vids === null) {
-            return $query;
-        }
-
-        return $query->whereHas('fee', fn ($q) => $q->whereIn('VID', $vids));
-    }
-
     /** RoleID 1 is the System Administrator — no branch restriction. */
     private function isSystemAdministrator(): bool
     {
-        return (int) (auth()->user()?->RoleID ?? 0) === 1;
+        return (int) (Auth::user()?->RoleID ?? 0) === 1;
     }
-
     /**
      * Variant IDs granted (Active) to the signed-in user's branch.
      * null = unrestricted; [] = no grants, so nothing is visible.
@@ -255,7 +231,7 @@ class Disbursements extends Component
      */
     private function grantedVids(): ?array
     {
-        $user = auth()->user();
+       $user = Auth::user();
 
         if (! $user || $this->isSystemAdministrator()) {
             return null;
@@ -379,14 +355,10 @@ class Disbursements extends Component
      */
     private function fallbackVid(): ?int
     {
-        $query = Variant::query()
-            ->whereRaw("LOWER(TRIM(COALESCE(status, ''))) = ?", ['active']);
-
-        if (($granted = $this->grantedVids()) !== null) {
-            $query->whereIn('VID', $granted);
-        }
-
-        $vid = $query->orderBy('name')->value('VID');
+        $vid = Variant::query()
+            ->whereRaw("LOWER(TRIM(COALESCE(status, ''))) = ?", ['active'])
+            ->orderBy('name')
+            ->value('VID');
 
         return $vid !== null ? (int) $vid : null;
     }
@@ -456,8 +428,6 @@ class Disbursements extends Component
     #[Computed]
     public function variantCards()
     {
-        // Branch isolation: a branch only sees the variants it was granted.
-        $vids = $this->grantedVids();
         // Legacy fallback: money rows that cannot be attributed to a variant
         // (activations created before activations.VID existed, and rows that
         // only carry withdrawID/DrawID) belong to the first Active card —
@@ -466,7 +436,6 @@ class Disbursements extends Component
         // collection: MF + CF + TX − DR − OV − PF − CL − RF − WD − PK − DB.
         $activeVids = Variant::query()
             ->whereRaw("LOWER(TRIM(COALESCE(status, ''))) = ?", ['active'])
-            ->when($vids !== null, fn ($q) => $q->whereIn('VID', $vids))
             ->pluck('VID')
             ->all();
 
@@ -474,7 +443,6 @@ class Disbursements extends Component
 
         return Variant::query()
             ->whereRaw("LOWER(TRIM(COALESCE(status, ''))) = ?", ['active'])
-            ->when($vids !== null, fn ($q) => $q->whereIn('VID', $vids))
             ->orderBy('name')
             ->get(['VID', 'name'])
             ->map(function ($variant) use ($fallbackVid) {
@@ -734,7 +702,7 @@ class Disbursements extends Component
             } else {
                 Disbursement::create($attributes + [
                     'status' => Disbursement::STATUS_UNPOSTED,
-                    'CreatedBy' => auth()->id(), // audit: who recorded it
+                    'CreatedBy' => Auth::id(),
                     'created_at' => $recordDate
                         ? Carbon::parse($recordDate.' '.now()->format('H:i:s'))
                         : now(),

@@ -142,7 +142,7 @@ class AdminUsers extends Component
      */
     private function findScopedUser($id): ?User
     {
-        return $this->scopedUsers()->where('UserID', $id)->first();
+        return User::where('UserID', $id)->first();
     }
 
 
@@ -1374,7 +1374,7 @@ class AdminUsers extends Component
 
 public function render()
 {
-    $users = $this->scopedUsers()
+    $users = User::query()
         ->withExists([
             'activations as has_pending_activation' => function ($query) {
                 $query->where('status', 'Pending');
