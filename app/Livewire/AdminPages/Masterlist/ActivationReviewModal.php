@@ -10,6 +10,8 @@ use App\Models\MembershipFee;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\Withdrawal;
+use App\Models\EmploymentType;
+use App\Models\MemberType;
 use App\Services\ActivationApprovalService;
 use App\Support\Modules;
 use Illuminate\Support\Facades\Auth;
@@ -41,6 +43,9 @@ class ActivationReviewModal extends Component
     public array $beneficiaries = [];
 
     public string $remarks = '';
+    public string $employmentTypeName = '';
+
+    public string $memberTypeName = '';
 
     public bool $isRejecting = false;
 
@@ -126,6 +131,7 @@ class ActivationReviewModal extends Component
             ->latest('ActivationID')
             ->first();
 
+        $this->loadTypeNames();
             // Load settings and the total for this activation's VID.
         $this->loadPaymentSettings();
 
@@ -974,6 +980,26 @@ class ActivationReviewModal extends Component
 
         $this->policy_number = '';
         $this->receipt_number = '';
+
+        $this->employmentTypeName = '';
+        $this->memberTypeName = '';
+    }
+
+    private function loadTypeNames(): void
+    {
+        $employmentId = $this->activation?->employment_type_id
+            ?: $this->member?->employment_type_id;
+
+        $memberTypeId = $this->activation?->member_type_id
+            ?: $this->member?->member_type_id;
+
+        $this->employmentTypeName = $employmentId
+            ? (string) EmploymentType::where('employment_type_id', $employmentId)->value('name')
+            : '';
+
+        $this->memberTypeName = $memberTypeId
+            ? (string) MemberType::where('member_type_id', $memberTypeId)->value('name')
+            : '';
     }
 
     public function render()

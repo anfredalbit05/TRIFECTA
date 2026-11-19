@@ -288,6 +288,20 @@
                                 <p class="text-xs font-bold uppercase text-slate-400">{{ $activationLabel ?? 'Date' }}</p>
                                 <p class="mt-1 text-sm font-semibold text-slate-800">{{ $activationDate ?? 'N/A' }}</p>
                             </div>
+
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p class="text-xs font-bold uppercase text-slate-400">Employment Type</p>
+                                <p class="mt-1 text-sm font-semibold text-slate-800">
+                                    {{ $employment_type ?: 'No Employment Type' }}
+                                </p>
+                            </div>
+
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p class="text-xs font-bold uppercase text-slate-400">Member Type</p>
+                                <p class="mt-1 text-sm font-semibold text-slate-800">
+                                    {{ $member_type ?: 'N/A' }}
+                                </p>
+                            </div>
                         </div>
                     </div>
 

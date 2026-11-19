@@ -15,6 +15,8 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use App\Models\EmploymentType;
+use App\Models\MemberType;
 
 class ApplicationModal extends Component
 {
@@ -23,6 +25,8 @@ class ApplicationModal extends Component
     private const LABELS = [
         'surname' => 'Surname', 'first_name' => 'First Name', 'middle_name' => 'Middle Name',
         'occupation' => 'Occupation', 'gender' => 'Gender', 'civil_status' => 'Civil Status',
+        'employment_type_id' => 'Employment Type',
+        'member_type_id' => 'Member Type',
         'birthdate' => 'Birthdate', 'address' => 'Address', 'mobile' => 'Mobile Number',
         'email' => 'Email', 'username' => 'Username', 'policy_number' => 'Policy Number',
         'policy_effectivity_date' => 'Policy Effectivity Date',
@@ -70,6 +74,10 @@ class ApplicationModal extends Component
 
     /** Snapshot of the record when opened for edit, used for the "what changed" diff. */
     public array $originalData = [];
+
+    public $employment_type_id = null;
+
+    public $member_type_id = null;
 
     #[Computed]
     public function previewPolicyNumber(): string
@@ -208,6 +216,10 @@ class ApplicationModal extends Component
             'civil_status' => 'nullable|string',
             'birthdate' => 'required|date',
             'occupation' => 'nullable|string|max:255',
+
+            'employment_type_id' => 'nullable|exists:employment_types,employment_type_id',
+            'member_type_id' => 'nullable|exists:member_types,member_type_id',
+
             'address' => 'required|string|max:500',
         ] + ($this->isEditMode ? [
             // Policy and receipt numbers are already issued.
@@ -461,6 +473,8 @@ class ApplicationModal extends Component
                     'civilstatus' => filled($this->civil_status) ? $this->civil_status : null,
                     'birthdate' => $this->birthdate,
                     'occupation' => $this->occupation,
+                    'employment_type_id' => $this->employment_type_id ?: null,
+                    'member_type_id' => $this->member_type_id ?: null,
                     'contactno' => filled($this->mobile) ? $this->mobile : null,
                     'email' => filled($this->email) ? $this->email : null,
                     'address' => $this->address,
@@ -606,6 +620,8 @@ class ApplicationModal extends Component
                     'civilstatus' => filled($this->civil_status) ? $this->civil_status : null,
                     'birthdate' => $this->birthdate,
                     'occupation' => $this->occupation,
+                    'employment_type_id' => $this->employment_type_id ?: null,
+                    'member_type_id' => $this->member_type_id ?: null,
                     'contactno' => filled($this->mobile) ? $this->mobile : null,
                     'email' => filled($this->email) ? $this->email : null,
                     'username' => $this->username,
@@ -656,6 +672,8 @@ class ApplicationModal extends Component
             'first_name' => $u->firstname ?? '',
             'middle_name' => $u->middlename ?? '',
             'occupation' => $u->occupation ?? '',
+            'employment_type_id' => $u->employment_type_id,
+            'member_type_id' => $u->member_type_id,
             'gender' => $u->gender ?? '',
             'civil_status' => $u->civilstatus ?? '',
             'birthdate' => $date($u->birthdate) ?? '',
@@ -757,6 +775,9 @@ class ApplicationModal extends Component
 
     public function render()
     {
-        return view('livewire.application-modal');
+        return view('livewire.application-modal', [
+            'employmentTypes' => EmploymentType::orderBy('name')->get(),
+            'memberTypes' => MemberType::orderBy('name')->get(),
+        ]);
     }
 }

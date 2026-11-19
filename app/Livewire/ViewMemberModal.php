@@ -5,6 +5,8 @@ namespace App\Livewire;
 use App\Models\Activation;
 use App\Models\ActivationHistory;
 use App\Models\User;
+use App\Models\EmploymentType;
+use App\Models\MemberType;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -38,6 +40,10 @@ class ViewMemberModal extends Component
     public $referralCode = '';
 
     public $uplineCode = '';
+
+    public $employment_type = '';
+
+    public $member_type = '';
 
     /*
     |--------------------------------------------------------------------------
@@ -137,7 +143,14 @@ class ViewMemberModal extends Component
         $this->birthdate = $user->birthdate;
         $this->referralCode = $user->referralCode;
         $this->uplineCode = $user->uplineCode;
-    }
+        $this->employment_type = $user->employment_type_id
+            ? (string) EmploymentType::where('employment_type_id', $user->employment_type_id)->value('name')
+            : '';
+
+        $this->member_type = $user->member_type_id
+            ? (string) MemberType::where('member_type_id', $user->member_type_id)->value('name')
+            : '';
+            }
 
     /*
     |--------------------------------------------------------------------------

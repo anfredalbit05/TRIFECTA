@@ -10,6 +10,9 @@ use App\Models\MembershipFee;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\Variant;
+use App\Models\EmploymentType;
+use App\Models\MemberType;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -17,6 +20,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\On;
 use Livewire\Component;
+
 
 class ActivationModal extends Component
 {
@@ -108,6 +112,12 @@ class ActivationModal extends Component
     |--------------------------------------------------------------------------
     */
     public ?int $selectedUserID = null;
+
+    public $employment_type_id = '';   // '' = No Employment Type
+    public bool $lockEmploymentType = false;   // true = member already has one, no "No Employment Type" option
+    public $member_type_id = null;
+    public array $employmentTypes = [];
+    public array $memberTypes = [];
 
 
     /*
@@ -292,6 +302,7 @@ class ActivationModal extends Component
         // and payment settings, because the branch is resolved from them.
         $this->selectedUserID = $UserID;
         $this->selectedUserRecord = User::find($UserID);
+        $this->loadTypeOptions();
         $this->upline_code = $this->selectedUserRecord?->uplineCode ?? '';
 
         $this->variants = $this->loadAvailableVariants();
@@ -332,11 +343,21 @@ class ActivationModal extends Component
 
         $this->selectedUserID = $UserID;
         $this->selectedUserRecord = User::find($UserID);
+        $this->loadTypeOptions();
 
         $activation = Activation::where('UserID', $UserID)
             ->where('status', 'Rejected')
             ->latest()
             ->first();
+
+        if ($activation) {
+            if ($activation->employment_type_id) {
+                $this->employment_type_id = $activation->employment_type_id;
+            }
+            if ($activation->member_type_id) {
+                $this->member_type_id = $activation->member_type_id;
+            }
+        }
 
         if ($activation) {
             $history = ActivationHistory::where('ActivationID', $activation->ActivationID)
@@ -568,6 +589,10 @@ class ActivationModal extends Component
             'bankAccountNumber',
             'selectedVariantId',
             'variants',
+            'employment_type_id',
+            'member_type_id',
+            'employmentTypes',
+            'memberTypes',
         ]);
 
         $this->isReactivation = false;
@@ -800,7 +825,9 @@ public function approveActivation($UserID = null): void
         ]);
 
         try {
-            $this->validate($this->activationRules($membershipFee));
+            $this->validate($this->activationRules($membershipFee), [
+                'employment_type_id.required' => 'This member already has an employment type. Please select one.',
+            ]);
             $this->assertPaymentMethodAvailable();
         } catch (ValidationException $e) {
             $this->dispatch('swal:close');
@@ -860,6 +887,8 @@ public function approveActivation($UserID = null): void
         $activationType = $this->payment_method === 'Cash' ? 'W' : 'O';
         $paymentReference = $this->payment_method === 'Cash' ? null : trim($this->reference_code);
 
+        $employmentTypeId = filled($this->employment_type_id) ? (int) $this->employment_type_id : null;
+        $memberTypeId = filled($this->member_type_id) ? (int) $this->member_type_id : null;
         DB::beginTransaction();
 
         try {
@@ -922,6 +951,8 @@ public function approveActivation($UserID = null): void
                 $rejectedActivation->update([
                     'amount' => (float) $membershipFee,
                     'VID' => $this->selectedVariantId,
+                    'employment_type_id' => $employmentTypeId,
+                    'member_type_id' => $memberTypeId,
                     'type' => $activationType,
                     'payment_method' => $this->payment_method === 'Maya' ? 'Maya' : $this->payment_method,
                     'upline_code' => $cleanUplineCode,
@@ -937,6 +968,8 @@ public function approveActivation($UserID = null): void
             } else {
                 Activation::create([
                     'VID' => $this->selectedVariantId,
+                    'employment_type_id' => $employmentTypeId,
+                    'member_type_id' => $memberTypeId,
                     'UserID' => $selectedUser->UserID,
                     'amount' => (float) $membershipFee,
                     'type' => $activationType,
@@ -958,9 +991,16 @@ public function approveActivation($UserID = null): void
             }
 
             // Store the submitted upline referral code.
-            $selectedUser->update([
-                'uplineCode' => $cleanUplineCode,
-            ]);
+            $userUpdates = ['uplineCode' => $cleanUplineCode];
+
+            if ($employmentTypeId) {
+                $userUpdates['employment_type_id'] = $employmentTypeId;
+            }
+            if ($memberTypeId) {
+                $userUpdates['member_type_id'] = $memberTypeId;
+            }
+
+            $selectedUser->update($userUpdates);
 
             $mailData = [
                 'selectedUser' => $selectedUser,
@@ -1103,6 +1143,13 @@ public function approveActivation($UserID = null): void
                     ->where('status', 'Active')
                     ->whereIn('VID', $this->allowedVariantIds()),
             ],
+            'employment_type_id' => $this->memberHasEmploymentType()
+            ? ['required', 'exists:employment_types,employment_type_id']
+            : ['nullable', 'exists:employment_types,employment_type_id'],
+            'member_type_id' => [
+                'nullable',
+                Rule::exists('member_types', 'member_type_id')->where('status', 'Active'),
+            ],
         ];
     }
 
@@ -1156,7 +1203,9 @@ public function confirmActivate(): void
     ]);
 
     try {
-        $this->validate($this->activationRules($membershipFee));
+        $this->validate($this->activationRules($membershipFee), [
+            'employment_type_id.required' => 'This member already has an employment type. Please select one.',
+        ]);
         $this->assertPaymentMethodAvailable();
     } catch (ValidationException $e) {
         $this->dispatch('swal:close');
@@ -1277,6 +1326,44 @@ public function confirmActivate(): void
         $this->benefitsVariantId = null;
         $this->benefitsVariantName = '';
         $this->variantBenefits = [];
+    }
+
+    private function loadTypeOptions(): void
+    {
+        $this->employmentTypes = EmploymentType::orderBy('name')
+            ->get(['employment_type_id', 'name'])->toArray();
+
+        // Only Active member types are displayed.
+        $this->memberTypes = MemberType::where('status', 'Active')
+            ->orderBy('name')
+            ->get(['member_type_id', 'name'])->toArray();
+
+        $user = $this->selectedUserRecord;
+
+        // Employment type: the user's current one, else "No Employment Type".
+        $this->employment_type_id = $user?->employment_type_id ?: '';
+        $this->lockEmploymentType = filled($user?->employment_type_id);
+
+        // Member type: keep the user's current one if still Active,
+        // otherwise default to TRIFECTA MEMBER.
+        $activeIds = array_map('strval', array_column($this->memberTypes, 'member_type_id'));
+        $current = (string) ($user?->member_type_id ?? '');
+
+        if (in_array($current, $activeIds, true)) {
+            $this->member_type_id = (int) $current;
+        } else {
+            $default = collect($this->memberTypes)
+                ->first(fn ($t) => strcasecmp($t['name'], 'TRIFECTA MEMBER') === 0);
+
+            $this->member_type_id = $default['member_type_id'] ?? null;
+        }
+    }
+
+    private function memberHasEmploymentType(): bool
+    {
+        return filled(
+            User::where('UserID', $this->selectedUserID)->value('employment_type_id')
+        );
     }
 
 

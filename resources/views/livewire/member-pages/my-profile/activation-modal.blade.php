@@ -589,6 +589,62 @@
                         @endif
                     </section>
 
+                    <section class="space-y-5">
+                        <h3 class="bg-[var(--color-primary)] text-white px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wider uppercase shadow-sm">
+                            Member Classification
+                        </h3>
+
+                        {{-- EMPLOYMENT TYPE --}}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">
+                               Employment Type
+                            @if ($lockEmploymentType)
+                                <span class="text-red-500">*</span>
+                            @else
+                                <span class="font-normal text-slate-400">(optional)</span>
+                            @endif
+                            </label>
+                            <select wire:model="employment_type_id"
+                                class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm bg-white focus:ring-2 focus:ring-[var(--color-primary)] focus:outline-none">
+                                @unless ($lockEmploymentType)
+                                    <option value="">No Employment Type</option>
+                                @endunless
+                                @foreach ($employmentTypes as $type)
+                                    <option value="{{ $type['employment_type_id'] }}">{{ $type['name'] }}</option>
+                                @endforeach
+                            </select>
+                            @error('employment_type_id')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- MEMBER TYPE (only Active ones are loaded) --}}
+                        @if (count($memberTypes))
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-3">Member Type</label>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    @foreach ($memberTypes as $type)
+                                        <label wire:key="member-type-{{ $type['member_type_id'] }}"
+                                            class="flex items-center gap-3 cursor-pointer p-3.5 rounded-xl border transition
+                                            {{ (string) $member_type_id === (string) $type['member_type_id']
+                                                ? 'border-[var(--color-primary)] bg-[var(--color-primary-tint)] ring-2 ring-[var(--color-primary)]/20'
+                                                : 'bg-white border-slate-300 hover:border-[var(--color-primary)] hover:bg-slate-50' }}">
+                                            <input type="radio" wire:model.live="member_type_id"
+                                                value="{{ $type['member_type_id'] }}"
+                                                class="w-4 h-4 text-[var(--color-primary)] shrink-0">
+                                            <span class="block text-sm font-bold text-slate-700">{{ $type['name'] }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+
+                                @error('member_type_id')
+                                    <p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        @endif
+                    </section>
+
                     <!-- =================================================
                         CONFIRMATION
                     ================================================== -->

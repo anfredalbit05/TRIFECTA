@@ -119,242 +119,265 @@
                         </div>
                     </section>
 
-{{-- ================================================= --}}
-{{-- ACTIVATION INFORMATION --}}
-{{-- ================================================= --}}
-<section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    {{-- ================================================= --}}
+                    {{-- ACTIVATION INFORMATION --}}
+                    {{-- ================================================= --}}
+                    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-    {{-- HEADER --}}
-    <div class="bg-[var(--color-primary)] px-5 py-3">
-        <h3 class="text-sm font-bold uppercase tracking-wider text-white">
-            Activation Information
-        </h3>
-    </div>
+                        {{-- HEADER --}}
+                        <div class="bg-[var(--color-primary)] px-5 py-3">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">
+                                Activation Information
+                            </h3>
+                        </div>
 
-    {{-- CONTENT --}}
-    <div class="space-y-5 p-5">
+                        {{-- CONTENT --}}
+                        <div class="space-y-5 p-5">
 
-        {{-- BASIC INFORMATION --}}
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                            {{-- BASIC INFORMATION --}}
+                            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
 
-            {{-- ACTIVATION ID --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    Activation ID
-                </p>
+                                {{-- ACTIVATION ID --}}
+                                <div>
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+                                        Activation ID
+                                    </p>
 
-                <p class="mt-1 font-bold text-slate-800">
-                    #{{ $activation?->ActivationID ?? '-' }}
-                </p>
-            </div>
-
-
-            {{-- AMOUNT --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    Amount
-                </p>
-
-                <p class="mt-1 text-lg font-extrabold text-[var(--color-primary)]">
-                    ₱{{ number_format($activation?->amount ?? 0, 2) }}
-                </p>
-            </div>
+                                    <p class="mt-1 font-bold text-slate-800">
+                                        #{{ $activation?->ActivationID ?? '-' }}
+                                    </p>
+                                </div>
 
 
-            {{-- PAYMENT METHOD --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    Payment Method
-                </p>
+                                {{-- AMOUNT --}}
+                                <div>
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+                                        Amount
+                                    </p>
 
-                <p class="mt-1 font-bold text-slate-800">
-                    {{ $activation?->payment_method ?? '-' }}
-                </p>
-            </div>
-
-
-            {{-- ACTIVATION TYPE --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    Activation Type
-                </p>
-
-                <p class="mt-1 font-bold text-slate-800">
-                    {{ $activation?->type === 'W'
-                        ? 'Walk-in'
-                        : ($activation?->type ? 'Online' : '-') }}
-                </p>
-            </div>
+                                    <p class="mt-1 text-lg font-extrabold text-[var(--color-primary)]">
+                                        ₱{{ number_format($activation?->amount ?? 0, 2) }}
+                                    </p>
+                                </div>
 
 
-            {{-- PAYMENT REFERENCE --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    Payment Reference
-                </p>
+                                {{-- PAYMENT METHOD --}}
+                                <div>
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+                                        Payment Method
+                                    </p>
 
-                <p class="mt-1 break-all font-bold text-slate-800">
-                    {{ $activation?->payment_reference ?? 'Cash Payment' }}
-                </p>
-            </div>
-
-
-            {{-- REQUEST STATUS --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    Request Status
-                </p>
-
-                <div class="mt-2">
-                    @php
-                        $status = $activation?->status ?? 'Pending';
-
-                        $statusClass = match (strtolower($status)) {
-                            'approved' => 'bg-[var(--color-primary-tint)] text-[var(--color-primary)]',
-                            'rejected' => 'bg-red-100 text-red-700',
-                            'cancelled' => 'bg-slate-200 text-slate-700',
-                            default => 'bg-amber-100 text-amber-700',
-                        };
-                    @endphp
-
-                    <span class="inline-flex rounded-full px-3 py-1 text-xs font-bold {{ $statusClass }}">
-                        {{ $status }}
-                    </span>
-                </div>
-            </div>
-
-        </div>
+                                    <p class="mt-1 font-bold text-slate-800">
+                                        {{ $activation?->payment_method ?? '-' }}
+                                    </p>
+                                </div>
 
 
-        {{-- POLICY + RECEIPT
-             Free members (provisioned when their satellite was approved)
-             never get these: no payment was collected, so their approval is
-             a one-click confirmation. --}}
-        @if (! ($activation?->isFree ?? false))
-        <div class="grid grid-cols-1 gap-5 border-t border-slate-100 pt-5 lg:grid-cols-2">
+                                {{-- ACTIVATION TYPE --}}
+                                <div>
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+                                        Activation Type
+                                    </p>
 
-            {{-- POLICY NUMBER --}}
-            <div>
-                <div class="mb-1.5 flex items-center justify-between gap-2">
+                                    <p class="mt-1 font-bold text-slate-800">
+                                        {{ $activation?->type === 'W'
+                                            ? 'Walk-in'
+                                            : ($activation?->type ? 'Online' : '-') }}
+                                    </p>
+                                </div>
 
-                    <label class="text-xs font-bold text-slate-700">
-                        Policy Number
-                        <span class="text-red-500">*</span>
-                    </label>
+                                {{-- PAYMENT REFERENCE --}}
+                                <div>
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+                                        Payment Reference
+                                    </p>
 
-                    <button
-                        type="button"
-                        wire:click="generatePolicyNumber"
-                        class="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-[var(--color-primary-dark)]"
-                    >
-                        Generate
-                    </button>
-
-                </div>
-
-                <input
-                    id="policy-number-input"
-                    wire:model.live="policy_number"
-                    type="text"
-                    maxlength="100"
-                    placeholder="{{ $this->nextPolicyNumber }}"
-                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm uppercase focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
-                >
-
-                @error('policy_number')
-                    <p class="mt-1 text-xs font-semibold text-red-600">
-                        {{ $message }}
-                    </p>
-                @enderror
-
-                @if ($policyNumberExists && ! $errors->has('policy_number'))
-                    <p class="mt-1 text-xs font-semibold text-red-600">
-                        ⚠ This policy number has already been used.
-                    </p>
-                @endif
-
-                <p class="mt-1 text-[10px] text-slate-500">
-                    Next:
-                    <span
-                        id="next-policy-number"
-                        data-sequence="{{ $this->nextPolicySequenceForJs }}"
-                        class="font-bold text-slate-600"
-                    >
-                        {{ $this->nextPolicyNumber }}
-                    </span>
-                    — backlog numbers below this are allowed if unused.
-                </p>
-            </div>
+                                    <p class="mt-1 break-all font-bold text-slate-800">
+                                        {{ $activation?->payment_reference ?? 'Cash Payment' }}
+                                    </p>
+                                </div>
 
 
-            {{-- RECEIPT NUMBER --}}
-            <div>
-                <div class="mb-1.5 flex items-center justify-between gap-2">
+                                {{-- REQUEST STATUS --}}
+                                <div>
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+                                        Request Status
+                                    </p>
 
-                    <label class="text-xs font-bold text-slate-700">
-                        Receipt Number
-                        <span class="text-red-500">*</span>
-                    </label>
+                                    <div class="mt-2">
+                                        @php
+                                            $status = $activation?->status ?? 'Pending';
 
-                    <button
-                        type="button"
-                        wire:click="generateReceiptNumber"
-                        class="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-[var(--color-primary-dark)]"
-                    >
-                        Generate
-                    </button>
+                                            $statusClass = match (strtolower($status)) {
+                                                'approved' => 'bg-[var(--color-primary-tint)] text-[var(--color-primary)]',
+                                                'rejected' => 'bg-red-100 text-red-700',
+                                                'cancelled' => 'bg-slate-200 text-slate-700',
+                                                default => 'bg-amber-100 text-amber-700',
+                                            };
+                                        @endphp
 
-                </div>
+                                        <span class="inline-flex rounded-full px-3 py-1 text-xs font-bold {{ $statusClass }}">
+                                            {{ $status }}
+                                        </span>
+                                    </div>
+                                </div>
 
-                <input
-                    id="receipt-number-input"
-                    wire:model.live="receipt_number"
-                    type="text"
-                    inputmode="numeric"
-                    maxlength="6"
-                    placeholder="{{ $this->nextReceiptNumber }}"
-                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
-                >
+                                                                {{-- EMPLOYMENT TYPE --}}
+                                <div>
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+                                        Employment Type
+                                    </p>
 
-                @error('receipt_number')
-                    <p class="mt-1 text-xs font-semibold text-red-600">
-                        {{ $message }}
-                    </p>
-                @enderror
+                                    <p class="mt-1 font-bold text-slate-800">
+                                        {{ $employmentTypeName !== '' ? $employmentTypeName : 'No Employment Type' }}
+                                    </p>
+                                </div>
 
-                @if ($receiptNumberExists && ! $errors->has('receipt_number'))
-                    <p class="mt-1 text-xs font-semibold text-red-600">
-                        ⚠ This receipt number has already been issued.
-                    </p>
-                @endif
 
-                <p class="mt-1 text-[10px] text-slate-500">
-                    Next:
-                    <span
-                        id="next-receipt-number"
-                        data-sequence="{{ (int) $this->nextReceiptNumber }}"
-                        class="font-bold text-slate-600"
-                    >
-                        {{ $this->nextReceiptNumber }}
-                    </span>
-                    — backlog numbers below this are allowed if unused.
-                </p>
-            </div>
+                                {{-- MEMBER TYPE --}}
+                                <div>
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+                                        Member Type
+                                    </p>
 
-        </div>
-        @else
-            <div class="mt-5 border-t border-slate-100 pt-5">
-                <p class="rounded-xl bg-[var(--color-primary-tint)] px-4 py-3 text-xs font-semibold text-[var(--color-primary)]">
-                    Free member — provisioned by their satellite. No payment was
-                    collected, so no policy or receipt number is issued: approving
-                    only completes their membership-fee ledger and credits the
-                    satellite owner.
-                </p>
-            </div>
-        @endif
+                                    <p class="mt-1 font-bold text-slate-800">
+                                        {{ $memberTypeName !== '' ? $memberTypeName : '-' }}
+                                    </p>
+                                </div>
 
-    </div>
-</section>
+
+                            </div>
+
+
+                            {{-- POLICY + RECEIPT
+                                Free members (provisioned when their satellite was approved)
+                                never get these: no payment was collected, so their approval is
+                                a one-click confirmation. --}}
+                            @if (! ($activation?->isFree ?? false))
+                            <div class="grid grid-cols-1 gap-5 border-t border-slate-100 pt-5 lg:grid-cols-2">
+
+                                {{-- POLICY NUMBER --}}
+                                <div>
+                                    <div class="mb-1.5 flex items-center justify-between gap-2">
+
+                                        <label class="text-xs font-bold text-slate-700">
+                                            Policy Number
+                                            <span class="text-red-500">*</span>
+                                        </label>
+
+                                        <button
+                                            type="button"
+                                            wire:click="generatePolicyNumber"
+                                            class="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-[var(--color-primary-dark)]"
+                                        >
+                                            Generate
+                                        </button>
+
+                                    </div>
+
+                                    <input
+                                        id="policy-number-input"
+                                        wire:model.live="policy_number"
+                                        type="text"
+                                        maxlength="100"
+                                        placeholder="{{ $this->nextPolicyNumber }}"
+                                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm uppercase focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                                    >
+
+                                    @error('policy_number')
+                                        <p class="mt-1 text-xs font-semibold text-red-600">
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+
+                                    @if ($policyNumberExists && ! $errors->has('policy_number'))
+                                        <p class="mt-1 text-xs font-semibold text-red-600">
+                                            ⚠ This policy number has already been used.
+                                        </p>
+                                    @endif
+
+                                    <p class="mt-1 text-[10px] text-slate-500">
+                                        Next:
+                                        <span
+                                            id="next-policy-number"
+                                            data-sequence="{{ $this->nextPolicySequenceForJs }}"
+                                            class="font-bold text-slate-600"
+                                        >
+                                            {{ $this->nextPolicyNumber }}
+                                        </span>
+                                        — backlog numbers below this are allowed if unused.
+                                    </p>
+                                </div>
+
+
+                                {{-- RECEIPT NUMBER --}}
+                                <div>
+                                    <div class="mb-1.5 flex items-center justify-between gap-2">
+
+                                        <label class="text-xs font-bold text-slate-700">
+                                            Receipt Number
+                                            <span class="text-red-500">*</span>
+                                        </label>
+
+                                        <button
+                                            type="button"
+                                            wire:click="generateReceiptNumber"
+                                            class="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-[var(--color-primary-dark)]"
+                                        >
+                                            Generate
+                                        </button>
+
+                                    </div>
+
+                                    <input
+                                        id="receipt-number-input"
+                                        wire:model.live="receipt_number"
+                                        type="text"
+                                        inputmode="numeric"
+                                        maxlength="6"
+                                        placeholder="{{ $this->nextReceiptNumber }}"
+                                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                                    >
+
+                                    @error('receipt_number')
+                                        <p class="mt-1 text-xs font-semibold text-red-600">
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+
+                                    @if ($receiptNumberExists && ! $errors->has('receipt_number'))
+                                        <p class="mt-1 text-xs font-semibold text-red-600">
+                                            ⚠ This receipt number has already been issued.
+                                        </p>
+                                    @endif
+
+                                    <p class="mt-1 text-[10px] text-slate-500">
+                                        Next:
+                                        <span
+                                            id="next-receipt-number"
+                                            data-sequence="{{ (int) $this->nextReceiptNumber }}"
+                                            class="font-bold text-slate-600"
+                                        >
+                                            {{ $this->nextReceiptNumber }}
+                                        </span>
+                                        — backlog numbers below this are allowed if unused.
+                                    </p>
+                                </div>
+
+                            </div>
+                            @else
+                                <div class="mt-5 border-t border-slate-100 pt-5">
+                                    <p class="rounded-xl bg-[var(--color-primary-tint)] px-4 py-3 text-xs font-semibold text-[var(--color-primary)]">
+                                        Free member — provisioned by their satellite. No payment was
+                                        collected, so no policy or receipt number is issued: approving
+                                        only completes their membership-fee ledger and credits the
+                                        satellite owner.
+                                    </p>
+                                </div>
+                            @endif
+
+                        </div>
+                    </section>
 
 
                     {{-- ================================================= --}}

@@ -72,10 +72,44 @@
 
                                 @include('livewire.partials.ymd-picker', ['model' => 'birthdate', 'label' => 'Birthdate *', 'title' => 'Select Date of Birth'])
 
-                                <div>
-                                    <label class="{{ $lbl }}">Occupation</label>
-                                    <input wire:model.live="occupation" type="text" placeholder="e.g. Teacher, Driver, Engineer" class="{{ $in }}">
-                                </div>
+                                    {{-- OCCUPATION --}}
+                                    <div>
+                                        <label class="{{ $lbl }}">Occupation</label>
+                                        <input wire:model.live="occupation" type="text"
+                                            placeholder="e.g. Teacher, Driver, Engineer" class="{{ $in }}">
+                                    </div>
+
+                                    {{-- EMPLOYMENT TYPE --}}
+                                    <div>
+                                        <label class="{{ $lbl }}">Employment Type</label>
+
+                                        <select wire:model="employment_type_id" class="{{ $in }}">
+                                            <option value="">Select Employment Type (Optional)</option>
+
+                                            @foreach ($employmentTypes as $type)
+                                                <option value="{{ $type->employment_type_id }}">
+                                                    {{ $type->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    {{-- MEMBER TYPE --}}
+                                    @if($isEditMode)
+                                    <div>
+                                        <label class="{{ $lbl }}">Member Type</label>
+
+                                        <select wire:model="member_type_id" class="{{ $in }}">
+                                            <option value="">Select Member Type (Optional)</option>
+
+                                            @foreach ($memberTypes as $type)
+                                                <option value="{{ $type->member_type_id }}">
+                                                    {{ $type->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @endif
                             </div>
                         </div>
 

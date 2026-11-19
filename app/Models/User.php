@@ -72,6 +72,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'position',
     'status',
     'signature',
+    'employment_type_id',
+    'member_type_id',
 ])]
 
 #[Hidden([
@@ -242,5 +244,22 @@ class User extends Authenticatable implements PasskeyUser
         return $this->belongsTo(User::class, 'UserID', 'UserID');
     }
 
+        public function employmentType(): BelongsTo
+    {
+        return $this->belongsTo(
+            EmploymentType::class,
+            'employment_type_id',
+            'employment_type_id'
+        );
+    }
+
+    public function memberType(): BelongsTo
+    {
+        return $this->belongsTo(
+            MemberType::class,
+            'member_type_id',
+            'member_type_id'
+        );
+    }
 
 }
