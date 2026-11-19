@@ -168,7 +168,7 @@
                     </div> --}}
                 </div>
 
-             <div>
+             {{-- <div>
                 <label for="membershipFeeVariant">Filter by Variant</label>
 
                 <select
@@ -182,7 +182,7 @@
                         </option>
                     @endforeach
                 </select>
-            </div>
+            </div> --}}
 
                 <div class="breakdown-list membership-fee-card__list">
                     @forelse($membershipFeeCollections as $fee)
@@ -192,11 +192,11 @@
                                     {{ $fee->FeeName }}
                                 </p>
 
-                                <p class="breakdown-list__sub">
+                                {{-- <p class="breakdown-list__sub">
                                     Fee ID: {{ $fee->FeeID }}
                                     ·
                                     {{ $fee->Variant_Name ?? 'No Variant' }}
-                                </p>
+                                </p> --}}
 
                             </div>
 
@@ -220,10 +220,10 @@
                             Total Collection
                         </span>
 
-                        <span class="membership-fee-total__sub">
+                        {{-- <span class="membership-fee-total__sub">
                             {{ $variants->firstWhere('VID', (int) $selectedVariant)->name
                                 ?? 'Selected Variant' }}
-                        </span>
+                        </span> --}}
                     </div>
 
                     <span class="membership-fee-total__amount">
@@ -248,7 +248,7 @@
                             <th>#</th>
                             <th>Fee ID</th>
                             <th>Fee Name</th>
-                            <th>Variant</th>
+                            {{-- <th>Variant</th> --}}
                             <th>Total Collection</th>
                         </tr>
                     </thead>
@@ -264,8 +264,8 @@
                                 </td>
 
                                 <td>{{ $fee->FeeName }}</td>
-
-                                <td>{{ $fee->Variant_Name ?? 'No Variant' }}</td>
+{{--
+                                <td>{{ $fee->Variant_Name ?? 'No Variant' }}</td> --}}
 
                                 <td class="print-table__cell--right">
                                     ₱{{ number_format((float) $fee->Total_Collection, 2) }}
@@ -410,10 +410,10 @@
                 <span class="membership-fee-total__label">
                     Total Collection
                 </span>
-
+{{--
                 <span class="membership-fee-total__sub">
                     All Sources
-                </span>
+                </span> --}}
             </div>
 
             <span class="membership-fee-total__amount">

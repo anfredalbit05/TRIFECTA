@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activation;
-use App\Models\ActivationHistory;
 use App\Models\MembershipFee;
 use App\Models\User;
 use App\Services\AcknowledgementReceiptService;
@@ -37,16 +36,13 @@ class ReceiptController extends Controller
                 'cashier_name',
                 'cashier_signature',
                 'amount',
+                'payment_method',
+                'created_at',
             ]);
 
         abort_unless($approved, 404, 'No approved activation receipt is available.');
 
         $amount = (float) $approved->amount;
-
-        $history = ActivationHistory::where('ActivationID', $approved->ActivationID)
-            ->where('status', 'Approved')
-            ->latest()
-            ->first();
 
         $path = app(AcknowledgementReceiptService::class)->generate(
             $user,
@@ -54,7 +50,8 @@ class ReceiptController extends Controller
             $approved?->receipt_number,
             $approved?->cashier_name,
             $approved?->cashier_signature,
-            $history?->created_at
+            $approved->created_at?->format('M j, Y'),
+            $approved
         );
 
         if ($path === null || ! is_file($path)) {
@@ -101,6 +98,8 @@ public function memberDownload(): StreamedResponse
             'cashier_name',
             'cashier_signature',
             'amount',
+            'payment_method',
+            'created_at',
         ]);
 
     abort_unless(
@@ -117,7 +116,9 @@ public function memberDownload(): StreamedResponse
         $amount,
         $approved->receipt_number,
         $approved->cashier_name,
-        $approved->cashier_signature
+        $approved->cashier_signature,
+        $approved->created_at?->format('M j, Y'),
+        $approved
     );
 
     if ($path === null || ! is_file($path)) {

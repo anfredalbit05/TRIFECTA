@@ -18,11 +18,12 @@ use Illuminate\Support\Facades\Storage;
  *
  *   Policy Number box ... x 281-715,  y 414-455  (blank in template)
  *   Date box ............ x 1355-1623, y 414-455 (blank in template)
- *   Left table (navy) ... x 47-457, header 467-508:
- *     Cash row ........... y 509-554 (label col x47-151, value x152-428)
- *     Check row .......... y 555-599
- *     Bank row ........... y 600-643
- *     Total row .......... y 644-687 (value x152-428)
+ *   Left table (navy) ... x 29-448, label cell x 30-167, value cell x 168-446:
+ *     Header "FORM OF PAYMENT" .. y 373-421
+ *     Cash row ........... y 421-476
+ *     Check row .......... y 476-536
+ *     Bank row ........... y 536-596
+ *     Total row .......... y 596-658
  *   Receipt No. box ..... x 47-429,  y 702-748 (label ends x191 — receipt no. goes after it)
  *   Right table ......... x 457-1623, label col x457-743, value col x744-1622:
  *     Payment From ....... y 468-507
@@ -67,7 +68,8 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
         ?string $receiptNumber = null,
         ?string $cashierName = null,
         ?string $cashierSignature = null,
-        ?string $dateReceipt = null
+        ?string $dateReceipt = null,
+        ?Activation $activation = null
     ): ?string {
         $templatePath = public_path(self::TEMPLATE);
 
@@ -112,10 +114,30 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
             // Policy Number — from the member's latest APPROVED activation
             // (the users table no longer holds policy data; drawn only when
             // present).
-            $activationPolicyNumber = Activation::where('UserID', $user->UserID)
+            $approvedActivation = Activation::where('UserID', $user->UserID)
                 ->where('status', 'Approved')
                 ->latest('ActivationID')
-                ->value('policy_number');
+                ->first();
+
+            $activationPolicyNumber = $approvedActivation?->policy_number;
+
+            /*
+            |----------------------------------------------------------------------
+            | Payment method
+            |----------------------------------------------------------------------
+            | Taken from the activation this receipt belongs to (the controller
+            | passes it in) so a renewal can never print the newer activation's
+            | method on an older receipt. Falls back to the member's latest
+            | approved activation for older callers.
+            |----------------------------------------------------------------------
+            */
+            $rawPaymentMethod = $activation?->payment_method;
+
+            if (blank($rawPaymentMethod)) {
+                $rawPaymentMethod = $approvedActivation?->payment_method;
+            }
+
+            $paymentMethod = strtolower(trim((string) ($rawPaymentMethod ?: 'Cash')));
 
             $this->text($image, (string) ($activationPolicyNumber ?? ''), 295, 303, 15, self::FONT_BOLD, $ink, 400);
 
@@ -129,12 +151,30 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
             ]);
 
             /*
-            |----------------------------------------------------------------------
-            | Left table (navy) — Cash amount + Total (value cell x 152-428)
-            |----------------------------------------------------------------------
+            |--------------------------------------------------------------------------
+            | Left table — FORM OF PAYMENT
+            |--------------------------------------------------------------------------
+            | The printed labels (Cash / Check / Bank) are part of the form and are
+            | never painted over. The value cells carry:
+            |
+            |   Cash row  -> the amount paid
+            |   Bank row  -> the payment method (Cash, GCash, Maya, Bank Transfer)
+            |   Total row -> the amount paid
+            |
+            | so a receipt always states the method without touching the template.
+            |--------------------------------------------------------------------------
             */
-            $this->text($image, $amountText, 185, 455, 17, self::FONT_BOLD, $ink, 250);
+
+            // Cash row: y 421-476 — amount paid.
+            $this->text($image, $amountText, 185, 461, 17, self::FONT_BOLD, $ink, 250);
+
+            // Bank row: y 536-596 — the payment method as text.
+            $this->text($image, $this->paymentLabel($paymentMethod), 185, 576, 17, self::FONT_BOLD, $ink, 250);
+
+            // Total row: y 596-658 — amount paid.
             $this->text($image, $amountText, 185, 638, 17, self::FONT_BOLD, $ink, 250);
+
+
             /*
             |----------------------------------------------------------------------
             | Receipt No. — the activation's issued receipt number, drawn after
@@ -183,6 +223,11 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
             | By: — signature ABOVE name
             |--------------------------------------------------------------------------
             */
+            Log::info('RECEIPT: Preparing to paste cashier signature.', [
+                'cashier_name' => $cashierName,
+                'cashier_signature' => $cashierSignature,
+                'signature_is_empty' => blank($cashierSignature),
+            ]);
             $this->pasteSignature($image, $cashierSignature);
 
             if (filled($cashierName)) {
@@ -192,7 +237,7 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
                     (string) $cashierName,
                     700,
                     770,
-                    20, // slightly larger
+                    25, // slightly larger
                     self::FONT_BOLD,
                     $ink,
                     680,
@@ -354,351 +399,383 @@ private const FONT_BOLD = __DIR__.'/../../vendor/dompdf/dompdf/lib/fonts/DejaVuS
      * White/light pixels become transparent while the actual signature ink
      * is converted to a dark ink color so it remains visible on Railway/PDF/etc.
      */
-    private function pasteSignature($image, ?string $storagePath): void
-    {
+
+private function pasteSignature($image, ?string $storagePath): void
+{
+    Log::info('========== CASHIER SIGNATURE DEBUG START ==========');
+
+    try {
+        // STEP 1: Validate path
         if (blank($storagePath)) {
+            Log::warning('SIGNATURE FAILED: Storage path is empty.');
             return;
         }
 
-        try {
+        $storagePath = ltrim(
+            str_replace('\\', '/', trim($storagePath)),
+            '/'
+        );
 
-        // Normalize the path stored in the settings table.
-        $storagePath = ltrim(str_replace('\\', '/', trim($storagePath)), '/');
+        Log::info('SIGNATURE: Original storage path.', [
+            'path' => $storagePath,
+        ]);
 
-        // Support both storage locations:
-        // 1. storage/app/public/images/...
-        // 2. public/images/...
+        // STEP 2: Resolve file
         $binary = null;
         $resolvedPath = null;
+        $storageExists = false;
+        $publicExists = false;
 
         if (Storage::disk('public')->exists($storagePath)) {
+            $storageExists = true;
+
             $binary = Storage::disk('public')->get($storagePath);
             $resolvedPath = Storage::disk('public')->path($storagePath);
+
+            Log::info('SIGNATURE: Found in public storage.', [
+                'path' => $resolvedPath,
+            ]);
         } else {
-            // Prevent paths from escaping the public/images directory.
             $filename = basename($storagePath);
 
             $publicImagePath = public_path('images/' . $filename);
 
-            if (is_file($publicImagePath)) {
+            $publicExists = is_file($publicImagePath);
+
+            if ($publicExists) {
                 $binary = file_get_contents($publicImagePath);
                 $resolvedPath = $publicImagePath;
+
+                Log::info('SIGNATURE: Found in public/images.', [
+                    'path' => $resolvedPath,
+                ]);
             }
         }
 
         if ($binary === null || $binary === false) {
-            Log::warning('Cashier signature file missing; receipt signed without signature.', [
-                'path' => $storagePath,
-                'storage_path' => Storage::disk('public')->path($storagePath),
-                'public_images_path' => public_path('images/' . basename($storagePath)),
+            Log::error('SIGNATURE FAILED: File does not exist.', [
+                'storage_path' => $storagePath,
+                'storage_exists' => $storageExists,
+                'public_images_exists' => $publicExists,
+                'public_images_path' => public_path(
+                    'images/' . basename($storagePath)
+                ),
+                'storage_public_root' => Storage::disk('public')->path(''),
             ]);
 
             return;
         }
 
-        Log::info('Cashier signature loaded for receipt.', [
-            'path' => $storagePath,
+        Log::info('SIGNATURE: File successfully loaded.', [
             'resolved_path' => $resolvedPath,
+            'file_size' => strlen($binary),
         ]);
 
+        // STEP 3: Inspect image
+        $imageInfo = @getimagesizefromstring($binary);
+
+        if ($imageInfo === false) {
+            Log::error('SIGNATURE FAILED: Invalid image file.', [
+                'path' => $resolvedPath,
+            ]);
+
+            return;
+        }
+
+        Log::info('SIGNATURE: Image information.', [
+            'width' => $imageInfo[0],
+            'height' => $imageInfo[1],
+            'mime' => $imageInfo['mime'] ?? 'unknown',
+            'bits' => $imageInfo['bits'] ?? null,
+        ]);
+
+        // STEP 4: Decode image
         $signature = @imagecreatefromstring($binary);
 
         if ($signature === false) {
-            Log::warning('Cashier signature file could not be decoded; skipped.', [
-                'path' => $storagePath,
-                'resolved_path' => $resolvedPath,
+            Log::error('SIGNATURE FAILED: GD could not decode image.', [
+                'path' => $resolvedPath,
+                'mime' => $imageInfo['mime'] ?? null,
+                'gd_available' => extension_loaded('gd'),
             ]);
 
             return;
         }
 
-            $srcWidth = imagesx($signature);
-            $srcHeight = imagesy($signature);
+        if (!imageistruecolor($signature)) {
+            imagepalettetotruecolor($signature);
+        }
 
-            /*
-            |--------------------------------------------------------------------------
-            | STEP 1: Find the white signature canvas
-            |--------------------------------------------------------------------------
-            |
-            | Some uploaded images contain a dark/black border around the actual
-            | white signature area. We must ignore that border completely.
-            |
-            */
+        $srcWidth = imagesx($signature);
+        $srcHeight = imagesy($signature);
 
-            $canvasLeft = $srcWidth;
-            $canvasRight = -1;
-            $canvasTop = $srcHeight;
-            $canvasBottom = -1;
+        Log::info('SIGNATURE: GD image decoded.', [
+            'width' => $srcWidth,
+            'height' => $srcHeight,
+            'truecolor' => imageistruecolor($signature),
+        ]);
 
-            for ($y = 0; $y < $srcHeight; $y++) {
-                for ($x = 0; $x < $srcWidth; $x++) {
+        // STEP 5: Detect actual signature ink
+        $left = $srcWidth;
+        $right = -1;
+        $top = $srcHeight;
+        $bottom = -1;
 
-                    $rgb = imagecolorat($signature, $x, $y);
+        $visiblePixels = 0;
+        $transparentPixels = 0;
+        $whitePixels = 0;
 
-                    $r = ($rgb >> 16) & 0xFF;
-                    $g = ($rgb >> 8) & 0xFF;
-                    $b = $rgb & 0xFF;
+        for ($y = 0; $y < $srcHeight; $y++) {
+            for ($x = 0; $x < $srcWidth; $x++) {
 
-                    /*
-                     * White / near-white pixels belong to the signature canvas.
-                     */
-                    if ($r >= 245 && $g >= 245 && $b >= 245) {
+                $pixel = imagecolorat($signature, $x, $y);
 
-                        $canvasLeft = min($canvasLeft, $x);
-                        $canvasRight = max($canvasRight, $x);
-                        $canvasTop = min($canvasTop, $y);
-                        $canvasBottom = max($canvasBottom, $y);
-                    }
+                $r = ($pixel >> 16) & 0xFF;
+                $g = ($pixel >> 8) & 0xFF;
+                $b = $pixel & 0xFF;
+
+                $sourceAlpha = ($pixel >> 24) & 0x7F;
+
+                if ($sourceAlpha >= 120) {
+                    $transparentPixels++;
+                    continue;
                 }
+
+                $brightness =
+                    (0.299 * $r) +
+                    (0.587 * $g) +
+                    (0.114 * $b);
+
+                if ($brightness >= 245) {
+                    $whitePixels++;
+                    continue;
+                }
+
+                $visiblePixels++;
+
+                $left = min($left, $x);
+                $right = max($right, $x);
+                $top = min($top, $y);
+                $bottom = max($bottom, $y);
             }
+        }
 
-            /*
-            |--------------------------------------------------------------------------
-            | No white canvas detected
-            |--------------------------------------------------------------------------
-            */
+        Log::info('SIGNATURE: Ink detection results.', [
+            'visible_ink_pixels' => $visiblePixels,
+            'transparent_pixels' => $transparentPixels,
+            'white_pixels' => $whitePixels,
+            'left' => $left,
+            'right' => $right,
+            'top' => $top,
+            'bottom' => $bottom,
+        ]);
 
-            if ($canvasRight < $canvasLeft || $canvasBottom < $canvasTop) {
-                Log::warning('Could not detect white signature canvas.', [
-                    'path' => $storagePath,
-                ]);
+        if ($visiblePixels === 0 || $right < $left || $bottom < $top) {
+            Log::error('SIGNATURE FAILED: No visible signature ink detected.', [
+                'path' => $resolvedPath,
+                'width' => $srcWidth,
+                'height' => $srcHeight,
+            ]);
 
-                imagedestroy($signature);
+            imagedestroy($signature);
+            return;
+        }
 
-                return;
-            }
+        // STEP 6: Calculate signature dimensions
+        $inkWidth = $right - $left + 1;
+        $inkHeight = $bottom - $top + 1;
 
-            /*
-            |--------------------------------------------------------------------------
-            | STEP 2: Crop to the actual white signature canvas
-            |--------------------------------------------------------------------------
-            */
+        Log::info('SIGNATURE: Detected signature dimensions.', [
+            'ink_width' => $inkWidth,
+            'ink_height' => $inkHeight,
+        ]);
 
-            $canvasWidth = $canvasRight - $canvasLeft + 1;
-            $canvasHeight = $canvasBottom - $canvasTop + 1;
+        // STEP 7: Create cropped transparent signature
+        $clean = imagecreatetruecolor($inkWidth, $inkHeight);
 
-            $clean = imagecreatetruecolor(
-                $canvasWidth,
-                $canvasHeight
-            );
+        imagealphablending($clean, false);
+        imagesavealpha($clean, true);
 
-            imagealphablending($clean, false);
-            imagesavealpha($clean, true);
+        $transparent = imagecolorallocatealpha(
+            $clean,
+            255,
+            255,
+            255,
+            127
+        );
 
-            $transparent = imagecolorallocatealpha(
-                $clean,
-                0,
-                0,
-                0,
-                127
-            );
+        imagefill($clean, 0, 0, $transparent);
 
-            imagefill(
-                $clean,
-                0,
-                0,
-                $transparent
-            );
+        $colors = [];
 
-            /*
-            |--------------------------------------------------------------------------
-            | STEP 3: Extract ONLY the actual signature ink
-            |--------------------------------------------------------------------------
-            */
+        for ($y = $top; $y <= $bottom; $y++) {
+            for ($x = $left; $x <= $right; $x++) {
 
-            for ($y = $canvasTop; $y <= $canvasBottom; $y++) {
+                $pixel = imagecolorat($signature, $x, $y);
 
-                for ($x = $canvasLeft; $x <= $canvasRight; $x++) {
+                $r = ($pixel >> 16) & 0xFF;
+                $g = ($pixel >> 8) & 0xFF;
+                $b = $pixel & 0xFF;
 
-                    $rgb = imagecolorat($signature, $x, $y);
+                $sourceAlpha = ($pixel >> 24) & 0x7F;
 
-                    $r = ($rgb >> 16) & 0xFF;
-                    $g = ($rgb >> 8) & 0xFF;
-                    $b = $rgb & 0xFF;
+                $brightness =
+                    (0.299 * $r) +
+                    (0.587 * $g) +
+                    (0.114 * $b);
 
-                    $brightness =
-                        (0.299 * $r) +
-                        (0.587 * $g) +
-                        (0.114 * $b);
+                // Preserve the original transparency of the PNG.
+                // Recolor its gray signature strokes into solid dark receipt ink.
+                if (($imageInfo['mime'] ?? '') === 'image/png' && $transparentPixels > 0) {
+                    $opacity = 1 - ($sourceAlpha / 127);
+                } else {
+                    // For JPEG or PNG files with a white background.
+                    $opacity = (1 - ($sourceAlpha / 127))
+                        * (1 - ($brightness / 255));
+                }
 
-                    /*
-                     * Ignore white background.
-                     */
-                    if ($brightness >= 245) {
-                        continue;
-                    }
+                $alpha = (int) round(127 * (1 - $opacity));
 
-                    /*
-                     * Convert darkness into opacity.
-                     *
-                     * Dark pixels  = opaque
-                     * Light pixels = transparent
-                     */
-                    $alpha = (int) round(
-                        ($brightness / 255) * 127
-                    );
+                $alpha = max(0, min(127, $alpha));
 
-                    $alpha = max(0, min(127, $alpha));
+                if ($alpha >= 127) {
+                    continue;
+                }
 
-                    $inkColor = imagecolorallocatealpha(
+                if (!isset($colors[$alpha])) {
+                    $colors[$alpha] = imagecolorallocatealpha(
                         $clean,
                         self::INK[0],
                         self::INK[1],
                         self::INK[2],
                         $alpha
                     );
-
-                    imagesetpixel(
-                        $clean,
-                        $x - $canvasLeft,
-                        $y - $canvasTop,
-                        $inkColor
-                    );
                 }
-            }
 
-            imagedestroy($signature);
-
-            /*
-            |--------------------------------------------------------------------------
-            | STEP 4: Find the actual signature ink bounds
-            |--------------------------------------------------------------------------
-            */
-
-            $left = $canvasWidth;
-            $right = -1;
-            $top = $canvasHeight;
-            $bottom = -1;
-
-            for ($y = 0; $y < $canvasHeight; $y++) {
-
-                for ($x = 0; $x < $canvasWidth; $x++) {
-
-                    $pixel = imagecolorat($clean, $x, $y);
-
-                    $alpha = ($pixel >> 24) & 0x7F;
-
-                    /*
-                     * Anything with meaningful opacity is actual ink.
-                     */
-                    if ($alpha < 120) {
-
-                        $left = min($left, $x);
-                        $right = max($right, $x);
-                        $top = min($top, $y);
-                        $bottom = max($bottom, $y);
-                    }
-                }
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | No signature found
-            |--------------------------------------------------------------------------
-            */
-
-            if ($right < $left || $bottom < $top) {
-
-                imagedestroy($clean);
-
-                Log::warning(
-                    'Cashier signature contained no visible ink.',
-                    ['path' => $storagePath]
+                imagesetpixel(
+                    $clean,
+                    $x - $left,
+                    $y - $top,
+                    $colors[$alpha]
                 );
-
-                return;
             }
+        }
 
-            /*
-            |--------------------------------------------------------------------------
-            | STEP 5: Actual signature dimensions
-            |--------------------------------------------------------------------------
-            */
+        imagedestroy($signature);
 
-            $inkWidth = $right - $left + 1;
-            $inkHeight = $bottom - $top + 1;
+        Log::info('SIGNATURE: Transparent signature created.', [
+            'width' => imagesx($clean),
+            'height' => imagesy($clean),
+        ]);
 
-            /*
-            |--------------------------------------------------------------------------
-            | STEP 6: Receipt signature area
-            |--------------------------------------------------------------------------
-            |
-            | Signature sits above cashier name.
-            |
-            */
 
-            $bandX = 530;
-            $bandY = 690;
+        // STEP 8: Destination area inside By: box
+        $bandX = 560;
+        $bandY = 700;
+        $bandWidth = 800;
+        $bandHeight = 80;
 
-            $bandWidth = 750;
-            $bandHeight = 80;
+        // STEP 9: Preserve original resolution where possible.
+        // Never enlarge the signature; only reduce it when necessary.
+        $scale = min(
+            1,
+            $bandWidth / $inkWidth,
+            $bandHeight / $inkHeight
+        );
 
-            /*
-            |--------------------------------------------------------------------------
-            | STEP 7: Scale while maintaining aspect ratio
-            |--------------------------------------------------------------------------
-            */
+        $dstWidth = max(1, (int) round($inkWidth * $scale));
+        $dstHeight = max(1, (int) round($inkHeight * $scale));
 
-            $scale = min(
-                $bandWidth / $inkWidth,
-                $bandHeight / $inkHeight
-            );
+        // STEP 10: Center signature
+        $dstX = $bandX + (int) (($bandWidth - $dstWidth) / 2);
+        $dstY = $bandY + (int) (($bandHeight - $dstHeight) / 2);
 
-            $dstWidth = max(
-                1,
-                (int) round($inkWidth * $scale)
-            );
+        // STEP 11: Validate destination
+        if (
+            $dstX < 0 ||
+            $dstY < 0 ||
+            ($dstX + $dstWidth) > imagesx($image) ||
+            ($dstY + $dstHeight) > imagesy($image)
+        ) {
+            Log::error('SIGNATURE FAILED: Destination outside receipt boundaries.');
 
-            $dstHeight = max(
-                1,
-                (int) round($inkHeight * $scale)
-            );
+            imagedestroy($clean);
+            return;
+        }
 
-            /*
-            |--------------------------------------------------------------------------
-            | STEP 8: Center signature
-            |--------------------------------------------------------------------------
-            */
+        // STEP 12: Paste signature
+        imagealphablending($image, true);
 
-            $dstX = $bandX +
-                (int) (($bandWidth - $dstWidth) / 2);
-
-            $dstY = $bandY +
-                (int) (($bandHeight - $dstHeight) / 2);
-
-            /*
-            |--------------------------------------------------------------------------
-            | STEP 9: Paste signature
-            |--------------------------------------------------------------------------
-            */
-
-            imagealphablending($image, true);
-
-            imagecopyresampled(
+        if ($dstWidth === $inkWidth && $dstHeight === $inkHeight) {
+            // No resizing: preserve original pixels.
+            $result = imagecopy(
                 $image,
                 $clean,
                 $dstX,
                 $dstY,
-                $left,
-                $top,
+                0,
+                0,
+                $inkWidth,
+                $inkHeight
+            );
+        } else {
+            // Downscale only when necessary.
+            $result = imagecopyresampled(
+                $image,
+                $clean,
+                $dstX,
+                $dstY,
+                0,
+                0,
                 $dstWidth,
                 $dstHeight,
                 $inkWidth,
                 $inkHeight
             );
-
-            imagedestroy($clean);
-
-        } catch (\Throwable $e) {
-
-            Log::error(
-                'Failed to paste cashier signature onto receipt.',
-                [
-                    'error' => $e->getMessage(),
-                    'path' => $storagePath,
-                ]
-            );
         }
+
+        imagedestroy($clean);
+
+        if (!$result) {
+            Log::error('SIGNATURE FAILED: Could not paste signature.');
+            return;
+        }
+
+        Log::info('SIGNATURE SUCCESS: Cashier signature pasted.', [
+            'original_width' => $inkWidth,
+            'original_height' => $inkHeight,
+            'destination_width' => $dstWidth,
+            'destination_height' => $dstHeight,
+        ]);
+
+            } catch (\Throwable $e) {
+
+                Log::error('SIGNATURE EXCEPTION: Failed to paste cashier signature.', [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTraceAsString(),
+                    'path' => $storagePath,
+                ]);
+            }
+
+            Log::info('========== CASHIER SIGNATURE DEBUG END ==========');
+        }
+
+
+    /**
+     * Human label for a stored activations.payment_method value.
+     */
+    private function paymentLabel(string $method): string
+    {
+        return match ($method) {
+            'gcash' => 'GCash',
+            'maya', 'paymaya' => 'Maya',
+            'bank transfer', 'bank' => 'Bank Transfer',
+            'check', 'cheque' => 'Check',
+            '' => 'Cash',
+            default => ucfirst($method),
+        };
     }
 
     /**

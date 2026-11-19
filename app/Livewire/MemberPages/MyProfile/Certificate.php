@@ -21,12 +21,14 @@ class Certificate extends Component
             ->latest('ActivationID')
             ->first();
 
-        return view(
-            'livewire.member-pages.my-profile.certificate',
-            [
-                'user' => $user,
-                'latestApprovedActivation' => $latestApprovedActivation,
-            ]
-        );
+        $hasApprovedActivation = Activation::where('UserID', $user->UserID)
+            ->where('status', 'Approved')
+            ->exists();
+
+        return view('livewire.member-pages.my-profile.certificate', [
+            'user' => $user,
+            'latestApprovedActivation' => $latestApprovedActivation,
+            'hasApprovedActivation' => $hasApprovedActivation,
+        ]);
     }
 }

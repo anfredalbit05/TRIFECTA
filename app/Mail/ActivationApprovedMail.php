@@ -65,7 +65,9 @@ class ActivationApprovedMail extends Mailable
                 $this->totalAmount,
                 $receiptNumber,
                 $this->activation->cashier_name ?? null,
-                $this->activation->cashier_signature ?? null
+                $this->activation->cashier_signature ?? null,
+                $this->activation->created_at?->format('M j, Y'),
+                $this->activation
             );
 
             if ($generatedPath !== null && is_file($generatedPath)) {

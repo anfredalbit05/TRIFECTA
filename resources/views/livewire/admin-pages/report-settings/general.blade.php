@@ -119,7 +119,6 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Variant</th>
                     <th>Setting Name</th>
                     <th>Value</th>
                     @if ($this->canUpdate || $this->canDelete)

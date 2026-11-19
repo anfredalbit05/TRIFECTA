@@ -271,7 +271,7 @@
         {{-- =================== RIGHT COLUMN =================== --}}
         <div class="profile-col">
 
-            @if (auth()->user()->RoleID != 8)
+            @if (auth()->user()->RoleID == 8)
                 {{-- --------------- 5. REGISTERED BENEFICIARIES (READ-ONLY) --------------- --}}
                 <div class="card">
                     <div class="card-header">

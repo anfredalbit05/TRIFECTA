@@ -1372,45 +1372,42 @@ class AdminUsers extends Component
         return $position !== '' ? $position : null;
     }
 
-public function render()
-{
-    $users = User::query()
-        ->withExists([
-            'activations as has_pending_activation' => function ($query) {
-                $query->where('status', 'Pending');
-            },
+    public function render()
+    {
+        $users = User::query()
+            ->where('RoleID', '!=', 8) // Exclude RoleID 8
+            ->withExists([
+                'withdrawals as has_pending_withdrawal' => function ($query) {
+                    $query->where('status', 'Pending');
+                },
 
-            'withdrawals as has_pending_withdrawal' => function ($query) {
-                $query->where('status', 'Pending');
-            },
+                'withdrawals as has_approved_withdrawal' => function ($query) {
+                    $query->where('status', 'Approved');
+                },
+            ])
+            ->when(
+                filled($this->search),
+                function ($query) {
+                    $search = trim($this->search);
 
-            'withdrawals as has_approved_withdrawal' => function ($query) {
-                $query->where('status', 'Approved');
-            },
-        ])
-        ->when(
-            filled($this->search),
-            function ($query) {
-                $search = trim($this->search);
+                    $query->where(function ($q) use ($search) {
+                        $q->where('firstname', 'like', "%{$search}%")
+                            ->orWhere('middlename', 'like', "%{$search}%")
+                            ->orWhere('lastname', 'like', "%{$search}%")
+                            ->orWhere('username', 'like', "%{$search}%")
+                            ->orWhere('contactno', 'like', "%{$search}%");
+                    });
+                }
+            )
+            ->latest('UserID')
+            ->paginate(10);
 
-                $query->where(function ($q) use ($search) {
-                    $q->where('firstname', 'like', "%{$search}%")
-                        ->orWhere('middlename', 'like', "%{$search}%")
-                        ->orWhere('lastname', 'like', "%{$search}%")
-                        ->orWhere('username', 'like', "%{$search}%")
-                        ->orWhere('contactno', 'like', "%{$search}%");
-                });
-            }
-        )
-        ->latest('UserID')
-        ->paginate(10);
-
-    return view(
-        'livewire.admin-pages.masterlist.admin-users',
-        [
-            'users' => $users,
-            'isWithdrawalActive' => $this->isWithdrawalActive(),
-        ]
-    );
-}
+        return view(
+            'livewire.admin-pages.masterlist.admin-users',
+            [
+                'users' => $users,
+                'isWithdrawalActive' => $this->isWithdrawalActive(),
+            ]
+        );
+    }
 }

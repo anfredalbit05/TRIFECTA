@@ -60,7 +60,6 @@ class Dashboard extends Component
 
         return view('livewire.admin-pages.masterlist.dashboard', [
             'totalMembers' => User::where('RoleID', 8)->count(),
-            'activeBranches' => Branch::where('status', true)->count(),
             'totalBenefits' => Benefit::where('status', true)->count(),
             'totalInquiries' => Inquiry::count(),
             'mapUsers' => $mapUsers,

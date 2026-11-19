@@ -52,7 +52,7 @@ final class Modules
 
     public const TXN_ACTIVATIONS = 9;
 
-    public const TXN_DISBURSEMENTS = 16;
+    public const TXN_DISBURSEMENTS = 17;
 
     // Post
     public const POST_NEWS = 10;

@@ -73,7 +73,6 @@
     @php
         $cards = [
             ['Total Members', $totalMembers, '👥', 'hover:shadow-[0_18px_40px_-12px_var(--color-primary)]'],
-            ['Active Branches', $activeBranches, '🏢', 'hover:shadow-[0_18px_40px_-12px_var(--color-primary)]'],
             ['Benefits', $totalBenefits, '🎁', 'hover:shadow-[0_18px_40px_-12px_var(--color-primary)]'],
             ['Inquiries', $totalInquiries, '📩', 'hover:shadow-[0_18px_40px_-12px_var(--color-primary)]'],
         ];
