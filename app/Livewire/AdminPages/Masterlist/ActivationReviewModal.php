@@ -165,34 +165,60 @@ class ActivationReviewModal extends Component
         $this->open = true;
     }
 
-    public function checkActivationNumberDuplicates(): array
+    public function checkActivationNumberDuplicates(): void
     {
-        if (! $this->activation) {
-            $this->policyNumberExists = false;
-            $this->receiptNumberExists = false;
+        $policyNumber = strtoupper(trim((string) $this->policy_number));
+        $receiptNumber = trim((string) $this->receipt_number);
 
-            return ['policy' => false, 'receipt' => false];
+        $activationID = $this->activation?->ActivationID;
+
+        // Check policy number in ACTIVATIONS table.
+        $policyExistsInActivations = false;
+
+        if ($policyNumber !== '') {
+            $policyExistsInActivations = Activation::query()
+                ->where('policy_number', $policyNumber)
+                ->when(
+                    $activationID,
+                    fn ($query) => $query->where(
+                        'ActivationID',
+                        '!=',
+                        $activationID
+                    )
+                )
+                ->exists();
         }
 
-        $policy = strtoupper(trim($this->policy_number));
-        $receipt = trim($this->receipt_number);
+        // Check policy number in USERS table.
+        // Exclude the currently selected member.
+        $policyExistsInUsers = false;
 
-        // Same TRIM/UPPER matching as approve(), so stored numbers with different
-        // casing or stray whitespace are still caught as duplicates.
-        $this->policyNumberExists = $policy !== ''
-            && Activation::whereRaw('UPPER(TRIM(policy_number)) = ?', [$policy])
-                ->where('ActivationID', '!=', $this->activation->ActivationID)
+        if ($policyNumber !== '') {
+            $policyExistsInUsers = User::query()
+                ->where('policy_number', $policyNumber)
+                ->where('UserID', '!=', $this->selectedUserID)
                 ->exists();
+        }
 
-        $this->receiptNumberExists = $receipt !== ''
-            && Activation::whereRaw('TRIM(receipt_number) = ?', [$receipt])
-                ->where('ActivationID', '!=', $this->activation->ActivationID)
+        $this->policyNumberExists =
+            $policyExistsInActivations || $policyExistsInUsers;
+
+        // Receipt numbers are checked in ACTIVATIONS only.
+        $this->receiptNumberExists = false;
+
+        if ($receiptNumber !== '') {
+            $this->receiptNumberExists = Activation::query()
+                ->where('receipt_number', $receiptNumber)
+                ->when(
+                    $activationID,
+                    fn ($query) => $query->where(
+                        'ActivationID',
+                        '!=',
+                        $activationID
+                    )
+                )
                 ->exists();
-
-        return [
-            'policy' => $this->policyNumberExists,
-            'receipt' => $this->receiptNumberExists,
-        ];
+        }
     }
 
     /** Live duplicate feedback while the admin types (drives the inline warnings). */
@@ -235,28 +261,15 @@ class ActivationReviewModal extends Component
 
     public function getNextReceiptNumberProperty(): string
     {
-        return str_pad(
-            (string) Activation::nextReceiptNumber(),
-            6,
-            '0',
-            STR_PAD_LEFT
-        );
+        return Activation::nextReceiptNumber();
     }
 
     public function generateReceiptNumber(): void
     {
-        $nextReceiptNumber = (int) Activation::nextReceiptNumber();
-
-        $this->receipt_number = str_pad(
-            (string) $nextReceiptNumber,
-            6,
-            '0',
-            STR_PAD_LEFT
-        );
+        $this->receipt_number = Activation::nextReceiptNumber();
 
         $this->resetValidation('receipt_number');
 
-        // Refresh the inline duplicate warnings for the generated value.
         $this->checkActivationNumberDuplicates();
     }
 
@@ -431,30 +444,32 @@ class ActivationReviewModal extends Component
         // ==========================================================
 
         try {
-            $this->validate([
-                'policy_number' => [
-                    'required',
-                    'string',
-                    'max:100',
-                    'regex:/^TRI-\d+-TS\d{4}-\d+$/',
-                ],
+        $this->validate([
+            'policy_number' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^TF-\d+-TF\d{4}-\d+$/',
+            ],
 
-                'receipt_number' => [
-                    'required',
-                    'string',
-                    'regex:/^\d{6}$/',
-                ],
-            ], [
-                'policy_number.required' => 'The policy number is required.',
+            'receipt_number' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^TF-\d+$/',
+            ],
+        ], [
+            'policy_number.required' => 'The policy number is required.',
 
-                'policy_number.regex' => 'The policy number must use the format TRI-00550-TS'.
-                    now()->year.
-                    '-550.',
+            'policy_number.regex' =>
+                'The policy number must use the format TF-00001-TF' .
+                now()->year . '-00001.',
 
-                'receipt_number.required' => 'The receipt number is required.',
+            'receipt_number.required' => 'The receipt number is required.',
 
-                'receipt_number.regex' => 'The receipt number must contain exactly 6 digits.',
-            ]);
+            'receipt_number.regex' =>
+                'The receipt number must use the format TF-00001.',
+        ]);
         } catch (ValidationException $e) {
             $errors = $e->validator->errors()->all();
 
@@ -471,7 +486,7 @@ class ActivationReviewModal extends Component
         // ==========================================================
 
         if (! preg_match(
-            '/^TRI-(\d+)-TS(\d{4})-(\d+)$/',
+            '/^TF-(\d+)-TF(\d{4})-(\d+)$/',
             $this->policy_number,
             $matches
         )) {
@@ -591,7 +606,13 @@ class ActivationReviewModal extends Component
         // RECEIPT NUMBER BASIC VALIDATION
         // ==========================================================
 
-        $receiptNumber = (int) $this->receipt_number;
+        preg_match(
+            '/^TF-(\d+)$/',
+            $this->receipt_number,
+            $receiptMatches
+        );
+
+        $receiptNumber = (int) $receiptMatches[1];
 
         // ==========================================================
         // DUPLICATE RECEIPT NUMBER
@@ -627,24 +648,27 @@ class ActivationReviewModal extends Component
         // RECEIPT NUMBER CANNOT JUMP AHEAD
         // ==========================================================
 
-        $nextReceiptNumber = (int) Activation::nextReceiptNumber();
+        $nextReceiptValue = Activation::nextReceiptNumber();
+
+        preg_match(
+            '/^TF-(\d+)$/',
+            $nextReceiptValue,
+            $nextReceiptMatches
+        );
+
+        $nextReceiptNumber = (int) $nextReceiptMatches[1];
 
         if ($receiptNumber > $nextReceiptNumber) {
-            $formattedNextReceipt = str_pad(
-                $nextReceiptNumber,
-                6,
-                '0',
-                STR_PAD_LEFT
+            $formattedNextReceipt = sprintf(
+                'TF-%05d',
+                $nextReceiptNumber
             );
 
             $message =
-                'The receipt number cannot jump ahead. '.
+                'The receipt number cannot jump ahead. ' .
                 "The next available receipt number is {$formattedNextReceipt}.";
 
-            $this->addError(
-                'receipt_number',
-                $message
-            );
+            $this->addError('receipt_number', $message);
 
             $this->showApprovalValidationError($message);
 

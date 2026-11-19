@@ -505,24 +505,19 @@ class ApplicationModal extends Component
             Mail::send('emails.new-application', $data, function ($m) use ($to, $subject, $attach) {
                 $m->to($to)->subject($subject);
 
-            if ($attach) {
-                $images = [
-                    'benefits.jpg' => public_path('images/benefits.jpg'),
-                    'second-image.jpg' => public_path('images/second-image.jpg'),
-                ];
+           if ($attach) {
+                $path = public_path('images/benefits.jpg');
 
-                foreach ($images as $filename => $path) {
-                    if (file_exists($path)) {
-                        $m->attach($path, [
-                            'as' => $filename,
-                            'mime' => 'image/jpeg',
-                        ]);
-                    } else {
-                        Log::warning('Email attachment missing', [
-                            'filename' => $filename,
-                            'path' => $path,
-                        ]);
-                    }
+                if (file_exists($path)) {
+                    $m->attach($path, [
+                        'as' => 'benefits.jpg',
+                        'mime' => 'image/jpeg',
+                    ]);
+                } else {
+                    Log::warning('Email attachment missing', [
+                        'filename' => 'benefits.jpg',
+                        'path' => $path,
+                    ]);
                 }
             }
             });

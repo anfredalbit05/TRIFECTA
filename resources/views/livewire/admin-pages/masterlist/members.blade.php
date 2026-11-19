@@ -270,7 +270,7 @@
 
 
                             {{-- ACTIONS --}}
-                            @if ($this->canUpdate || $this->canDelete || $this->canRead || $this->canCreate)
+                            @if ($this->canUpdate || $this->canRead || $this->canCreate)
 
                                 <td class="member-actions-cell">
 

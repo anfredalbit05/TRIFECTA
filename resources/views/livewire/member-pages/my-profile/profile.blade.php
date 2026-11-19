@@ -354,7 +354,7 @@
             </div>
 
 
-            @if (auth()->user()->RoleID != 8)
+            @if (auth()->user()->RoleID == 8)
                 {{-- --------------- 7. LIVE ID PREVIEW --------------- --}}
             <div class="id-preview-card">
                 <h4 class="id-preview-title">👁️ Live ID Preview</h4>

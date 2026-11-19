@@ -111,9 +111,6 @@ class Profile extends Component
             ->whereNotNull('receipt_number')
             ->exists();
 
-        // ID card data — membership no: TL + current year + zero-padded UserID
-        $this->membershipNo = 'TL'.now()->year.str_pad((string) $user->UserID, 3, '0', STR_PAD_LEFT);
-
         // Date of issue / valid until come from the approved activation's
         // policy effectivity/expiration dates (falling back to the
         // activation's approval date for the issue date).
@@ -121,6 +118,11 @@ class Profile extends Component
             ->where('status', 'Approved')
             ->latest('ActivationID')
             ->first();
+
+       // ID card data — membership no: TL + current year + zero-padded UserID
+       // Membership number comes from the approved activation policy number
+        $this->membershipNo = $approvedActivation?->policy_number ?? 'N/A';
+
 
         $issueDate = $approvedActivation?->policy_effectivity_date
             ?: $approvedActivation?->updated_at;
