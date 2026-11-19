@@ -962,10 +962,9 @@
                             <div>
                                 <label class="au-form-label">Role
                                     Name</label>
-                                <select wire:model="RoleID"
-                                    class="au-form-select">
+                                <select wire:model="RoleID" class="au-form-select">
                                     <option value="">Select Role</option>
-                                    @foreach (\App\Models\Role::where('RoleID', '!=', 4)->get() as $role)
+                                    @foreach ($this->assignableRoles as $role)
                                         <option value="{{ $role->RoleID }}">{{ $role->rolename }}</option>
                                     @endforeach
                                 </select>

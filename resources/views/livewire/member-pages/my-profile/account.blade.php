@@ -63,7 +63,10 @@
         </form>
     </div>
 
-    @if(auth()->user()->RoleID != 8 && $this->hasApprovedActivationHistory)
+    @if (
+        (auth()->user()->RoleID == 8 && $this->hasApprovedActivationHistory)
+        || in_array(auth()->user()->RoleID, [5,6,7])
+    )
     {{-- ================= 3. READ-ONLY ACCOUNT DETAILS ================= --}}
     <div class="card">
         <div class="card-header">

@@ -11,6 +11,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
+use App\Models\Role;
 use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -282,7 +283,7 @@ class AdminUsers extends Component
             'gender' => 'nullable|in:Male,Female,Other',
             'birthdate' => 'nullable|date',
             'address' => 'nullable|string',
-            'RoleID' => 'required|exists:roles,RoleID',
+            'RoleID' => 'required|exists:roles,RoleID|not_in:1',
             'positionMode' => 'required|in:select,custom',
             'position' => 'nullable|string|max:255|required_if:positionMode,select',
             'customPosition' => 'nullable|string|max:255|required_if:positionMode,custom',
@@ -360,6 +361,12 @@ class AdminUsers extends Component
             "Attempting to update user ID: {$this->selectedUserId}"
         );
 
+        $currentRoleId = (int) User::where('UserID', $this->selectedUserId)->value('RoleID');
+
+        $roleRules = ['required', 'exists:roles,RoleID'];
+        if ($currentRoleId !== 1) {
+            $roleRules[] = 'not_in:1';
+        }
         $this->validate([
             'firstname' => 'required|string|max:100',
             'middlename' => 'nullable|string|max:100',
@@ -374,7 +381,7 @@ class AdminUsers extends Component
             'birthdate' => 'nullable|date',
             'address' => 'nullable|string',
 
-            'RoleID' => 'required|exists:roles,RoleID',
+            'RoleID' => $roleRules,
 
             'positionMode' => 'required|in:select,custom',
             'position' => 'nullable|string|max:255|required_if:positionMode,select',
@@ -1370,6 +1377,19 @@ class AdminUsers extends Component
         $position = trim($position);
 
         return $position !== '' ? $position : null;
+    }
+
+    /**
+     * Roles that can be assigned in the Add/Edit form.
+     * Super Admin (1) is hidden, unless the user being edited already is one,
+     * so editing a Super Admin doesn't blank their role.
+     */
+    public function getAssignableRolesProperty()
+    {
+        return Role::where('RoleID', '!=', 1)
+            ->orWhere('RoleID', (int) $this->RoleID)
+            ->orderBy('RoleID')
+            ->get();
     }
 
     public function render()

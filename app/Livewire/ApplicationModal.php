@@ -194,10 +194,17 @@ class ApplicationModal extends Component
             return;
         }
 
-        if (in_array($property, ['surname', 'first_name', 'middle_name', 'occupation', 'address'])) {
-            $this->{$property} = ucwords(strtolower($value));
+        if (in_array($property, [
+            'surname',
+            'first_name',
+            'middle_name',
+            'occupation',
+            'address',
+        ])) {
+            $this->{$property} = $this->formatName($value);
+
         } elseif (preg_match('/^beneficiaries\.(\d+)\.(fullname|relationship)$/', $property, $m)) {
-            $this->beneficiaries[$m[1]][$m[2]] = ucwords(strtolower($value));
+            $this->beneficiaries[$m[1]][$m[2]] = $this->formatName($value);
         }
     }
 
@@ -771,6 +778,25 @@ class ApplicationModal extends Component
         if (! empty($address)) {
             $this->address = ucwords(strtolower($address));
         }
+    }
+
+    private function formatName(string $value): string
+    {
+        $value = mb_convert_case(mb_strtolower(trim($value)), MB_CASE_TITLE, 'UTF-8');
+
+        // Preserve repeated-character uppercase abbreviations (AA, AAA, etc.)
+        $value = preg_replace_callback('/\b([A-Z])\1{1,}\b/i', function ($matches) {
+            return strtoupper($matches[0]);
+        }, $value);
+
+        // Preserve Roman numeral suffixes (II, III, IV, V, VI, etc.)
+        $value = preg_replace_callback(
+            '/\b(I|II|III|IV|V|VI|VII|VIII|IX|X)\b/i',
+            fn ($matches) => strtoupper($matches[0]),
+            $value
+        );
+
+        return $value;
     }
 
     public function render()

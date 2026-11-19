@@ -54,7 +54,8 @@
                                 @foreach ([['surname', 'Surname *', 'Dela Cruz'], ['first_name', 'First Name *', 'Juan'], ['middle_name', 'Middle Name (Optional)', 'Santos']] as [$f, $l, $p])
                                     <div>
                                         <label class="{{ $lbl }}">{{ $l }}</label>
-                                        <input wire:model.live="{{ $f }}" type="text" placeholder="{{ $p }}" class="{{ $in }}">
+                                        <input wire:model.blur="{{ $f }}" type="text"
+                                            placeholder="{{ $p }}" class="{{ $in }}">
                                     </div>
                                 @endforeach
 
@@ -75,8 +76,8 @@
                                     {{-- OCCUPATION --}}
                                     <div>
                                         <label class="{{ $lbl }}">Occupation</label>
-                                        <input wire:model.live="occupation" type="text"
-                                            placeholder="e.g. Teacher, Driver, Engineer" class="{{ $in }}">
+                                        <input wire:model.blur="occupation" type="text"
+                                                placeholder="e.g. Teacher, Driver, Engineer" class="{{ $in }}">
                                     </div>
 
                                     {{-- EMPLOYMENT TYPE --}}
@@ -185,7 +186,9 @@
                             <div class="space-y-2">
                                 <label class="{{ $lbl }}">Complete Address *</label>
                                 <div class="flex gap-2">
-                                    <input wire:model.live="address" type="text" placeholder="House No., Street, Barangay, City/Municipality, Province" class="{{ $in }}">
+                                    <input wire:model.blur="address" type="text"
+                                            placeholder="House No., Street, Barangay, City/Municipality, Province"
+                                            class="{{ $in }}">
                                     <button type="button" wire:click="toggleMap" class="{{ $btn }} px-4">
                                         {{ $showMapModal ? 'Close Map' : 'Pin Map' }}
                                     </button>
@@ -239,14 +242,16 @@
 
                                 <div>
                                     <label class="{{ $lbl }}">Full Name</label>
-                                    <input wire:model.live="beneficiaries.{{ $i }}.fullname" type="text" placeholder="Full name of beneficiary" class="{{ $in }}">
+                                    <input wire:model.blur="beneficiaries.{{ $i }}.fullname"
+                                            type="text" placeholder="Full name of beneficiary" class="{{ $in }}">
                                 </div>
 
                                 @include('livewire.partials.ymd-picker', ['model' => "beneficiaries.$i.birthdate", 'label' => 'Birthdate', 'title' => 'Select Beneficiary Birthdate'])
 
                                 <div>
                                     <label class="{{ $lbl }}">Relationship</label>
-                                    <input wire:model.live="beneficiaries.{{ $i }}.relationship" type="text" placeholder="Father, Mother, Spouse..." class="{{ $in }}">
+                                    <input wire:model.blur="beneficiaries.{{ $i }}.relationship"
+                                            type="text" placeholder="Father, Mother, Spouse..." class="{{ $in }}">
                                 </div>
                             </div>
                         @endfor
