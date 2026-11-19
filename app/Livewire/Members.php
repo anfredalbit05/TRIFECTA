@@ -5,7 +5,6 @@ namespace App\Livewire;
 use App\Livewire\Concerns\AuthorizesModules;
 use App\Mail\PasswordResetConfirmation;
 use App\Models\Activation;
-use App\Models\Branch;
 use App\Models\Ledger;
 use App\Models\Setting;
 use App\Models\User;
@@ -30,9 +29,6 @@ class Members extends Component
     use AuthorizesModules;
     use WithPagination;
 
-    /** BranchID of the Main Branch (can see every branch's members). */
-    private const MAIN_BRANCH_ID = 1;
-
     public string $search = '';
 
     public string $dateRange = '';   // e.g. "2026-08-01 to 2026-08-16"
@@ -40,9 +36,6 @@ class Members extends Component
     public string $summaryFilter = 'all';
 
     public string $statusFilter = 'all';
-
-    // Branch filter (Main Branch only): 'all' or a BranchID
-    public string $branchFilter = 'all';
 
     // Excel Export Filters
     public $exportYear = '';
@@ -90,21 +83,6 @@ class Members extends Component
         return Modules::MEMBERS;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Branch scoping
-    |
-    | Main Branch users see every member and may narrow the list with the
-    | Branch dropdown. Users from any other branch only see (and can act
-    | on) members of their own branch. A logged-in user with no branch
-    | sees nothing.
-    |--------------------------------------------------------------------------
-    */
-
-    private function isMainBranchUser(): bool
-    {
-        return (int) Auth::user()?->branchCode === self::MAIN_BRANCH_ID;
-    }
 
     /**
      * Base query for every member lookup in this component.
@@ -117,23 +95,13 @@ class Members extends Component
     }
 
     /**
-     * Find one member inside the logged-in user's branch scope.
+     * Find one member.
      */
     private function findScopedMember($id): ?User
     {
-        return $this->scopedMembers()->where('UserID', $id)->first();
-    }
-
-    /**
-     * Branch list for the dropdown (Main Branch only).
-     */
-    public function getBranchesProperty()
-    {
-        if (! $this->isMainBranchUser()) {
-            return collect();
-        }
-
-        return Branch::orderBy('branchname')->get(['BranchID', 'branchname']);
+        return $this->scopedMembers()
+            ->where('UserID', $id)
+            ->first();
     }
 
     /*
@@ -203,7 +171,6 @@ class Members extends Component
 
         [$dateFrom, $dateTo] = $this->parsedDateRange();
 
-        $isMainBranch = $this->isMainBranchUser();
 
         $members = $this->scopedMembers()
             ->withExists([
@@ -225,13 +192,6 @@ class Members extends Component
                     $query->where('status', 'Pending');
                 },
             ])
-            // Branch dropdown — only honored for Main Branch users.
-            ->when(
-                $isMainBranch && $this->branchFilter !== 'all' && $this->branchFilter !== '',
-                function ($query) {
-                    $query->where('branchCode', $this->branchFilter);
-                }
-            )
             ->when(filled($this->search), function ($query) {
                 $words = array_filter(
                     explode(' ', trim(preg_replace('/[\s,]+/', ' ', $this->search)))
@@ -283,8 +243,6 @@ class Members extends Component
             'members' => $members,
             'isWithdrawalActive' => $this->isWithdrawalActive(),
             'isSatelliteApplicationActive' => $isSatelliteApplicationActive,
-            'isMainBranch' => $isMainBranch,
-            'branches' => $this->branches,
         ]);
     }
 
@@ -305,11 +263,6 @@ class Members extends Component
     }
 
     public function updatedStatusFilter()
-    {
-        $this->resetPage();
-    }
-
-    public function updatedBranchFilter()
     {
         $this->resetPage();
     }
@@ -1133,7 +1086,6 @@ class Members extends Component
         $this->search = '';
         $this->summaryFilter = 'all';
         $this->statusFilter = 'all';
-        $this->branchFilter = 'all';
         $this->dateRange = '';           // Clear month filter
         $this->exportYear = '';
         $this->exportMonth = '';

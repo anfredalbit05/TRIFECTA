@@ -83,12 +83,6 @@
             <div class="ws-rail-group">
                 <div class="ws-rail-label">Operations</div>
 
-                <a href="#" class="ws-rail-link" :class="tab === 'branches' ? 'is-active' : ''"
-                   @click.prevent="tab = 'branches'">
-                    <span class="ws-rail-icon">⌖</span>
-                    <span>Branches</span>
-                </a>
-
                 <a href="#" class="ws-rail-link" :class="tab === 'benefits' ? 'is-active' : ''"
                    @click.prevent="tab = 'benefits'">
                     <span class="ws-rail-icon">♡</span>
@@ -143,12 +137,6 @@
                     <livewire:admin-pages.masterlist.satellite-members lazy />
                 </div>
             </template> --}}
-
-            <template x-if="tab === 'branches'">
-                <div class="masterlist-main-card">
-                    <livewire:admin-pages.masterlist.branches-list lazy />
-                </div>
-            </template>
 
             <template x-if="tab === 'benefits'">
                 <div class="masterlist-main-card">

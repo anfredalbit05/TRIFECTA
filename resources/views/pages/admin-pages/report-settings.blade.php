@@ -76,12 +76,6 @@
                         <span class="ws-rail-icon">▦</span>
                         <span>Variants</span>
                     </a>
-
-                    <a href="#" class="ws-rail-link" :class="tab === 'branch-variant-grants' ? 'is-active' : ''"
-                       @click.prevent="switchTab('branch-variant-grants')">
-                        <span class="ws-rail-icon">◫</span>
-                        <span>Branch Variant Grants</span>
-                    </a>
                 </div>
             @endif
 
@@ -146,12 +140,6 @@
                 <template x-if="tab === 'variants'">
                     <div class="report-settings-main-card">
                         <livewire:admin-pages.report-settings.variants lazy />
-                    </div>
-                </template>
-
-                <template x-if="tab === 'branch-variant-grants'">
-                    <div class="report-settings-main-card">
-                        <livewire:admin-pages.report-settings.branch-variant-grants lazy />
                     </div>
                 </template>
 

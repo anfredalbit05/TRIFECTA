@@ -11,7 +11,6 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
-use App\Models\Branch;
 use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -32,9 +31,6 @@ class AdminUsers extends Component
     use WithPagination;
 
     protected $paginationTheme = 'tailwind';
-
-    /** BranchID of the Main Branch (can see every admin user). */
-    private const MAIN_BRANCH_ID = 1;
 
     // =====================================================
     // Table state
@@ -92,8 +88,6 @@ class AdminUsers extends Component
 
     public string $RoleID = '';
 
-    public string $branch = '';
-
     public string $position = '';
 
     public string $positionMode = 'select';
@@ -143,32 +137,6 @@ class AdminUsers extends Component
         return Modules::ADMIN_USERS;
     }
 
-    /*
-    |----------------------------------------------------------------------
-    | Branch scoping
-    |
-    | Main Branch users see every admin user. Users from any other
-    | branch only see (and can act on) admin users of their own branch.
-    | A logged-in user with no branch sees nothing.
-    |----------------------------------------------------------------------
-    */
-
-    private function isMainBranchUser(): bool
-    {
-        return (int) Auth::user()?->branchCode === self::MAIN_BRANCH_ID;
-    }
-
-    /**
-     * Base query for every admin user lookup in this component.
-     */
-    private function scopedUsers()
-    {
-        $branchCode = Auth::user()?->branchCode;
-
-        return User::query()
-            ->where('RoleID', '!=', 8);
-    }
-
     /**
      * Find one admin user inside the logged-in user's branch scope.
      */
@@ -177,20 +145,6 @@ class AdminUsers extends Component
         return $this->scopedUsers()->where('UserID', $id)->first();
     }
 
-    /**
-     * The branchCode value to save: Main Branch picks freely,
-     * everyone else is locked to their own branch.
-     */
-    private function branchCodeToSave(): ?string
-    {
-        if ($this->isMainBranchUser()) {
-            return $this->branch !== '' ? $this->branch : null;
-        }
-
-        $own = Auth::user()?->branchCode;
-
-        return filled($own) ? (string) $own : null;
-    }
 
     // ==========================================
     // WITHDRAWAL GLOBAL STATUS
@@ -296,7 +250,6 @@ class AdminUsers extends Component
             'address',
             'status',
             'RoleID',
-            'branch',
             'position',
             'customPosition',
             'selectedUserId',
@@ -312,9 +265,6 @@ class AdminUsers extends Component
         $this->resetUserForm();
 
         $this->status = 'Active';
-        $this->branch = $this->isMainBranchUser()
-            ? ''
-            : (string) Auth::user()?->branchCode;
         $this->positionMode = 'select';
         $this->isAddModalOpen = true;
     }
@@ -337,7 +287,6 @@ class AdminUsers extends Component
             'position' => 'nullable|string|max:255|required_if:positionMode,select',
             'customPosition' => 'nullable|string|max:255|required_if:positionMode,custom',
             'status' => 'required|in:Active,Inactive,Suspended',
-            'branch' => 'nullable|exists:branches,BranchID',
         ]);
 
         User::create([
@@ -355,7 +304,6 @@ class AdminUsers extends Component
             'position' => $this->getPositionValue() ?? 'client',
             'status' => $this->status,
             'referralCode' => $this->generateUplineCode(),
-            'branchCode' => $this->branchCodeToSave(),
         ]);
 
         session()->flash(
@@ -367,17 +315,6 @@ class AdminUsers extends Component
 
         $this->status = 'Active';
         $this->isAddModalOpen = false;
-    }
-
-    public function getBranchesProperty()
-    {
-        return Branch::query()
-            ->when(
-                ! $this->isMainBranchUser(),
-                fn ($q) => $q->where('BranchID', Auth::user()?->branchCode)
-            )
-            ->orderBy('branchname')
-            ->get(['BranchID', 'branchname']);
     }
 
     public function editUser(int $userId): void
@@ -409,8 +346,6 @@ class AdminUsers extends Component
         $this->address = $user->address ?? '';
         $this->status = $user->status ?? 'Inactive';
         $this->RoleID = $user->RoleID ?? '';
-
-        $this->branch = (string) ($user->branchCode ?? '');
 
         $this->position = $user->position ?? '';
         $this->customPosition = '';
@@ -447,7 +382,6 @@ class AdminUsers extends Component
 
             'status' => 'required|in:Active,Inactive,Suspended',
 
-            'branch' => 'nullable|exists:branches,BranchID',
         ]);
 
         $user = $this->findScopedUser($this->selectedUserId);
@@ -495,7 +429,6 @@ class AdminUsers extends Component
 
             'position' => $this->getPositionValue(),
 
-            'branchCode' => $this->branchCodeToSave(),
         ]);
 
         Log::info(
@@ -1439,91 +1372,45 @@ class AdminUsers extends Component
         return $position !== '' ? $position : null;
     }
 
+public function render()
+{
+    $users = $this->scopedUsers()
+        ->withExists([
+            'activations as has_pending_activation' => function ($query) {
+                $query->where('status', 'Pending');
+            },
 
-    public function render()
-    {
-        $users = $this->scopedUsers()
+            'withdrawals as has_pending_withdrawal' => function ($query) {
+                $query->where('status', 'Pending');
+            },
 
-            ->withExists([
+            'withdrawals as has_approved_withdrawal' => function ($query) {
+                $query->where('status', 'Approved');
+            },
+        ])
+        ->when(
+            filled($this->search),
+            function ($query) {
+                $search = trim($this->search);
 
-                'activations as has_pending_activation' => function ($query) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('firstname', 'like', "%{$search}%")
+                        ->orWhere('middlename', 'like', "%{$search}%")
+                        ->orWhere('lastname', 'like', "%{$search}%")
+                        ->orWhere('username', 'like', "%{$search}%")
+                        ->orWhere('contactno', 'like', "%{$search}%");
+                });
+            }
+        )
+        ->latest('UserID')
+        ->paginate(10);
 
-                    $query->where(
-                        'status',
-                        'Pending'
-                    );
-                },
-
-                'withdrawals as has_pending_withdrawal' => function ($query) {
-
-                    $query->where(
-                        'status',
-                        'Pending'
-                    );
-                },
-
-                'withdrawals as has_approved_withdrawal' => function ($query) {
-
-                    $query->where(
-                        'status',
-                        'Approved'
-                    );
-                },
-            ])
-
-            ->when(
-                filled($this->search),
-                function ($query) {
-
-                    $search =
-                        trim($this->search);
-
-                    $query->where(
-                        function ($q) use ($search) {
-
-                            $q->where(
-                                'firstname',
-                                'like',
-                                "%{$search}%"
-                            )
-                                ->orWhere(
-                                    'middlename',
-                                    'like',
-                                    "%{$search}%"
-                                )
-                                ->orWhere(
-                                    'lastname',
-                                    'like',
-                                    "%{$search}%"
-                                )
-                                ->orWhere(
-                                    'username',
-                                    'like',
-                                    "%{$search}%"
-                                )
-                                ->orWhere(
-                                    'contactno',
-                                    'like',
-                                    "%{$search}%"
-                                );
-                        }
-                    );
-                }
-            )
-
-            ->latest('UserID')
-
-            ->paginate(10);
-
-        return view(
-            'livewire.admin-pages.masterlist.admin-users',
-            [
-                'users' => $users,
-
-                'isWithdrawalActive' => $this->isWithdrawalActive(),
-
-                'branchNames' => Branch::pluck('branchname', 'BranchID'),
-            ]
-        );
-    }
+    return view(
+        'livewire.admin-pages.masterlist.admin-users',
+        [
+            'users' => $users,
+            'isWithdrawalActive' => $this->isWithdrawalActive(),
+        ]
+    );
+}
 }

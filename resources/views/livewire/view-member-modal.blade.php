@@ -386,14 +386,14 @@
                                 Download Policy
                             </a>
 
-                            <a href="{{ route('admin.member.certificate.download', $UserID) }}" target="_blank"
+                            {{-- <a href="{{ route('admin.member.certificate.download', $UserID) }}" target="_blank"
                                 class="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-accent)] px-6 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-[var(--color-accent)] sm:w-auto">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                 </svg>
                                 Download Certificate
-                            </a>
+                            </a> --}}
                         @endif
 
                         <button

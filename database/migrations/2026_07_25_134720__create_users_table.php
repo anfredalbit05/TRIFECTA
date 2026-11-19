@@ -55,8 +55,6 @@ return new class extends Migration
 
             $table->string('position')->nullable()->default('client');
 
-            $table->string('branchCode', 20)->nullable();
-
             // Status
             $table->enum('status', [
                 'Active',

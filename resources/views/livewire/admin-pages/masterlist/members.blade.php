@@ -70,23 +70,6 @@
     {{-- FILTERS AND REFRESH --}}
     <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
 
-        {{-- BRANCH FILTER (NEW) — Main Branch only --}}
-        @if ($isMainBranch)
-            <select
-                wire:model.live="branchFilter"
-                title="Filter by branch"
-                class="border border-slate-200 rounded-xl px-3 py-2.5 text-sm
-                    focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]
-                    focus:border-[var(--color-primary)] bg-white font-medium text-slate-700
-                    shadow-sm cursor-pointer transition"
-            >
-                <option value="all">All Branches</option>
-                @foreach ($branches as $branchOption)
-                    <option value="{{ $branchOption->BranchID }}">{{ $branchOption->branchname }}</option>
-                @endforeach
-            </select>
-        @endif
-
         {{-- STATUS FILTER --}}
         <select
             wire:model.live="statusFilter"

@@ -959,19 +959,6 @@
                             </div>
                             @endif
 
-                              <div>
-                                <label class="au-form-label">Branches</label>
-                                <select wire:model="branch" class="au-form-select">
-                                    <option value="">Select Branch</option>
-                                    @foreach ($this->branches as $branchOption)
-                                        <option value="{{ $branchOption->BranchID }}">{{ $branchOption->branchname }}</option>
-                                    @endforeach
-                                </select>
-                                @error('branch')
-                                    <span class="au-form-error">{{ $message }}</span>
-                                @enderror
-                            </div>
-
                             <div>
                                 <label class="au-form-label">Role
                                     Name</label>

@@ -53,13 +53,13 @@
                     <span>Security</span>
                 </a>
 
-                {{-- @if(auth()->user()->RoleID == 1 || auth()->user()->RoleID == 4)
+                @if(auth()->user()->RoleID == 8)
                     <a href="#" class="ws-rail-link" :class="tab === 'certificate' ? 'is-active' : ''"
                        @click.prevent="tab = 'certificate'">
                         <span class="ws-rail-icon">▣</span>
                         <span>Certificate</span>
                     </a>
-                @endif --}}
+                @endif
             </div>
 
         </aside>
@@ -82,11 +82,11 @@
                 <livewire:member-pages.my-profile.activity lazy />
             </div>
 
-            {{-- @if(auth()->user()->RoleID == 1 || auth()->user()->RoleID == 4)
+            @if(auth()->user()->RoleID == 8)
                 <div x-show="tab === 'certificate'" x-cloak class="my-profile-main-card">
                     <livewire:member-pages.my-profile.certificate lazy />
                 </div>
-            @endif --}}
+            @endif
 
         </section>
 

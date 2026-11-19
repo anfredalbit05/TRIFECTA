@@ -20,10 +20,7 @@ use Livewire\Component;
 
 class ActivationModal extends Component
 {
-    /**
-     * BranchID => prefix of that branch's rows in the settings table.
-     * Main Branch (1) uses the original un-prefixed names.
-     */
+
 
     public bool $open = false;
 
@@ -112,42 +109,6 @@ class ActivationModal extends Component
     */
     public ?int $selectedUserID = null;
 
-    /*
-    |--------------------------------------------------------------------------
-    | Branch Resolution
-    |
-    | Order of priority:
-    |   1. The branch of the entered upline code (referralCode owner)
-    |   2. The member's own branchCode
-    |   3. The logged-in user's branchCode
-    |
-    | Drives both the variant grants and the payment settings below.
-    | No branch = nothing available.
-    |--------------------------------------------------------------------------
-    */
-    private function resolveBranchId(): ?int
-    {
-        // 1. Upline's branch (the member inherits it on activation).
-        $uplineCode = trim($this->upline_code);
-
-        if ($uplineCode !== '') {
-            $uplineBranch = User::where('referralCode', $uplineCode)->value('branchCode');
-
-            if (filled($uplineBranch)) {
-                return (int) $uplineBranch;
-            }
-        }
-
-        // 2. The member's own branch.
-        $branch = $this->selectedUserRecord?->branchCode;
-
-        // 3. The logged-in user's branch.
-        if (blank($branch)) {
-            $branch = Auth::user()?->branchCode;
-        }
-
-        return filled($branch) ? (int) $branch : null;
-    }
 
     /*
     |--------------------------------------------------------------------------
@@ -191,20 +152,8 @@ class ActivationModal extends Component
      */
     private function loadAvailableVariants(): array
     {
-        $branchId = $this->resolveBranchId();
-
-        if ($branchId === null) {
-            return [];
-        }
-
         return Variant::query()
             ->where('status', 'Active')
-            ->whereIn('VID', function ($query) use ($branchId) {
-                $query->select('VID')
-                    ->from('branch_variant_grants')
-                    ->where('BranchID', $branchId)
-                    ->where('status', 'Active');
-            })
             ->orderBy('name')
             ->get()
             ->toArray();
@@ -215,21 +164,6 @@ class ActivationModal extends Component
      *
      * @return array<int, int>
      */
-    private function allowedVariantIds(): array
-    {
-        $branchId = $this->resolveBranchId();
-
-        if ($branchId === null) {
-            return [];
-        }
-
-        return DB::table('branch_variant_grants')
-            ->where('BranchID', $branchId)
-            ->where('status', 'Active')
-            ->pluck('VID')
-            ->map(fn ($vid) => (int) $vid)
-            ->all();
-    }
 
     /*
     |--------------------------------------------------------------------------
@@ -706,13 +640,8 @@ public function approveActivation($UserID = null): void
             $user->update([
                 'status' => 'Active',
                 'uplineCode' => $uplineCode,
-                'branchCode' => $upline->branchCode,
             ]);
 
-            // Mark the activation request as approved.
-            $activation->update([
-                'status' => 'Approved',
-            ]);
         });
     } catch (\Throwable $e) {
         Log::error('Activation approval failed.', [
@@ -776,8 +705,6 @@ public function approveActivation($UserID = null): void
     Log::info('Activation approved and branch assigned.', [
         'user_id' => $targetUserID,
         'upline_code' => $uplineCode,
-        'upline_branch_code' => $upline->branchCode,
-        'assigned_branch_code' => $user?->branchCode,
     ]);
 
     $this->dispatch('activation-approved');
@@ -1030,18 +957,10 @@ public function approveActivation($UserID = null): void
                     : 'New Activation Request Submitted (Admin Notice)';
             }
 
-            // Store/Update uplineCode on the User table column upon submission.
-            // The member also inherits the upline's branch right away
-            // (approval assigns it again, so both stay consistent).
-            $memberUpdates = [
+            // Store the submitted upline referral code.
+            $selectedUser->update([
                 'uplineCode' => $cleanUplineCode,
-            ];
-
-            if (filled($referralUser->branchCode)) {
-                $memberUpdates['branchCode'] = $referralUser->branchCode;
-            }
-
-            $selectedUser->update($memberUpdates);
+            ]);
 
             $mailData = [
                 'selectedUser' => $selectedUser,
@@ -1102,10 +1021,10 @@ public function approveActivation($UserID = null): void
                 );
             }
 
-            Log::info('✅ ACTIVATION COMMITTED SUCCESSFULLY', [
+            Log::info('ACTIVATION COMMITTED SUCCESSFULLY', [
                 'selected_user_id' => $selectedUser->UserID,
                 'payment_method' => $this->payment_method,
-                'inherited_branch_code' => $referralUser->branchCode,
+                'upline_code' => $cleanUplineCode,
             ]);
 
             $wasRenewal = $this->isRenewal;
@@ -1142,6 +1061,19 @@ public function approveActivation($UserID = null): void
                 message: 'Activation failed. Please try again.'
             );
         }
+    }
+
+    /**
+     * Get the IDs of variants available to the resolved branch.
+     *
+     * @return array<int, int>
+     */
+    private function allowedVariantIds(): array
+    {
+        return array_map(
+            'intval',
+            array_column($this->loadAvailableVariants(), 'VID')
+        );
     }
 
     /*
@@ -1306,10 +1238,15 @@ public function confirmActivate(): void
     */
     public function viewBenefits($vid): void
     {
-        $variant = Variant::where('VID', $vid)->first();
+        $variant = Variant::where('VID', $vid)
+            ->where('status', 'Active')
+            ->first();
 
         if (! $variant) {
-            $this->addError('selectedVariantId', 'The selected membership variant was not found.');
+            $this->addError(
+                'selectedVariantId',
+                'The selected membership variant was not found or is inactive.'
+            );
 
             return;
         }

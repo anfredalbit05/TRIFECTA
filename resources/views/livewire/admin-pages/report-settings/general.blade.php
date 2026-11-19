@@ -135,16 +135,6 @@
                         </td>
 
                         <td class="cell-name">
-                            <span class="name-badge">
-                                @if ((int) $setting->BranchID === 0)
-                                    All Branches
-                                @else
-                                    {{ $branchNames[$setting->BranchID] ?? 'Unknown Branch' }}
-                                @endif
-                            </span>
-                        </td>
-
-                        <td class="cell-name">
                             <span class="value-text">
 
                                     {{ $setting->name ?? 'Unknown Name' }}
@@ -253,23 +243,6 @@
                 <form wire:submit.prevent="saveSetting">
                     <div class="modal-body">
 
-                   <div>
-                    <label class="field-label">Branch</label>
-
-                    <select wire:model="BranchID" class="field-input">
-                        <option value="0">All Branches</option>
-
-                        @foreach ($branches as $branch)
-                            <option value="{{ $branch->BranchID }}">
-                                {{ $branch->branchname }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    @error('BranchID')
-                        <span class="field-error">{{ $message }}</span>
-                    @enderror
-                </div>
                         <!-- Name -->
                         <div>
                             <label class="field-label">Setting

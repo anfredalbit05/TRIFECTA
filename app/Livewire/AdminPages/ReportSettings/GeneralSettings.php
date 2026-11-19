@@ -4,7 +4,6 @@ namespace App\Livewire\AdminPages\ReportSettings;
 
 use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Setting;
-use App\Models\Branch;
 use App\Support\Modules;
 use Illuminate\Support\Facades\Storage;
 use App\Livewire\Concerns\HasTabSkeleton;
@@ -40,13 +39,11 @@ class GeneralSettings extends Component
     public $signatureUpload = null;
 
     protected $rules = [
-        'BranchID' => 'required|integer|min:0',
         'name' => 'required|string|max:100',
         'value' => 'nullable|string',
         'signatureUpload' => 'nullable|image|mimes:png,jpg,jpeg|max:5120',
     ];
 
-    public $BranchID  = 0;
 
     public function updatingSearch()
     {
@@ -87,8 +84,6 @@ class GeneralSettings extends Component
             'signatureUpload',
         ]);
 
-        $this->BranchID = 0;
-
         $this->dispatch(
             'setting-modal-type',
             type: 'text'
@@ -113,7 +108,6 @@ class GeneralSettings extends Component
             'signatureUpload',
         ]);
 
-        $this->BranchID = 0;
     }
 
     /**
@@ -132,7 +126,6 @@ class GeneralSettings extends Component
         $setting = Setting::findOrFail($id);
 
         $this->setting_id = $setting->SettingsID;
-        $this->BranchID = $setting->BranchID ?? 0;
         $this->name = $setting->name;
         $this->value = $setting->value;
         $this->signatureUpload = null;
@@ -227,7 +220,6 @@ class GeneralSettings extends Component
         }
 
         $this->validate([
-            'BranchID' => 'required|integer|min:0',
             'name' => 'required|string|max:100',
             'value' => 'nullable|string',
         ]);
@@ -278,7 +270,6 @@ class GeneralSettings extends Component
         |--------------------------------------------------------------------------
         */
         Setting::create([
-            'BranchID' => $this->BranchID,
             'name' => $this->name,
             'value' => $this->value,
         ]);
@@ -308,7 +299,6 @@ public function performUpdate()
 
     // Validate all editable fields.
     $this->validate([
-        'BranchID' => 'required|integer|min:0',
         'name' => 'required|string|max:100',
         'value' => 'nullable|string',
     ]);
@@ -317,7 +307,6 @@ public function performUpdate()
 
     // Check whether ANY field has changed.
     if (
-        (int) $setting->BranchID === (int) $this->BranchID &&
         $setting->name === $this->name &&
         $setting->value === $this->value
     ) {
@@ -346,7 +335,6 @@ public function performUpdate()
 
     // Save the updated variant, name, and value.
     $setting->update([
-        'BranchID' => $this->BranchID,
         'name' => $this->name,
         'value' => $this->value,
     ]);
@@ -652,17 +640,10 @@ public function performUpdate()
             })
             ->latest('SettingsID')
             ->paginate(10);
-
-        $branches = Branch::orderBy('branchname')->get();
-
-        $branchNames = $branches->pluck('branchname', 'BranchID');
-
         return view(
             'livewire.admin-pages.report-settings.general',
             [
                 'settings' => $settings,
-                'branches' => $branches,
-                'branchNames' => $branchNames,
             ]
         );
     }

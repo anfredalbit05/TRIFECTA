@@ -7,14 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class SettingsSeeder extends Seeder
 {
-    /**
-     * Centralized system settings.
-     *
-     * BranchID = 0 means these are global system settings.
-     *
-     * updateOrInsert prevents duplicates, but will update existing values
-     * whenever this seeder is executed.
-     */
     public function run(): void
     {
         $settings = [
@@ -116,7 +108,6 @@ class SettingsSeeder extends Seeder
         foreach ($settings as $name => $value) {
             DB::table('settings')->updateOrInsert(
                 [
-                    'BranchID' => 0,
                     'name' => $name,
                 ],
                 [

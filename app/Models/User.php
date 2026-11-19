@@ -70,7 +70,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     // Account Settings
     'RoleID',
     'position',
-    'branchCode',
     'status',
     'signature',
 ])]
@@ -243,16 +242,5 @@ class User extends Authenticatable implements PasskeyUser
         return $this->belongsTo(User::class, 'UserID', 'UserID');
     }
 
-    /**
-     * Get the branch assigned to this user.
-     */
-    public function branch(): BelongsTo
-    {
-        return $this->belongsTo(
-            Branch::class,
-            'branchCode',
-            'BranchID'
-        );
-    }
 
 }

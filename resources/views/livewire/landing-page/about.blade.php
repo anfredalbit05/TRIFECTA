@@ -1,7 +1,6 @@
 
 @php
     $joinAllow = \Illuminate\Support\Facades\DB::table('settings')
-        ->where('BranchID', 0)
         ->where('name', 'join_allow')
         ->value('value');
 
@@ -106,7 +105,7 @@
 <!-- =========================
      DTI REGISTRATION CERTIFICATE
 ========================= -->
-{{-- <section class="about-band bg-[#F4F7FC]">
+<section class="about-band bg-[#F4F7FC]">
     <div class="about-container">
 
         <!-- Section Header -->
@@ -161,7 +160,7 @@
                         Registration No.
                     </p>
                     <p class="mt-2 font-bold text-[var(--color-primary)]">
-                        8404829
+                        8618981
                     </p>
                 </div>
 
@@ -170,7 +169,7 @@
                         Valid Until
                     </p>
                     <p class="mt-2 font-bold text-[var(--color-primary)]">
-                        August 06, 2026 to August 06, 2031
+                        November 14, 2026 to November 14, 2031
                     </p>
                 </div>
 
@@ -209,7 +208,7 @@
         </div>
 
     </div>
-</section> --}}
+</section>
 
 
 <!-- =========================

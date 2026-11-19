@@ -2,7 +2,6 @@
 @php
     $joinAllow = filter_var(
         \Illuminate\Support\Facades\DB::table('settings')
-            ->where('BranchID', 0)
             ->where('name', 'join_allow')
             ->value('value'),
         FILTER_VALIDATE_BOOLEAN

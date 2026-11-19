@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id('SettingsID');
-            $table->unsignedBigInteger('BranchID')->nullable();
             $table->string('name', 100)->unique();
             $table->longText('value')->nullable();
             $table->timestamps();

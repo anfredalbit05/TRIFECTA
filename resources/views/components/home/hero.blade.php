@@ -1,6 +1,5 @@
 @php
     $joinAllow = \Illuminate\Support\Facades\DB::table('settings')
-        ->where('BranchID', 0)
         ->where('name', 'join_allow')
         ->value('value');
 

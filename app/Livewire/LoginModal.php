@@ -145,27 +145,17 @@ class LoginModal extends Component
             return;
         }
 
-        // Check if the user's branch is under maintenance.
-        $branchCode = (int) $user->branchCode;
-
+        // Check global system maintenance mode.
         $maintenance = DB::table('settings')
-            ->where('BranchID', $branchCode)
-            ->where('name', 'like', '%_branch_maintenance_mode')
-            ->where('value', 'true')
-            ->first();
+            ->where('name', 'maintenance_mode')
+            ->value('value');
 
-        if ($maintenance) {
-            $branch = DB::table('branches')
-                ->where('BranchID', $branchCode)
-                ->first();
-
-            $branchName = $branch?->branchname ?? 'Your Branch';
-
+        if ($maintenance === 'true' || $maintenance === '1') {
             $this->dispatch('swal:close');
 
             $this->dispatch(
                 'swal:warning',
-                message: "{$branchName} is Under Maintenance"
+                message: 'The system is currently under maintenance. Please try again later.'
             );
 
             return;

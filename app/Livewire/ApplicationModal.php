@@ -454,7 +454,6 @@ class ApplicationModal extends Component
                     'password' => bcrypt($this->password),
                     'referralCode' => $code,
                     'uplineCode' => $this->upline,
-                    'branchCode' => Auth::user()?->branchCode ?? 1,
                     'lastname' => $this->surname,
                     'firstname' => $this->first_name,
                     'middlename' => $this->middle_name,
