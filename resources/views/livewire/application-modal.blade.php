@@ -24,6 +24,7 @@
                             class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 font-bold text-slate-500 transition hover:bg-rose-100 hover:text-rose-600">&#10005;</button>
                     </div>
 
+                    @unless ($isEditMode)
                     <div class="mt-4 flex items-center gap-2">
                         @foreach ($steps as $i => $label)
                             @php $n = $i + 1; @endphp
@@ -38,13 +39,14 @@
                             </div>
                         @endforeach
                     </div>
+                    @endunless
                 </div>
 
                 {{-- BODY (all steps stay in the DOM so the map survives step changes) --}}
                 <div x-data x-effect="$wire.step, $el.scrollTop = 0" class="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
 
                     {{-- ========== STEP 1: PERSONAL + ADDRESS ========== --}}
-                    <div x-show="$wire.step === 1" x-cloak class="space-y-7">
+                    <div x-show="$wire.isEditMode || $wire.step === 1" x-cloak class="space-y-7">
                         <div class="space-y-4">
                             {!! $head('Applicant Personal Information', "Please provide the applicant's personal details.") !!}
 
@@ -58,7 +60,7 @@
 
                                 @foreach (['gender' => ['Gender', ['Male', 'Female', 'Other']], 'civil_status' => ['Civil Status', ['Single', 'Married', 'Widowed', 'Separated']]] as $f => [$l, $opts])
                                     <div>
-                                        <label class="{{ $lbl }}">{{ $l }} *</label>
+                                        <label class="{{ $lbl }}">{{ $l }}</label>
                                         <select wire:model="{{ $f }}" class="{{ $in }}">
                                             <option value="">Select {{ $l }}</option>
                                             @foreach ($opts as $o)
@@ -83,28 +85,43 @@
                                 {!! $head('Policy Information', 'Membership policy details and expiration information.') !!}
 
                                 <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2">
-                                    @foreach ([
-                                        ['policy_number', 'Policy Number', 'generatePolicyNumber', $this->previewPolicyNumber, $issuedPolicyNumber, 'uppercase', 20],
-                                        ['receipt_number', 'Receipt Number', 'generateControlNumber', $this->previewControlNumber, $activationControlNumber, '', 6],
-                                    ] as [$f, $l, $gen, $next, $issued, $cls, $max])
-                                        <div>
-                                            <label class="{{ $lbl }}">{{ $l }}</label>
-                                            <div class="flex gap-2">
-                                                <input wire:model.live="{{ $f }}" type="text" maxlength="{{ $max }}" placeholder="{{ $next }}" class="{{ $in }} {{ $cls }}">
-                                                <button type="button" wire:click="{{ $gen }}" class="{{ $btn }}">Generate</button>
-                                            </div>
-                                            @if (filled($issued))
-                                                <p class="mt-1 text-[10px] font-bold uppercase tracking-wide text-[var(--color-gold-darker)]">✓ Issued: {{ $issued }}</p>
-                                            @endif
-                                            @error($f)
-                                                <p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>
-                                            @enderror
-                                            <p class="mt-1 text-[10px] text-slate-500">
-                                                Next: <span class="font-bold text-slate-600">{{ $next }}</span>
-                                                — backlog numbers below this are allowed if unused.
-                                            </p>
-                                        </div>
-                                    @endforeach
+
+                                {{-- POLICY NUMBER: VIEW ONLY --}}
+                                <div>
+                                    <label class="{{ $lbl }}">Policy Number</label>
+
+                                    <input
+                                        wire:model="policy_number"
+                                        type="text"
+                                        readonly
+                                        class="{{ $in }} cursor-not-allowed bg-slate-100 text-slate-600"
+                                    />
+
+                                    @if (filled($issuedPolicyNumber))
+                                        <p class="mt-1 text-[10px] font-bold uppercase tracking-wide text-[var(--color-gold-darker)]">
+                                            ✓ Issued: {{ $issuedPolicyNumber }}
+                                        </p>
+                                    @endif
+                                </div>
+
+                                {{-- RECEIPT NUMBER: VIEW ONLY --}}
+                                <div>
+                                    <label class="{{ $lbl }}">Receipt Number</label>
+
+                                    <input
+                                        wire:model="receipt_number"
+                                        type="text"
+                                        readonly
+                                        class="{{ $in }} cursor-not-allowed bg-slate-100 text-slate-600"
+                                    />
+
+                                    @if (filled($activationControlNumber))
+                                        <p class="mt-1 text-[10px] font-bold uppercase tracking-wide text-[var(--color-gold-darker)]">
+                                            ✓ Issued: {{ $activationControlNumber }}
+                                        </p>
+                                    @endif
+                                </div>
+
 
                                     @foreach (['policy_effectivity_date' => 'Policy Effectivity Date', 'policy_expiration_date' => 'Policy Expiration Date'] as $f => $l)
                                         <div>
@@ -158,6 +175,7 @@
                         </div>
                     </div>
 
+                    @unless ($isEditMode)
                     {{-- ========== STEP 2: BENEFICIARIES ========== --}}
                     <div x-show="$wire.step === 2" x-cloak class="space-y-4">
                         <div class="flex items-center justify-between rounded-xl bg-[var(--color-primary)] px-4 py-2.5 shadow-sm">
@@ -199,14 +217,15 @@
                             </div>
                         @endfor
                     </div>
+                    @endunless
 
                     {{-- ========== STEP 3: ACCOUNT & SECURITY ========== --}}
-                    <div x-show="$wire.step === 3" x-cloak class="space-y-7">
+                    <div x-show="$wire.isEditMode || $wire.step === 3" x-cloak class="space-y-7">
                         <div class="space-y-4">
                             {!! $head('Account & Security Information', 'Account credentials and contact information.') !!}
 
                             <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2 lg:grid-cols-3">
-                                @foreach ([['mobile', 'Mobile Number *', 'tel', '0917XXXXXXX', 'live'], ['email', 'Email Address (Optional)', 'email', 'juan@example.com', 'blur'], ['username', 'Username *', 'text', 'Juan123', 'blur']] as [$f, $l, $t, $p, $m])
+                                @foreach ([['mobile', 'Mobile Number', 'tel', '0917XXXXXXX', 'live'], ['email', 'Email Address (Optional)', 'email', 'juan@example.com', 'blur'], ['username', 'Username *', 'text', 'Juan123', 'blur']] as [$f, $l, $t, $p, $m])
                                     <div>
                                         <label class="{{ $lbl }}">{{ $l }}</label>
                                         <input wire:model.{{ $m }}="{{ $f }}" type="{{ $t }}" placeholder="{{ $p }}" class="{{ $in }}">
@@ -251,27 +270,71 @@
 
                 {{-- FOOTER --}}
                 <div class="flex items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 p-4">
-                    <span class="hidden text-xs text-slate-500 sm:block">Step {{ $step }} of 3 &bull; Please verify all details before submitting.</span>
+
+                    @unless ($isEditMode)
+                        <span class="hidden text-xs text-slate-500 sm:block">
+                            Step {{ $step }} of 3 &bull; Please verify all details before submitting.
+                        </span>
+                    @endunless
 
                     <div class="ml-auto flex w-full items-center gap-3 sm:w-auto">
-                        @if ($step > 1)
-                            <button wire:click="back" type="button"
-                                class="w-1/2 rounded-xl border border-slate-300 px-5 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-100 sm:w-auto">&larr; Back</button>
-                        @else
-                            <button wire:click="close" type="button"
-                                class="w-1/2 rounded-xl border border-slate-300 px-5 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-100 sm:w-auto">Cancel</button>
-                        @endif
 
-                        @if ($step < 3)
-                            <button wire:click="next" type="button" wire:loading.attr="disabled" wire:target="next"
-                                class="w-1/2 rounded-xl bg-[var(--color-accent)] px-6 py-2.5 text-xs font-bold text-white shadow-md transition disabled:opacity-50 sm:w-auto">Next &rarr;</button>
-                        @else
-                            @php $action = $isEditMode ? 'confirmUpdate' : 'submit'; @endphp
-                            <button wire:click="{{ $action }}" type="button" wire:loading.attr="disabled" @disabled(! $agree && ! $isEditMode)
-                                class="flex w-1/2 items-center justify-center rounded-xl bg-[var(--color-accent)] px-6 py-2.5 text-xs font-bold text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
-                                <span wire:loading.remove wire:target="{{ $action }}">{{ $isEditMode ? 'Update Member' : 'Submit Application' }}</span>
-                                <span wire:loading wire:target="{{ $action }}">{{ $isEditMode ? 'Updating...' : 'Submitting...' }}</span>
+                        @if ($isEditMode)
+
+                            <button wire:click="close" type="button"
+                                class="w-1/2 rounded-xl border border-slate-300 px-5 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-100 sm:w-auto">
+                                Cancel
                             </button>
+
+                            <button wire:click="confirmUpdate" type="button"
+                                wire:loading.attr="disabled" wire:target="confirmUpdate"
+                                class="flex w-1/2 items-center justify-center rounded-xl bg-[var(--color-accent)] px-6 py-2.5 text-xs font-bold text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
+
+                                <span wire:loading.remove wire:target="confirmUpdate">
+                                    Update Member
+                                </span>
+
+                                <span wire:loading wire:target="confirmUpdate">
+                                    Updating...
+                                </span>
+                            </button>
+
+                        @else
+
+                            @if ($step > 1)
+                                <button wire:click="back" type="button"
+                                    class="w-1/2 rounded-xl border border-slate-300 px-5 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-100 sm:w-auto">
+                                    &larr; Back
+                                </button>
+                            @else
+                                <button wire:click="close" type="button"
+                                    class="w-1/2 rounded-xl border border-slate-300 px-5 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-100 sm:w-auto">
+                                    Cancel
+                                </button>
+                            @endif
+
+                            @if ($step < 3)
+                                <button wire:click="next" type="button"
+                                    wire:loading.attr="disabled" wire:target="next"
+                                    class="w-1/2 rounded-xl bg-[var(--color-accent)] px-6 py-2.5 text-xs font-bold text-white shadow-md transition disabled:opacity-50 sm:w-auto">
+                                    Next &rarr;
+                                </button>
+                            @else
+                                <button wire:click="submit" type="button"
+                                    wire:loading.attr="disabled" wire:target="submit"
+                                    @disabled(! $agree)
+                                    class="flex w-1/2 items-center justify-center rounded-xl bg-[var(--color-accent)] px-6 py-2.5 text-xs font-bold text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
+
+                                    <span wire:loading.remove wire:target="submit">
+                                        Submit Application
+                                    </span>
+
+                                    <span wire:loading wire:target="submit">
+                                        Submitting...
+                                    </span>
+                                </button>
+                            @endif
+
                         @endif
                     </div>
                 </div>

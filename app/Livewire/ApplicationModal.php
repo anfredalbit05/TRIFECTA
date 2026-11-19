@@ -129,7 +129,7 @@ class ApplicationModal extends Component
 
     public function next(): void
     {
-        if ($this->step === 1 && ! $this->check($this->rules1(), $this->isEditMode)) {
+        if ($this->step === 1 && ! $this->check($this->rules1())) {
             return;
         }
 
@@ -155,6 +155,12 @@ class ApplicationModal extends Component
         if ($property === 'mobile') {
             $v = (string) $value;
 
+            if (trim($v) === '') {
+                $this->mobile = '';
+
+                return;
+            }
+
             if (str_starts_with($v, '+63')) {
                 $v = '09'.substr($v, 3);
             } elseif (str_starts_with($v, '63') && strlen($v) === 12) {
@@ -172,6 +178,8 @@ class ApplicationModal extends Component
             }
 
             $this->mobile = substr($v, 0, 11);
+
+            return;
         }
 
         if (! is_string($value)) {
@@ -190,30 +198,31 @@ class ApplicationModal extends Component
     | Validation
     |--------------------------------------------------------------------------
     */
+
     private function rules1(): array
     {
         return [
             'surname' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',
-            'gender' => 'required',
-            'civil_status' => 'required',
+            'gender' => 'nullable|string',
+            'civil_status' => 'nullable|string',
             'birthdate' => 'required|date',
             'occupation' => 'nullable|string|max:255',
             'address' => 'required|string|max:500',
         ] + ($this->isEditMode ? [
-            'policy_number' => 'nullable|string|max:100',
+            // Policy and receipt numbers are already issued.
+            // Only the policy dates and Cocogen number are editable.
             'policy_effectivity_date' => 'nullable|date',
             'policy_expiration_date' => 'nullable|date',
             'cocogen_policy_number' => 'nullable|string|max:255',
-            'receipt_number' => ['nullable', 'string', 'max:50', 'regex:/^\d{6}$/',
-                Rule::unique('activations', 'receipt_number')->ignore($this->activationId, 'ActivationID')],
         ] : []);
     }
+
 
     private function rules3(): array
     {
         return [
-            'mobile' => 'required|digits:11',
+            'mobile' => 'nullable|digits:11',
             'email' => ['nullable', 'email', Rule::unique('users', 'email')->ignore($this->userId, 'UserID')],
             'username' => ['required', 'string', 'max:100',
                 Rule::unique('users', 'username')->ignore($this->userId, 'UserID')],
@@ -449,11 +458,11 @@ class ApplicationModal extends Component
                     'lastname' => $this->surname,
                     'firstname' => $this->first_name,
                     'middlename' => $this->middle_name,
-                    'gender' => $this->gender,
-                    'civilstatus' => $this->civil_status,
+                    'gender' => filled($this->gender) ? $this->gender : null,
+                    'civilstatus' => filled($this->civil_status) ? $this->civil_status : null,
                     'birthdate' => $this->birthdate,
                     'occupation' => $this->occupation,
-                    'contactno' => $this->mobile,
+                    'contactno' => filled($this->mobile) ? $this->mobile : null,
                     'email' => filled($this->email) ? $this->email : null,
                     'address' => $this->address,
                     'latitude' => $this->latitude,
@@ -540,23 +549,28 @@ class ApplicationModal extends Component
     | Update Member
     |--------------------------------------------------------------------------
     */
+
     public function confirmUpdate()
     {
-        if (! $this->validateBeneficiaries()
-            || ! $this->check($this->rules1() + self::BEN_RULES + $this->rules3(), true)) {
+        if (! $this->check($this->rules1() + $this->rules3())) {
             return;
         }
 
         $changes = $this->getChangedFields();
 
         if (! $changes) {
-            $this->dispatch('validation-error', title: 'No Changes', html: 'There are no changes to save.');
+            $this->dispatch(
+                'validation-error',
+                title: 'No Changes',
+                html: 'There are no changes to save.'
+            );
 
             return;
         }
 
         $this->dispatch('swal-confirm-update', changes: $changes);
     }
+
 
     private function getChangedFields(): array
     {
@@ -570,25 +584,14 @@ class ApplicationModal extends Component
                 $changes[] = ['field' => $label, 'old' => $old ?: '—', 'new' => $new ?: '—'];
             }
         }
-
-        $fmt = fn ($b) => implode('', $b) === '' ? '—'
-            : trim("{$b['fullname']} – {$b['relationship']} ({$b['birthdate']})");
-
-        foreach ($this->beneficiaries as $i => $b) {
-            $old = $this->originalData['beneficiaries'][$i] ?? self::BLANK;
-
-            if ($old != $b) {
-                $changes[] = ['field' => 'Beneficiary '.($i + 1), 'old' => $fmt($old), 'new' => $fmt($b)];
-            }
-        }
-
         return $changes;
     }
+
 
     #[On('confirmed-update-member')]
     public function updateMember(): void
     {
-        if (! $this->check($this->rules1() + self::BEN_RULES + $this->rules3(), true)) {
+        if (! $this->check($this->rules1() + self::BEN_RULES + $this->rules3())) {
             return;
         }
 
@@ -600,11 +603,11 @@ class ApplicationModal extends Component
                     'lastname' => $this->surname,
                     'firstname' => $this->first_name,
                     'middlename' => $this->middle_name,
-                    'gender' => $this->gender,
-                    'civilstatus' => $this->civil_status,
+                    'gender' => filled($this->gender) ? $this->gender : null,
+                    'civilstatus' => filled($this->civil_status) ? $this->civil_status : null,
                     'birthdate' => $this->birthdate,
                     'occupation' => $this->occupation,
-                    'contactno' => $this->mobile,
+                    'contactno' => filled($this->mobile) ? $this->mobile : null,
                     'email' => filled($this->email) ? $this->email : null,
                     'username' => $this->username,
                     'address' => $this->address,
@@ -612,37 +615,35 @@ class ApplicationModal extends Component
                     'longitude' => $this->longitude,
                 ]);
 
-                // Policy fields + control number belong to the APPROVED activation, not users.
+                // Update only editable policy information.
+                // Never modify the already-issued policy or receipt numbers.
                 if ($this->activationId) {
-                    $activation = Activation::where('ActivationID', $this->activationId);
-
-                    (clone $activation)->update([
-                        'cocogen_policy_number' => $this->cocogen_policy_number,
-                        'policy_number' => $this->policy_number,
-                        'policy_effectivity_date' => $this->policy_effectivity_date,
-                        'policy_expiration_date' => $this->policy_expiration_date,
-                    ]);
-
-                    if (filled($this->receipt_number)) {
-                        (clone $activation)->whereNull('receipt_number')
-                            ->update(['receipt_number' => $this->receipt_number]);
-                    }
+                    Activation::where('ActivationID', $this->activationId)
+                        ->update([
+                            'cocogen_policy_number' => $this->cocogen_policy_number,
+                            'policy_effectivity_date' => $this->policy_effectivity_date,
+                            'policy_expiration_date' => $this->policy_expiration_date,
+                        ]);
                 }
 
-                Beneficiary::where('UserID', $user->UserID)->delete();
-                $this->saveBeneficiaries($user->UserID);
             });
         } catch (\Throwable $e) {
-            Log::error('Update failed', ['error' => $e->getMessage()]);
+            Log::error('Update failed', [
+                'error' => $e->getMessage(),
+            ]);
 
             $this->dispatch('swal-close');
-            $this->dispatch('validation-error', title: 'Error', html: 'Failed to update member.');
+            $this->dispatch('validation-error',
+                title: 'Error',
+                html: 'Failed to update member.'
+            );
 
             return;
         }
 
         $this->finish('Updated!', 'Member updated successfully.');
     }
+
 
     private function fillUserData(User $u): void
     {
