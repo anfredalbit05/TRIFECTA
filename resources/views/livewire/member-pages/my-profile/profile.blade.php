@@ -312,7 +312,7 @@
 
 
             {{-- --------------- 6. SIGNATURE PAD --------------- --}}
-            <div class="signature-card" x-data="signaturePadSetup($el.dataset.signatureUrl || null)"
+            {{-- <div class="signature-card" x-data="signaturePadSetup($el.dataset.signatureUrl || null)"
              data-signature-url="{{ $signature ? Storage::url($signature) : '' }}" x-init="initPad()">
                 <h3 class="signature-title">Signature</h3>
 
@@ -326,14 +326,14 @@
 
                 <div class="signature-actions">
 
-                {{-- DELETE --}}
+                DELETE
                 <button type="button"
                     @click="deleteSignature"
                     class="btn-warning">
                     Delete Signature
                 </button>
 
-                {{-- CLEAR + SAVE --}}
+                CLEAR + SAVE
                 <div class="signature-actions-right">
 
                     <button type="button"
@@ -351,24 +351,24 @@
                 </div>
 
             </div>
-            </div>
+            </div> --}}
 
 
-            @if (auth()->user()->RoleID == 8)
-                {{-- --------------- 7. LIVE ID PREVIEW --------------- --}}
+            {{-- @if (auth()->user()->RoleID == 8)
+                --------------- 7. LIVE ID PREVIEW ---------------
             <div class="id-preview-card">
                 <h4 class="id-preview-title">👁️ Live ID Preview</h4>
 
                 <div class="id-card-viewport">
 
-                    {{-- FRONT SIDE --}}
+                    FRONT SIDE
                     <div id="id-card-front" class="id-card-side id-card-front-new">
 
                         <img src="{{ asset('images/certificate/trifecta-id.png') }}"
                             class="id-template-img"
                             alt="TRIFECTA Membership ID Front">
 
-                        {{-- Member Photo --}}
+                        Member Photo
                         <div class="idn-photo">
                             @if ($profilepic && is_object($profilepic))
                                 <img src="{{ $profilepic->temporaryUrl() }}" alt="Member Photo">
@@ -379,14 +379,14 @@
                             @endif
                         </div>
 
-                        {{-- Cover Existing Sample Information --}}
+                        Cover Existing Sample Information
                         <div class="idn-mask idn-name-mask"></div>
                         <div class="idn-mask idn-membership-mask"></div>
                         <div class="idn-mask idn-certificate-mask"></div>
                         <div class="idn-mask idn-issue-mask"></div>
                         <div class="idn-mask idn-valid-mask"></div>
 
-                        {{-- Dynamic Member Information --}}
+                        Dynamic Member Information
                         <div class="idn-field idn-name">
                             {{ strtoupper(trim("$firstname " . ($middlename ? substr(trim($middlename), 0, 1) . '. ' : '') . $lastname)) }}
                         </div>
@@ -409,7 +409,7 @@
 
                     </div>
 
-                    {{-- BACK SIDE --}}
+                    BACK SIDE
                     <div id="id-card-back" class="id-card-side id-card-back-new hidden">
 
                         <img src="{{ asset('images/certificate/trifecta-id.png') }}"
@@ -420,7 +420,7 @@
 
                 </div>
 
-                {{-- FRONT / BACK TABS
+                FRONT / BACK TABS
                 <div class="id-tabs">
                     <button type="button"
                             id="btn-front"
@@ -435,9 +435,9 @@
                             class="id-tab id-tab--inactive">
                         Back
                     </button>
-                </div> --}}
+                </div>
 
-                {{-- ACTIONS --}}
+                ACTIONS
                 <div class="id-actions flex justify-center items-center gap-4 flex-wrap">
 
                     <a href="{{ route('member.id-card.pdf') }}"
@@ -452,16 +452,16 @@
                         </a>
                     @endif
 
-                    {{-- <button type="button"
+                    <button type="button"
                             wire:click="requestPhysicalId"
                             class="btn-download text-center">
                         Request Physical ID
-                    </button> --}}
+                    </button>
 
                 </div>
             </div>
 
-            @endif
+            @endif --}}
         </div>
     </div>
 
