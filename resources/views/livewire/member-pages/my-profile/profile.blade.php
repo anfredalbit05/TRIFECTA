@@ -71,63 +71,6 @@
         {{-- =================== LEFT COLUMN =================== --}}
         <div class="profile-col">
 
-            {{-- --------------- 3. PROFILE PICTURE CARD --------------- --}}
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Profile Picture</h3>
-                    <p class="card-subtitle">Upload a clear profile picture. Maximum file size is 2 MB.</p>
-                </div>
-
-                <div class="avatar-section">
-                    <div class="avatar-frame">
-                        @if ($profilepic)
-                            <img src="{{ $profilepic->temporaryUrl() }}" class="avatar-img"
-                                alt="New profile picture preview">
-                        @else
-                            @php
-                                $profilePic = auth()->user()->profilepic;
-                            @endphp
-
-                            @if (!$profilePic || $profilePic === 'images/profiles/default-avatar.png')
-                                <img src="{{ asset('images/profiles/default-avatar.png') }}" class="avatar-img"
-                                    alt="Default profile picture">
-                            @else
-                                <img src="{{ Storage::url($profilePic) }}" class="avatar-img" alt="Profile picture">
-                            @endif
-                        @endif
-                    </div>
-
-                    <div class="avatar-actions">
-                        <div class="avatar-buttons-row">
-                            <label for="profilepic" class="btn-primary">
-                                Choose Profile Picture
-                            </label>
-                            <input id="profilepic" type="file" wire:model="profilepic" accept="image/jpeg,image/jpg"
-                                class="hidden">
-
-                            @if (!$profilepic && auth()->user()->profilepic && auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
-                            <button type="button"
-                                wire:click="removeProfilePicture"
-                                wire:confirm="Are you sure you want to remove your profile picture?"
-                                class="btn-danger">
-                                Remove Profile Picture
-                            </button>
-                            @endif
-                        </div>
-
-                        @error('profilepic')
-                            <p class="field-error">{{ $message }}</p>
-                        @enderror
-
-                        @if ($profilepic)
-                            <button type="button" wire:click="updateProfilePicture" class="btn-secondary mt-3">
-                                Save Profile Picture
-                            </button>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
             {{-- ------ 4. PERSONAL DETAILS + EMERGENCY CONTACT FORM ------ --}}
             <div class="card">
                 <div class="card-header">
@@ -270,6 +213,63 @@
 
         {{-- =================== RIGHT COLUMN =================== --}}
         <div class="profile-col">
+
+                 {{-- --------------- 3. PROFILE PICTURE CARD --------------- --}}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Profile Picture</h3>
+                    <p class="card-subtitle">Upload a clear profile picture. Maximum file size is 2 MB.</p>
+                </div>
+
+                <div class="avatar-section">
+                    <div class="avatar-frame">
+                        @if ($profilepic)
+                            <img src="{{ $profilepic->temporaryUrl() }}" class="avatar-img"
+                                alt="New profile picture preview">
+                        @else
+                            @php
+                                $profilePic = auth()->user()->profilepic;
+                            @endphp
+
+                            @if (!$profilePic || $profilePic === 'images/profiles/default-avatar.png')
+                                <img src="{{ asset('images/profiles/default-avatar.png') }}" class="avatar-img"
+                                    alt="Default profile picture">
+                            @else
+                                <img src="{{ Storage::url($profilePic) }}" class="avatar-img" alt="Profile picture">
+                            @endif
+                        @endif
+                    </div>
+
+                    <div class="avatar-actions">
+                        <div class="avatar-buttons-row">
+                            <label for="profilepic" class="btn-primary">
+                                Choose Profile Picture
+                            </label>
+                            <input id="profilepic" type="file" wire:model="profilepic" accept="image/jpeg,image/jpg"
+                                class="hidden">
+
+                            @if (!$profilepic && auth()->user()->profilepic && auth()->user()->profilepic !== 'images/profiles/default-avatar.png')
+                            <button type="button"
+                                wire:click="removeProfilePicture"
+                                wire:confirm="Are you sure you want to remove your profile picture?"
+                                class="btn-danger">
+                                Remove Profile Picture
+                            </button>
+                            @endif
+                        </div>
+
+                        @error('profilepic')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+
+                        @if ($profilepic)
+                            <button type="button" wire:click="updateProfilePicture" class="btn-secondary mt-3">
+                                Save Profile Picture
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            </div>
 
             @if (auth()->user()->RoleID == 8)
                 {{-- --------------- 5. REGISTERED BENEFICIARIES (READ-ONLY) --------------- --}}
