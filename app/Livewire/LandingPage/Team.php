@@ -44,7 +44,6 @@ class Team extends Component
     public function render()
     {
         return view('livewire.landing-page.team', [
-            'branches' => Branch::where('status', true)->get()
         ]);
     }
 }
