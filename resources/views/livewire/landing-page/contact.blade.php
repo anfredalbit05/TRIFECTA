@@ -108,11 +108,37 @@
                     <br>
                     <x-editable-text key="contact_fb_sub" :value="$contexts['contact_fb_sub'] ?? ''" tag="span" class="inline-block"/>
                 </p>
-                <a href="{{ $contexts['contact_fb_url'] ?? 'https://facebook.com' }}" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">
-                    <flux:icon.globe-alt class="w-5 h-5"/>
-                    <x-editable-text key="contact_fb_btn_text" :value="$contexts['contact_fb_btn_text'] ?? 'Visit Our Facebook'" tag="span" class="inline-block"/>
-                    <flux:icon.arrow-up-right class="w-4 h-4"/>
-                </a>
+@php
+    $fbDefault = 'https://www.facebook.com/profile.php?id=61596844733795';
+    $fbRaw     = trim((string) ($contexts['contact_fb_url'] ?? ''));
+    $fbHost    = (string) parse_url($fbRaw, PHP_URL_HOST);
+    $fbPath    = trim((string) parse_url($fbRaw, PHP_URL_PATH), '/');
+    $fbQuery   = parse_url($fbRaw, PHP_URL_QUERY);
+
+    // A bare facebook.com / www.facebook.com value has no path or query
+    $isBareHome = $fbHost !== ''
+        && preg_match('/(^|\.)facebook\.com$/i', $fbHost)
+        && $fbPath === ''
+        && blank($fbQuery);
+
+    $fbUrl = (filled($fbRaw) && filter_var($fbRaw, FILTER_VALIDATE_URL) && ! $isBareHome)
+        ? $fbRaw
+        : $fbDefault;
+@endphp
+
+<a href="{{ $fbUrl }}"
+   target="_blank"
+   rel="noopener noreferrer"
+   class="contact-facebook-btn">
+    <flux:icon.globe-alt class="w-5 h-5"/>
+    <x-editable-text
+        key="contact_fb_btn_text"
+        :value="$contexts['contact_fb_btn_text'] ?? 'Visit Our Facebook'"
+        tag="span"
+        class="inline-block"
+    />
+    <flux:icon.arrow-up-right class="w-4 h-4"/>
+</a>
             </div>
         </div>
     </section>
