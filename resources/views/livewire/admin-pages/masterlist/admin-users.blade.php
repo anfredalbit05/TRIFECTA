@@ -140,7 +140,6 @@
                     <th class="au-th">Username</th>
                     <th class="au-th">Contact</th>
                     <th class="au-th">Position</th>
-                    <th class="au-th">Branch</th>
                     <th class="au-th">Birthday</th>
                     <th class="au-th">Status</th>
                     <th class="au-th">Role ID</th>
@@ -159,8 +158,6 @@
                         <td class="au-td">{{ $user->username }}</td>
                         <td class="au-td">{{ $user->contactno ?? '-' }}</td>
                         <td class="au-td">{{ $user->position ?? '-' }}</td>
-
-                        <td class="au-td">{{ $branchNames[$user->branchCode] ?? '-' }}</td>
                         <td class="au-td">
                             {{ $user->birthdate ? \Carbon\Carbon::parse($user->birthdate)->format('F d, Y') : '-' }}
                         </td>

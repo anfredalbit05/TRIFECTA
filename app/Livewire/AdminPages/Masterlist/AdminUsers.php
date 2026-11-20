@@ -601,19 +601,23 @@ class AdminUsers extends Component
                 'reset_by' => Auth::id(),
             ]);
 
-            // Notify the user by email when one is on file, using the same
-            // branded confirmation template as the member / self-service flow.
-            $emailSent = false;
+            $emailQueued = false;
 
             if (filled($user->email)) {
                 try {
-                    Mail::to($user->email)->send(
+                    Mail::to($user->email)->queue(
                         new PasswordResetConfirmation($user, $password)
                     );
 
-                    $emailSent = true;
+                    $emailQueued = true;
+
+                    Log::info('Password reset email queued successfully', [
+                        'user_id' => $user->UserID,
+                        'email' => $user->email,
+                    ]);
+
                 } catch (\Throwable $e) {
-                    Log::error('Failed to email user about password reset', [
+                    Log::error('Failed to queue password reset email', [
                         'user_id' => $user->UserID,
                         'error' => $e->getMessage(),
                     ]);
@@ -624,13 +628,11 @@ class AdminUsers extends Component
                 ($user->firstname ?? '').' '.($user->lastname ?? '')
             );
 
-            $text = $emailSent
+            $text = $emailQueued
                 ? "{$name}'s password has been changed successfully. "
-                    .'A confirmation email containing the new password was '
-                    ."sent to {$user->email}."
-                : "{$name}'s password has been changed successfully to: "
-                    ."{$password}. No email is on file, so please share the "
-                    .'new password with the user.';
+                    ."A password confirmation email has been queued for {$user->email}."
+                : "{$name}'s password has been changed successfully. "
+                    .'However, the confirmation email could not be queued. Please notify the user securely.';
 
             $this->dispatch('swal:success', [
                 'title' => 'Password Updated!',
