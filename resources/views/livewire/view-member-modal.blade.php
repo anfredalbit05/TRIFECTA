@@ -165,6 +165,11 @@
                                 @endif
                             </div>
                         </div>
+
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-bold uppercase text-slate-400">Referral Code</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-800">{{ $referralCode ?: 'N/A' }}</p>
+                        </div>
                     </div>
                 </div>
 
