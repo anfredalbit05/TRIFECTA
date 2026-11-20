@@ -1,10 +1,22 @@
-
 {{-- resources/views/livewire/member-pages/my-profile/id-card-pdf-component.blade.php --}}
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
+
+{{--
+|--------------------------------------------------------------------------
+| MEMBER ID CARD — PDF
+|--------------------------------------------------------------------------
+|
+| One card, printed on half-letter landscape (8.5in × 5.5in) and centred.
+| The artwork is 1200 × 896, so the card box is 85.6mm × 63.9mm (the same
+| ratio) and every overlay is positioned in mm using the SAME percentages
+| as the live ID preview in my-profile.css. That is what keeps the PDF and
+| the browser preview identical: each value sits on its printed label.
+|
+--}}
 
 <style>
 
@@ -30,149 +42,70 @@ body {
     width: 8.5in;
     height: 5.5in;
     overflow: hidden;
-    page-break-after: avoid;
-    page-break-inside: avoid;
 }
 
-
-.card-front {
+/* Card = 85.6mm × 63.9mm, centred on the page */
+.id-card {
     position: absolute;
-
-    /* Smaller landscape card */
-    width: 72mm;
-    height: 45.7mm;
-
-    /* Center horizontally and vertically */
-    left: 50%;
-    top: 50%;
-    margin-left: -36mm;
-    margin-top: -22.85mm;
-
+    left: 65.15mm;
+    top: 37.9mm;
+    width: 85.6mm;
+    height: 63.9mm;
     overflow: hidden;
 }
-
 
 .template-img {
     position: absolute;
     left: 0;
     top: 0;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: fill;
+    width: 85.6mm;
+    height: 63.9mm;
 }
 
-/* MEMBER PHOTO — MATCH LIVE PREVIEW */
-.photo-box {
+/* MEMBER PHOTO — right side, below the member type */
+.idf-photo {
     position: absolute;
-    z-index: 2;
-
-    left: 6.2%;
-    top: 32.6%;
-
-    width: 18%;
-    height: 33.6%;
-
+    left: 68.05mm;
+    top: 16.93mm;
+    width: 12.41mm;
+    height: 17.25mm;
     overflow: hidden;
-    border-radius: 9%;
 }
 
-.photo-box img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+.idf-photo img {
+    width: 12.41mm;
+    height: 17.25mm;
 }
 
-
-/* MEMBER INFORMATION — MATCH LIVE PREVIEW */
+/* MEMBER INFORMATION — on the printed labels, navy on the light artwork */
 .idf-field {
     position: absolute;
-    z-index: 3;
-
-    font-family: "DejaVu Sans", sans-serif;
-    font-size: 6pt;
-    font-weight: 700;
+    font-family: "DejaVu Sans", Helvetica, Arial, sans-serif;
+    font-size: 8pt;
+    font-weight: bold;
     line-height: 1.2;
-
-    color: #ffffff;
-
+    color: #0c2c6b;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-/* MEMBER NAME — MATCH LIVE PREVIEW */
-.idf-name {
-    left: 28.3%;
-    top: 34%;
-    width: 67%;
+/* The name shares its line with the printed label, so it is one size
+   down to keep full names inside the card. */
+.idf-name       { left: 31.59mm; top: 20mm; width: 36.46mm;}
+.idf-membership { left: 25.08mm; top: 28.1mm; width: 38.50mm; }
+.idf-issue      { left: 31.07mm; top: 36.2mm; width: 35.50mm; }
+.idf-valid      { left: 27.56mm; top: 44.1mm; width: 38.50mm; }
 
-}
-
-/* MEMBERSHIP NUMBER */
-.idf-membership {
-    left: 28.3%;
-    top: 48%;
-    width: 29%;
-
-    width: 29%;
-
-    color: #f5d34e;
-    font-size: 2.5cqw;
-}
-
-/* CERTIFICATE NUMBER */
-.idf-certificate {
-    left: 61.3%;
-    top: 50.2%;
-    width: 32%;
-
-    width: 32%;
-
-    font-size: 2.3cqw;
-}
-
-/* DATE OF ISSUE */
-.idf-issue {
-    left: 28.3%;
-    top: 61%;
-    width: 29%;
-
-    width: 29%;
-
-    font-size: 2.3cqw;
-}
-
-/* VALID UNTIL */
-.idf-valid {
-    left: 61.3%;
-    top: 61%;
-    width: 32%;
-
-    width: 32%;
-
-    font-size: 2.3cqw;
-}
-
-/* MEMBER SIGNATURE */
-.idf-signature {
+/* REFERRAL QR — encodes the referral / join link */
+.idf-qr {
     position: absolute;
-    z-index: 3;
-
-    left: 60%;
-    top: 80%;
-
-    width: 25%;
-    height: 8%;
+    left: 69.34mm;
+    top: 45mm;
 }
 
-.idf-signature img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+.idf-qr img {
+    width: 12mm;
+    height: 12mm;
 }
 
 </style>
@@ -182,8 +115,7 @@ body {
 
     <div class="pdf-page">
 
-        {{-- FRONT ID CARD ONLY --}}
-        <div class="card card-front">
+        <div class="id-card">
 
             {{-- FRONT TEMPLATE --}}
             @if ($frontTemplateBase64)
@@ -195,7 +127,7 @@ body {
             @endif
 
             {{-- MEMBER PHOTO --}}
-            <div class="photo-box">
+            <div class="idf-photo">
                 @if ($profilePicBase64)
                     <img src="{{ $profilePicBase64 }}" alt="Member Photo">
                 @endif
@@ -212,14 +144,9 @@ body {
                 )) }}
             </div>
 
-            {{-- MEMBERSHIP NUMBER --}}
+            {{-- POLICY NUMBER --}}
             <div class="idf-field idf-membership">
                 {{ $membershipNo }}
-            </div>
-
-            {{-- CERTIFICATE NUMBER --}}
-            <div class="idf-field idf-certificate">
-                {{ $certificateNo ?? '' }}
             </div>
 
             {{-- DATE OF ISSUE --}}
@@ -232,10 +159,10 @@ body {
                 {{ $validUntil }}
             </div>
 
-            {{-- MEMBER SIGNATURE --}}
-            <div class="idf-signature">
-                @if ($signatureBase64)
-                    <img src="{{ $signatureBase64 }}" alt="Member Signature">
+            {{-- REFERRAL QR (PNG — dompdf cannot draw inline SVG) --}}
+            <div class="idf-qr">
+                @if (! empty($qrCodePng))
+                    <img src="{{ $qrCodePng }}" alt="Referral QR">
                 @endif
             </div>
 

@@ -333,7 +333,9 @@
                                             @if ($this->canCreate)
 
                                                 <button type="button" wire:click="openWithdrawalModal({{ $member->UserID }})"
-                                                    title="Create Withdrawal Request"
+                                                    @disabled(! $withdrawalWindow['open'])
+                                                    title="{{ $withdrawalWindow['open'] ? 'Create Withdrawal Request' : $withdrawalWindow['message'] }}"
+                                                    @style(['opacity: .5' => ! $withdrawalWindow['open'], 'cursor: not-allowed' => ! $withdrawalWindow['open']])
                                                     class="member-action member-action-withdraw member-action-badge-anchor" >
                                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path

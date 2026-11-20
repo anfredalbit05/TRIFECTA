@@ -12,6 +12,7 @@ use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Withdrawal;
+use App\Services\WithdrawalWindowService;
 
 class NewsUpdates extends Component
 {
@@ -152,6 +153,18 @@ public function openWithdrawalModal(): void
         return;
     }
 
+    // Requests are only accepted Friday 5:01 PM to Sunday 12:00 AM.
+    $withdrawalWindow = app(WithdrawalWindowService::class);
+
+    if (! $withdrawalWindow->isOpen()) {
+        $this->dispatch('swal:error', [
+            'title' => 'Withdrawal Window Closed',
+            'text' => $withdrawalWindow->message(),
+        ]);
+
+        return;
+    }
+
     $totalAmount = Wallet::where('UserID', $user->UserID)
         ->where('status', 'Active')
         ->where('source', '!=', 'PF')
@@ -192,6 +205,17 @@ public function getMinimumWithdrawalAmount(): float
                 ->value('value'),
             FILTER_VALIDATE_BOOLEAN
         );
+    }
+
+    // ==========================================
+    // WITHDRAWAL REQUEST WINDOW
+    // Friday 5:01 PM to Sunday 12:00 AM.
+    // See App\Services\WithdrawalWindowService.
+    // ==========================================
+
+    public function withdrawalWindow(): array
+    {
+        return app(WithdrawalWindowService::class)->status();
     }
 
     // ==========================================
@@ -315,6 +339,8 @@ public function getMinimumWithdrawalAmount(): float
                 'totalWithdrawals' => $totalWithdrawals,
 
                 'isWithdrawalActive' => $isWithdrawalActive,
+
+                'withdrawalWindow' => $this->withdrawalWindow(),
 
                 'isKabuhayanSpinActive' => $isKabuhayanSpinActive,
 

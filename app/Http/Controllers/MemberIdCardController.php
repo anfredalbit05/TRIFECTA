@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Activation;
 use App\Models\User;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
+use BaconQrCode\Common\ErrorCorrectionLevel;
+use BaconQrCode\Encoder\Encoder;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -44,7 +42,7 @@ class MemberIdCardController extends Controller
         */
 
         $frontTemplateBase64 = $toBase64(
-            public_path('images/certificate/trifecta-id.png')
+            public_path('images/certificate/trifecta-id.jpg')
         );
 
         /*
@@ -107,31 +105,24 @@ class MemberIdCardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $renderer = new ImageRenderer(
-            new RendererStyle(160),
-            new SvgImageBackEnd()
-        );
+        // Same referral / join link the Account page shows and copies.
+        $referralUrl = rtrim(config('app.url'), '/')
+            . '/?ref=' . urlencode($user->referralCode ?? '');
 
-        $writer = new Writer($renderer);
+        /*
+        |------------------------------------------------------------------
+        | The QR must be a raster image: dompdf ignores inline SVG, which
+        | left the printed ID without a scannable code.
+        |------------------------------------------------------------------
+        */
 
-        $referralUrl = url('/?ref=' . ($user->referralCode ?? ''));
-
-        $qrCode = $writer->writeString($referralUrl);
+        $qrCodePng = $this->qrCodePng($referralUrl);
 
         /*
         |--------------------------------------------------------------------------
         | MEMBERSHIP INFORMATION
         |--------------------------------------------------------------------------
         */
-
-        $membershipNo = 'TL' .
-            now()->year .
-            str_pad(
-                (string) $user->UserID,
-                3,
-                '0',
-                STR_PAD_LEFT
-            );
 
         $approvedActivation = Activation::where(
             'UserID',
@@ -140,6 +131,16 @@ class MemberIdCardController extends Controller
             ->where('status', 'Approved')
             ->orderByDesc('ActivationID')
             ->first();
+
+        // Same value the live ID preview prints: the approved activation's
+        // policy number, falling back to the generated membership number.
+        $membershipNo = $approvedActivation?->policy_number
+            ?: 'TL' . now()->year . str_pad(
+                (string) $user->UserID,
+                3,
+                '0',
+                STR_PAD_LEFT
+            );
 
         $dateOfIssue = 'N/A';
 
@@ -176,8 +177,8 @@ class MemberIdCardController extends Controller
                 // ID templates
                 'frontTemplateBase64' => $frontTemplateBase64,
 
-                // QR code
-                'qrCode' => $qrCode,
+                // QR code (PNG data URI — encoded referral / join link)
+                'qrCodePng' => $qrCodePng,
 
                 // Member images
                 'profilePicBase64' => $profilePicBase64,
@@ -233,5 +234,51 @@ class MemberIdCardController extends Controller
             ) .
             '.pdf'
         );
+    }
+
+    /**
+     * Render the referral link as a PNG data URI so dompdf can print it.
+     */
+    private function qrCodePng(string $content, int $scale = 8, int $margin = 2): string
+    {
+        $matrix = Encoder::encode(
+            $content,
+            ErrorCorrectionLevel::M()
+        )->getMatrix();
+
+        $modules = $matrix->getWidth();
+        $size = ($modules + ($margin * 2)) * $scale;
+
+        $image = imagecreatetruecolor($size, $size);
+        $white = imagecolorallocate($image, 255, 255, 255);
+        $black = imagecolorallocate($image, 12, 44, 107);
+
+        imagefilledrectangle($image, 0, 0, $size, $size, $white);
+
+        for ($y = 0; $y < $modules; $y++) {
+            for ($x = 0; $x < $modules; $x++) {
+                if ($matrix->get($x, $y) !== 1) {
+                    continue;
+                }
+
+                $left = ($x + $margin) * $scale;
+                $top = ($y + $margin) * $scale;
+
+                imagefilledrectangle(
+                    $image,
+                    $left,
+                    $top,
+                    $left + $scale - 1,
+                    $top + $scale - 1,
+                    $black
+                );
+            }
+        }
+
+        ob_start();
+        imagepng($image);
+        $png = (string) ob_get_clean();
+
+        return 'data:image/png;base64,' . base64_encode($png);
     }
 }

@@ -2,9 +2,6 @@
 
 namespace App\Services;
 
-use App\Mail\ActivationApprovedMail;
-use App\Mail\ActivationRejectedMail;
-use App\Mail\InviteeApprovedMail;
 use App\Models\Activation;
 use App\Models\ActivationHistory;
 use App\Models\Beneficiary;
@@ -17,7 +14,7 @@ use App\Models\Wallet;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
+
 
 class ActivationApprovalService
 {
@@ -61,11 +58,6 @@ class ActivationApprovalService
 
         $gcashCF = $this->settingEnabled('gcash_convenience_fee_enabled');
         $paymayaCF = $this->settingEnabled('paymaya_convenience_fee_enabled');
-
-        $totalMembershipFees = (float) $this
-        ->membershipFeesForActivation($activation)
-        ->sum('Cost');
-        $activatedUser = null;
 
         try {
             DB::transaction(function () use (
@@ -322,45 +314,6 @@ class ActivationApprovalService
             ]);
 
             return false;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | EMAILS
-        |--------------------------------------------------------------------------
-        */
-        if ($activatedUser?->email) {
-            try {
-                Mail::to($activatedUser->email)->send(
-                    new ActivationApprovedMail(
-                        $activatedUser,
-                        $activation,
-                        $totalMembershipFees
-                    )
-                );
-            } catch (\Throwable $e) {
-                Log::error('Failed to send member approval email.', [
-                    'email' => $activatedUser->email,
-                    'error' => $e->getMessage(),
-                ]);
-            }
-        }
-
-        if ($referralUser?->email && $activatedUser) {
-            try {
-                Mail::to($referralUser->email)->send(
-                    new InviteeApprovedMail(
-                        $referralUser,
-                        $activatedUser,
-                        $activation
-                    )
-                );
-            } catch (\Throwable $e) {
-                Log::error('Failed to send upline approval email.', [
-                    'email' => $referralUser->email,
-                    'error' => $e->getMessage(),
-                ]);
-            }
         }
 
         return true;
@@ -1518,31 +1471,6 @@ class ActivationApprovalService
                 'status' => 'Inactive',
             ]);
         });
-
-        $user = User::find($selectedUserID);
-
-        if ($user?->email) {
-            $beneficiaries = Beneficiary::where('UserID', $selectedUserID)
-                ->where('status', true)
-                ->orderBy('BeneficiaryID')
-                ->get()
-                ->toArray();
-
-            try {
-                Mail::to($user->email)->send(
-                    new ActivationRejectedMail(
-                        $user,
-                        $activation,
-                        $beneficiaries,
-                        $remarks
-                    )
-                );
-            } catch (\Throwable $e) {
-                Log::error('Failed to send rejection email.', [
-                    'error' => $e->getMessage(),
-                ]);
-            }
-        }
     }
 
     /**

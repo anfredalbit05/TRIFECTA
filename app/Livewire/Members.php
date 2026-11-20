@@ -10,6 +10,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
+use App\Services\WithdrawalWindowService;
 use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -157,6 +158,20 @@ class Members extends Component
 
     /*
     |--------------------------------------------------------------------------
+    | Withdrawal Request Window
+    |
+    | Requests are only accepted Friday 5:01 PM to Sunday 12:00 AM.
+    | See App\Services\WithdrawalWindowService.
+    |--------------------------------------------------------------------------
+    */
+
+    public function withdrawalWindow(): array
+    {
+        return app(WithdrawalWindowService::class)->status();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Render Members
     |--------------------------------------------------------------------------
     */
@@ -245,6 +260,7 @@ class Members extends Component
         return view('livewire.admin-pages.masterlist.members', [
             'members' => $members,
             'isWithdrawalActive' => $this->isWithdrawalActive(),
+            'withdrawalWindow' => $this->withdrawalWindow(),
             'isSatelliteApplicationActive' => $isSatelliteApplicationActive,
         ]);
     }
@@ -739,6 +755,16 @@ class Members extends Component
 
     public function openWithdrawalModal(int $userId): void
     {
+
+        if (! $this->withdrawalWindow()['open']) {
+
+            $this->dispatch('swal:error', [
+                'title' => 'Withdrawal Window Closed',
+                'text' => $this->withdrawalWindow()['message'],
+            ]);
+
+            return;
+        }
 
         $member = $this->findScopedMember($userId);
 

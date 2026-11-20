@@ -6,6 +6,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
+use App\Services\WithdrawalWindowService;
 use App\Support\Modules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -191,6 +192,23 @@ class WithdrawalModal extends Component
             $this->dispatch(
                 'withdrawal-error',
                 message: 'Withdrawals are currently unavailable. Please try again later.'
+            );
+
+            return;
+        }
+
+        // ==========================================
+        // CHECK THE GLOBAL WINDOW
+        // Requests are only accepted Friday 5:01 PM
+        // to Sunday 12:00 AM (see the service).
+        // ==========================================
+
+        $withdrawalWindow = app(WithdrawalWindowService::class);
+
+        if (! $withdrawalWindow->isOpen()) {
+            $this->dispatch(
+                'withdrawal-error',
+                message: $withdrawalWindow->message()
             );
 
             return;

@@ -354,22 +354,22 @@
             </div> --}}
 
 
-            {{-- @if (auth()->user()->RoleID == 8)
-                --------------- 7. LIVE ID PREVIEW ---------------
+            @if (auth()->user()->RoleID == 8)
+                {{-- --------------- 7. LIVE ID PREVIEW --------------- --}}
             <div class="id-preview-card">
                 <h4 class="id-preview-title">👁️ Live ID Preview</h4>
 
                 <div class="id-card-viewport">
 
-                    FRONT SIDE
+                    {{-- FRONT SIDE --}}
                     <div id="id-card-front" class="id-card-side id-card-front-new">
 
-                        <img src="{{ asset('images/certificate/trifecta-id.png') }}"
+                        <img src="{{ asset('images/certificate/trifecta-id.jpg') }}"
                             class="id-template-img"
                             alt="TRIFECTA Membership ID Front">
 
-                        Member Photo
-                        <div class="idn-photo">
+                        {{-- Member Photo --}}
+                        {{-- <div class="idn-photo">
                             @if ($profilepic && is_object($profilepic))
                                 <img src="{{ $profilepic->temporaryUrl() }}" alt="Member Photo">
                             @elseif (auth()->user()->profilepic &&
@@ -377,26 +377,16 @@
                                 <img src="{{ asset('storage/' . auth()->user()->profilepic) }}"
                                     alt="Member Photo">
                             @endif
-                        </div>
+                        </div> --}}
 
-                        Cover Existing Sample Information
-                        <div class="idn-mask idn-name-mask"></div>
-                        <div class="idn-mask idn-membership-mask"></div>
-                        <div class="idn-mask idn-certificate-mask"></div>
-                        <div class="idn-mask idn-issue-mask"></div>
-                        <div class="idn-mask idn-valid-mask"></div>
-
-                        Dynamic Member Information
+                        {{-- Dynamic Member Information — sits on the printed
+                             labels of the template, one value per line. --}}
                         <div class="idn-field idn-name">
                             {{ strtoupper(trim("$firstname " . ($middlename ? substr(trim($middlename), 0, 1) . '. ' : '') . $lastname)) }}
                         </div>
 
                         <div class="idn-field idn-membership">
                             {{ $membershipNo }}
-                        </div>
-
-                        <div class="idn-field idn-certificate">
-                            {{ $certificateNo ?? '' }}
                         </div>
 
                         <div class="idn-field idn-issue">
@@ -407,9 +397,17 @@
                             {{ $validUntil }}
                         </div>
 
+                        {{-- Referral QR — encodes the referral link, so
+                             scanning it opens the join page; clicking it
+                             opens the same link in a new tab. --}}
+                        <a class="idn-qr" href="{{ $referralUrl }}" target="_blank" rel="noopener"
+                            title="Open your referral / join link">
+                            {!! $qrCode !!}
+                        </a>
+
                     </div>
 
-                    BACK SIDE
+                    {{-- BACK SIDE --}}
                     <div id="id-card-back" class="id-card-side id-card-back-new hidden">
 
                         <img src="{{ asset('images/certificate/trifecta-id.png') }}"
@@ -420,8 +418,8 @@
 
                 </div>
 
-                FRONT / BACK TABS
-                <div class="id-tabs">
+                {{-- FRONT / BACK TABS --}}
+                {{-- <div class="id-tabs">
                     <button type="button"
                             id="btn-front"
                             onclick="switchIdTab('front')"
@@ -435,9 +433,9 @@
                             class="id-tab id-tab--inactive">
                         Back
                     </button>
-                </div>
+                </div> --}}
 
-                ACTIONS
+                {{-- ACTIONS --}}
                 <div class="id-actions flex justify-center items-center gap-4 flex-wrap">
 
                     <a href="{{ route('member.id-card.pdf') }}"
@@ -461,7 +459,7 @@
                 </div>
             </div>
 
-            @endif --}}
+            @endif
         </div>
     </div>
 

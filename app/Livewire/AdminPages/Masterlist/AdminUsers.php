@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
 use App\Models\Role;
+use App\Services\WithdrawalWindowService;
 use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -165,6 +166,20 @@ class AdminUsers extends Component
                 ->value('value'),
             FILTER_VALIDATE_BOOLEAN
         );
+    }
+
+    /*
+    |----------------------------------------------------------------------
+    | Withdrawal Request Window
+    |
+    | Requests are only accepted Friday 5:01 PM to Sunday 12:00 AM.
+    | See App\Services\WithdrawalWindowService.
+    |----------------------------------------------------------------------
+    */
+
+    public function withdrawalWindow(): array
+    {
+        return app(WithdrawalWindowService::class)->status();
     }
 
     /*
@@ -892,6 +907,16 @@ class AdminUsers extends Component
             return;
         }
 
+        if (! $this->withdrawalWindow()['open']) {
+
+            session()->flash(
+                'error',
+                $this->withdrawalWindow()['message']
+            );
+
+            return;
+        }
+
         $user = $this->findScopedUser($userId);
 
         if (! $user) {
@@ -1429,6 +1454,7 @@ class AdminUsers extends Component
             [
                 'users' => $users,
                 'isWithdrawalActive' => $this->isWithdrawalActive(),
+                'withdrawalWindow' => $this->withdrawalWindow(),
             ]
         );
     }

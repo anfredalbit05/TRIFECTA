@@ -123,7 +123,7 @@
                 </h2>
                 @endif
 
-                @if (in_array(auth()->user()->RoleID, [2, 3, 4 , 5, 6, 7, 8]) && $isWithdrawalActive)
+                @if (in_array(auth()->user()->RoleID, [2, 3, 4 , 5, 6, 7, 8]) && $isWithdrawalActive && $withdrawalWindow['open'])
 
                     <button type="button"
                         wire:click="openWithdrawalModal"
@@ -136,8 +136,9 @@
                     <div class="w-full px-4 py-2.5 rounded-lg
                         bg-gray-100 border border-gray-200
                         text-gray-500 text-sm font-semibold
-                        mt-6 text-center cursor-not-allowed">
-                        Withdrawals are currently unavailable
+                        mt-6 text-center cursor-not-allowed"
+                        title="{{ $isWithdrawalActive ? $withdrawalWindow['message'] : 'Withdrawals are currently unavailable' }}">
+                        {{ $isWithdrawalActive ? 'Withdrawal window closed — opens ' . $withdrawalWindow['opens_at']->format('D, M j g:i A') : 'Withdrawals are currently unavailable' }}
                     </div>
 
                 @endif

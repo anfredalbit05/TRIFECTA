@@ -231,7 +231,9 @@
                                         @if ($this->canCreate)
                                             <button type="button"
                                                 wire:click="openWithdrawalModal({{ $user->UserID }})"
-                                                title="Create Withdrawal Request"
+                                                @disabled(! $withdrawalWindow['open'])
+                                                title="{{ $withdrawalWindow['open'] ? 'Create Withdrawal Request' : $withdrawalWindow['message'] }}"
+                                                @style(['opacity: .5' => ! $withdrawalWindow['open'], 'cursor: not-allowed' => ! $withdrawalWindow['open']])
                                                 class="au-wd-create">
                                                 Withdraw
                                             </button>

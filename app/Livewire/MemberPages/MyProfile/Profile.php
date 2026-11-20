@@ -96,7 +96,9 @@ class Profile extends Component
         $this->civilStatus = $user->civilstatus ?? 'Single';
         $this->sex = $user->gender ?? 'Male';
         $this->beneficiaries = $user->beneficiaries;
-        $this->referralUrl = url('/?ref='.($user->referralCode ?? ''));
+        // Same referral link format as the Account page, so the QR code
+        // printed on the ID opens the join/registration page.
+        $this->referralUrl = rtrim(config('app.url'), '/').'/?ref='.urlencode($user->referralCode ?? '');
 
         // Treat a signature value whose file no longer exists as none,
         // so the preview and pad don't render broken images.
