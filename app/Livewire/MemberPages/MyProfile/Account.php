@@ -39,7 +39,7 @@ class Account extends Component
         $this->username = $user->username ?? '';
         $this->email = $user->email ?? '';
         $this->status = $user->status ?? '';
-        $this->referralUrl = url('/?ref=' . $user->referralCode);
+         $this->referralUrl = rtrim(config('app.url'), '/') . '/?ref=' . $user->referralCode;
         $this->policy_number = $user->policy_number ?? '';
 
         $renderer = new ImageRenderer(
@@ -136,7 +136,7 @@ public function executeSave(): void
 
         $writer = new Writer($renderer);
 
-        $referralUrl = url('/?ref=' . ($user->referralCode ?? ''));
+        $referralUrl = rtrim(config('app.url'), '/') . '/?ref=' . urlencode($user->referralCode ?? '');
         $qrCode = $writer->writeString($referralUrl);
 
         $pdf = Pdf::loadView('pdf.id-card', [

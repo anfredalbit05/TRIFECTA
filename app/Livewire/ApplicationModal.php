@@ -512,10 +512,6 @@ class ApplicationModal extends Component
             'civil_status', 'birthdate', 'policy_number', 'policy_effectivity_date',
             'policy_expiration_date', 'address', 'mobile', 'email', 'username', 'beneficiaries']);
 
-        User::where('RoleID', 1)->whereNotNull('email')->pluck('email')->each(fn ($to) => $this->mail(
-            $to, 'New Member Application Submitted',
-            $data + ['title' => 'New Member Application Notice (Admin)', 'includeCredentials' => false]
-        ));
 
         if (filled($this->email)) {
             $this->mail($this->email, 'Your Application Details & Credentials', $data + [

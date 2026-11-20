@@ -24,7 +24,7 @@ return new class extends Migration
             $table->foreignId('ActivationID')
                 ->constrained('activations', 'ActivationID')
                 ->cascadeOnUpdate()
-                ->cascadeOnDelete();
+                ->restrictOnDelete();
 
             /*
             |--------------------------------------------------------------------------
