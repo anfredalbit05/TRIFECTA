@@ -57,7 +57,7 @@
                     <a href="#" class="ws-rail-link" :class="tab === 'certificate' ? 'is-active' : ''"
                        @click.prevent="tab = 'certificate'">
                         <span class="ws-rail-icon">▣</span>
-                        <span>Certificate</span>
+                        <span>Policy & Receipt</span>
                     </a>
                 @endif
             </div>
