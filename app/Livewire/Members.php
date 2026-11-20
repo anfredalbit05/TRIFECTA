@@ -218,10 +218,13 @@ class Members extends Component
                 }
             })
             ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
-                $query->whereBetween('created_at', [
-                    Carbon::parse($dateFrom)->startOfDay(),
-                    Carbon::parse($dateTo)->endOfDay(),
-                ]);
+                $query->whereHas('activations.histories', function ($h) use ($dateFrom, $dateTo) {
+                    $h->where('status', 'Approved')
+                    ->whereBetween('created_at', [
+                        Carbon::parse($dateFrom)->startOfDay(),
+                        Carbon::parse($dateTo)->endOfDay(),
+                    ]);
+                });
             })
             ->when($this->statusFilter !== 'all', function ($query) {
                 $query->where('status', $this->statusFilter);

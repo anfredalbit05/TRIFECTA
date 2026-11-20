@@ -921,7 +921,7 @@
     });
 
 
-    {{-- STATUS CONFIRMATION (activate / deactivate) — alert shows the member's full name --}}
+    // {{-- STATUS CONFIRMATION (activate / deactivate) — alert shows the member's full name --}}
     $wire.on('members-confirm-status', (data) => {
 
         const d = Array.isArray(data) ? data[0] : data;
