@@ -12,15 +12,9 @@
                             <h2 class="text-xl font-extrabold text-[var(--color-primary)]">
                                 Activation Review
                             </h2>
-                            @if ($this->memberType === 'satellite')
-                                <span class="inline-flex items-center rounded-full bg-[var(--color-accent)] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
-                                    Satellite Member
-                                </span>
-                            @else
                                 <span class="inline-flex items-center rounded-full bg-[var(--color-primary)] px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
                                     TRIFECTA Member
                                 </span>
-                            @endif
                         </div>
                         <p class="mt-1 text-xs text-slate-500">
                             Review the member's activation request and beneficiary information.
