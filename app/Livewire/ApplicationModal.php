@@ -9,7 +9,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
@@ -507,48 +506,7 @@ class ApplicationModal extends Component
             return;
         }
 
-        // Emails run AFTER commit; a mail failure never rolls back the application.
-        $data = $this->only(['surname', 'first_name', 'middle_name', 'occupation', 'gender',
-            'civil_status', 'birthdate', 'policy_number', 'policy_effectivity_date',
-            'policy_expiration_date', 'address', 'mobile', 'email', 'username', 'beneficiaries']);
-
-
-        if (filled($this->email)) {
-            $this->mail($this->email, 'Your Application Details & Credentials', $data + [
-                'title' => 'Welcome to TRIFECTA - Application Details',
-                'password' => $this->password,
-                'includeCredentials' => true,
-            ], true);
-        }
-
         $this->finish('Success!', 'Application submitted successfully.');
-    }
-
-    private function mail(string $to, string $subject, array $data, bool $attach = false): void
-    {
-        try {
-            Mail::send('emails.new-application', $data, function ($m) use ($to, $subject, $attach) {
-                $m->to($to)->subject($subject);
-
-           if ($attach) {
-                $path = public_path('images/benefits.jpg');
-
-                if (file_exists($path)) {
-                    $m->attach($path, [
-                        'as' => 'benefits.jpg',
-                        'mime' => 'image/jpeg',
-                    ]);
-                } else {
-                    Log::warning('Email attachment missing', [
-                        'filename' => 'benefits.jpg',
-                        'path' => $path,
-                    ]);
-                }
-            }
-            });
-        } catch (\Throwable $e) {
-            Log::error('Failed to send email', ['email' => $to, 'message' => $e->getMessage()]);
-        }
     }
 
     private function finish(string $title, string $text): void
