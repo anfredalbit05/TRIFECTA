@@ -2,7 +2,6 @@
 
 namespace App\Livewire\MemberPages\MyProfile;
 
-use App\Jobs\SendActivationEmail;
 use App\Models\Activation;
 use App\Models\ActivationHistory;
 use App\Models\Beneficiary;
@@ -16,7 +15,6 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -651,9 +649,7 @@ public function approveActivation($UserID = null): void
 
     try {
         DB::transaction(function () use (
-            $activation,
             $targetUserID,
-            $upline,
             $uplineCode
         ) {
             // Lock and retrieve the member being activated.
@@ -682,49 +678,6 @@ public function approveActivation($UserID = null): void
         );
 
         return;
-    }
-
-    // Reload the approved member and direct referral for notifications.
-    $user = User::find($targetUserID);
-
-    $upline = User::where('referralCode', $uplineCode)->first();
-
-    // Notify the activated member.
-    if ($user && filled($user->email)) {
-        try {
-            Mail::raw(
-                "Congratulations!\n\n"
-                . "Your account has been activated successfully.\n\n"
-                . 'You can now log in and access all features.',
-                function ($message) use ($user) {
-                    $message->to($user->email)
-                        ->subject('Account Activated');
-                }
-            );
-        } catch (\Throwable $e) {
-            Log::error('Failed to send approval email to member.', [
-                'user_id' => $user->UserID,
-                'error' => $e->getMessage(),
-            ]);
-        }
-    }
-
-    // Notify the direct referral/upline.
-    if ($upline && filled($upline->email) && $user) {
-        try {
-            Mail::raw(
-                "Your downline {$user->username} has been approved.",
-                function ($message) use ($upline) {
-                    $message->to($upline->email)
-                        ->subject('Downline Approved');
-                }
-            );
-        } catch (\Throwable $e) {
-            Log::error('Failed to send approval email to upline.', [
-                'upline_id' => $upline->UserID,
-                'error' => $e->getMessage(),
-            ]);
-        }
     }
 
     Log::info('Activation approved and branch assigned.', [
@@ -757,33 +710,6 @@ public function approveActivation($UserID = null): void
         $activation->update([
             'status' => 'Rejected',
         ]);
-
-        $user = User::find($userIdToReject);
-
-        $upline = User::where(
-            'referralCode',
-            $activation->upline_code
-        )->first();
-
-        if ($user && filled($user->email)) {
-            Mail::raw(
-                'Unfortunately, your activation request has been rejected.',
-                function ($message) use ($user) {
-                    $message->to($user->email)
-                        ->subject('Activation Rejected');
-                }
-            );
-        }
-
-        if ($upline && filled($upline->email) && $user) {
-            Mail::raw(
-                "The activation request for your downline {$user->username} has been rejected.",
-                function ($message) use ($upline) {
-                    $message->to($upline->email)
-                        ->subject('Downline Activation Rejected');
-                }
-            );
-        }
 
         $this->dispatch('activation-rejected');
         $this->closeModal();
@@ -897,8 +823,6 @@ public function approveActivation($UserID = null): void
                 ->latest()
                 ->first();
 
-            $adminEmail = config('mail.from.address', 'anfredalbit110525@gmail.com');
-
             $cleanBeneficiaries = [];
             foreach ($this->beneficiaries as $index => $beneficiary) {
                 $fullname = trim($beneficiary['fullname'] ?? '');
@@ -961,10 +885,6 @@ public function approveActivation($UserID = null): void
                     'status' => 'Pending',
                 ]);
 
-                $actionLabel = 'resubmitted successfully';
-                $userSubject = 'Activation Request Resubmitted';
-                $uplineSubject = 'Downline Activation Resubmitted';
-                $adminSubject = 'Activation Request Resubmitted (Admin Notice)';
             } else {
                 Activation::create([
                     'VID' => $this->selectedVariantId,
@@ -980,14 +900,6 @@ public function approveActivation($UserID = null): void
                     'status' => 'Pending',
                 ]);
 
-                $actionLabel = $this->isRenewal
-                    ? 'renewed successfully — a new activation has been filed'
-                    : 'submitted successfully';
-                $userSubject = $this->isRenewal ? 'Membership Renewal Submitted' : 'Activation Request Submitted';
-                $uplineSubject = $this->isRenewal ? 'Downline Membership Renewal' : 'New Downline Activation Request';
-                $adminSubject = $this->isRenewal
-                    ? 'Membership Renewal Submitted (Admin Notice)'
-                    : 'New Activation Request Submitted (Admin Notice)';
             }
 
             // Store the submitted upline referral code.
@@ -1002,64 +914,7 @@ public function approveActivation($UserID = null): void
 
             $selectedUser->update($userUpdates);
 
-            $mailData = [
-                'selectedUser' => $selectedUser,
-                'currentUser' => $currentUser,
-                'payment_method' => $this->payment_method,
-                'amount' => $membershipFee,
-                'upline_code' => $cleanUplineCode,
-                'reference_code' => $paymentReference,
-                'formattedBeneficiaries' => $cleanBeneficiaries,
-            ];
-
             DB::commit();
-
-            if (filled($selectedUser->email)) {
-                SendActivationEmail::dispatch(
-                    $selectedUser->email,
-                    $userSubject,
-                    'Activation Request Status',
-                    "Your activation request has been {$actionLabel}. Below are your complete details:",
-                    $mailData
-                );
-            }
-
-            if ($referralUser && filled($referralUser->email)) {
-                SendActivationEmail::dispatch(
-                    $referralUser->email,
-                    $uplineSubject,
-                    'Downline Activation Notice',
-                    'Hello '.($referralUser->firstname ?? $referralUser->username)
-                        .', your downline ('.$selectedUser->username
-                        .") has {$actionLabel} an activation request.",
-                    $mailData
-                );
-            }
-
-            if (filled($adminEmail)) {
-                SendActivationEmail::dispatch(
-                    $adminEmail,
-                    $adminSubject,
-                    'Admin Notice: Activation Request',
-                    "An activation request has been {$actionLabel} with the following comprehensive details:",
-                    $mailData
-                );
-            }
-
-            if (
-                $currentUser &&
-                filled($currentUser->email) &&
-                $currentUser->UserID !== $selectedUser->UserID
-            ) {
-                SendActivationEmail::dispatch(
-                    $currentUser->email,
-                    'Activation Request Submitted on Behalf',
-                    'Action Notice: Activation Submission',
-                    'You have successfully submitted an activation request for '
-                        .$selectedUser->username.'. Here are the details:',
-                    $mailData
-                );
-            }
 
             Log::info('ACTIVATION COMMITTED SUCCESSFULLY', [
                 'selected_user_id' => $selectedUser->UserID,
