@@ -113,6 +113,7 @@
             <!-- CASH WALLET -->
             <div class="wallet-block">
 
+                  @if ((int) auth()->user()->RoleID !== 1)
                 <span class="wallet-label">
                     Cash Wallet
                 </span>
@@ -120,29 +121,34 @@
                 <h2 class="wallet-value">
                     ₱{{ number_format($totalAmount, 2) }}
                 </h2>
+                @endif
 
+                @if (in_array(auth()->user()->RoleID, [2, 3, 4 , 5, 6, 7, 8]) && $isWithdrawalActive)
 
-                <!-- WITHDRAWAL STATUS -->
-                @if ($isWithdrawalActive)
-                    <button type="button" wire:click="openWithdrawalModal" class="wallet-btn-withdraw cursor-pointer">
+                    <button type="button"
+                        wire:click="openWithdrawalModal"
+                        class="wallet-btn-withdraw cursor-pointer">
                         Withdraw Cash Wallet
                     </button>
-                @else
-                    <div
-                        class="w-full px-4 py-2.5 rounded-lg
+                @elseif((int) auth()->user()->RoleID == 1)
+
+                @elseif((int) auth()->user()->RoleID != 1)
+                    <div class="w-full px-4 py-2.5 rounded-lg
                         bg-gray-100 border border-gray-200
                         text-gray-500 text-sm font-semibold
                         mt-6 text-center cursor-not-allowed">
                         Withdrawals are currently unavailable
                     </div>
+
                 @endif
 
             </div>
 
-
+            @if ((int) auth()->user()->RoleID !== 1)
             <hr>
+            @endif
 
-
+            @if ((int) auth()->user()->RoleID !== 1)
             <!-- PROVIDENT FUND -->
             <div class="wallet-block">
 
@@ -155,53 +161,73 @@
                 </h2>
 
             </div>
+            @endif
+
+            <!-- DIVISION FUND: ROLE 1 AND 4 -->
+            @if (in_array((int) auth()->user()->RoleID, [1, 4]))
 
 
-            <hr>
+                @if ((int) auth()->user()->RoleID !== 1)
+                <hr>
+                @endif
 
+                <div class="wallet-block">
 
-            <!-- WALLET SUMMARY -->
-            <div class="wallet-summary">
-
-                <div>
-                    <span>
-                        Total Earnings
+                    <span class="wallet-label">
+                        Division Fund
                     </span>
 
-                    <strong>
-                        ₱{{ number_format($totalEarnings, 2) }}
-                    </strong>
-                </div>
+                    <h2 class="wallet-value">
+                        ₱{{ number_format($divisionFundAmount, 2) }}
+                    </h2>
 
-
-                <div>
-                    <span>
-                        Total Withdrawals
-                    </span>
-
-                    <strong>
-                        ₱{{ number_format($totalWithdrawals, 2) }}
-                    </strong>
-                </div>
-
-            </div>
-
-
-            <!-- EARNINGS DISTRIBUTION -->
-            <div class="distribution-card">
-
-
-                <div>
-                    <h4>
-                        Earnings Distribution
-                    </h4>
-
-                    <p>
-                        Categorized income based on transaction source.
+                    <p class="text-xs text-gray-500 mt-1">
+                        Membership fee collections for your division.
                     </p>
+
                 </div>
 
-            </div>
+            @endif
+
+            <!-- WALLET SUMMARY: HIDE FOR ROLE 1 -->
+            @if ((int) auth()->user()->RoleID !== 1)
+
+                <hr>
+
+                <div class="wallet-summary">
+
+                    <div>
+                        <span>Total Earnings</span>
+
+                        <strong>
+                            ₱{{ number_format($totalEarnings, 2) }}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>Total Withdrawals</span>
+
+                        <strong>
+                            ₱{{ number_format($totalWithdrawals, 2) }}
+                        </strong>
+                    </div>
+
+                </div>
+
+                <!-- EARNINGS DISTRIBUTION -->
+                <div class="distribution-card">
+
+                    <div>
+                        <h4>Earnings Distribution</h4>
+
+                        <p>
+                            Categorized income based on transaction source.
+                        </p>
+                    </div>
+
+                </div>
+
+            @endif
 
         </aside>
     </div>

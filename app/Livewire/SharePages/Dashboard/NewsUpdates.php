@@ -231,6 +231,28 @@ public function getMinimumWithdrawalAmount(): float
         $userID = $user?->UserID;
 
         // ------------------------------------------
+        // DIVISION FUNDS
+        // ------------------------------------------
+
+        $divisionFeeMap = [
+            1 => 'FEE011',
+            4 => 'FEE012',
+        ];
+
+        $divisionFundAmount = 0;
+
+        if (isset($divisionFeeMap[(int) $user->RoleID])) {
+
+            $divisionFundAmount = \App\Models\Ledger::where(
+                'RefID',
+                $divisionFeeMap[(int) $user->RoleID]
+            )
+                ->where('Source', 'MF')
+                ->where('status', 'Completed')
+                ->sum('amount');
+        }
+
+        // ------------------------------------------
         // TOTAL WITHDRAWALS
         // ------------------------------------------
 
@@ -295,6 +317,8 @@ public function getMinimumWithdrawalAmount(): float
                 'isWithdrawalActive' => $isWithdrawalActive,
 
                 'isKabuhayanSpinActive' => $isKabuhayanSpinActive,
+
+                'divisionFundAmount' => $divisionFundAmount,
             ]
         );
     }
