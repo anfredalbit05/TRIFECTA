@@ -446,15 +446,15 @@
                     @if ($hasDownloadableReceipt)
                         <a href="{{ route('activation.receipt.download') }}"
                         class="btn-submit">
-                            🧾 Download Receipt
+                            Download Receipt
                         </a>
                     @endif
 
-                    <button type="button"
+                    {{-- <button type="button"
                             wire:click="requestPhysicalId"
                             class="btn-download text-center">
                         Request Physical ID
-                    </button>
+                    </button> --}}
 
                 </div>
             </div>

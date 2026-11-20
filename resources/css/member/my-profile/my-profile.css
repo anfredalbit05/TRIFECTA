@@ -363,6 +363,11 @@
 
 /* ---------------------------------------------------------------
    SHARED FRONT AND BACK CARD
+
+   The template JPG has a gray canvas (with a baked-in shadow)
+   around the white card. This box stays transparent; the gray is
+   cropped off on the image itself (see .id-template-img below).
+   The drop-shadow filter follows the clipped card shape.
 --------------------------------------------------------------- */
 
 .id-card-side {
@@ -379,15 +384,22 @@
     container-type: inline-size;
 
     overflow: hidden;
-    border: 1px solid #cbd5e1;
-    border-radius: 14px;
+    border: none;
+    border-radius: 0;
 
-    background: #ffffff;
-    box-shadow: 0 8px 24px rgb(15 23 42 / 12%);
+    background: transparent;
+    box-shadow: none;
+    filter: drop-shadow(0 8px 14px rgb(15 23 42 / 18%));
 }
 
 /* ---------------------------------------------------------------
    CARD ARTWORK
+
+   clip-path: inset(top right bottom left round radius)
+   Crops the gray margin around the card without resizing the
+   image, so all overlays (name, policy no., QR...) stay aligned.
+   Nudge the four inset values if a gray sliver remains or the
+   card edge looks cut.
 --------------------------------------------------------------- */
 
 .id-template-img {
@@ -400,6 +412,8 @@
 
     object-fit: fill;
     object-position: center;
+
+    clip-path: inset(4.5% 2.6% 6.5% 2.6% round 4.2cqw);
 
     pointer-events: none;
     user-select: none;
@@ -580,10 +594,6 @@
 --------------------------------------------------------------- */
 
 @media (max-width: 640px) {
-
-    .id-card-side {
-        border-radius: 10px;
-    }
 
     .id-card-viewport {
         padding-left: 2px;
