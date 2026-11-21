@@ -103,9 +103,10 @@ class MemberIdCardImageService
             $this->pasteQr(
                 $image,
                 rtrim(config('app.url'), '/').'/?ref='.urlencode($user->referralCode ?? ''),
-                972,
-                631,
-                168
+                939, // X position
+                625, // Y position
+                200, // Width
+                200  // Height
             );
 
             $directory = storage_path('app/id-cards');
@@ -189,48 +190,69 @@ class MemberIdCardImageService
         imagedestroy($photo);
     }
 
-    /** Paste the referral QR code as a crisp, integer-scaled block. */
-    private function pasteQr($image, string $content, int $x, int $y, int $size): void
-    {
-        $matrix = Encoder::encode($content, ErrorCorrectionLevel::M())->getMatrix();
+ /** Paste the referral QR code with independently adjustable width and height. */
+private function pasteQr(
+    $image,
+    string $content,
+    int $x,
+    int $y,
+    int $width,
+    int $height
+): void {
+    $matrix = Encoder::encode($content, ErrorCorrectionLevel::M())->getMatrix();
 
-        $modules = $matrix->getWidth();
-        $margin = 2;
-        $total = $modules + ($margin * 2);
-        $scale = max(1, (int) floor($size / $total));
+    $modules = $matrix->getWidth();
+    $margin = 2;
+    $total = $modules + ($margin * 2);
 
-        $qr = imagecreatetruecolor($total * $scale, $total * $scale);
-        $white = imagecolorallocate($qr, 255, 255, 255);
-        $black = imagecolorallocate($qr, ...self::NAVY);
+    // Generate QR at high resolution first.
+    $scale = 10;
 
-        imagefilledrectangle($qr, 0, 0, $total * $scale, $total * $scale, $white);
+    $qrSize = $total * $scale;
 
-        for ($row = 0; $row < $modules; $row++) {
-            for ($column = 0; $column < $modules; $column++) {
-                if ($matrix->get($column, $row) !== 1) {
-                    continue;
-                }
+    $qr = imagecreatetruecolor($qrSize, $qrSize);
 
-                $left = ($column + $margin) * $scale;
-                $top = ($row + $margin) * $scale;
+    $white = imagecolorallocate($qr, 255, 255, 255);
+    $black = imagecolorallocate($qr, ...self::NAVY);
 
-                imagefilledrectangle(
-                    $qr,
-                    $left,
-                    $top,
-                    $left + $scale - 1,
-                    $top + $scale - 1,
-                    $black
-                );
+    imagefilledrectangle($qr, 0, 0, $qrSize, $qrSize, $white);
+
+    for ($row = 0; $row < $modules; $row++) {
+        for ($column = 0; $column < $modules; $column++) {
+            if ($matrix->get($column, $row) !== 1) {
+                continue;
             }
+
+            $left = ($column + $margin) * $scale;
+            $top = ($row + $margin) * $scale;
+
+            imagefilledrectangle(
+                $qr,
+                $left,
+                $top,
+                $left + $scale - 1,
+                $top + $scale - 1,
+                $black
+            );
         }
-
-        $drawn = $total * $scale;
-
-        imagecopy($image, $qr, $x, $y, 0, 0, $drawn, $drawn);
-
-        imagedestroy($qr);
     }
+
+    // Resize to the requested width and height.
+    imagecopyresampled(
+        $image,
+        $qr,
+        $x,
+        $y,
+        0,
+        0,
+        $width,
+        $height,
+        $qrSize,
+        $qrSize
+    );
+
+    imagedestroy($qr);
+}
 
     private function text(
         $image,
