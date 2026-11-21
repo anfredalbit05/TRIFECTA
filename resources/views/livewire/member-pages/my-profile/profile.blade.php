@@ -438,17 +438,10 @@
                 {{-- ACTIONS --}}
                 <div class="id-actions flex justify-center items-center gap-4 flex-wrap">
 
-                    <a href="{{ route('member.id-card.pdf') }}"
+                    <a href="{{ route('member.id-card.download') }}"
                     class="btn-submit">
-                        Download ID (PDF)
+                        Download ID
                     </a>
-
-                    @if ($hasDownloadableReceipt)
-                        <a href="{{ route('activation.receipt.download') }}"
-                        class="btn-submit">
-                            Download Receipt
-                        </a>
-                    @endif
 
                     {{-- <button type="button"
                             wire:click="requestPhysicalId"

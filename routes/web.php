@@ -100,6 +100,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/members/{userId}/policy/download', [PolicyController::class, 'adminDownload'])
         ->name('admin.member.policy.download');
 
+    Route::get('/admin/members/{userId}/id-card/download', [MemberIdCardController::class, 'adminDownload'])
+        ->name('admin.member.id-card.download');
+
     Route::get('/my-profile', function () {
         $currentUserId = Auth::id();
         $activation = Activation::where('ProcessedBy', $currentUserId)
@@ -110,8 +113,8 @@ Route::middleware(['auth'])->group(function () {
         return view('pages.share-pages.my-profile', compact('activationStatus'));
     })->name('my-profile');
 
-    Route::get('/member/id-card/pdf', [MemberIdCardController::class, 'download'])
-        ->name('member.id-card.pdf');
+    Route::get('/member/id-card/download', [MemberIdCardController::class, 'download'])
+        ->name('member.id-card.download');
 
     Route::get('/satellite', fn () => view('pages.member-pages.satellite'))
         ->name('satellite.portal');
