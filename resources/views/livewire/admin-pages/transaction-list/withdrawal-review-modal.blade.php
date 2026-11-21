@@ -291,19 +291,29 @@
                         Close
                     </button>
 
-                    <div class="flex flex-col gap-3 sm:flex-row">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+                        @if (! $this->approvalWindow()['open'])
+                            <p class="text-[11px] font-semibold leading-relaxed text-amber-700 sm:w-full sm:text-right">
+                                {{ $this->approvalWindow()['message'] }}
+                            </p>
+                        @endif
+
                         {{-- REJECT — needs can_change_status (or can_delete)
                              on Transaction List - Withdrawal --}}
                         @if (($this->canChangeStatus || $this->canDelete) && $withdrawal->status === 'Pending')
                             <button type="button" wire:click="confirmReject"
-                                class="rounded-xl bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] px-6 py-2.5 text-xs font-bold text-white transition cursor-pointer">
+                                @disabled(! $this->approvalWindow()['open'])
+                                title="{{ $this->approvalWindow()['message'] }}"
+                                class="rounded-xl bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] px-6 py-2.5 text-xs font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
                                 Reject
                             </button>
 
                             {{-- APPROVE — needs can_change_status (or can_delete)
                                  on Transaction List - Withdrawal --}}
                             <button type="button" wire:click="confirmApprove"
-                                class="rounded-xl bg-[var(--color-primary)] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-[var(--color-primary-dark)] cursor-pointer">
+                                @disabled(! $this->approvalWindow()['open'])
+                                title="{{ $this->approvalWindow()['message'] }}"
+                                class="rounded-xl bg-[var(--color-primary)] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-[var(--color-primary-dark)] disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
                                 Approve & Release
                             </button>
                         @endif

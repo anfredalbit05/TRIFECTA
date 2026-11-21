@@ -672,6 +672,13 @@
                     {{-- FOOTER --}}
                     <div class="member-modal-footer">
 
+                        @if (! $this->approvalWindow()['open'])
+                            <p
+                                style="flex-basis:100%;width:100%;margin:0 0 10px;font-size:12px;font-weight:600;line-height:1.4;color:#b45309;">
+                                {{ $this->approvalWindow()['message'] }}
+                            </p>
+                        @endif
+
                         <button
                             type="button"
                             wire:click="closeWithdrawalModal"
@@ -686,6 +693,8 @@
                             type="button"
                             wire:click="confirmWithdrawalRejection"
                             wire:loading.attr="disabled"
+                            @disabled(! $this->approvalWindow()['open'])
+                            title="{{ $this->approvalWindow()['message'] }}"
                             class="modal-btn modal-btn-reject"
                         >
                             <span wire:loading.remove wire:target="confirmWithdrawalRejection">
@@ -702,6 +711,8 @@
                             type="button"
                             wire:click="processWithdrawalApproval"
                             wire:loading.attr="disabled"
+                            @disabled(! $this->approvalWindow()['open'])
+                            title="{{ $this->approvalWindow()['message'] }}"
                             class="modal-btn modal-btn-approve"
                         >
                             <span wire:loading.remove wire:target="processWithdrawalApproval">

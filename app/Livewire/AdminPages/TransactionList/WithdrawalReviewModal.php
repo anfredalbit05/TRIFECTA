@@ -4,6 +4,7 @@ namespace App\Livewire\AdminPages\TransactionList;
 
 use App\Livewire\Concerns\AuthorizesModules;
 use App\Models\Withdrawal;
+use App\Services\WithdrawalWindowService;
 use App\Support\Modules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -86,8 +87,41 @@ class WithdrawalReviewModal extends Component
     |--------------------------------------------------------------------------
     */
 
+    /*
+    | Approve/reject only happen every Monday, 12:00 AM - 11:59 PM. The modal
+    | may still be opened for review on any day; the actions are refused.
+    */
+    public function approvalWindow(): array
+    {
+        return app(WithdrawalWindowService::class)->approvalStatus();
+    }
+
+    private function approvalWindowBlocked(): bool
+    {
+        $window = $this->approvalWindow();
+
+        if ($window['open']) {
+            return false;
+        }
+
+        Log::warning('Withdrawal approval blocked: outside the Monday approval window.', [
+            'caller' => Auth::id(),
+        ]);
+
+        $this->dispatch('swal:error', [
+            'title' => 'Approvals Closed',
+            'text' => $window['message'],
+        ]);
+
+        return true;
+    }
+
     public function confirmApprove(): void
     {
+        if ($this->approvalWindowBlocked()) {
+            return;
+        }
+
         if (! $this->isPrivileged) {
             Log::warning('Withdrawal approval blocked: user lacks privileges.', [
                 'UserID' => Auth::id(),
@@ -121,6 +155,10 @@ class WithdrawalReviewModal extends Component
 
     public function confirmReject(): void
     {
+        if ($this->approvalWindowBlocked()) {
+            return;
+        }
+
         if (! $this->isPrivileged) {
             Log::warning('Withdrawal rejection blocked: user lacks privileges.', [
                 'UserID' => Auth::id(),

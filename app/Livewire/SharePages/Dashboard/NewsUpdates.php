@@ -153,7 +153,7 @@ public function openWithdrawalModal(): void
         return;
     }
 
-    // Requests are only accepted Friday 5:01 PM to Sunday 12:00 AM.
+    // Requests are only accepted Friday 5:00 PM to Sunday 11:59 PM.
     $withdrawalWindow = app(WithdrawalWindowService::class);
 
     if (! $withdrawalWindow->isOpen()) {
@@ -209,7 +209,7 @@ public function getMinimumWithdrawalAmount(): float
 
     // ==========================================
     // WITHDRAWAL REQUEST WINDOW
-    // Friday 5:01 PM to Sunday 12:00 AM.
+    // Friday 5:00 PM to Sunday 11:59 PM.
     // See App\Services\WithdrawalWindowService.
     // ==========================================
 

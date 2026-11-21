@@ -7,6 +7,7 @@ use App\Models\Activation;
 use App\Models\Ledger;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
+use App\Services\WithdrawalWindowService;
 use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -134,6 +135,41 @@ class Withdrawals extends Component
 
     /*
     |--------------------------------------------------------------------------
+    | APPROVAL WINDOW — approve/reject only every Monday, 12:00 AM - 11:59 PM
+    |--------------------------------------------------------------------------
+    | Requests may be filed Fri 5:00 PM - Sun 11:59 PM, but a pending request
+    | is only acted on during Monday. Every approve/reject entry point checks
+    | this guard, so the rule cannot be bypassed from the browser.
+    |--------------------------------------------------------------------------
+    */
+
+    public function approvalWindow(): array
+    {
+        return app(WithdrawalWindowService::class)->approvalStatus();
+    }
+
+    private function approvalWindowBlocked(): bool
+    {
+        $window = $this->approvalWindow();
+
+        if ($window['open']) {
+            return false;
+        }
+
+        Log::warning('Withdrawal approval blocked: outside the Monday approval window.', [
+            'caller' => Auth::id(),
+        ]);
+
+        $this->dispatch('swal:error', [
+            'title' => 'Approvals Closed',
+            'text' => $window['message'],
+        ]);
+
+        return true;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | PENDING COUNTS — badges on the page-shell tab nav
     |--------------------------------------------------------------------------
     */
@@ -178,6 +214,10 @@ class Withdrawals extends Component
 
     public function approveWithdrawal(int $withdrawalId): void
     {
+        if ($this->approvalWindowBlocked()) {
+            return;
+        }
+
         if (! $this->canProcess) {
             $this->dispatch('swal:error', [
                 'title' => 'Not Allowed',
@@ -325,6 +365,10 @@ class Withdrawals extends Component
 
     public function confirmApproveWithdrawal(int $withdrawalId): void
     {
+        if ($this->approvalWindowBlocked()) {
+            return;
+        }
+
         if (! $this->canProcess) {
             $this->dispatch('swal:error', [
                 'title' => 'Not Allowed',
@@ -354,6 +398,10 @@ class Withdrawals extends Component
 
     public function confirmRejectWithdrawal(int $withdrawalId): void
     {
+        if ($this->approvalWindowBlocked()) {
+            return;
+        }
+
         if (! $this->canProcess) {
             $this->dispatch('swal:error', [
                 'title' => 'Not Allowed',
@@ -380,6 +428,10 @@ class Withdrawals extends Component
     #[On('txn-reject-withdrawal')]
     public function rejectWithdrawal($withdrawalId): void
     {
+        if ($this->approvalWindowBlocked()) {
+            return;
+        }
+
         if (! $this->canProcess) {
             $this->dispatch('swal:error', [
                 'title' => 'Not Allowed',

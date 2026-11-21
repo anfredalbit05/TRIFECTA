@@ -160,7 +160,7 @@ class Members extends Component
     |--------------------------------------------------------------------------
     | Withdrawal Request Window
     |
-    | Requests are only accepted Friday 5:01 PM to Sunday 12:00 AM.
+    | Requests are only accepted Friday 5:00 PM to Sunday 11:59 PM.
     | See App\Services\WithdrawalWindowService.
     |--------------------------------------------------------------------------
     */
@@ -168,6 +168,37 @@ class Members extends Component
     public function withdrawalWindow(): array
     {
         return app(WithdrawalWindowService::class)->status();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | APPROVAL WINDOW — approve/reject only every Monday, 12:00 AM - 11:59 PM
+    |--------------------------------------------------------------------------
+    */
+
+    public function approvalWindow(): array
+    {
+        return app(WithdrawalWindowService::class)->approvalStatus();
+    }
+
+    private function approvalWindowBlocked(): bool
+    {
+        $window = $this->approvalWindow();
+
+        if ($window['open']) {
+            return false;
+        }
+
+        Log::warning('Member withdrawal approval blocked: outside the Monday approval window.', [
+            'caller' => Auth::id(),
+        ]);
+
+        $this->dispatch('swal:error', [
+            'title' => 'Approvals Closed',
+            'text' => $window['message'],
+        ]);
+
+        return true;
     }
 
     /*
@@ -837,6 +868,10 @@ class Members extends Component
     public function confirmWithdrawalRejection(): void
     {
 
+        if ($this->approvalWindowBlocked()) {
+            return;
+        }
+
         if (! $this->selectedWithdrawal) {
 
             $this->dispatch('swal:error', [
@@ -858,6 +893,10 @@ class Members extends Component
 
     public function rejectWithdrawal(): void
     {
+
+        if ($this->approvalWindowBlocked()) {
+            return;
+        }
 
         if (! $this->selectedWithdrawal) {
             return;
@@ -946,6 +985,10 @@ class Members extends Component
 
     public function processWithdrawalApproval(): void
     {
+
+        if ($this->approvalWindowBlocked()) {
+            return;
+        }
 
         if (! $this->selectedWithdrawal) {
             return;

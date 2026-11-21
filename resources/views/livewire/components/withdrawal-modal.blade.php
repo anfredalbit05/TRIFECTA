@@ -4,51 +4,21 @@
         showWithdrawModal: false,
         balance: @entangle('totalAmount'),
         minimumWithdrawalAmount: {{ (float) $minimumWithdrawalAmount }},
-        withdrawAmount: @entangle('withdrawAmount').live,
 
         get amount() {
-            const value = parseFloat(this.withdrawAmount);
-            return isNaN(value) ? 0 : value;
-        },
-
-        get remainingBalance() {
-            return Math.max(0, this.balance - this.amount);
+            return parseFloat(this.balance) || 0;
         },
 
         get isBelowMinimum() {
-            return this.withdrawAmount !== '' &&
-                this.amount > 0 &&
+            return this.amount > 0 &&
                 this.amount < this.minimumWithdrawalAmount;
-        },
-
-        get exceedsBalance() {
-            return this.amount > this.balance;
         },
 
         formatMoney(value) {
             return new Intl.NumberFormat('en-PH', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
-            }).format(value);
-        },
-
-        sanitizeAmount() {
-            let value = this.withdrawAmount ?? '';
-
-            value = value.replace(/[^0-9.]/g, '');
-
-            const parts = value.split('.');
-
-            if (parts.length > 2) {
-                value = parts[0] + '.' + parts.slice(1).join('');
-            }
-
-            if (value.includes('.')) {
-                const decimalParts = value.split('.');
-                value = decimalParts[0] + '.' + decimalParts[1].slice(0, 2);
-            }
-
-            this.withdrawAmount = value;
+            }).format(parseFloat(value) || 0);
         }
     }"
 
@@ -58,7 +28,6 @@
     <div
         x-show="showWithdrawModal"
         x-cloak
-        x-transition.opacity
         class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 backdrop-blur-sm p-4"
         @click.self="showWithdrawModal = false"
     >
@@ -107,22 +76,23 @@
                 <div class="mb-5 grid grid-cols-2 gap-3">
                     <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                         <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                            Available Balance
-                        </span>
-
-                        <span class="mt-1 block text-xl font-bold text-[var(--color-primary)]">
-                            ₱{{ number_format($totalAmount, 2) }}
-                        </span>
-                    </div>
-
-                    <div class="rounded-xl border border-[var(--color-primary-tint)] bg-[var(--color-primary-tint)] p-4">
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-[var(--color-primary)]">
-                            Remaining
+                            Cash Wallet Balance
                         </span>
 
                         <span
                             class="mt-1 block text-xl font-bold text-[var(--color-primary)]"
-                            x-text="'₱' + formatMoney(remainingBalance)"
+                            x-text="'₱' + formatMoney(amount)"
+                        ></span>
+                    </div>
+
+                    <div class="rounded-xl border border-[var(--color-primary-tint)] bg-[var(--color-primary-tint)] p-4">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-[var(--color-primary)]">
+                            Withdrawal Amount
+                        </span>
+
+                        <span
+                            class="mt-1 block text-xl font-bold text-[var(--color-primary)]"
+                            x-text="'₱' + formatMoney(amount)"
                         ></span>
                     </div>
                 </div>
@@ -133,77 +103,35 @@
                     </div>
 
                     <p class="text-xs leading-5 text-[var(--color-primary-dark)]">
-                        Friday 6:01 PM to Friday 6:00 PM requests are processed
-                        and released on the upcoming Monday.
+                        Requests are accepted from Friday 5:00 PM to Sunday
+                        11:59 PM, and are approved or released every Monday.
                     </p>
                 </div>
 
                 <div class="space-y-5">
 
-                    <div>
-                        <label class="mb-1.5 block text-xs font-semibold text-slate-700">
-                            Withdrawal Amount
-                        </label>
-
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 font-bold text-slate-500">
-                                ₱
-                            </span>
-
-                            <input
-                                type="text"
-                                inputmode="decimal"
-                                x-model="withdrawAmount"
-                                @input="sanitizeAmount()"
-                                @keydown="
-                                    if (['-', '+', 'e', 'E'].includes($event.key)) {
-                                        $event.preventDefault()
-                                    }
-                                "
-                                placeholder="0.00"
-                                autocomplete="off"
-                                :class="{
-                                    'border-red-400 focus:border-red-500 focus:ring-red-100':
-                                        isBelowMinimum || exceedsBalance,
-                                    'border-slate-200 focus:border-[var(--color-primary)] focus:ring-[var(--color-primary-tint)]':
-                                        !isBelowMinimum && !exceedsBalance
-                                }"
-                                class="w-full rounded-xl border py-3 pl-8 pr-4 text-sm font-semibold outline-none focus:ring-2"
-                            >
-                        </div>
+                    <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                        <p class="text-xs leading-5 text-amber-800">
+                            No amount to type in — this request withdraws your
+                            entire Cash Wallet balance of
+                            <strong x-text="'₱' + formatMoney(amount)"></strong>.
+                            Minimum withdrawal:
+                            <strong>₱{{ number_format($minimumWithdrawalAmount, 2) }}</strong>.
+                        </p>
 
                         <p
                             x-show="isBelowMinimum"
                             x-cloak
-                            class="mt-1.5 text-xs font-medium text-red-500"
+                            class="mt-1.5 text-xs font-semibold text-red-600"
                         >
-                            Minimum withdrawal amount is
-                            ₱{{ number_format($minimumWithdrawalAmount, 2) }}.
-                        </p>
-
-                        <p
-                            x-show="exceedsBalance"
-                            x-cloak
-                            class="mt-1.5 text-xs font-medium text-red-500"
-                        >
-                            Withdrawal amount exceeds available balance.
+                            Your balance is below the minimum withdrawal amount.
                         </p>
 
                         @error('withdrawAmount')
-                            <p class="mt-1.5 text-xs text-red-500">
+                            <p class="mt-1.5 text-xs font-semibold text-red-600">
                                 {{ $message }}
                             </p>
                         @enderror
-
-                        <p
-                            x-show="!isBelowMinimum && !exceedsBalance"
-                            class="mt-1.5 text-[11px] text-slate-500"
-                        >
-                            Minimum withdrawal:
-                            <strong class="text-slate-600">
-                                ₱{{ number_format($minimumWithdrawalAmount, 2) }}
-                            </strong>
-                        </p>
                     </div>
 
                     <div>
@@ -344,7 +272,7 @@
                     class="rounded-xl bg-[var(--color-primary)] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
                 >
                     <span wire:loading.remove wire:target="submitWithdrawal">
-                        Submit Request
+                        Request Now
                     </span>
 
                     <span wire:loading wire:target="submitWithdrawal">
@@ -359,8 +287,9 @@
 <script>
     window.confirmWithdrawal = function () {
 
-        const amount = parseFloat($wire.withdrawAmount) || 0;
-        const balance = parseFloat($wire.totalAmount) || 0;
+        // The withdrawal amount is always the full Cash
+        // Wallet balance — there is no amount field.
+        const amount = parseFloat($wire.totalAmount) || 0;
 
         // ==========================================
         // INVALID AMOUNT
@@ -369,66 +298,8 @@
         if (!amount || amount <= 0) {
             Swal.fire({
                 icon: 'warning',
-                title: 'Invalid Amount',
-                text: 'Please enter a valid withdrawal amount first.',
-                confirmButtonColor: 'var(--color-primary)'
-            });
-
-            return;
-        }
-
-        // ==========================================
-        // EXCEEDS BALANCE
-        // ==========================================
-
-        if (amount > balance) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Insufficient Balance',
-                html: `
-                    <div class="text-center">
-
-                        <p class="mb-3 text-sm text-slate-600">
-                            The withdrawal amount exceeds your available balance.
-                        </p>
-
-                        <div class="space-y-2 rounded-xl border border-red-100 bg-red-50 p-4">
-
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs text-slate-500">
-                                    Available Balance
-                                </span>
-
-                                <strong class="text-sm text-[var(--color-primary)]">
-                                    ₱${balance.toLocaleString('en-PH', {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    })}
-                                </strong>
-                            </div>
-
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs text-slate-500">
-                                    Withdrawal Amount
-                                </span>
-
-                                <strong class="text-sm text-red-600">
-                                    ₱${amount.toLocaleString('en-PH', {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    })}
-                                </strong>
-                            </div>
-
-                        </div>
-
-                        <p class="mt-3 text-xs text-slate-500">
-                            Please enter an amount that does not exceed your available balance.
-                        </p>
-
-                    </div>
-                `,
-                confirmButtonText: 'Okay',
+                title: 'No Available Balance',
+                text: 'Your Cash Wallet has no withdrawable balance.',
                 confirmButtonColor: 'var(--color-primary)'
             });
 
@@ -528,17 +399,20 @@
         // CONFIRMATION
         // ==========================================
 
-        const formattedAmount = amount.toFixed(2);
+        const formattedAmount = amount.toLocaleString('en-PH', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
 
         Swal.fire({
-            icon: 'warning',
-            title: 'Confirm Withdrawal',
+            icon: 'question',
+            title: 'Request This Withdrawal?',
 
             html: `
                 <div class="text-left">
 
                     <p class="mb-3 text-sm text-slate-600">
-                        You are about to submit a withdrawal request for:
+                        Your entire Cash Wallet balance will be requested:
                     </p>
 
                     <div class="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-center">
@@ -553,33 +427,26 @@
 
                     </div>
 
-                    <p class="mb-2 text-sm text-slate-600">
-                        To confirm, type:
-                    </p>
+                    <div class="rounded-xl border border-slate-200 p-4">
 
-                    <div class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-center">
+                        <div class="flex items-center justify-between gap-4">
+                            <span class="text-xs text-slate-500">
+                                Method
+                            </span>
 
-                        <strong class="text-amber-700">
-                            ${formattedAmount}
-                        </strong>
+                            <strong class="text-right text-xs text-slate-700">
+                                ${withdrawalMethod}
+                            </strong>
+                        </div>
 
                     </div>
 
                 </div>
             `,
 
-            input: 'text',
-
-            inputPlaceholder: `Type ${formattedAmount}`,
-
-            inputAttributes: {
-                autocapitalize: 'off',
-                autocomplete: 'off'
-            },
-
             showCancelButton: true,
 
-            confirmButtonText: 'Submit Withdrawal',
+            confirmButtonText: 'Request Now',
 
             cancelButtonText: 'Cancel',
 
@@ -591,23 +458,7 @@
 
             allowOutsideClick: false,
 
-            allowEscapeKey: false,
-
-            preConfirm: (value) => {
-
-                const typedAmount = value.trim();
-
-                if (typedAmount !== formattedAmount) {
-
-                    Swal.showValidationMessage(
-                        `Please type exactly: ${formattedAmount}`
-                    );
-
-                    return false;
-                }
-
-                return true;
-            }
+            allowEscapeKey: false
 
         }).then((result) => {
 

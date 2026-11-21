@@ -175,6 +175,21 @@ class WithdrawalModal extends Component
             return;
         }
 
+        // ==========================================
+        // FULL WALLET WITHDRAWAL
+        //
+        // The amount is no longer typed in. The
+        // request always withdraws the acting user's
+        // entire Cash Wallet balance.
+        // ==========================================
+
+        $this->withdrawAmount = number_format(
+            $this->totalAmount,
+            2,
+            '.',
+            ''
+        );
+
         $this->dispatch('open-withdraw-modal');
     }
 
@@ -199,8 +214,8 @@ class WithdrawalModal extends Component
 
         // ==========================================
         // CHECK THE GLOBAL WINDOW
-        // Requests are only accepted Friday 5:01 PM
-        // to Sunday 12:00 AM (see the service).
+        // Requests are only accepted Friday 5:00 PM
+        // to Sunday 11:59 PM (see the service).
         // ==========================================
 
         $withdrawalWindow = app(WithdrawalWindowService::class);
@@ -257,6 +272,16 @@ class WithdrawalModal extends Component
         $this->refreshBalance();
 
         $availableBalance = $this->totalAmount;
+
+        // The submitted amount is always the full wallet
+        // balance, regardless of anything sent by the
+        // browser — there is no amount field anymore.
+        $this->withdrawAmount = number_format(
+            $availableBalance,
+            2,
+            '.',
+            ''
+        );
 
         $minimumWithdrawal = $this->getMinimumWithdrawalAmount();
 

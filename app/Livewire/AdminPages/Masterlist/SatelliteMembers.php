@@ -9,6 +9,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
+use App\Services\WithdrawalWindowService;
 use App\Support\Modules;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -1024,6 +1025,35 @@ class SatelliteMembers extends Component
     }
 
     // =====================================================
+    // APPROVAL WINDOW — Monday 12:00 AM to 11:59 PM only
+    // =====================================================
+
+    public function approvalWindow(): array
+    {
+        return app(WithdrawalWindowService::class)->approvalStatus();
+    }
+
+    private function approvalWindowBlocked(): bool
+    {
+        $window = $this->approvalWindow();
+
+        if ($window['open']) {
+            return false;
+        }
+
+        Log::warning('Satellite withdrawal approval blocked: outside the Monday approval window.', [
+            'caller' => Auth::id(),
+        ]);
+
+        $this->dispatch('swal:error', [
+            'title' => 'Approvals Closed',
+            'text' => $window['message'],
+        ]);
+
+        return true;
+    }
+
+    // =====================================================
     // OPEN WITHDRAWAL APPROVAL
     // =====================================================
 
@@ -1108,6 +1138,10 @@ class SatelliteMembers extends Component
 
     public function confirmWithdrawalRejection(): void
     {
+        if ($this->approvalWindowBlocked()) {
+            return;
+        }
+
         if (! $this->canUpdate) {
 
             $this->dispatch('swal:error', [
@@ -1139,6 +1173,10 @@ class SatelliteMembers extends Component
 
     public function rejectWithdrawal(): void
     {
+        if ($this->approvalWindowBlocked()) {
+            return;
+        }
+
         if (! $this->canUpdate) {
 
             $this->dispatch('swal:error', [
@@ -1211,6 +1249,10 @@ class SatelliteMembers extends Component
 
     public function processWithdrawalApproval(): void
     {
+        if ($this->approvalWindowBlocked()) {
+            return;
+        }
+
         if (! $this->canUpdate) {
 
             $this->dispatch('swal:error', [
