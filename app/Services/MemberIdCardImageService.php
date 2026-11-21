@@ -190,69 +190,87 @@ class MemberIdCardImageService
         imagedestroy($photo);
     }
 
- /** Paste the referral QR code with independently adjustable width and height. */
-private function pasteQr(
-    $image,
-    string $content,
-    int $x,
-    int $y,
-    int $width,
-    int $height
-): void {
-    $matrix = Encoder::encode($content, ErrorCorrectionLevel::M())->getMatrix();
-
-    $modules = $matrix->getWidth();
-    $margin = 2;
-    $total = $modules + ($margin * 2);
-
-    // Generate QR at high resolution first.
-    $scale = 10;
-
-    $qrSize = $total * $scale;
-
-    $qr = imagecreatetruecolor($qrSize, $qrSize);
-
-    $white = imagecolorallocate($qr, 255, 255, 255);
-    $black = imagecolorallocate($qr, ...self::NAVY);
-
-    imagefilledrectangle($qr, 0, 0, $qrSize, $qrSize, $white);
-
-    for ($row = 0; $row < $modules; $row++) {
-        for ($column = 0; $column < $modules; $column++) {
-            if ($matrix->get($column, $row) !== 1) {
-                continue;
-            }
-
-            $left = ($column + $margin) * $scale;
-            $top = ($row + $margin) * $scale;
-
-            imagefilledrectangle(
-                $qr,
-                $left,
-                $top,
-                $left + $scale - 1,
-                $top + $scale - 1,
-                $black
-            );
-        }
-    }
-
-    // Resize to the requested width and height.
-    imagecopyresampled(
+    /** Paste a sharp referral QR code using integer-sized modules. */
+    private function pasteQr(
         $image,
-        $qr,
-        $x,
-        $y,
-        0,
-        0,
-        $width,
-        $height,
-        $qrSize,
-        $qrSize
-    );
+        string $content,
+        int $x,
+        int $y,
+        int $width,
+        int $height
+    ): void {
+        $matrix = Encoder::encode(
+            $content,
+            ErrorCorrectionLevel::M()
+        )->getMatrix();
 
-    imagedestroy($qr);
-}
+        $modules = $matrix->getWidth();
+        $margin = 2;
+        $total = $modules + ($margin * 2);
+
+        // Keep QR square and preserve sharp module edges.
+        $targetSize = min($width, $height);
+        $scale = max(1, (int) floor($targetSize / $total));
+
+        $drawnSize = $total * $scale;
+
+        $qr = imagecreatetruecolor($drawnSize, $drawnSize);
+
+        if ($qr === false) {
+            throw new \RuntimeException('Could not create QR image.');
+        }
+
+        $white = imagecolorallocate($qr, 255, 255, 255);
+        $black = imagecolorallocate($qr, ...self::NAVY);
+
+        imagefilledrectangle(
+            $qr,
+            0,
+            0,
+            $drawnSize - 1,
+            $drawnSize - 1,
+            $white
+        );
+
+        for ($row = 0; $row < $modules; $row++) {
+            for ($column = 0; $column < $modules; $column++) {
+
+                if ($matrix->get($column, $row) !== 1) {
+                    continue;
+                }
+
+                $left = ($column + $margin) * $scale;
+                $top = ($row + $margin) * $scale;
+
+                imagefilledrectangle(
+                    $qr,
+                    $left,
+                    $top,
+                    $left + $scale - 1,
+                    $top + $scale - 1,
+                    $black
+                );
+            }
+        }
+
+        // Center QR inside the requested dimensions.
+        $destinationX = $x + (int) floor(($width - $drawnSize) / 2);
+        $destinationY = $y + (int) floor(($height - $drawnSize) / 2);
+
+        // Copy without resampling to preserve scan quality.
+        imagecopy(
+            $image,
+            $qr,
+            $destinationX,
+            $destinationY,
+            0,
+            0,
+            $drawnSize,
+            $drawnSize
+        );
+
+        imagedestroy($qr);
+    }
 
     private function text(
         $image,
