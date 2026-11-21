@@ -103,10 +103,10 @@ class MemberIdCardImageService
             $this->pasteQr(
                 $image,
                 rtrim(config('app.url'), '/').'/?ref='.urlencode($user->referralCode ?? ''),
-                939, // X position
-                625, // Y position
-                200, // Width
-                200  // Height
+                925, // X position
+                600, // Y position
+                220, // Width
+                220  // Height
             );
 
             $directory = storage_path('app/id-cards');
