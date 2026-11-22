@@ -6,6 +6,14 @@
     @vite('resources/css/member/print/genealogy.css')
 @endpush
 
+@push('scripts')
+    {{-- Loaded with the page: Livewire-rendered markup never executes injected scripts --}}
+    @vite([
+        'resources/js/livewire/member-pages/genealogy/board-members.js',
+        'resources/js/livewire/member-pages/genealogy/invitee.js',
+    ])
+@endpush
+
 @section('content')
 
 <div class="ws-page" x-data="{ tab: $persist('invitee').as('genealogy-tree-tab') }">

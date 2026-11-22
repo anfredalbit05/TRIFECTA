@@ -59,7 +59,8 @@
     >
         <div
             class="tree-stage"
-            :style="`transform: translate(${offsetX}px, ${offsetY}px) scale(${scale});`"
+            x-ref="stage"
+            x-effect="$refs.stage.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`"
         >
             <div class="board-hierarchy">
 
@@ -132,8 +133,6 @@
 
             </div>
         </div>
-
-        @vite('resources/js/livewire/member-pages/genealogy/board-members.js')
     </div>
 </div>
 

@@ -21,6 +21,7 @@ export default defineConfig({
                 'resources/js/livewire/landing-page/team.js',
                 'resources/js/livewire/landing-page/home.js',
                 'resources/js/livewire/member-pages/genealogy/board-members.js',
+                'resources/js/livewire/member-pages/genealogy/invitee.js',
                 'resources/js/livewire/member-pages/my-profile/account.js',
                 'resources/js/livewire/member-pages/my-profile/profile.js',
                 'resources/js/livewire/member-pages/my-profile/security.js',
