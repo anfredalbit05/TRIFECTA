@@ -74,7 +74,7 @@
             <p class="card-subtitle">Information managed by the system.</p>
         </div>
 
-        <div class="grid divide-y divide-slate-200 md:grid-cols-3 md:divide-x md:divide-y-0">
+       <div class="grid divide-y divide-slate-200 {{ auth()->user()->RoleID == 8 ? 'md:grid-cols-3 md:divide-x md:divide-y-0' : 'md:grid-cols-2 md:divide-x md:divide-y-0' }}">
         {{-- Status --}}
         <div class="account-detail-cell">
             <p class="account-detail-label">Account Status</p>
@@ -103,11 +103,15 @@
             <p class="account-detail-value">{{ auth()->user()->referralCode ?? 'Not available' }}</p>
         </div>
 
-        {{-- Policy Number --}}
-        <div class="account-detail-cell">
-            <p class="account-detail-label">Policy Number</p>
-            <p class="account-detail-value">{{ auth()->user()->policy_number ?? 'Not available' }}</p>
-        </div>
+        @if (auth()->user()->RoleID == 8)
+            {{-- Policy Number --}}
+            <div class="account-detail-cell">
+                <p class="account-detail-label">Policy Number</p>
+                <p class="account-detail-value">
+                    {{ $policy_number ?: 'Not available' }}
+                </p>
+            </div>
+        @endif
     </div>
 
         {{-- ==================== 4. REFERRAL QR & LINK ==================== --}}

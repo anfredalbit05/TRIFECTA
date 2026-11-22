@@ -39,8 +39,17 @@ class Account extends Component
         $this->username = $user->username ?? '';
         $this->email = $user->email ?? '';
         $this->status = $user->status ?? '';
-         $this->referralUrl = rtrim(config('app.url'), '/') . '/?ref=' . $user->referralCode;
-        $this->policy_number = $user->policy_number ?? '';
+        $this->referralUrl = rtrim(config('app.url'), '/') . '/?ref=' . $user->referralCode;
+        $activation = DB::table('activations')
+            ->where('UserID', $user->UserID)
+            ->where('status', 'Approved')
+            ->whereNotNull('policy_number')
+            ->where('policy_number', '!=', '')
+            ->orderByDesc('created_at')
+            ->orderByDesc('ActivationID')
+            ->first();
+
+        $this->policy_number = $activation->policy_number ?? '';
 
         $renderer = new ImageRenderer(
             new RendererStyle(200),
