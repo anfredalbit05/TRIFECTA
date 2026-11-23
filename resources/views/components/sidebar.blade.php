@@ -70,19 +70,27 @@
             @keydown.escape.window="open = false"
             class="tf-topbar-menu">
 
-            <button type="button"
-                    @click="open = !open"
-                    :aria-expanded="open"
-                    aria-label="Open profile menu"
-                    class="tf-topbar-user">
-                <div class="text-right">
-                    <b>{{ $user?->firstname ?? 'Member' }} {{ $user?->lastname ?? '' }}</b>
-                    <small>{{ $user?->branch?->branchname ?? 'Member' }}</small>
-                </div>
-                <img src="{{ $avatarSrc }}"
-                    alt="Profile picture"
-                    onerror="this.onerror=null;this.src='{{ $defaultAvatar }}';">
-            </button>
+        <button type="button"
+                @click="open = !open"
+                :aria-expanded="open"
+                aria-label="Open profile menu"
+                class="tf-topbar-user">
+            <div class="text-right">
+                <b>{{ $user?->firstname ?? 'Member' }} {{ $user?->lastname ?? '' }}</b>
+                <small>{{ $user?->branch?->branchname ?? 'Member' }}</small>
+            </div>
+            <img src="{{ $avatarSrc }}"
+                alt="Profile picture"
+                onerror="this.onerror=null;this.src='{{ $defaultAvatar }}';">
+
+            {{-- Dropdown indicator (same as the navbar) --}}
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor"
+                class="h-3.5 w-3.5 shrink-0 text-[var(--color-primary)]/70 transition-transform duration-200"
+                :class="{ 'rotate-180': open }">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
 
             <div x-show="open"
                 x-cloak
