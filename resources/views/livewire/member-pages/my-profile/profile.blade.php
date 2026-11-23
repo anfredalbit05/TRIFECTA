@@ -277,6 +277,7 @@
                 </div>
             </div>
 
+            {{-- //Hello --}}
             @if (auth()->user()->RoleID == 8)
                 {{-- --------------- 5. REGISTERED BENEFICIARIES (READ-ONLY) --------------- --}}
                 <div class="card">
