@@ -16,6 +16,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use App\Models\EmploymentType;
 use App\Models\MemberType;
+use App\Models\Branch;
 
 class ApplicationModal extends Component
 {
@@ -77,6 +78,8 @@ class ApplicationModal extends Component
     public $employment_type_id = null;
 
     public $member_type_id = null;
+
+    public $BranchID = null;
 
     #[Computed]
     public function previewPolicyNumber(): string
@@ -225,6 +228,8 @@ class ApplicationModal extends Component
 
             'employment_type_id' => 'nullable|exists:employment_types,employment_type_id',
             'member_type_id' => 'nullable|exists:member_types,member_type_id',
+
+            'BranchID' => 'required|exists:branches,BranchID',
 
             'address' => 'required|string|max:500',
         ] + ($this->isEditMode ? [
@@ -488,6 +493,7 @@ class ApplicationModal extends Component
                     'longitude' => $this->longitude,
                     'RoleID' => 8,
                     'status' => 'Inactive',
+                    'BranchID' => $this->BranchID,
                 ]);
 
                 $this->saveBeneficiaries($user->UserID);
@@ -589,6 +595,7 @@ class ApplicationModal extends Component
                     'address' => $this->address,
                     'latitude' => $this->latitude,
                     'longitude' => $this->longitude,
+                    'BranchID' => $this->BranchID,
                 ]);
 
                 // Update only editable policy information.
@@ -758,6 +765,7 @@ class ApplicationModal extends Component
         return view('livewire.application-modal', [
             'employmentTypes' => EmploymentType::orderBy('name')->get(),
             'memberTypes' => MemberType::orderBy('name')->get(),
+            'branches' => Branch::orderBy('branchName')->get(),
         ]);
     }
 }

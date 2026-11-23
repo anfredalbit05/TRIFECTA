@@ -14,6 +14,11 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id('UserID');
 
+            $table->foreign('BranchID')
+            ->references('BranchID')
+            ->on('branches')
+            ->nullOnDelete();
+
             // Account Information
             $table->string('username', 50)->unique();
             $table->string('password');
@@ -112,5 +117,9 @@ return new class extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['BranchID']);
+            $table->dropColumn('BranchID');
+        });
     }
 };

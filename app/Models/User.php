@@ -17,6 +17,7 @@ use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Branch;
 
 /**
  * @property int $id
@@ -33,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon|null $updated_at
  */
 #[Fillable([
+
     // Account
     'username',
     'password',
@@ -74,6 +76,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'signature',
     'employment_type_id',
     'member_type_id',
+    'BranchID',
 ])]
 
 #[Hidden([
@@ -259,6 +262,15 @@ class User extends Authenticatable implements PasskeyUser
             MemberType::class,
             'member_type_id',
             'member_type_id'
+        );
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(
+            Branch::class,
+            'BranchID',
+            'BranchID'
         );
     }
 

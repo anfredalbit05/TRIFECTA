@@ -111,6 +111,27 @@
                                         </select>
                                     </div>
                                     @endif
+
+                                    {{-- BRANCH --}}
+                                    <div>
+                                        <label class="{{ $lbl }}">Branch *</label>
+
+                                        <select wire:model="BranchID" class="{{ $in }}">
+                                            <option value="">Select Branch</option>
+
+                                            @foreach ($branches as $branch)
+                                                <option value="{{ $branch->BranchID }}">
+                                                    {{ $branch->branchName }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+
+                                        @error('BranchID')
+                                            <p class="mt-1 text-xs font-semibold text-red-600">
+                                                {{ $message }}
+                                            </p>
+                                        @enderror
+                                    </div>
                             </div>
                         </div>
 
