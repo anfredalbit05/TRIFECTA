@@ -15,6 +15,7 @@ use App\Livewire\Concerns\HasTabSkeleton;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
+
 class Profile extends Component
 {
     use HasTabSkeleton;

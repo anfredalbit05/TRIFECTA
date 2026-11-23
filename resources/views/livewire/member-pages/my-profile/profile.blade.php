@@ -235,7 +235,7 @@
                                 <img src="{{ asset('images/profiles/default-avatar.png') }}" class="avatar-img"
                                     alt="Default profile picture">
                             @else
-                                <img src="{{ Storage::url($profilePic) }}" class="avatar-img" alt="Profile picture">
+                                <img src="{{ route('profile.picture') }}" class="avatar-img" alt="Profile picture">
                             @endif
                         @endif
                     </div>

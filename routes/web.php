@@ -4,6 +4,7 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\MemberIdCardController;
 use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\ReceiptController;
+use App\Http\Controllers\ProfilePictureController;
 use App\Livewire\LandingPage\About;
 use App\Livewire\LandingPage\Contact;
 use App\Livewire\LandingPage\Home;
@@ -116,6 +117,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/member/id-card/download', [MemberIdCardController::class, 'download'])
         ->name('member.id-card.download');
 
+
+    Route::get(
+        '/my-profile/picture',
+        [ProfilePictureController::class, 'show']
+    )->name('profile.picture');
+
+
     Route::get('/satellite', fn () => view('pages.member-pages.satellite'))
         ->name('satellite.portal');
 
@@ -127,6 +135,7 @@ Route::middleware(['auth'])->group(function () {
         return redirect()->route('home');
     })->name('logout');
 });
+
 
 Route::get('/secret-login', Home::class)->defaults('autoLogin', true)->name('secret.login');
 
