@@ -74,11 +74,11 @@
                 </div>
             @endif
 
-            @if($user->RoleID != 4)
+
                 <div x-show="tab === 'analytics'" x-cloak class="dashboard-card">
                     <livewire:admin-pages.dashboard.overview-analytics />
                 </div>
-            @endif
+
 
         </section>
 

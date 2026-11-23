@@ -78,7 +78,7 @@
 
             </div>
 
-              @if (auth()->check() && (int) auth()->user()->RoleID != 8)
+
                 <div x-show="tab === 'overview'"
                      x-cloak
                      x-transition.opacity.duration.200ms
@@ -89,7 +89,7 @@
                     </div>
 
                 </div>
-            @endif
+
 
             {{-- <div x-show="tab === 'board-member'"
                  x-cloak
