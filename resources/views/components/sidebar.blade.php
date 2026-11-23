@@ -19,13 +19,11 @@
     //             ->whereHas('user', fn ($q) => $q->where('RoleID', 8))
     //             ->exists());
 
-    $profilePic = $user?->profilepic;
-    $defaultAvatar = 'images/profiles/default-avatar.png';
+    $defaultAvatar = asset('images/profiles/default-avatar.png');
 
-    $avatarSrc = (!$profilePic || $profilePic === $defaultAvatar)
-        ? asset($defaultAvatar)
-        : (Str::startsWith($profilePic, 'storage/') ? asset($profilePic) : asset('storage/' . $profilePic));
-
+    $avatarSrc = $user
+        ? route('profile.picture') . '?v=' . ($user->updated_at?->timestamp ?? time())
+        : $defaultAvatar;
     /*
     | Pending transaction counts (admin sidebar badges). Only queried for
     | admins — members never see these two links.
@@ -72,7 +70,11 @@
                 <b>{{ $user?->firstname ?? 'Member' }} {{ $user?->lastname ?? '' }}</b>
                 <small>{{ $user?->branch?->branchname ?? 'Member' }}</small>
             </div>
-            <img src="{{ $avatarSrc }}" alt="Profile picture">
+            <img
+                src="{{ $avatarSrc }}"
+                alt="Profile picture"
+                onerror="this.onerror=null;this.src='{{ $defaultAvatar }}';"
+            >
         </a>
     </header>
 
