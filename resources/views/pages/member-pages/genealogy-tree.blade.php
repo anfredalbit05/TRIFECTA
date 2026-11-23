@@ -37,6 +37,14 @@
             <div class="ws-rail-group">
                 <div class="ws-rail-label">Network</div>
 
+
+
+                <a href="#" class="ws-rail-link" :class="tab === 'invitee' ? 'is-active' : ''"
+                   @click.prevent="tab = 'invitee'">
+                    <span class="ws-rail-icon">♧</span>
+                    <span>Invitee</span>
+                </a>
+
                 @if (auth()->check() && (int) auth()->user()->RoleID != 8)
                     {{-- Overview is a leadership tool — not shown to plain Members --}}
                     <a href="#" class="ws-rail-link" :class="tab === 'overview' ? 'is-active' : ''"
@@ -45,12 +53,6 @@
                         <span>Overview</span>
                     </a>
                 @endif
-
-                <a href="#" class="ws-rail-link" :class="tab === 'invitee' ? 'is-active' : ''"
-                   @click.prevent="tab = 'invitee'">
-                    <span class="ws-rail-icon">♧</span>
-                    <span>Invitee</span>
-                </a>
 
                 {{-- <a href="#" class="ws-rail-link" :class="tab === 'board-member' ? 'is-active' : ''"
                    @click.prevent="tab = 'board-member'">
