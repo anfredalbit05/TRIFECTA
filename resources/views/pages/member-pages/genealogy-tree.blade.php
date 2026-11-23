@@ -66,6 +66,16 @@
         <section class="ws-panel">
 
 
+                <div x-show="tab === 'overview'"
+                     x-cloak
+                     x-transition.opacity.duration.200ms
+                     class="genealogy-main-card">
+
+                    <div class="genealogy-scroll-area">
+                        <livewire:member-pages.genealogy.overview lazy />
+                    </div>
+
+                </div>
 
             <div x-show="tab === 'invitee'"
                  x-cloak
@@ -79,16 +89,6 @@
             </div>
 
 
-                <div x-show="tab === 'overview'"
-                     x-cloak
-                     x-transition.opacity.duration.200ms
-                     class="genealogy-main-card">
-
-                    <div class="genealogy-scroll-area">
-                        <livewire:member-pages.genealogy.overview  />
-                    </div>
-
-                </div>
 
 
             {{-- <div x-show="tab === 'board-member'"
