@@ -127,7 +127,7 @@ protected function dailyLedgerQueryWithoutDateFilter(): Builder
     $walletDaily = DB::table('wallets as w')
         ->join('users as u', 'u.UserID', '=', 'w.UserID')
         ->join('roles as r', 'r.RoleID', '=', 'u.RoleID')
-        ->where('u.RoleID', 4)
+        ->whereIn('u.RoleID', [4, 5, 6, 7, 8])
         ->whereIn('w.source', [
             'DR', 'PF', 'CS', 'SDR', 'OV', 'WD',
         ])
@@ -303,7 +303,7 @@ protected function reportQuery(): Builder
 
     $selectedUser = $this->selectedUserLedgerID
         ? User::with(['role', 'wallets', 'ledgers'])
-            ->where('RoleID', 4)
+            ->where('RoleID', [4,5,6,7,8])
             ->find($this->selectedUserLedgerID)
         : null;
 
