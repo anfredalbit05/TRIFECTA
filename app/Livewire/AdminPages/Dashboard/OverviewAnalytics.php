@@ -144,10 +144,10 @@ class OverviewAnalytics extends Component
         $this->recentMembers = User::where(fn($q) => $applyFilter($q))->latest()->limit(5)->get();
         $this->recentNews = NewsUpdate::where(fn($q) => $applyFilter($q))->latest()->limit(5)->get();
 
-        // Branch Distribution
-        $this->branchStats = Branch::withCount(['user' => function ($query) use ($applyFilter) {
-            $applyFilter($query);
-        }])->get();
+        // // Branch Distribution
+        // $this->branchStats = Branch::withCount(['user' => function ($query) use ($applyFilter) {
+        //     $applyFilter($query);
+        // }])->get();
 
         // Benefit Analytics
         try {
