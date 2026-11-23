@@ -65,18 +65,7 @@
 
         <section class="ws-panel">
 
-            @if (auth()->check() && (int) auth()->user()->RoleID != 8)
-                <div x-show="tab === 'overview'"
-                     x-cloak
-                     x-transition.opacity.duration.200ms
-                     class="genealogy-main-card">
 
-                    <div class="genealogy-scroll-area">
-                        <livewire:member-pages.genealogy.overview lazy />
-                    </div>
-
-                </div>
-            @endif
 
             <div x-show="tab === 'invitee'"
                  x-cloak
@@ -88,6 +77,19 @@
                 </div>
 
             </div>
+
+              @if (auth()->check() && (int) auth()->user()->RoleID != 8)
+                <div x-show="tab === 'overview'"
+                     x-cloak
+                     x-transition.opacity.duration.200ms
+                     class="genealogy-main-card">
+
+                    <div class="genealogy-scroll-area">
+                        <livewire:member-pages.genealogy.overview lazy />
+                    </div>
+
+                </div>
+            @endif
 
             {{-- <div x-show="tab === 'board-member'"
                  x-cloak
