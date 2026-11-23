@@ -37,14 +37,14 @@
             <div class="ws-rail-group">
                 <div class="ws-rail-label">Network</div>
 
-                @if (auth()->check() && (int) auth()->user()->RoleID != 8)
+                {{-- @if (auth()->check() && (int) auth()->user()->RoleID != 8) --}}
                     {{-- Overview is a leadership tool — not shown to plain Members --}}
-                    <a href="#" class="ws-rail-link" :class="tab === 'overview' ? 'is-active' : ''"
+                    {{-- <a href="#" class="ws-rail-link" :class="tab === 'overview' ? 'is-active' : ''"
                        @click.prevent="tab = 'overview'">
                         <span class="ws-rail-icon">♢</span>
                         <span>Overview</span>
                     </a>
-                @endif
+                @endif --}}
 
                 <a href="#" class="ws-rail-link" :class="tab === 'invitee' ? 'is-active' : ''"
                    @click.prevent="tab = 'invitee'">
@@ -63,7 +63,7 @@
 
         <section class="ws-panel">
 
-            @if (auth()->check() && (int) auth()->user()->RoleID != 8)
+            {{-- @if (auth()->check() && (int) auth()->user()->RoleID != 8)
                 <div x-show="tab === 'overview'"
                      x-cloak
                      x-transition.opacity.duration.200ms
@@ -74,7 +74,7 @@
                     </div>
 
                 </div>
-            @endif
+            @endif --}}
 
             <div x-show="tab === 'invitee'"
                  x-cloak
