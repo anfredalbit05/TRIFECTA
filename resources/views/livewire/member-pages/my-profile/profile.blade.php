@@ -214,7 +214,8 @@
         {{-- =================== RIGHT COLUMN =================== --}}
         <div class="profile-col">
 
-                 {{-- --------------- 3. PROFILE PICTURE CARD --------------- --}}
+             @if (auth()->user()->RoleID != 8)
+            {{-- --------------- 3. PROFILE PICTURE CARD --------------- --}}
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Profile Picture</h3>
@@ -276,6 +277,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             {{-- //Hello --}}
             @if (auth()->user()->RoleID == 8)

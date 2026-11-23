@@ -53,7 +53,7 @@
          MOBILE TOP BAR
     ========================================================== --}}
     <header class="tf-topbar">
-        <div class="flex items-center gap-2">
+        <div class="tf-topbar-brand">
             <a href="{{ route('home') }}" class="tf-topbar-logo">
                 <img src="{{ asset('images/truelife-logo.png') }}" alt="TRIFECTA">
             </a>
@@ -65,17 +65,71 @@
             </div>
         </div>
 
-        <a href="{{ route('my-profile') }}" class="tf-topbar-user">
-            <div class="text-right">
-                <b>{{ $user?->firstname ?? 'Member' }} {{ $user?->lastname ?? '' }}</b>
-                <small>{{ $user?->branch?->branchname ?? 'Member' }}</small>
+        <div x-data="{ open: false }"
+            @click.away="open = false"
+            @keydown.escape.window="open = false"
+            class="tf-topbar-menu">
+
+            <button type="button"
+                    @click="open = !open"
+                    :aria-expanded="open"
+                    aria-label="Open profile menu"
+                    class="tf-topbar-user">
+                <div class="text-right">
+                    <b>{{ $user?->firstname ?? 'Member' }} {{ $user?->lastname ?? '' }}</b>
+                    <small>{{ $user?->branch?->branchname ?? 'Member' }}</small>
+                </div>
+                <img src="{{ $avatarSrc }}"
+                    alt="Profile picture"
+                    onerror="this.onerror=null;this.src='{{ $defaultAvatar }}';">
+            </button>
+
+            <div x-show="open"
+                x-cloak
+                x-transition:enter="transition ease-out duration-150"
+                x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
+                class="tf-nav-pop">
+
+                <div class="tf-nav-pop-head">
+                    <img src="{{ $avatarSrc }}" alt="" class="tf-nav-avatar"
+                        onerror="this.onerror=null;this.src='{{ $defaultAvatar }}';">
+                    <div class="min-w-0">
+                        <p class="truncate text-sm font-bold text-slate-800">
+                            {{ $user?->firstname ?? 'Member' }} {{ $user?->lastname ?? '' }}
+                        </p>
+                        <p class="truncate text-xs text-slate-500">{{ $user?->username ?? 'Username' }}</p>
+                    </div>
+                </div>
+
+                <a href="{{ route('home') }}" @click="open = false">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 10.5L12 3l9 7.5M5 9.5V21h14V9.5M9 21v-6h6v6" />
+                    </svg>
+                    <span>Back to Landing Page</span>
+                </a>
+
+                <form id="topbarLogoutForm" action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="button"
+                        class="is-danger"
+                        @click="open = false"
+                        onclick="window.showLogoutConfirmation
+                                    ? showLogoutConfirmation('topbarLogoutForm')
+                                    : (confirm('Are you sure you want to log out?') && document.getElementById('topbarLogoutForm').submit())">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12H3m0 0l4-4m-4 4l4 4m5-9V5a2 2 0 012-2h5a2 2 0 012 2v14a2 2 0 01-2 2h-5a2 2 0 01-2-2v-2" />
+                        </svg>
+                        <span>Logout</span>
+                    </button>
+                </form>
             </div>
-            <img
-                src="{{ $avatarSrc }}"
-                alt="Profile picture"
-                onerror="this.onerror=null;this.src='{{ $defaultAvatar }}';"
-            >
-        </a>
+        </div>
     </header>
 
 
@@ -324,3 +378,4 @@
     </nav>
 
 </div>
+@vite('resources/js/components/navbar.js')

@@ -2029,6 +2029,19 @@ body.tf-app {
     .ws-panel { padding: 12px; }
 }
 
+/* Navbar: stop the wordmark from running under the action buttons */
+.tf-nav-brand { flex: 0 1 auto; }
+.tf-nav-wordmark { min-width: 0; }
+
+@media (max-width: 639px) {
+    .tf-nav-inner { gap: 10px; }
+    .tf-nav-logo { width: 40px; height: 40px; border-radius: 12px; }
+    .tf-nav-wordmark strong { font-size: 13px; letter-spacing: .1em; }
+    .tf-nav-join { padding: 9px 13px; font-size: 10px; }
+}
+
+
+
 /* =========================================================================
    SHELL WIRING
    ========================================================================= */

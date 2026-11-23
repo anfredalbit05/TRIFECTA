@@ -519,6 +519,34 @@
     .sidebar-overlay{
         display:none!important;
     }
+    .tf-topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+.tf-topbar-menu {
+    position: relative;
+    min-width: 0;
+}
+.tf-topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+.tf-topbar-user > div { min-width: 0; }
+.tf-topbar-user b,
+.tf-topbar-user small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 }
 
 
