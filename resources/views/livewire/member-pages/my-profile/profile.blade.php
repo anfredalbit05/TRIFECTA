@@ -235,7 +235,13 @@
                                 <img src="{{ asset('images/profiles/default-avatar.png') }}" class="avatar-img"
                                     alt="Default profile picture">
                             @else
-                                <img src="{{ route('profile.picture') }}" class="avatar-img" alt="Profile picture">
+                                <img
+                                    src="{{ route('profile.picture', [
+                                        'v' => auth()->id() . '-' . md5(auth()->user()->profilepic ?? 'default'),
+                                    ]) }}"
+                                    class="avatar-img"
+                                    alt="Profile picture"
+                                >
                             @endif
                         @endif
                     </div>
