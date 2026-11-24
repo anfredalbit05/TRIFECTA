@@ -132,14 +132,32 @@ class Overview extends Component
         }
 
         // Global Financial & Report Metrics
-        $totalIncome = Ledger::whereYear('created_at', $year)
+
+        // 1. Gross Income (all completed ledger transactions)
+        $grossIncome = Ledger::whereYear('created_at', $year)
             ->where('status', 'Completed')
             ->sum('amount');
 
+        // 2. Approved Withdrawals
+        $approvedWithdrawals = DB::table('withdrawals')
+            ->whereYear('created_at', $year)
+            ->where('status', 'Approved')
+            ->sum('amount');
+
+        // 3. Total Disbursements (all statuses)
+        $totalDisbursements = DB::table('disburstments')
+            ->whereYear('created_at', $year)
+            ->sum('amount');
+
+        // 4. Net Total Income
+        $totalIncome = $grossIncome
+            - $approvedWithdrawals
+            - $totalDisbursements;
+
+        // Other metrics
         $totalReportsGenerated = Ledger::whereYear('created_at', $year)->count();
         $totalSettingsCount = Setting::count();
 
-        // General System Stats
         $totalUsers = User::count();
         $activeAccounts = User::where('status', 1)->count();
 
@@ -317,6 +335,9 @@ class Overview extends Component
             $walletCollectionsTotal = (float) $walletCollections->sum('Total_Collection');
 
         return view('livewire.admin-pages.report-settings.overview', [
+            'grossIncome' => $grossIncome,
+            'approvedWithdrawals' => $approvedWithdrawals,
+            'totalDisbursements' => $totalDisbursements,
             'totalIncome' => $totalIncome,
             'totalReportsGenerated' => $totalReportsGenerated,
             'totalSettingsCount' => $totalSettingsCount,
