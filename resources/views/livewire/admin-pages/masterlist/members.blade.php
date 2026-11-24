@@ -41,7 +41,52 @@
     {{-- SEARCH / FILTERS / REFRESH --}}
     {{-- ============================================================ --}}
 
+           {{-- ============================================================ --}}
+{{-- MEMBER TOTALS --}}
+{{-- ============================================================ --}}
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
+
+    {{-- ALL MEMBERS --}}
+    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">
+            Total Members
+        </p>
+
+        <h3 class="text-3xl font-bold text-slate-800 mt-2">
+            {{ number_format($totalMembers) }}
+        </h3>
+
+        <p class="text-xs text-slate-400 mt-1">
+            Across all branches
+        </p>
+    </div>
+
+    {{-- MEMBERS PER BRANCH --}}
+    @foreach ($branchMemberCounts as $branch)
+        <div
+            wire:key="branch-total-{{ $branch->BranchID }}"
+            class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm"
+        >
+            <p class="text-sm font-medium text-slate-500">
+                {{ $branch->branchName }}
+            </p>
+
+            <h3 class="text-3xl font-bold text-slate-800 mt-2">
+                {{ number_format($branch->total_members) }}
+            </h3>
+
+            <p class="text-xs text-slate-400 mt-1">
+                Total members
+            </p>
+        </div>
+    @endforeach
+
+</div>
+
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+
+
 
         {{-- SEARCH --}}
         <div class="relative max-w-sm w-full sm:w-auto flex-1">
@@ -69,6 +114,24 @@
 
         {{-- FILTERS AND REFRESH --}}
         <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
+
+            {{-- BRANCH FILTER --}}
+            <select
+                wire:model.live="branchFilter"
+                title="Filter by branch"
+                class="border border-slate-200 rounded-xl px-3 py-2.5 text-sm
+                    focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]
+                    focus:border-[var(--color-primary)] bg-white font-medium text-slate-700
+                    shadow-sm cursor-pointer transition"
+            >
+                <option value="all">All Branches</option>
+
+                @foreach ($branches as $branch)
+                    <option value="{{ $branch->BranchID }}">
+                        {{ $branch->branchName }}
+                    </option>
+                @endforeach
+            </select>
 
             {{-- STATUS FILTER --}}
             <select
@@ -169,11 +232,11 @@
 
                         <th>#</th>
 
+                        <th>Branch</th>
+
                         <th>Name</th>
 
                         <th>Contact</th>
-
-                        <th>Gender</th>
 
                         <th>Status</th>
 
@@ -198,6 +261,11 @@
                                 {{ $members->firstItem() + $index }}
                             </td>
 
+                            {{-- BRANCH --}}
+                            <td class="member-branch-cell">
+                                {{ $member->branch_name ?? 'Unassigned' }}
+                            </td>
+
 
                             {{-- NAME --}}
                             <td class="member-name-cell">
@@ -214,16 +282,6 @@
                             {{-- CONTACT --}}
                             <td class="member-contact">
                                 {{ $member->contactno ?: '-' }}
-                            </td>
-
-
-                            {{-- GENDER --}}
-                            <td>
-
-                                <span class="gender-badge">
-                                    {{ $member->gender ?: '-' }}
-                                </span>
-
                             </td>
 
                             {{-- STATUS --}}

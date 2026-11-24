@@ -86,13 +86,13 @@
                 @endif
 
 
-                @if(auth()->user()->RoleID == 1)
-                    <a href="#" class="ws-rail-link" :class="tab === 'membership-fees' ? 'is-active' : ''"
-                       @click.prevent="tab = 'membership-fees'">
-                        <span class="ws-rail-icon">▤</span>
-                        <span>Membership Fees</span>
-                    </a>
-                @endif
+            @if(in_array(auth()->user()->RoleID, [1, 4]))
+                <a href="#" class="ws-rail-link" :class="tab === 'membership-fees' ? 'is-active' : ''"
+                @click.prevent="tab = 'membership-fees'">
+                    <span class="ws-rail-icon">▤</span>
+                    <span>Membership Fees</span>
+                </a>
+            @endif
             </div>
 
         </aside>
@@ -118,7 +118,7 @@
             </template>
 
 
-            @if(auth()->user()->RoleID == 1)
+             @if(in_array(auth()->user()->RoleID, [1, 4]))
                 <template x-if="tab === 'disbursements'">
                     <div class="report-settings-main-card">
                         <livewire:admin-pages.transaction-list.disbursements lazy />

@@ -67,6 +67,8 @@ class Members extends Component
 
     public ?Withdrawal $selectedWithdrawal = null;
 
+    public string $branchFilter = 'all';
+
     public function mount()
     {
         // Sets the default filter display to the current year
@@ -215,10 +217,33 @@ class Members extends Component
         // and status badges reflect reality on every load.
         $this->expireLapsedActivations();
 
+        // Total members across all branches
+        $totalMembers = $this->scopedMembers()->count();
+
+        // Total members per branch (including branches with zero members)
+        $branchMemberCounts = DB::table('branches')
+            ->leftJoin('users', function ($join) {
+                $join->on('branches.BranchID', '=', 'users.BranchID')
+                    ->where('users.RoleID', 8);
+            })
+            ->select(
+                'branches.BranchID',
+                'branches.branchName',
+                DB::raw('COUNT(users.UserID) as total_members')
+            )
+            ->groupBy('branches.BranchID', 'branches.branchName')
+            ->orderBy('branches.branchName')
+            ->get();
+
         [$dateFrom, $dateTo] = $this->parsedDateRange();
 
 
         $members = $this->scopedMembers()
+                ->leftJoin('branches', 'users.BranchID', '=', 'branches.BranchID')
+                ->select('users.*', 'branches.branchName as branch_name')
+                ->when($this->branchFilter !== 'all', function ($query) {
+                    $query->where('users.BranchID', $this->branchFilter);
+                })
             ->withExists([
                 'activations as has_pending_activation' => function ($query) {
                     $query->where('status', 'Pending');
@@ -275,7 +300,7 @@ class Members extends Component
             ->when($this->statusFilter !== 'all', function ($query) {
                 $query->where('status', $this->statusFilter);
             })
-            ->latest()
+            ->orderByDesc('users.created_at')
             ->paginate(10);
 
         $isSatelliteApplicationActive = Setting::where(
@@ -290,10 +315,20 @@ class Members extends Component
 
         return view('livewire.admin-pages.masterlist.members', [
             'members' => $members,
+            'totalMembers' => $totalMembers,
+            'branchMemberCounts' => $branchMemberCounts,
             'isWithdrawalActive' => $this->isWithdrawalActive(),
             'withdrawalWindow' => $this->withdrawalWindow(),
             'isSatelliteApplicationActive' => $isSatelliteApplicationActive,
+            'branches' => DB::table('branches')
+                ->orderBy('branchName')
+                ->get(),
         ]);
+    }
+
+    public function updatedBranchFilter(): void
+    {
+        $this->resetPage();
     }
 
     protected function parsedDateRange(): array
