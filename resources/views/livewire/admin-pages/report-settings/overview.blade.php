@@ -85,7 +85,7 @@
             ['Gross Income', '₱ ' . number_format($grossIncome, 2), '💰'],
             ['Approved Withdrawals', '₱ ' . number_format($approvedWithdrawals, 2), '💸'],
             ['Disbursements', '₱ ' . number_format($totalDisbursements, 2), '📤'],
-            ['Total Income (Net)', '₱ ' . number_format($totalIncome, 2), '📊'],
+            ['Total Income', '₱ ' . number_format($totalIncome, 2), '📊'],
             ['Reports / Entries', $totalReportsGenerated, '📋'],
             ['Total Users', $totalUsers, '👥'],
             ['Active Accounts', $activeAccounts, '✅'],
