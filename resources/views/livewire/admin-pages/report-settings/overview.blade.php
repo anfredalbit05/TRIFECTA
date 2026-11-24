@@ -87,7 +87,7 @@
             ['Disbursements', '₱ ' . number_format($totalDisbursements, 2), '📤'],
             ['Total Income', '₱ ' . number_format($totalIncome, 2), '📊'],
             ['Reports / Entries', $totalReportsGenerated, '📋'],
-            ['Total Users', $totalUsers, '👥'],
+            ['Total Members', $totalUsers, '👥'],
             ['Active Accounts', $activeAccounts, '✅'],
             ['System Settings', $totalSettingsCount, '⚙️'],
         ];
