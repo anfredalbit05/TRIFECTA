@@ -52,6 +52,14 @@ class Disbursements extends Component
     /** Record date (Y-m-d), defaults to today. */
     public string $disbursement_date = '';
 
+    private const INSURANCE_FEE_ID = 'FEE001';
+    private const INSURANCE_PLAN = 'Economy/Standard';
+    private const INSURANCE_AMOUNT_PER_MEMBER = 400.00;
+
+    public array $selectedMemberIds = [];
+
+    public bool $showInsuranceMembersModal = false;
+
     /* --------------------------------------------------------------------------
     | Fund figures
     | -------------------------------------------------------------------------- */
@@ -225,13 +233,16 @@ class Disbursements extends Component
             return null;
         }
 
-        $disbursed = Disbursement::disbursedForFee($this->fee_id);
+        $disbursed = (float) ($this->disbursedByFee()[$this->fee_id] ?? 0);
+
+        $collected = (float) $fee['Total_Collection'];
+        $wallet = (float) $fee['Wallet'];
 
         return [
-            'collected' => round((float) $fee['Total_Collection'], 2),
-            'wallet' => round((float) $fee['Wallet'], 2),
+            'collected' => round($collected, 2),
+            'wallet' => round($wallet, 2),
             'disbursed' => round($disbursed, 2),
-            'available' => round((float) $fee['Total_Collection'] - (float) $fee['Wallet'] - $disbursed, 2),
+            'available' => round($collected - $wallet - $disbursed, 2),
         ];
     }
 
@@ -239,13 +250,23 @@ class Disbursements extends Component
     #[Computed]
     public function insufficientFund(): bool
     {
-        if (blank($this->fee_id) || $this->amount === '' || ! is_numeric($this->amount)) {
-            return false;
+        if ($this->isInsuranceFund) {
+            if ($this->insuranceMemberCount < 1) {
+                return true;
+            }
+
+            $amount = $this->insuranceTotalCoverage;
+        } else {
+            if ($this->amount === '' || ! is_numeric($this->amount)) {
+                return false;
+            }
+
+            $amount = (float) $this->amount;
         }
 
         $available = (float) ($this->selectedFund['available'] ?? 0);
 
-        return (float) $this->amount > $available + 0.005;
+        return $amount > $available + 0.005;
     }
 
     /** Users who created disbursements. */
@@ -295,6 +316,17 @@ class Disbursements extends Component
         $this->amount = '';
         $this->remarks = '';
         $this->disbursement_date = '';
+        $this->selectedMemberIds = [];
+        $this->showInsuranceMembersModal = false;
+
+        unset(
+            $this->eligibleInsuranceMembers,
+            $this->selectedInsuranceMembers,
+            $this->insuranceMemberCount,
+            $this->insuranceTotalCoverage,
+            $this->selectedFund
+        );
+
         $this->resetErrorBag();
     }
 
@@ -308,6 +340,28 @@ class Disbursements extends Component
      */
     private function validatedInput(): ?array
     {
+        if ($this->isInsuranceFund) {
+            $this->selectedMemberIds = array_values(array_unique(
+                array_map('intval', $this->selectedMemberIds)
+            ));
+
+            if (empty($this->selectedMemberIds)) {
+                $this->addError(
+                    'selectedMemberIds',
+                    'Please select at least one member.'
+                );
+
+                return null;
+            }
+
+            $this->amount = number_format(
+                count($this->selectedMemberIds) * self::INSURANCE_AMOUNT_PER_MEMBER,
+                2,
+                '.',
+                ''
+            );
+        }
+
         $validated = $this->validate([
             'fee_id' => ['required', 'string', 'exists:membership_fees,FeeID'],
             'amount' => ['required', 'numeric', 'min:0.01', 'max:9999999999.99'],
@@ -315,15 +369,30 @@ class Disbursements extends Component
             'disbursement_date' => ['nullable', 'date', 'before_or_equal:today'],
         ]);
 
-        // Only Active fees are allowed.
         if ($this->feeOptions->firstWhere('FeeID', $validated['fee_id']) === null) {
             $this->addError('fee_id', 'This source fund is not Active.');
+
             return null;
         }
 
-        // Cannot proceed when the amount is greater than the available fund.
+        if ($this->isInsuranceFund) {
+            $eligibleCount = $this->eligibleInsuranceMembers
+                ->whereIn('UserID', $this->selectedMemberIds)
+                ->count();
+
+            if ($eligibleCount !== count($this->selectedMemberIds)) {
+                $this->addError(
+                    'selectedMemberIds',
+                    'One or more selected members are no longer eligible. Please review your selection.'
+                );
+
+                return null;
+            }
+        }
+
         if ($this->insufficientFund) {
             $this->addError('amount', 'Insufficient fund available.');
+
             return null;
         }
 
@@ -379,6 +448,7 @@ class Disbursements extends Component
                 'title' => 'Confirmation Required',
                 'message' => 'Please review and confirm the information before saving.',
             ]);
+
             return;
         }
 
@@ -388,24 +458,129 @@ class Disbursements extends Component
             return;
         }
 
-        $recordDate = $validated['disbursement_date'] ?? null;
+        try {
+            DB::transaction(function () use ($validated) {
 
-        Disbursement::create([
-            'FeeID' => $validated['fee_id'],
-            'amount' => $validated['amount'],
-            'remarks' => $validated['remarks'] ?? null,
-            'CreatedBy' => Auth::id(),
-            'created_at' => $recordDate
-                ? Carbon::parse($recordDate.' '.now()->format('H:i:s'))
-                : now(),
-        ]);
+                $insuranceMembers = collect();
 
-        $this->dispatch('swal:success', [
-            'title' => 'Disbursement Saved',
-            'message' => 'The disbursement was recorded.',
-        ]);
+                if ($this->isInsuranceFund) {
+                    // Lock selected member rows to prevent concurrent changes.
+                    $insuranceMembers = User::query()
+                        ->whereIn('UserID', $this->selectedMemberIds)
+                        ->where('RoleID', 8)
+                        ->where('status', 'Active')
+                        ->orderByDesc('UserID')
+                        ->lockForUpdate()
+                        ->get();
 
-        $this->closeModal();
+                    if ($insuranceMembers->count() !== count($this->selectedMemberIds)) {
+                        throw new \RuntimeException(
+                            'Some selected members are no longer active. Please review your selection.'
+                        );
+                    }
+
+                    $alreadyInsured = DB::table('cocogen_members_insurance')
+                        ->whereIn('UserID', $this->selectedMemberIds)
+                        ->exists();
+
+                    if ($alreadyInsured) {
+                        throw new \RuntimeException(
+                            'Some selected members already have insurance records. Please reopen the member selection.'
+                        );
+                    }
+
+                    // Recalculate amount from the locked member collection.
+                    $this->amount = number_format(
+                        $insuranceMembers->count() * self::INSURANCE_AMOUNT_PER_MEMBER,
+                        2,
+                        '.',
+                        ''
+                    );
+                }
+
+                // Recheck available balance inside the transaction.
+                $fund = $this->selectedFund;
+
+                if (! $fund || (float) $this->amount > $fund['available'] + 0.005) {
+                    throw new \RuntimeException('Insufficient fund available.');
+                }
+
+                $recordDate = $validated['disbursement_date'] ?? null;
+
+                $disbursement = Disbursement::create([
+                    'FeeID' => $validated['fee_id'],
+                    'amount' => $this->amount,
+                    'remarks' => $validated['remarks'] ?? null,
+                    'CreatedBy' => Auth::id(),
+                    'created_at' => $recordDate
+                        ? Carbon::parse($recordDate.' '.now()->format('H:i:s'))
+                        : now(),
+                ]);
+
+                // Insert insurance records for every selected member.
+                if ($this->isInsuranceFund) {
+                    $now = now();
+
+                    $insuranceRows = $insuranceMembers->map(function (User $user) use ($now) {
+                        return [
+                            'UserID' => $user->UserID,
+
+                            'member_name' => trim(implode(' ', array_filter([
+                                $user->firstname,
+                                $user->middlename,
+                                $user->lastname,
+                            ]))),
+
+                            'beneficiary_name' => null,
+
+                            'address' => $user->address,
+                            'birthdate' => $user->birthdate,
+                            'civil_status' => $user->civilstatus,
+                            'gender' => $user->gender,
+                            'occupation' => $user->occupation,
+                            'contact_number' => $user->contactno,
+
+                            'plan' => self::INSURANCE_PLAN,
+                            'amount' => self::INSURANCE_AMOUNT_PER_MEMBER,
+
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ];
+                    })->all();
+
+                    DB::table('cocogen_members_insurance')->insert($insuranceRows);
+                }
+            });
+
+            $this->dispatch('swal:success', [
+                'title' => 'Disbursement Saved',
+                'message' => $this->isInsuranceFund
+                    ? 'Disbursement and insurance records for '.$this->insuranceMemberCount.' members were saved successfully.'
+                    : 'The disbursement was recorded.',
+            ]);
+
+            $this->closeModal();
+
+            unset(
+                $this->feeCards,
+                $this->totalAvailable,
+                $this->totalCollected,
+                $this->totalDisbursed,
+                $this->totalWallet,
+                $this->rows,
+                $this->selectedFund
+            );
+
+        } catch (\Throwable $e) {
+            report($e);
+
+            $this->dispatch('swal:error', [
+                'title' => 'Unable to Save',
+                'message' => $e instanceof \RuntimeException
+                    ? $e->getMessage()
+                    : 'An error occurred while saving the disbursement and insurance records.',
+            ]);
+        }
     }
 
     /* --------------------------------------------------------------------------
@@ -425,6 +600,190 @@ class Disbursements extends Component
         $this->showModal = false;
 
         return false;
+    }
+
+    /**
+     * Whether the selected source fund is Insurance.
+     */
+    #[Computed]
+    public function isInsuranceFund(): bool
+    {
+        return $this->fee_id === self::INSURANCE_FEE_ID;
+    }
+
+    /**
+     * Active members who do not yet have an insurance record.
+     * Ordered by UserID descending.
+     */
+    #[Computed]
+    public function eligibleInsuranceMembers()
+    {
+        return User::query()
+            ->where('RoleID', 8)
+            ->where('status', 'Active')
+            ->whereNotIn('UserID', function ($query) {
+                $query->select('UserID')
+                    ->from('cocogen_members_insurance');
+            })
+            ->orderByDesc('UserID')
+            ->get([
+                'UserID',
+                'firstname',
+                'middlename',
+                'lastname',
+                'address',
+                'birthdate',
+                'civilstatus',
+                'gender',
+                'occupation',
+                'contactno',
+            ]);
+    }
+
+    /**
+     * Currently selected eligible members.
+     */
+    #[Computed]
+    public function selectedInsuranceMembers()
+    {
+        if (! $this->isInsuranceFund || empty($this->selectedMemberIds)) {
+            return collect();
+        }
+
+        return User::query()
+            ->where('RoleID', 8)
+            ->where('status', 'Active')
+            ->whereIn('UserID', $this->selectedMemberIds)
+            ->whereNotIn('UserID', function ($query) {
+                $query->select('UserID')
+                    ->from('cocogen_members_insurance');
+            })
+            ->orderByDesc('UserID')
+            ->get([
+                'UserID',
+                'firstname',
+                'middlename',
+                'lastname',
+            ]);
+    }
+
+    /**
+     * Total number of selected members.
+     */
+    #[Computed]
+    public function insuranceMemberCount(): int
+    {
+        return $this->selectedInsuranceMembers->count();
+    }
+
+    /**
+     * Total insurance coverage.
+     */
+    #[Computed]
+    public function insuranceTotalCoverage(): float
+    {
+        return round(
+            $this->insuranceMemberCount * self::INSURANCE_AMOUNT_PER_MEMBER,
+            2
+        );
+    }
+
+    /**
+     * Open the member selection modal.
+     */
+    public function openInsuranceMembersModal(): void
+    {
+        if (! $this->isInsuranceFund) {
+            return;
+        }
+
+        unset($this->eligibleInsuranceMembers);
+
+        $this->showInsuranceMembersModal = true;
+    }
+
+    /**
+     * Close the member selection modal.
+     */
+    public function closeInsuranceMembersModal(): void
+    {
+        $this->showInsuranceMembersModal = false;
+    }
+
+    /**
+     * Select every eligible member.
+     */
+    public function selectAllInsuranceMembers(): void
+    {
+        $this->selectedMemberIds = $this->eligibleInsuranceMembers
+            ->pluck('UserID')
+            ->map(fn ($id) => (string) $id)
+            ->all();
+
+        $this->syncInsuranceAmount();
+    }
+
+    /**
+     * Clear all selected members.
+     */
+    public function clearInsuranceMembers(): void
+    {
+        $this->selectedMemberIds = [];
+
+        $this->syncInsuranceAmount();
+    }
+
+    /**
+     * Keep the amount synchronized with the selection.
+     */
+    public function updatedSelectedMemberIds(): void
+    {
+        $this->syncInsuranceAmount();
+    }
+
+    /**
+     * Update the disbursement amount automatically.
+     */
+    private function syncInsuranceAmount(): void
+    {
+        unset($this->selectedInsuranceMembers);
+        unset($this->insuranceMemberCount);
+        unset($this->insuranceTotalCoverage);
+        unset($this->selectedFund);
+        unset($this->feeCards);
+        unset($this->totalAvailable);
+
+        if ($this->isInsuranceFund) {
+            $this->amount = number_format(
+                $this->insuranceTotalCoverage,
+                2,
+                '.',
+                ''
+            );
+        }
+    }
+
+    /**
+     * Reset insurance selection when changing source fund.
+     */
+    public function updatedFeeId(): void
+    {
+        $this->selectedMemberIds = [];
+        $this->showInsuranceMembersModal = false;
+
+        unset(
+            $this->selectedInsuranceMembers,
+            $this->eligibleInsuranceMembers,
+            $this->insuranceMemberCount,
+            $this->insuranceTotalCoverage,
+            $this->selectedFund,
+            $this->feeCards,
+            $this->totalAvailable
+        );
+
+        if ($this->isInsuranceFund) {
+            $this->amount = '0.00';
+        }
     }
 
     public function render()

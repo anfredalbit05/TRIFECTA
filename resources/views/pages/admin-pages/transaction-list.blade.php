@@ -83,6 +83,13 @@
                         <span class="ws-rail-icon">₱</span>
                         <span>Disbursement</span>
                     </a>
+
+
+                    <a href="#" class="ws-rail-link" :class="tab === 'cocogen-members-insurance' ? 'is-active' : ''"
+                       @click.prevent="tab = 'cocogen-members-insurance'">
+                        <span class="ws-rail-icon">₱</span>
+                        <span>Cocogen Members Insurance</span>
+                    </a>
                 @endif
 
 
@@ -124,7 +131,13 @@
                         <livewire:admin-pages.transaction-list.disbursements lazy />
                     </div>
                 </template>
+                <template x-if="tab === 'cocogen-members-insurance'">
+                    <div class="report-settings-main-card">
+                        <livewire:admin-pages.transaction-list.cocoge-members-insurance lazy />
+                    </div>
+                </template>
             @endif
+
 
 
             @if(auth()->user()->RoleID == 1)

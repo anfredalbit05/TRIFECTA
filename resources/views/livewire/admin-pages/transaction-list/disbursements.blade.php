@@ -153,6 +153,79 @@
                         @error('fee_id') <p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p> @enderror
                     </div>
 
+                    {{-- INSURANCE MEMBER SELECTION --}}
+                    @if ($this->isInsuranceFund)
+                        <div class="mt-3 space-y-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
+
+                            <div>
+                                <p class="text-sm font-bold text-blue-900">
+                                    Insurance Registration
+                                </p>
+                                <p class="mt-1 text-xs text-blue-700">
+                                    Select the active members who will receive insurance coverage.
+                                </p>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2">
+
+                                <button
+                                    type="button"
+                                    wire:click="openInsuranceMembersModal"
+                                    class="rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800"
+                                >
+                                    {{ count($selectedMemberIds) > 0 ? 'Edit Selected Members' : 'Select Members' }}
+                                </button>
+
+                                @if (count($selectedMemberIds) > 0)
+                                    <span class="rounded-lg bg-white px-3 py-2 text-xs font-bold text-blue-800">
+                                        {{ count($selectedMemberIds) }} selected
+                                    </span>
+                                @endif
+
+                            </div>
+
+                            @if (count($selectedMemberIds) > 0)
+                                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+
+                                    <div class="rounded-lg border border-blue-200 bg-white p-3">
+                                        <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                                            Selected Members
+                                        </p>
+                                        <p class="mt-1 text-xl font-bold text-slate-800">
+                                            {{ $this->insuranceMemberCount }}
+                                        </p>
+                                    </div>
+
+                                    <div class="rounded-lg border border-blue-200 bg-white p-3">
+                                        <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                                            Total Insurance Coverage
+                                        </p>
+                                        <p class="mt-1 text-xl font-bold text-blue-800">
+                                            ₱{{ number_format($this->insuranceTotalCoverage, 2) }}
+                                        </p>
+                                    </div>
+
+                                </div>
+
+                                <div class="rounded-lg border border-blue-200 bg-white px-3 py-2 text-xs text-slate-600">
+                                    <div class="flex justify-between">
+                                        <span>Insurance Plan</span>
+                                        <strong>{{ self::INSURANCE_PLAN ?? 'Economy/Standard' }}</strong>
+                                    </div>
+                                    <div class="mt-1 flex justify-between">
+                                        <span>Coverage per member</span>
+                                        <strong>₱400.00</strong>
+                                    </div>
+                                </div>
+                            @endif
+
+                            @error('selectedMemberIds')
+                                <p class="text-xs font-semibold text-red-600">{{ $message }}</p>
+                            @enderror
+
+                        </div>
+                    @endif
+
                     {{-- 2. AVAILABLE FUND (read-only) --}}
                     <div>
                         <label class="mb-1 block text-xs font-bold text-slate-700">Available Fund</label>
@@ -174,10 +247,12 @@
                             type="number"
                             step="0.01"
                             min="0.01"
+                            @if ($this->isInsuranceFund) readonly @endif
                             class="w-full rounded-xl border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2
                                 {{ $this->insufficientFund
                                     ? 'border-red-500 focus:ring-red-500'
-                                    : 'border-slate-300 focus:ring-[var(--color-primary)]' }}"
+                                    : 'border-slate-300 focus:ring-[var(--color-primary)]' }}
+                                {{ $this->isInsuranceFund ? 'cursor-not-allowed bg-slate-100 font-bold' : '' }}"
                         >
                         @if ($this->insufficientFund)
                             <p class="mt-1 text-xs font-semibold text-red-600">Insufficient fund available.</p>
@@ -267,4 +342,174 @@
             </div>
         </div>
     @endif
+    {{-- INSURANCE MEMBER SELECTION MODAL --}}
+@if ($showInsuranceMembersModal)
+    <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
+
+        <div class="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+
+            {{-- HEADER --}}
+            <div class="flex items-center justify-between border-b border-slate-200 p-5">
+                <div>
+                    <h3 class="text-base font-bold text-[var(--color-primary)]">
+                        Select Insurance Members
+                    </h3>
+                    <p class="mt-1 text-xs text-slate-500">
+                        Only active members who do not yet have insurance are displayed.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    wire:click="closeInsuranceMembersModal"
+                    class="text-xl text-slate-500 hover:text-slate-700"
+                >
+                    ✕
+                </button>
+            </div>
+
+            {{-- SELECTION SUMMARY --}}
+            <div class="grid grid-cols-2 gap-3 border-b border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
+
+                <div>
+                    <p class="text-[10px] font-bold uppercase text-slate-500">
+                        Selected Members
+                    </p>
+                    <p class="mt-1 text-lg font-bold text-slate-800">
+                        {{ $this->insuranceMemberCount }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-[10px] font-bold uppercase text-slate-500">
+                        Coverage Each
+                    </p>
+                    <p class="mt-1 text-lg font-bold text-slate-800">
+                        ₱400.00
+                    </p>
+                </div>
+
+                <div class="col-span-2 sm:col-span-1">
+                    <p class="text-[10px] font-bold uppercase text-slate-500">
+                        Total Coverage
+                    </p>
+                    <p class="mt-1 text-lg font-bold text-blue-700">
+                        ₱{{ number_format($this->insuranceTotalCoverage, 2) }}
+                    </p>
+                </div>
+
+            </div>
+
+            {{-- SELECT ALL / CLEAR --}}
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 p-4">
+
+                <p class="text-xs font-semibold text-slate-600">
+                    {{ $this->eligibleInsuranceMembers->count() }} eligible members
+                </p>
+
+                <div class="flex gap-2">
+
+                    <button
+                        type="button"
+                        wire:click="selectAllInsuranceMembers"
+                        class="rounded-lg border border-blue-200 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-50"
+                    >
+                        Select All
+                    </button>
+
+                    <button
+                        type="button"
+                        wire:click="clearInsuranceMembers"
+                        class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50"
+                    >
+                        Clear Selection
+                    </button>
+
+                </div>
+            </div>
+
+            {{-- MEMBER LIST --}}
+            <div class="min-h-0 flex-1 overflow-y-auto p-4">
+
+                @forelse ($this->eligibleInsuranceMembers as $member)
+                    <label
+                        wire:key="insurance-member-{{ $member->UserID }}"
+                        class="mb-2 flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 p-3 transition hover:border-blue-300 hover:bg-blue-50
+                            {{ in_array((string) $member->UserID, array_map('strval', $selectedMemberIds), true)
+                                ? 'border-blue-400 bg-blue-50'
+                                : 'bg-white' }}"
+                    >
+
+                        <input
+                            type="checkbox"
+                            wire:model.live="selectedMemberIds"
+                            value="{{ $member->UserID }}"
+                            class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        >
+
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+
+                                <p class="truncate text-sm font-bold text-slate-800">
+                                    {{ trim(implode(' ', array_filter([
+                                        $member->firstname,
+                                        $member->middlename,
+                                        $member->lastname,
+                                    ]))) }}
+                                </p>
+
+                                <span class="font-mono text-[10px] text-slate-400">
+                                    ID: {{ $member->UserID }}
+                                </span>
+
+                            </div>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                {{ $member->address ?: 'No address provided' }}
+                            </p>
+                        </div>
+
+                        <span class="whitespace-nowrap text-xs font-bold text-blue-700">
+                            ₱400.00
+                        </span>
+
+                    </label>
+                @empty
+                    <div class="py-12 text-center">
+                        <p class="text-sm font-semibold text-slate-600">
+                            No eligible members found.
+                        </p>
+                        <p class="mt-1 text-xs text-slate-400">
+                            All active members may already have insurance records.
+                        </p>
+                    </div>
+                @endforelse
+
+            </div>
+
+            {{-- FOOTER --}}
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 bg-white p-4">
+
+                <div>
+                    <p class="text-sm font-bold text-slate-800">
+                        {{ $this->insuranceMemberCount }} members selected
+                    </p>
+                    <p class="text-xs text-slate-500">
+                        Total: ₱{{ number_format($this->insuranceTotalCoverage, 2) }}
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    wire:click="closeInsuranceMembersModal"
+                    class="rounded-xl bg-[var(--color-primary)] px-5 py-2.5 text-sm font-bold text-white hover:bg-[var(--color-primary-mid)]"
+                >
+                    Done Selecting
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+@endif
 </div>
