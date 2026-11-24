@@ -61,7 +61,7 @@
         </select>
 
         <div class="ml-auto">
-            @if ($this->canCreate)
+            {{-- @if ($this->canCreate) --}}
                 <button
                     type="button"
                     wire:click="openCreate"
@@ -69,7 +69,7 @@
                 >
                     + New Disbursement
                 </button>
-            @endif
+            {{-- @endif --}}
         </div>
     </div>
 
@@ -126,329 +126,329 @@
     </div>
 
 
-{{-- NEW DISBURSEMENT MODAL --}}
-@if ($showModal)
-    <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4">
-        <div class="my-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl">
+    {{-- NEW DISBURSEMENT MODAL --}}
+    @if ($showModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4">
+            <div class="my-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl">
 
-            {{-- HEADER --}}
-            <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-                <div>
-                    <h3 class="text-base font-bold text-[var(--color-primary)]">
-                        New Disbursement
-                    </h3>
-                    <p class="mt-1 text-xs text-slate-500">
-                        Enter the disbursement details and review the source fund.
-                    </p>
-                </div>
-
-                <button type="button" wire:click="closeModal"
-                    class="text-xl text-slate-400 hover:text-slate-700">
-                    ✕
-                </button>
-            </div>
-
-            {{-- TWO-COLUMN CONTENT --}}
-            <div class="grid grid-cols-1 gap-6 p-6 lg:grid-cols-2">
-
-                {{-- LEFT COLUMN: DISBURSEMENT DETAILS --}}
-                <div class="space-y-4">
-
-                    <div class="border-b border-slate-100 pb-3">
-                        <h4 class="text-sm font-bold text-slate-800">
-                            Disbursement Details
-                        </h4>
+                {{-- HEADER --}}
+                <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+                    <div>
+                        <h3 class="text-base font-bold text-[var(--color-primary)]">
+                            New Disbursement
+                        </h3>
                         <p class="mt-1 text-xs text-slate-500">
-                            Provide the fund, amount, date, and remarks.
+                            Enter the disbursement details and review the source fund.
                         </p>
                     </div>
 
-                    {{-- SOURCE FUND --}}
-                    <div>
-                        <label class="mb-1 block text-xs font-bold text-slate-700">
-                            Source Fund *
-                        </label>
+                    <button type="button" wire:click="closeModal"
+                        class="text-xl text-slate-400 hover:text-slate-700">
+                        ✕
+                    </button>
+                </div>
 
-                        <select wire:model.live="fee_id"
-                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
-                            <option value="">— Select fee fund —</option>
-                            @foreach ($this->feeOptions as $fee)
-                                <option value="{{ $fee['FeeID'] }}">
-                                    {{ $fee['FeeName'] }} ({{ $fee['FeeID'] }})
-                                </option>
-                            @endforeach
-                        </select>
+                {{-- TWO-COLUMN CONTENT --}}
+                <div class="grid grid-cols-1 gap-6 p-6 lg:grid-cols-2">
 
-                        @error('fee_id')
-                            <p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    {{-- LEFT COLUMN: DISBURSEMENT DETAILS --}}
+                    <div class="space-y-4">
 
-                    {{-- AVAILABLE FUND --}}
-                    <div>
-                        <label class="mb-1 block text-xs font-bold text-slate-700">
-                            Available Fund
-                        </label>
-
-                        @php($availableFund = $this->selectedFund['available'] ?? 0)
-
-                        <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                            <p class="text-xl font-bold {{ $availableFund < 0 ? 'text-red-600' : 'text-slate-800' }}">
-                                ₱{{ number_format($availableFund, 2) }}
-                            </p>
-                            <p class="mt-1 text-[10px] text-slate-500">
-                                Current available balance
+                        <div class="border-b border-slate-100 pb-3">
+                            <h4 class="text-sm font-bold text-slate-800">
+                                Disbursement Details
+                            </h4>
+                            <p class="mt-1 text-xs text-slate-500">
+                                Provide the fund, amount, date, and remarks.
                             </p>
                         </div>
-                    </div>
 
-                    {{-- AMOUNT --}}
-                    <div>
-                        <label class="mb-1 block text-xs font-bold text-slate-700">
-                            Amount Out *
-                        </label>
+                        {{-- SOURCE FUND --}}
+                        <div>
+                            <label class="mb-1 block text-xs font-bold text-slate-700">
+                                Source Fund *
+                            </label>
 
-                        <input wire:model.live.debounce.300ms="amount"
-                            type="number"
-                            step="0.01"
-                            min="0.01"
-                            @if ($this->isInsuranceFund) readonly @endif
-                            class="w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:ring-2
-                                {{ $this->insufficientFund
-                                    ? 'border-red-500 focus:ring-red-500'
-                                    : 'border-slate-300 focus:ring-[var(--color-primary)]' }}
-                                {{ $this->isInsuranceFund ? 'cursor-not-allowed bg-slate-100 font-bold' : 'bg-white' }}">
+                            <select wire:model.live="fee_id"
+                                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
+                                <option value="">— Select fee fund —</option>
+                                @foreach ($this->feeOptions as $fee)
+                                    <option value="{{ $fee['FeeID'] }}">
+                                        {{ $fee['FeeName'] }} ({{ $fee['FeeID'] }})
+                                    </option>
+                                @endforeach
+                            </select>
 
-                        @if ($this->insufficientFund)
-                            <p class="mt-1 text-xs font-semibold text-red-600">
-                                Insufficient fund available.
-                            </p>
-                        @else
-                            @error('amount')
+                            @error('fee_id')
                                 <p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>
                             @enderror
-                        @endif
-                    </div>
+                        </div>
 
-                    {{-- DATE --}}
-                    <div>
-                        <label class="mb-1 block text-xs font-bold text-slate-700">
-                            Date *
-                        </label>
+                        {{-- AVAILABLE FUND --}}
+                        <div>
+                            <label class="mb-1 block text-xs font-bold text-slate-700">
+                                Available Fund
+                            </label>
 
-                        <input wire:model.live="disbursement_date"
-                            type="date"
-                            max="{{ now()->format('Y-m-d') }}"
-                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
+                            @php($availableFund = $this->selectedFund['available'] ?? 0)
 
-                        @error('disbursement_date')
-                            <p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    {{-- REMARKS --}}
-                    <div>
-                        <label class="mb-1 block text-xs font-bold text-slate-700">
-                            Remarks
-                        </label>
-
-                        <textarea wire:model="remarks"
-                            rows="3"
-                            maxlength="1000"
-                            placeholder="Optional — e.g. payout recipient or reference"
-                            class="w-full resize-none rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"></textarea>
-
-                        @error('remarks')
-                            <p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                {{-- RIGHT COLUMN: INSURANCE INFORMATION --}}
-                <div class="space-y-4">
-
-                    <div class="border-b border-slate-100 pb-3">
-                        <h4 class="text-sm font-bold text-slate-800">
-                            Insurance / Coverage
-                        </h4>
-                        <p class="mt-1 text-xs text-slate-500">
-                            Select members if this is an insurance fund.
-                        </p>
-                    </div>
-
-                    @if ($this->isInsuranceFund)
-
-                        <div class="space-y-4 rounded-xl border border-blue-200 bg-blue-50 p-4">
-
-                            <div>
-                                <p class="text-sm font-bold text-blue-900">
-                                    Insurance Registration
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                <p class="text-xl font-bold {{ $availableFund < 0 ? 'text-red-600' : 'text-slate-800' }}">
+                                    ₱{{ number_format($availableFund, 2) }}
                                 </p>
-                                <p class="mt-1 text-xs text-blue-700">
-                                    Select active members who will receive insurance coverage.
+                                <p class="mt-1 text-[10px] text-slate-500">
+                                    Current available balance
                                 </p>
                             </div>
+                        </div>
 
-                            <button type="button"
-                                wire:click="openInsuranceMembersModal"
-                                class="w-full rounded-xl bg-blue-700 px-4 py-3 text-sm font-bold text-white hover:bg-blue-800">
-                                {{ count($selectedMemberIds) > 0 ? 'Edit Selected Members' : 'Select Members' }}
-                            </button>
+                        {{-- AMOUNT --}}
+                        <div>
+                            <label class="mb-1 block text-xs font-bold text-slate-700">
+                                Amount Out *
+                            </label>
 
-                            @if (count($selectedMemberIds) > 0)
+                            <input wire:model.live.debounce.300ms="amount"
+                                type="number"
+                                step="0.01"
+                                min="0.01"
+                                @if ($this->isInsuranceFund) readonly @endif
+                                class="w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:ring-2
+                                    {{ $this->insufficientFund
+                                        ? 'border-red-500 focus:ring-red-500'
+                                        : 'border-slate-300 focus:ring-[var(--color-primary)]' }}
+                                    {{ $this->isInsuranceFund ? 'cursor-not-allowed bg-slate-100 font-bold' : 'bg-white' }}">
 
-                                <div class="grid grid-cols-2 gap-3">
-
-                                    <div class="rounded-xl border border-blue-200 bg-white p-3">
-                                        <p class="text-[10px] font-bold uppercase text-slate-500">
-                                            Selected Members
-                                        </p>
-                                        <p class="mt-1 text-2xl font-bold text-slate-800">
-                                            {{ $this->insuranceMemberCount }}
-                                        </p>
-                                    </div>
-
-                                    <div class="rounded-xl border border-blue-200 bg-white p-3">
-                                        <p class="text-[10px] font-bold uppercase text-slate-500">
-                                            Total Coverage
-                                        </p>
-                                        <p class="mt-1 text-xl font-bold text-blue-800">
-                                            ₱{{ number_format($this->insuranceTotalCoverage, 2) }}
-                                        </p>
-                                    </div>
-
-                                </div>
-
-                                <div class="rounded-xl border border-blue-200 bg-white p-3 text-xs text-slate-600">
-                                    <div class="flex justify-between">
-                                        <span>Insurance Plan</span>
-                                        <strong>{{ self::INSURANCE_PLAN ?? 'Economy/Standard' }}</strong>
-                                    </div>
-                                    <div class="mt-2 flex justify-between">
-                                        <span>Coverage per member</span>
-                                        <strong>₱400.00</strong>
-                                    </div>
-                                </div>
-
+                            @if ($this->insufficientFund)
+                                <p class="mt-1 text-xs font-semibold text-red-600">
+                                    Insufficient fund available.
+                                </p>
                             @else
-                                <div class="rounded-xl border border-dashed border-blue-300 bg-white p-6 text-center">
-                                    <p class="text-sm font-semibold text-slate-600">
-                                        No members selected
-                                    </p>
-                                    <p class="mt-1 text-xs text-slate-400">
-                                        Select members to calculate insurance coverage.
-                                    </p>
-                                </div>
+                                @error('amount')
+                                    <p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>
+                                @enderror
                             @endif
+                        </div>
 
-                            @error('selectedMemberIds')
-                                <p class="text-xs font-semibold text-red-600">{{ $message }}</p>
+                        {{-- DATE --}}
+                        <div>
+                            <label class="mb-1 block text-xs font-bold text-slate-700">
+                                Date *
+                            </label>
+
+                            <input wire:model.live="disbursement_date"
+                                type="date"
+                                max="{{ now()->format('Y-m-d') }}"
+                                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
+
+                            @error('disbursement_date')
+                                <p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>
                             @enderror
-
                         </div>
 
-                    @else
+                        {{-- REMARKS --}}
+                        <div>
+                            <label class="mb-1 block text-xs font-bold text-slate-700">
+                                Remarks
+                            </label>
 
-                        <div class="flex min-h-52 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-                            <p class="text-sm font-semibold text-slate-600">
-                                Regular Disbursement
-                            </p>
-                            <p class="mt-1 max-w-xs text-xs text-slate-400">
-                                Member selection and insurance coverage will appear here when an insurance fund is selected.
-                            </p>
-                        </div>
+                            <textarea wire:model="remarks"
+                                rows="3"
+                                maxlength="1000"
+                                placeholder="Optional — e.g. payout recipient or reference"
+                                class="w-full resize-none rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"></textarea>
 
-                    @endif
-
-                    {{-- DISBURSEMENT SUMMARY --}}
-                    <div class="rounded-xl border border-slate-200 bg-white p-4">
-                        <h4 class="text-xs font-bold uppercase tracking-wide text-slate-500">
-                            Disbursement Summary
-                        </h4>
-
-                        <div class="mt-3 flex justify-between text-xs text-slate-600">
-                            <span>Available Fund</span>
-                            <strong>₱{{ number_format($availableFund, 2) }}</strong>
-                        </div>
-
-                        <div class="mt-2 flex justify-between text-xs text-slate-600">
-                            <span>Amount Out</span>
-                            <strong>₱{{ number_format((float) $amount, 2) }}</strong>
-                        </div>
-
-                        <div class="mt-3 border-t border-slate-100 pt-3">
-                            <div class="flex justify-between">
-                                <span class="text-sm font-bold text-slate-700">
-                                    Remaining Balance
-                                </span>
-                                <strong class="text-base {{ ($availableFund - (float) $amount) < 0 ? 'text-red-600' : 'text-[var(--color-primary)]' }}">
-                                    ₱{{ number_format($availableFund - (float) $amount, 2) }}
-                                </strong>
-                            </div>
+                            @error('remarks')
+                                <p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
+                    {{-- RIGHT COLUMN: INSURANCE INFORMATION --}}
+                    <div class="space-y-4">
+
+                        <div class="border-b border-slate-100 pb-3">
+                            <h4 class="text-sm font-bold text-slate-800">
+                                Insurance / Coverage
+                            </h4>
+                            <p class="mt-1 text-xs text-slate-500">
+                                Select members if this is an insurance fund.
+                            </p>
+                        </div>
+
+                        @if ($this->isInsuranceFund)
+
+                            <div class="space-y-4 rounded-xl border border-blue-200 bg-blue-50 p-4">
+
+                                <div>
+                                    <p class="text-sm font-bold text-blue-900">
+                                        Insurance Registration
+                                    </p>
+                                    <p class="mt-1 text-xs text-blue-700">
+                                        Select active members who will receive insurance coverage.
+                                    </p>
+                                </div>
+
+                                <button type="button"
+                                    wire:click="openInsuranceMembersModal"
+                                    class="w-full rounded-xl bg-blue-700 px-4 py-3 text-sm font-bold text-white hover:bg-blue-800">
+                                    {{ count($selectedMemberIds) > 0 ? 'Edit Selected Members' : 'Select Members' }}
+                                </button>
+
+                                @if (count($selectedMemberIds) > 0)
+
+                                    <div class="grid grid-cols-2 gap-3">
+
+                                        <div class="rounded-xl border border-blue-200 bg-white p-3">
+                                            <p class="text-[10px] font-bold uppercase text-slate-500">
+                                                Selected Members
+                                            </p>
+                                            <p class="mt-1 text-2xl font-bold text-slate-800">
+                                                {{ $this->insuranceMemberCount }}
+                                            </p>
+                                        </div>
+
+                                        <div class="rounded-xl border border-blue-200 bg-white p-3">
+                                            <p class="text-[10px] font-bold uppercase text-slate-500">
+                                                Total Coverage
+                                            </p>
+                                            <p class="mt-1 text-xl font-bold text-blue-800">
+                                                ₱{{ number_format($this->insuranceTotalCoverage, 2) }}
+                                            </p>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="rounded-xl border border-blue-200 bg-white p-3 text-xs text-slate-600">
+                                        <div class="flex justify-between">
+                                            <span>Insurance Plan</span>
+                                            <strong>{{ self::INSURANCE_PLAN ?? 'Economy/Standard' }}</strong>
+                                        </div>
+                                        <div class="mt-2 flex justify-between">
+                                            <span>Coverage per member</span>
+                                            <strong>₱400.00</strong>
+                                        </div>
+                                    </div>
+
+                                @else
+                                    <div class="rounded-xl border border-dashed border-blue-300 bg-white p-6 text-center">
+                                        <p class="text-sm font-semibold text-slate-600">
+                                            No members selected
+                                        </p>
+                                        <p class="mt-1 text-xs text-slate-400">
+                                            Select members to calculate insurance coverage.
+                                        </p>
+                                    </div>
+                                @endif
+
+                                @error('selectedMemberIds')
+                                    <p class="text-xs font-semibold text-red-600">{{ $message }}</p>
+                                @enderror
+
+                            </div>
+
+                        @else
+
+                            <div class="flex min-h-52 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+                                <p class="text-sm font-semibold text-slate-600">
+                                    Regular Disbursement
+                                </p>
+                                <p class="mt-1 max-w-xs text-xs text-slate-400">
+                                    Member selection and insurance coverage will appear here when an insurance fund is selected.
+                                </p>
+                            </div>
+
+                        @endif
+
+                        {{-- DISBURSEMENT SUMMARY --}}
+                        <div class="rounded-xl border border-slate-200 bg-white p-4">
+                            <h4 class="text-xs font-bold uppercase tracking-wide text-slate-500">
+                                Disbursement Summary
+                            </h4>
+
+                            <div class="mt-3 flex justify-between text-xs text-slate-600">
+                                <span>Available Fund</span>
+                                <strong>₱{{ number_format($availableFund, 2) }}</strong>
+                            </div>
+
+                            <div class="mt-2 flex justify-between text-xs text-slate-600">
+                                <span>Amount Out</span>
+                                <strong>₱{{ number_format((float) $amount, 2) }}</strong>
+                            </div>
+
+                            <div class="mt-3 border-t border-slate-100 pt-3">
+                                <div class="flex justify-between">
+                                    <span class="text-sm font-bold text-slate-700">
+                                        Remaining Balance
+                                    </span>
+                                    <strong class="text-base {{ ($availableFund - (float) $amount) < 0 ? 'text-red-600' : 'text-[var(--color-primary)]' }}">
+                                        ₱{{ number_format($availableFund - (float) $amount, 2) }}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
-            </div>
 
-            {{-- FOOTER --}}
-            <div class="flex flex-wrap justify-end gap-2 border-t border-slate-200 bg-slate-50 px-6 py-4">
+                {{-- FOOTER --}}
+                <div class="flex flex-wrap justify-end gap-2 border-t border-slate-200 bg-slate-50 px-6 py-4">
 
-                <button type="button"
-                    wire:click="closeModal"
-                    class="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100">
-                    Cancel
-                </button>
+                    <button type="button"
+                        wire:click="closeModal"
+                        class="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100">
+                        Cancel
+                    </button>
 
-                <button
-                    type="button"
-                    wire:loading.attr="disabled"
-                    wire:target="prepareReview,save"
-                    @disabled($this->insufficientFund)
-                    @click="
-                        if (! window.Swal) return;
-                        $wire.call('prepareReview').then((r) => {
-                            if (! r) return;
+                    <button
+                        type="button"
+                        wire:loading.attr="disabled"
+                        wire:target="prepareReview,save"
+                        @disabled($this->insufficientFund)
+                        @click="
+                            if (! window.Swal) return;
+                            $wire.call('prepareReview').then((r) => {
+                                if (! r) return;
 
-                            const row = (label, value, strong) =>
-                                '<tr>' +
-                                '<td style=\'padding:6px 10px;color:#64748b;font-size:12px;vertical-align:top;white-space:nowrap\'>' + label + '</td>' +
-                                '<td style=\'padding:6px 10px;font-size:13px;' + (strong ? 'font-weight:700;' : '') + '\'>' + value + '</td>' +
-                                '</tr>';
+                                const row = (label, value, strong) =>
+                                    '<tr>' +
+                                    '<td style=\'padding:6px 10px;color:#64748b;font-size:12px;vertical-align:top;white-space:nowrap\'>' + label + '</td>' +
+                                    '<td style=\'padding:6px 10px;font-size:13px;' + (strong ? 'font-weight:700;' : '') + '\'>' + value + '</td>' +
+                                    '</tr>';
 
-                            Swal.fire({
-                                icon: 'question',
-                                title: 'Review Disbursement',
-                                html:
-                                    '<table style=\'width:100%;text-align:left;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:8px\'>' +
-                                    row('Source Fund', r.fund, true) +
-                                    row('Available Fund', r.available, false) +
-                                    row('Amount Out', r.amount, true) +
-                                    row('Fund After', r.remaining, false) +
-                                    row('Date', r.date, false) +
-                                    row('Remarks', r.remarks, false) +
-                                    '</table>',
-                                input: 'checkbox',
-                                inputValue: 0,
-                                inputPlaceholder: 'I am sure the information above is correct.',
-                                inputValidator: (checked) => checked ? undefined : 'Please tick the box to confirm.',
-                                showCancelButton: true,
-                                confirmButtonText: 'Confirm & Save',
-                                cancelButtonText: 'Go back',
-                                showLoaderOnConfirm: true,
-                                allowOutsideClick: () => ! Swal.isLoading(),
-                                preConfirm: () => $wire.call('save', true),
+                                Swal.fire({
+                                    icon: 'question',
+                                    title: 'Review Disbursement',
+                                    html:
+                                        '<table style=\'width:100%;text-align:left;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:8px\'>' +
+                                        row('Source Fund', r.fund, true) +
+                                        row('Available Fund', r.available, false) +
+                                        row('Amount Out', r.amount, true) +
+                                        row('Fund After', r.remaining, false) +
+                                        row('Date', r.date, false) +
+                                        row('Remarks', r.remarks, false) +
+                                        '</table>',
+                                    input: 'checkbox',
+                                    inputValue: 0,
+                                    inputPlaceholder: 'I am sure the information above is correct.',
+                                    inputValidator: (checked) => checked ? undefined : 'Please tick the box to confirm.',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Confirm & Save',
+                                    cancelButtonText: 'Go back',
+                                    showLoaderOnConfirm: true,
+                                    allowOutsideClick: () => ! Swal.isLoading(),
+                                    preConfirm: () => $wire.call('save', true),
+                                });
                             });
-                        });
-                    "
-                    class="rounded-xl bg-[var(--color-primary)] px-5 py-2.5 text-sm font-bold text-white hover:bg-[var(--color-primary-mid)] disabled:cursor-not-allowed disabled:opacity-50">
-                    Save Disbursement
-                </button>
+                        "
+                        class="rounded-xl bg-[var(--color-primary)] px-5 py-2.5 text-sm font-bold text-white hover:bg-[var(--color-primary-mid)] disabled:cursor-not-allowed disabled:opacity-50">
+                        Save Disbursement
+                    </button>
 
+                </div>
             </div>
         </div>
-    </div>
-@endif
+    @endif
 
     {{-- INSURANCE MEMBER SELECTION MODAL --}}
     @if ($showInsuranceMembersModal)

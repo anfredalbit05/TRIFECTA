@@ -295,9 +295,9 @@ class Disbursements extends Component
 
     public function openCreate(): void
     {
-        if (! $this->authorizeCreateOrAbort()) {
-            return;
-        }
+        // if (! $this->authorizeCreateOrAbort()) {
+        //     return;
+        // }
 
         $this->resetForm();
         $this->disbursement_date = now()->format('Y-m-d');
@@ -405,9 +405,9 @@ class Disbursements extends Component
      */
     public function prepareReview(): ?array
     {
-        if (! $this->authorizeCreateOrAbort()) {
-            return null;
-        }
+        // if (! $this->authorizeCreateOrAbort()) {
+        //     return null;
+        // }
 
         $validated = $this->validatedInput();
 
@@ -439,9 +439,9 @@ class Disbursements extends Component
      */
     public function save(bool $confirmed = false): void
     {
-        if (! $this->authorizeCreateOrAbort()) {
-            return;
-        }
+        // if (! $this->authorizeCreateOrAbort()) {
+        //     return;
+        // }
 
         if (! $confirmed) {
             $this->dispatch('swal:error', [
