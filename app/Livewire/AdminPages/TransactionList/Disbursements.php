@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Support\Modules;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -18,6 +19,16 @@ class Disbursements extends Component
 {
     use HasTabSkeleton;
     use AuthorizesModules;
+
+    /**
+     * Fee name (lowercase) => wallets.source whose Active amounts are
+     * deducted from that fund. Commission pays out through DR wallets,
+     * Overrides through OV wallets.
+     */
+    private const WALLET_SOURCE_BY_FEE_NAME = [
+        'commission' => 'DR',
+        'overrides' => 'OV',
+    ];
 
     /** Module this component manages (Transaction List - Disbursement). */
     protected function module(): int
@@ -42,7 +53,7 @@ class Disbursements extends Component
     public string $disbursement_date = '';
 
     /* --------------------------------------------------------------------------
-    | Fee cards (top of the tab)
+    | Fund figures
     | -------------------------------------------------------------------------- */
 
     /** Completed 'MF' ledger totals keyed by FeeID (RefID = FeeID). */
@@ -68,48 +79,82 @@ class Disbursements extends Component
     }
 
     /**
-     * One card per membership fee: collected from the ledger minus what
-     * has been disbursed, so the card shows what is left in the fund.
+     * Wallet amounts deducted from a fund, keyed by FeeID: Commission takes
+     * the Active DR wallets, Overrides the Active OV wallets. Other funds 0.
+     */
+    private function walletByFee()
+    {
+        $sums = DB::table('wallets')
+            ->where('status', 'Active')
+            ->whereIn('source', array_values(self::WALLET_SOURCE_BY_FEE_NAME))
+            ->selectRaw('source, COALESCE(SUM(amount), 0) AS total')
+            ->groupBy('source')
+            ->pluck('total', 'source');
+
+        return MembershipFee::query()
+            ->get(['FeeID', 'FeeName'])
+            ->mapWithKeys(function (MembershipFee $fee) use ($sums) {
+                $source = self::WALLET_SOURCE_BY_FEE_NAME[strtolower(trim((string) $fee->FeeName))] ?? null;
+
+                return [$fee->FeeID => $source ? (float) ($sums[$source] ?? 0) : 0.0];
+            });
+    }
+
+    /**
+     * One card per membership fee: collected from the ledger minus wallet
+     * amounts (Commission / Overrides) minus disbursements.
      */
     #[Computed]
     public function feeCards()
     {
         $collected = $this->collectedByFee();
         $disbursed = $this->disbursedByFee();
+        $wallet = $this->walletByFee();
 
         return MembershipFee::query()
             ->orderBy('FeeID')
             ->get(['FeeID', 'FeeName', 'status'])
-            ->map(function (MembershipFee $fee) use ($collected, $disbursed) {
+            ->map(function (MembershipFee $fee) use ($collected, $disbursed, $wallet) {
                 $in = round((float) ($collected[$fee->FeeID] ?? 0), 2);
                 $out = round((float) ($disbursed[$fee->FeeID] ?? 0), 2);
+                $wal = round((float) ($wallet[$fee->FeeID] ?? 0), 2);
 
                 return [
                     'FeeID' => $fee->FeeID,
                     'name' => $fee->FeeName,
                     'status' => $fee->status,
                     'collected' => $in,
+                    'wallet' => $wal,
                     'disbursed' => $out,
-                    'available' => round($in - $out, 2),
+                    'available' => round($in - $wal - $out, 2),
                 ];
             });
     }
 
-    /** The "all membership fees" card: total collected minus all disbursements. */
+    /** The "all membership fees" card: collected − wallet − disbursed. */
     #[Computed]
     public function totalAvailable(): float
     {
         return round(
-            (float) $this->collectedByFee()->sum() - (float) $this->disbursedByFee()->sum(),
+            (float) $this->collectedByFee()->sum()
+                - (float) $this->walletByFee()->sum()
+                - (float) $this->disbursedByFee()->sum(),
             2
         );
     }
 
-    /** Total collected before any disbursement (shown under the total card). */
+    /** Total collected before any deduction. */
     #[Computed]
     public function totalCollected(): float
     {
         return round((float) $this->collectedByFee()->sum(), 2);
+    }
+
+    /** Total wallet amount deducted (Commission DR + Overrides OV). */
+    #[Computed]
+    public function totalWallet(): float
+    {
+        return round((float) $this->walletByFee()->sum(), 2);
     }
 
     /** Total disbursed across every fund. */
@@ -152,6 +197,7 @@ class Disbursements extends Component
     public function feeOptions()
     {
         $collected = $this->collectedByFee();
+        $wallet = $this->walletByFee();
 
         return MembershipFee::query()
             ->whereRaw("LOWER(TRIM(COALESCE(status, ''))) = ?", ['active'])
@@ -161,10 +207,11 @@ class Disbursements extends Component
                 'FeeID' => $fee->FeeID,
                 'FeeName' => $fee->FeeName,
                 'Total_Collection' => (float) ($collected[$fee->FeeID] ?? 0),
+                'Wallet' => (float) ($wallet[$fee->FeeID] ?? 0),
             ]);
     }
 
-    /** Fund balance shown in the modal: collected − disbursed. */
+    /** Fund balance shown in the modal: collected − wallet − disbursed. */
     #[Computed]
     public function selectedFund(): ?array
     {
@@ -182,8 +229,9 @@ class Disbursements extends Component
 
         return [
             'collected' => round((float) $fee['Total_Collection'], 2),
+            'wallet' => round((float) $fee['Wallet'], 2),
             'disbursed' => round($disbursed, 2),
-            'available' => round((float) $fee['Total_Collection'] - $disbursed, 2),
+            'available' => round((float) $fee['Total_Collection'] - (float) $fee['Wallet'] - $disbursed, 2),
         ];
     }
 
