@@ -84,6 +84,15 @@
                         <span>Disbursement</span>
                     </a>
                 @endif
+
+
+                @if(auth()->user()->RoleID == 1)
+                    <a href="#" class="ws-rail-link" :class="tab === 'membership-fees' ? 'is-active' : ''"
+                       @click.prevent="tab = 'membership-fees'">
+                        <span class="ws-rail-icon">▤</span>
+                        <span>Membership Fees</span>
+                    </a>
+                @endif
             </div>
 
         </aside>
@@ -108,6 +117,7 @@
                 </div>
             </template>
 
+
             @if(auth()->user()->RoleID == 1)
                 <template x-if="tab === 'disbursements'">
                     <div class="report-settings-main-card">
@@ -115,6 +125,16 @@
                     </div>
                 </template>
             @endif
+
+
+            @if(auth()->user()->RoleID == 1)
+                <template x-if="tab === 'membership-fees'">
+                    <div class="report-settings-main-card">
+                        <livewire:admin-pages.transaction-list.membership-fees lazy />
+                    </div>
+                </template>
+            @endif
+
 
         </section>
 
