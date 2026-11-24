@@ -217,18 +217,18 @@ class Members extends Component
         // and status badges reflect reality on every load.
         $this->expireLapsedActivations();
 
-        // Total users application (ALL users, regardless of role or status)
-        $totalUsersApplication = User::count();
+        // Total users application (RoleID 8, regardless of status)
+        $totalUsersApplication = User::where('RoleID', 8)->count();
 
-        // Total members not activated
+        // Total members not activated (RoleID 8 and Inactive)
         $totalMembersNotActivated = $this->scopedMembers()
             ->where('status', 'Inactive')
             ->count();
 
-        // Total members activated
+        // Total members activated (RoleID 8 and Active)
         $totalMembersActivated = $this->scopedMembers()
             ->where('status', 'Active')
-            ->count();
+    ->count();
 
         // Total members per branch (all RoleID 8 members)
         $branchMemberCounts = DB::table('branches')
