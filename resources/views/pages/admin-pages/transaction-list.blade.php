@@ -77,7 +77,7 @@
                           x-text="pendingActivations" x-cloak></span>
                 </a>
 
-                @if(auth()->user()->RoleID == 1)
+                @if(in_array(auth()->user()->RoleID, [1, 4]))
                     <a href="#" class="ws-rail-link" :class="tab === 'disbursements' ? 'is-active' : ''"
                        @click.prevent="tab = 'disbursements'">
                         <span class="ws-rail-icon">₱</span>
@@ -86,7 +86,7 @@
                 @endif
 
 
-            @if(in_array(auth()->user()->RoleID, [1, 4]))
+            @if(auth()->user()->RoleID == 1)
                 <a href="#" class="ws-rail-link" :class="tab === 'membership-fees' ? 'is-active' : ''"
                 @click.prevent="tab = 'membership-fees'">
                     <span class="ws-rail-icon">▤</span>
