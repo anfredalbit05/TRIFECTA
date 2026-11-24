@@ -217,33 +217,44 @@ class Members extends Component
         // and status badges reflect reality on every load.
         $this->expireLapsedActivations();
 
-        // Total users application (RoleID 8, regardless of status)
-        $totalUsersApplication = User::where('RoleID', 8)->count();
+// Total users application (RoleID 8, regardless of status)
+$totalUsersApplication = $this->scopedMembers()->count();
 
-        // Total members not activated (RoleID 8 and Inactive)
-        $totalMembersNotActivated = $this->scopedMembers()
-            ->where('status', 'Inactive')
-            ->count();
-
-        // Total members activated (RoleID 8 and Active)
-        $totalMembersActivated = $this->scopedMembers()
-            ->where('status', 'Active')
+// Total members not activated (RoleID 8 and Inactive)
+$totalMembersNotActivated = $this->scopedMembers()
+    ->where('status', 'Inactive')
     ->count();
 
-        // Total members per branch (all RoleID 8 members)
-        $branchMemberCounts = DB::table('branches')
-            ->leftJoin('users', function ($join) {
-                $join->on('branches.BranchID', '=', 'users.BranchID')
-                    ->where('users.RoleID', 8);
-            })
-            ->select(
-                'branches.BranchID',
-                'branches.branchName',
-                DB::raw('COUNT(users.UserID) as total_members')
-            )
-            ->groupBy('branches.BranchID', 'branches.branchName')
-            ->orderBy('branches.branchName')
-            ->get();
+// Total members activated (RoleID 8 and Active)
+$totalMembersActivated = $this->scopedMembers()
+    ->where('status', 'Active')
+    ->count();
+
+// Total members per branch, separated by activation status (RoleID 8 only)
+$branchMemberCounts = DB::table('branches')
+    ->leftJoin('users', function ($join) {
+        $join->on('branches.BranchID', '=', 'users.BranchID')
+            ->where('users.RoleID', 8);
+    })
+    ->select(
+        'branches.BranchID',
+        'branches.branchName',
+        DB::raw("
+            SUM(CASE
+                WHEN users.status = 'Active' THEN 1
+                ELSE 0
+            END) as activated_members
+        "),
+        DB::raw("
+            SUM(CASE
+                WHEN users.status = 'Inactive' THEN 1
+                ELSE 0
+            END) as not_activated_members
+        ")
+    )
+    ->groupBy('branches.BranchID', 'branches.branchName')
+    ->orderBy('branches.branchName')
+    ->get();
 
         [$dateFrom, $dateTo] = $this->parsedDateRange();
 

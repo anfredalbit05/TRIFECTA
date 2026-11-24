@@ -92,25 +92,38 @@
             </p>
         </div>
 
-        {{-- MEMBERS PER BRANCH --}}
-        @foreach ($branchMemberCounts as $branch)
-            <div
-                wire:key="branch-total-{{ $branch->BranchID }}"
-                class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm"
-            >
-                <p class="text-sm font-medium text-slate-500">
-                    {{ $branch->branchName }}
-                </p>
+{{-- MEMBERS PER BRANCH --}}
+@foreach ($branchMemberCounts as $branch)
 
-                <h3 class="text-3xl font-bold text-slate-800 mt-2">
-                    {{ number_format($branch->total_members) }}
-                </h3>
+    {{-- ACTIVATED MEMBERS --}}
+    <div
+        wire:key="branch-activated-{{ $branch->BranchID }}"
+        class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm"
+    >
+        <p class="text-sm font-medium text-slate-500">
+            {{ $branch->branchName }} Activated Members
+        </p>
 
-                <p class="text-xs text-slate-400 mt-1">
-                    Total branch members
-                </p>
-            </div>
-        @endforeach
+        <h3 class="text-3xl font-bold text-green-600 mt-2">
+            {{ number_format($branch->activated_members) }}
+        </h3>
+    </div>
+
+    {{-- NOT ACTIVATED MEMBERS --}}
+    <div
+        wire:key="branch-not-activated-{{ $branch->BranchID }}"
+        class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm"
+    >
+        <p class="text-sm font-medium text-slate-500">
+            {{ $branch->branchName }} Not Activated Members
+        </p>
+
+        <h3 class="text-3xl font-bold text-amber-600 mt-2">
+            {{ number_format($branch->not_activated_members) }}
+        </h3>
+    </div>
+
+@endforeach
 
     </div>
 
