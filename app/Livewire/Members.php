@@ -217,10 +217,20 @@ class Members extends Component
         // and status badges reflect reality on every load.
         $this->expireLapsedActivations();
 
-        // Total members across all branches
-        $totalMembers = $this->scopedMembers()->count();
+        // Total users application (ALL users, regardless of role or status)
+        $totalUsersApplication = User::count();
 
-        // Total members per branch (including branches with zero members)
+        // Total members not activated
+        $totalMembersNotActivated = $this->scopedMembers()
+            ->where('status', 'Inactive')
+            ->count();
+
+        // Total members activated
+        $totalMembersActivated = $this->scopedMembers()
+            ->where('status', 'Active')
+            ->count();
+
+        // Total members per branch (all RoleID 8 members)
         $branchMemberCounts = DB::table('branches')
             ->leftJoin('users', function ($join) {
                 $join->on('branches.BranchID', '=', 'users.BranchID')
@@ -315,7 +325,9 @@ class Members extends Component
 
         return view('livewire.admin-pages.masterlist.members', [
             'members' => $members,
-            'totalMembers' => $totalMembers,
+            'totalUsersApplication' => $totalUsersApplication,
+            'totalMembersNotActivated' => $totalMembersNotActivated,
+            'totalMembersActivated' => $totalMembersActivated,
             'branchMemberCounts' => $branchMemberCounts,
             'isWithdrawalActive' => $this->isWithdrawalActive(),
             'withdrawalWindow' => $this->withdrawalWindow(),

@@ -41,48 +41,78 @@
     {{-- SEARCH / FILTERS / REFRESH --}}
     {{-- ============================================================ --}}
 
-           {{-- ============================================================ --}}
-{{-- MEMBER TOTALS --}}
-{{-- ============================================================ --}}
+    {{-- ============================================================ --}}
+    {{-- MEMBER TOTALS --}}
+    {{-- ============================================================ --}}
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
 
-    {{-- ALL MEMBERS --}}
-    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-        <p class="text-sm font-medium text-slate-500">
-            Total Members
-        </p>
-
-        <h3 class="text-3xl font-bold text-slate-800 mt-2">
-            {{ number_format($totalMembers) }}
-        </h3>
-
-        <p class="text-xs text-slate-400 mt-1">
-            Across all branches
-        </p>
-    </div>
-
-    {{-- MEMBERS PER BRANCH --}}
-    @foreach ($branchMemberCounts as $branch)
-        <div
-            wire:key="branch-total-{{ $branch->BranchID }}"
-            class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm"
-        >
+        {{-- TOTAL USERS APPLICATION --}}
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
             <p class="text-sm font-medium text-slate-500">
-                {{ $branch->branchName }}
+                Total Users Application
             </p>
 
             <h3 class="text-3xl font-bold text-slate-800 mt-2">
-                {{ number_format($branch->total_members) }}
+                {{ number_format($totalUsersApplication) }}
             </h3>
 
             <p class="text-xs text-slate-400 mt-1">
-                Total members
+                All registered users
             </p>
         </div>
-    @endforeach
 
-</div>
+        {{-- TOTAL MEMBERS NOT ACTIVATED --}}
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <p class="text-sm font-medium text-slate-500">
+                Total Members Not Activated
+            </p>
+
+            <h3 class="text-3xl font-bold text-slate-800 mt-2">
+                {{ number_format($totalMembersNotActivated) }}
+            </h3>
+
+            <p class="text-xs text-slate-400 mt-1">
+                Inactive members
+            </p>
+        </div>
+
+        {{-- TOTAL MEMBERS ACTIVATED --}}
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <p class="text-sm font-medium text-slate-500">
+                Total Members Activated
+            </p>
+
+            <h3 class="text-3xl font-bold text-slate-800 mt-2">
+                {{ number_format($totalMembersActivated) }}
+            </h3>
+
+            <p class="text-xs text-slate-400 mt-1">
+                Active members
+            </p>
+        </div>
+
+        {{-- MEMBERS PER BRANCH --}}
+        @foreach ($branchMemberCounts as $branch)
+            <div
+                wire:key="branch-total-{{ $branch->BranchID }}"
+                class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm"
+            >
+                <p class="text-sm font-medium text-slate-500">
+                    {{ $branch->branchName }}
+                </p>
+
+                <h3 class="text-3xl font-bold text-slate-800 mt-2">
+                    {{ number_format($branch->total_members) }}
+                </h3>
+
+                <p class="text-xs text-slate-400 mt-1">
+                    Total branch members
+                </p>
+            </div>
+        @endforeach
+
+    </div>
 
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
 
