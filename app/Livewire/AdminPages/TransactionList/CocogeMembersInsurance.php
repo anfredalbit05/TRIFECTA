@@ -54,14 +54,14 @@ class CocogeMembersInsurance extends Component
      */
     public function exportExcel()
     {
-        if (! $this->canRead) {
-            $this->dispatch('swal:error', [
-                'title' => 'Not Allowed',
-                'message' => "You don't have permission to export membership insurance records.",
-            ]);
+        // if (! $this->canRead) {
+        //     $this->dispatch('swal:error', [
+        //         'title' => 'Not Allowed',
+        //         'message' => "You don't have permission to export membership insurance records.",
+        //     ]);
 
-            return;
-        }
+        //     return;
+        // }
 
         return Excel::download(
             new CocogenMembersInsuranceExport(

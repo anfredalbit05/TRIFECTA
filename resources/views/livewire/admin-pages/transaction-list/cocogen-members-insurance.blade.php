@@ -12,7 +12,7 @@
             </p>
         </div>
 
-        @if ($this->canRead)
+        {{-- @if ($this->canRead) --}}
             <button
                 type="button"
                 wire:click="exportExcel"
@@ -66,7 +66,7 @@
                     Preparing Excel...
                 </span>
             </button>
-        @endif
+        {{-- @endif --}}
     </div>
 
     {{-- FILTER BAR --}}
