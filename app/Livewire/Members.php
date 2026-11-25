@@ -650,6 +650,23 @@ $branchMemberCounts = DB::table('branches')
         $this->dispatch('open-view-member', UserID: $member->UserID);
     }
 
+    public function openBeneficiaries($id): void
+    {
+        if (! $this->canUpdate) {
+            return;
+        }
+
+        $member = $this->findScopedMember($id);
+
+        if (! $member) {
+            Log::warning('Beneficiaries: member not found.', ['UserID' => $id]);
+
+            return;
+        }
+
+        $this->dispatch('open-beneficiary-modal', UserID: $member->UserID);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Set New Password (Admin-Forced Password Reset)

@@ -21,6 +21,9 @@ class Beneficiary extends Model
         'status',
 
     ];
+     protected $table = 'beneficiaries';
+     protected $guarded = [];
+     protected $casts = ['birthdate' => 'date:Y-m-d'];
 
     public function user()
     {
