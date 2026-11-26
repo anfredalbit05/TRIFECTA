@@ -13,23 +13,23 @@
         </div>
 
         <!-- ACTIONS: YEAR FILTER (2020 - Current Year) & REFRESH -->
-        <div class="overview__actions">
+        {{-- <div class="overview__actions">
             <select wire:model.live="selectedYear" class="overview__year-select">
                 @foreach($availableYears as $year)
                     <option value="{{ $year }}">{{ $year }}</option>
                 @endforeach
-            </select>
+            </select> --}}
 
             {{-- REFRESH ANALYTICS --}}
-            <button
+            {{-- <button
                 type="button"
                 wire:click="refreshAnalytics"
                 wire:loading.attr="disabled"
                 title="Refresh Analytics"
                 class="refresh-btn"
-            >
+            > --}}
                 {{-- NORMAL STATE --}}
-                <span
+                {{-- <span
                     wire:loading.remove
                     wire:target="refreshAnalytics"
                     class="refresh-btn__icon"
@@ -46,10 +46,10 @@
                             d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6.5L20 9M18.5 15A7 7 0 0 1 6 17.5L4 15"
                         />
                     </svg>
-                </span>
+                </span> --}}
 
                 {{-- LOADING STATE --}}
-                <span
+                {{-- <span
                     wire:loading
                     wire:target="refreshAnalytics"
                     class="refresh-btn__loading"
@@ -76,7 +76,7 @@
 
                 <span class="refresh-btn__label">Refresh</span>
             </button>
-        </div>
+        </div> --}}
     </div>
 
     <!-- KPI CARDS -->
