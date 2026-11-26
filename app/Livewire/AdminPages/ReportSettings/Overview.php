@@ -131,28 +131,35 @@ class Overview extends Component
             $this->resetDatesToYear($year);
         }
 
-        // Global Financial & Report Metrics
-
-        // 1. Gross Income (all completed ledger transactions)
-        $grossIncome = Ledger::whereYear('created_at', $year)
+        // 1. Total Positive Income (all sources, excluding negative amounts)
+        $totalPositiveIncome = Ledger::whereYear('created_at', $year)
             ->where('status', 'Completed')
+            ->where('amount', '>', 0)
             ->sum('amount');
 
-        // 2. Approved Withdrawals
+        // 2. Total Negative Overrides
+        $totalOverrides = Ledger::whereYear('created_at', $year)
+            ->where('status', 'Completed')
+            ->where('Source', 'OV')
+            ->where('amount', '<', 0)
+            ->sum(DB::raw('ABS(amount)'));
+
+                    // 5. Total Disbursements
+        $totalDisbursements = DB::table('disburstments')
+            ->whereYear('created_at', $year)
+            ->sum('amount');
+
+        // 3. Gross Income = Positive Income - Negative Overrides
+        $grossIncome = $totalPositiveIncome - $totalOverrides - $totalDisbursements ;
+
+        // 4. Approved Withdrawals
         $approvedWithdrawals = DB::table('withdrawals')
             ->whereYear('created_at', $year)
             ->where('status', 'Approved')
             ->sum('amount');
 
-        // 3. Total Disbursements (all statuses)
-        $totalDisbursements = DB::table('disburstments')
-            ->whereYear('created_at', $year)
-            ->sum('amount');
-
-        // 4. Net Total Income
-        $totalIncome = $grossIncome
-            - $approvedWithdrawals
-            - $totalDisbursements;
+        // 6. Total Income = All Positive Ledger Income
+        $totalIncome = $totalPositiveIncome;
 
         // Other metrics
         $totalReportsGenerated = Ledger::whereYear('created_at', $year)->count();
