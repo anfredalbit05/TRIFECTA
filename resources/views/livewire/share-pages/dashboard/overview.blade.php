@@ -40,7 +40,7 @@
             </button>
         </div>
 
-        {{-- @if (!in_array(auth()->user()->RoleID, [4, 8]))
+        @if (!in_array(auth()->user()->RoleID, [4, 8]))
 
             @if ($isKabuhayanSpinActive)
 
@@ -57,7 +57,7 @@
                     <span class="min-w-0 flex-1">
 
                         <span class="wallet-btn-spin-title">
-                            Spin the Wheel
+                            Spin Pangkabuhayan
                         </span>
 
                         <span class="wallet-btn-spin-hint">
@@ -95,14 +95,14 @@
                     </span>
 
                     <span class="min-w-0 flex-1">
-                        Spin the Wheel is currently unavailable
+                        Spin Pangkabuhayan is currently unavailable
                     </span>
 
                 </div>
 
             @endif
 
-        @endif --}}
+        @endif
 
 
         <!-- =========================

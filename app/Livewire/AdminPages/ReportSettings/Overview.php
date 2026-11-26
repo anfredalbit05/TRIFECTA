@@ -165,12 +165,12 @@ class Overview extends Component
         $totalReportsGenerated = Ledger::whereYear('created_at', $year)->count();
         $totalSettingsCount = Setting::count();
 
-    $totalUsers = User::where('RoleID', 8)
-    ->count();
-
-    $activeAccounts = User::where('status', 1)
-        ->where('RoleID', 8)
+        $totalUsers = User::where('RoleID', 8)
         ->count();
+
+        $activeAccounts = User::where('status', 1)
+            ->where('RoleID', 8)
+            ->count();
 
         // Monthly Income Chart Data (Guarantees all 12 months for the chosen year)
         $monthlyIncome = $this->getMonthlyIncomeData($year);
