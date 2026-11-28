@@ -131,29 +131,25 @@ class Overview extends Component
             $this->resetDatesToYear($year);
         }
 
-      // 1. Total Positive Income (all sources, excluding negative amounts)
-        $totalPositiveIncome = Ledger::whereYear('created_at', $year)
-            ->where('status', 'Completed')
+        // 1. Total Positive Income (all sources, excluding negative amounts)
+        $totalPositiveIncome = Ledger::where('status', 'Completed')
             ->where('amount', '>', 0)
             ->sum('amount');
 
-        // 2. Total Negative Overrides and Direct Referral
-        $totalNegativeAdjustments = Ledger::whereYear('created_at', $year)
-            ->where('status', 'Completed')
-            ->whereIn('Source', ['OV', 'DR' , 'PF'])
+        // 2. Total Negative Overrides, Direct Referral, and PF
+        $totalNegativeAdjustments = Ledger::where('status', 'Completed')
+            ->whereIn('Source', ['OV', 'DR', 'PF'])
             ->where('amount', '<', 0)
             ->sum(DB::raw('ABS(amount)'));
 
         // 3. Total Disbursements
         $totalDisbursements = DB::table('disburstments')
-            ->whereYear('created_at', $year)
             ->sum('amount');
 
         // 4. Gross Income
         $grossIncome = $totalPositiveIncome
             - $totalNegativeAdjustments
             - $totalDisbursements;
-
 
         // 4. Approved Withdrawals
         $approvedWithdrawals = DB::table('withdrawals')

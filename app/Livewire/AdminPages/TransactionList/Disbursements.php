@@ -90,11 +90,17 @@ class Disbursements extends Component
      * Wallet amounts deducted from a fund, keyed by FeeID: Commission takes
      * the Active DR wallets, Overrides the Active OV wallets. Other funds 0.
      */
+    /**
+     * Wallet amounts deducted from a fund:
+     * Commission = Active DR wallets
+     * Overrides  = Active OV wallets
+     * FEE006     = Active PF wallets
+     */
     private function walletByFee()
     {
         $sums = DB::table('wallets')
             ->where('status', 'Active')
-            ->whereIn('source', array_values(self::WALLET_SOURCE_BY_FEE_NAME))
+            ->whereIn('source', ['DR', 'OV', 'PF'])
             ->selectRaw('source, COALESCE(SUM(amount), 0) AS total')
             ->groupBy('source')
             ->pluck('total', 'source');
@@ -102,9 +108,21 @@ class Disbursements extends Component
         return MembershipFee::query()
             ->get(['FeeID', 'FeeName'])
             ->mapWithKeys(function (MembershipFee $fee) use ($sums) {
-                $source = self::WALLET_SOURCE_BY_FEE_NAME[strtolower(trim((string) $fee->FeeName))] ?? null;
 
-                return [$fee->FeeID => $source ? (float) ($sums[$source] ?? 0) : 0.0];
+                $feeName = strtolower(trim((string) $fee->FeeName));
+
+                $source = self::WALLET_SOURCE_BY_FEE_NAME[$feeName] ?? null;
+
+                // PF wallet deduction belongs exclusively to FEE006.
+                if ($fee->FeeID === 'FEE006') {
+                    $source = 'PF';
+                }
+
+                return [
+                    $fee->FeeID => $source
+                        ? (float) ($sums[$source] ?? 0)
+                        : 0.0,
+                ];
             });
     }
 
