@@ -110,42 +110,54 @@ body{
     </div>
 
 
-    <!-- BENEFICIARY #1 -->
 
-    <div class="field" style="left:612px;top:168px;">
-        {{ $beneficiaries[0]->fullname ?? '' }}
-    </div>
+<!-- BENEFICIARY #1 -->
 
-    <div class="field" style="left:543px;top:182px;">
-        {{ isset($beneficiaries[0])
-            ? \Carbon\Carbon::parse($beneficiaries[0]->birthdate)->format('M d, Y')
-            : '' }}
-    </div>
+<div class="field"
+     style="left:612px; top:168px; width:190px; height:13px;
+            font-size:9px; line-height:13px;
+            font-weight:bold; white-space:nowrap; overflow:hidden;">
+    {{ $beneficiaries[0]->fullname ?? '' }}
+</div>
+
+<div class="field" style="left:543px;top:182px;">
+    {{ isset($beneficiaries[0])
+        ? \Carbon\Carbon::parse($beneficiaries[0]->birthdate)->format('M d, Y')
+        : '' }}
+</div>
 
 
-     <!-- BENEFICIARY #2 -->
+<!-- BENEFICIARY #2 -->
 
-    <div class="field" style="left:614px;top:199px;">
-        {{ $beneficiaries[1]->fullname ?? '' }}
-    </div>
+<div class="field"
+     style="left:614px; top:199px; width:190px; height:13px;
+            font-size:9px; line-height:13px;
+            font-weight:bold; white-space:nowrap; overflow:hidden;">
+    {{ $beneficiaries[1]->fullname ?? '' }}
+</div>
 
-    <div class="field" style="left:543px;top:215px;">
-        {{ isset($beneficiaries[1])
-            ? \Carbon\Carbon::parse($beneficiaries[1]->birthdate)->format('M d, Y')
-            : '' }}
-    </div>
+<div class="field" style="left:543px;top:215px;">
+    {{ isset($beneficiaries[1])
+        ? \Carbon\Carbon::parse($beneficiaries[1]->birthdate)->format('M d, Y')
+        : '' }}
+</div>
 
-        <!-- BENEFICIARY #3 -->
 
-    <div class="field" style="left:616px;top:238px;">
-        {{ $beneficiaries[2]->fullname ?? '' }}
-    </div>
+<!-- BENEFICIARY #3 -->
 
-    <div class="field" style="left:545px;top:254px;">
-        {{ isset($beneficiaries[2])
-            ? \Carbon\Carbon::parse($beneficiaries[2]->birthdate)->format('M d, Y')
-            : '' }}
-    </div>
+<div class="field"
+     style="left:616px; top:238px; width:190px; height:13px;
+            font-size:9px; line-height:13px;
+            font-weight:bold; white-space:nowrap; overflow:hidden;">
+    {{ $beneficiaries[2]->fullname ?? '' }}
+</div>
+
+<div class="field" style="left:545px;top:254px;">
+    {{ isset($beneficiaries[2])
+        ? \Carbon\Carbon::parse($beneficiaries[2]->birthdate)->format('M d, Y')
+        : '' }}
+</div>
+
 
 </div>
 
