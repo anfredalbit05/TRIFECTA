@@ -131,7 +131,7 @@ class Overview extends Component
             $this->resetDatesToYear($year);
         }
 
-        // 1. Total Positive Income (all sources, excluding negative amounts)
+      // 1. Total Positive Income (all sources, excluding negative amounts)
         $totalPositiveIncome = Ledger::whereYear('created_at', $year)
             ->where('status', 'Completed')
             ->where('amount', '>', 0)
@@ -140,7 +140,7 @@ class Overview extends Component
         // 2. Total Negative Overrides and Direct Referral
         $totalNegativeAdjustments = Ledger::whereYear('created_at', $year)
             ->where('status', 'Completed')
-            ->whereIn('Source', ['OV', 'DR'])
+            ->whereIn('Source', ['OV', 'DR' , 'PF'])
             ->where('amount', '<', 0)
             ->sum(DB::raw('ABS(amount)'));
 
