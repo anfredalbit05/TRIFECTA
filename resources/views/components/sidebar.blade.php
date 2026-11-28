@@ -2,7 +2,7 @@
     use Illuminate\Support\Str;
 
     $user = auth()->user();
-    $isAdmin = $user && !in_array($user->RoleID, [8, 9]); // 8 = Satellite, 9 = Satellite Admin
+    $isAdmin = $user && !in_array($user->RoleID, [8,13]); // 8 = Satellite, 9 = Satellite Admin
 
     /*
     | Satellite nav visibility:
