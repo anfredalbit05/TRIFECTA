@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 class Overview extends Component
 {
     use HasTabSkeleton;
-    public $selectedYear;
+    public $selectedYear = 2026;
 
     public array $availableYears = [];
 
@@ -131,9 +131,10 @@ class Overview extends Component
             $this->resetDatesToYear($year);
         }
 
-        // 1. Total Positive Income (all sources, excluding negative amounts)
+        // 1. Total Positive Income (all sources, excluding negative amounts and Source TX)
         $totalPositiveIncome = Ledger::where('status', 'Completed')
             ->where('amount', '>', 0)
+            ->where('Source', '!=', 'TX')
             ->sum('amount');
 
         // 2. Total Negative Overrides, Direct Referral, and PF
