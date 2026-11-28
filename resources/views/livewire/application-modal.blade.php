@@ -112,6 +112,7 @@
                                     </div>
                                     @endif
 
+                                    @if(!$isEditMode)
                                     {{-- BRANCH --}}
                                     <div>
                                         <label class="{{ $lbl }}">Branch *</label>
@@ -132,6 +133,7 @@
                                             </p>
                                         @enderror
                                     </div>
+                                    @endif
                             </div>
                         </div>
 

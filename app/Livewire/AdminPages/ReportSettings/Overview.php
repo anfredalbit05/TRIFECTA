@@ -137,20 +137,23 @@ class Overview extends Component
             ->where('amount', '>', 0)
             ->sum('amount');
 
-        // 2. Total Negative Overrides
-        $totalOverrides = Ledger::whereYear('created_at', $year)
+        // 2. Total Negative Overrides and Direct Referral
+        $totalNegativeAdjustments = Ledger::whereYear('created_at', $year)
             ->where('status', 'Completed')
-            ->where('Source', 'OV')
+            ->whereIn('Source', ['OV', 'DR'])
             ->where('amount', '<', 0)
             ->sum(DB::raw('ABS(amount)'));
 
-                    // 5. Total Disbursements
+        // 3. Total Disbursements
         $totalDisbursements = DB::table('disburstments')
             ->whereYear('created_at', $year)
             ->sum('amount');
 
-        // 3. Gross Income = Positive Income - Negative Overrides
-        $grossIncome = $totalPositiveIncome - $totalOverrides - $totalDisbursements ;
+        // 4. Gross Income
+        $grossIncome = $totalPositiveIncome
+            - $totalNegativeAdjustments
+            - $totalDisbursements;
+
 
         // 4. Approved Withdrawals
         $approvedWithdrawals = DB::table('withdrawals')

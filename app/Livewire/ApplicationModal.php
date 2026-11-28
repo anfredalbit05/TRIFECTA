@@ -229,7 +229,7 @@ class ApplicationModal extends Component
             'employment_type_id' => 'nullable|exists:employment_types,employment_type_id',
             'member_type_id' => 'nullable|exists:member_types,member_type_id',
 
-            'BranchID' => 'required|exists:branches,BranchID',
+            // 'BranchID' => 'required|exists:branches,BranchID',
 
             'address' => 'required|string|max:500',
         ] + ($this->isEditMode ? [
